@@ -20,7 +20,7 @@ func ColorOptions() []string {
 }
 
 func isTty() bool {
-	// Inpsired by the color package:
+	// Inspired by the color package:
 	// color package decides whether or not to use colors based on stdout,
 	// but it does it on import time, which is too early for us.
 	return os.Getenv("TERM") != "dumb" &&
