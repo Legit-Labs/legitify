@@ -8,7 +8,7 @@
  
 Strengthen the security posture of your GitHub organization! <br/>
 Detect and remediate misconfigurations, security and compliance issues across all your GitHub assets with ease 🔥 <br/>
- by Legit Security
+ by [Legit Security](https://www.legitsecurity.com/)
 </div>
 
 https://user-images.githubusercontent.com/74864790/178964716-825840a6-d714-4b1d-a41e-efa2728507a6.mp4
@@ -23,20 +23,12 @@ git clone git@github.com:Legit-Labs/legitify.git
 go run main.go analyze ...
 ```
 ## Requirements
-legitify requires your GitHub personal access token (PAT) to analyze your organizations successfully, which can be either provided as an argument (-t) or as an environment variable ($GITHUB_ENV). Please Note:
-Your user needs to be an admin or a member of at least one organization.
-Additionally, to get repository-related policies results, your user should have write permissions on the repositories in the organization. The following table summarizes the user role requirements:
-
-- legitify requires the following user role to operate successfully per resource:
-  | Resource                                  | Organization |Repository |
-  |-------------------------------------------|--------------|-----------|
-  | Minimal role required (partial results)   | Member       | Admin     |
-  | Full results and remediation capabilities | Owner        | Admin     |
-
-- The PAT requires the following scopes for full analysis:
+1. To get the most of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository, in which case you'll be able to see only repository-related policies results.
+2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`$GITHUB_ENV`).
+   The PAT needs the following scopes for full analysis:
   ```
   admin:org, read:enterprise, admin:org_hook, read:org, repo, read:repo_hook
-  ```  
+  ```
 See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more info.
 
 ## Usage
@@ -124,8 +116,10 @@ legitify runs the following scorecard checks:
 |Vulnerabilities|V|V|
 |Webhooks|V|V|
 
-## Custom Policies
+## Policies
 legitify comes with a set of policies in the `policies/github` directory.
+These policies are documented [here](https://legit-labs.github.io/legitify/).
+
 In addition, you can use the `--policies-path (-p)` flag to specificy a custom directory for OPA policies.
 
 ## Contribution
