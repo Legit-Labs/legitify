@@ -5,7 +5,7 @@ nav_order: 1
 ---
 
 <div align="center">
-<img src="./assets/legitify_logo.png" width="300" height="300" />
+<img src="/legitify/assets/legitify_logo.png" width="300" height="300" />
 </div>
 
 Strengthen the security posture of your GitHub organization!
