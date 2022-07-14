@@ -1,7 +1,6 @@
 <div align="center">
  
 [![golangci-lint](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_lint.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_lint.yaml)
-[![test](https://github.com/Legit-Labs/legitify/actions/workflows/test.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/test.yaml)
 [![goreleaser](https://github.com/Legit-Labs/legitify/actions/workflows/release.yml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/release.yml)
  
  <img width="250" alt="Legitify Logo" src="https://user-images.githubusercontent.com/74864790/174815311-746a0c98-9a1f-44a9-808c-035788edfd4d.png">
