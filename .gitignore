@@ -28,8 +28,6 @@ docs/_site
 docs/.jekyll-cache/
 docs/Gemfile
 docs/Gemfile.lock
-docs/policies
-docs/policies/**
 generated-docs.yaml
 .DS_Store
 docs/.DS_Store
