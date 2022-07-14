@@ -27,10 +27,10 @@ Your user needs to be an admin or a member of at least one organization.
 Additionally, to get repository-related policies results, your user should have write permissions on the repositories in the organization. The following table summarizes the user role requirements:
 
 - legitify requires the following user role to operate successfully per resource:
-  | Resource                                  | Repository | Organization |
-  |-------------------------------------------|------------|--------------|
-  | Minimal role required (partial results)   | Write      | Member       |
-  | Full results and remediation capabilities | Admin      | Owner        |
+  | Resource                                  | Organization |Repository |
+  |-------------------------------------------|--------------|-----------|
+  | Minimal role required (partial results)   | Member       | Admin     |
+  | Full results and remediation capabilities | Owner        | Admin     |
 
 - The PAT requires the following scopes for full analysis:
   ```
