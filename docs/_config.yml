@@ -1,0 +1,17 @@
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+title: Legitify
+heading_anchors: true
+
+
+# Aux links for the upper right navigation
+aux_links:
+  "<img src=\"/assets/GitHub-Mark-32px.png\">&emsp;Legitify on GitHub":
+    - "//github.com/Legit-Labs/legitify"
+
+aux_links_new_tab: true
+logo: "/assets/legit_logo.svg"
+
+footer_content: "By <a href=\"https://www.legitsecurity.com/\">Legit Security</a>"

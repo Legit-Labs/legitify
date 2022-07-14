@@ -1,0 +1,60 @@
+before:
+  hooks:
+    - go mod verify
+    - go mod tidy
+
+builds:
+  - id: legitify
+    binary: '{{ .ProjectName }}'
+    main: ./main.go
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - '-s'
+      - '-w'
+      - '-X=github.com/Legit-Labs/legitify/internal/version.Name={{ .ProjectName }}'
+      - '-X=github.com/Legit-Labs/legitify/internal/version.Version={{ .Version }}'
+      - '-X=github.com/Legit-Labs/legitify/internal/version.Commit={{ .Commit }}'
+      - '-extldflags=-static'
+    targets:
+      - 'darwin_amd64'
+      - 'darwin_arm64'
+      - 'linux_amd64'
+      - 'linux_arm64'
+      - 'windows_amd64'
+      - 'windows_arm64'
+
+dockers:
+  -
+    image_templates:
+      - 'ghcr.io/legit-labs/{{ .ProjectName }}:{{ .Major }}.{{ .Minor }}.{{ .Patch }}'
+      - 'ghcr.io/legit-labs/{{ .ProjectName }}:latest'
+    build_flag_templates:
+      - '--pull'
+      - '--label=org.opencontainers.image.created={{ .CommitTimestamp }}'
+      - '--label=org.opencontainers.image.description=Strengthen the security posture of your GitHub organization!'
+      - '--label=org.opencontainers.image.revision={{ .FullCommit }}'
+      - '--label=org.opencontainers.image.source=https://github.com/legit-labs/legitify'
+      - '--label=org.opencontainers.image.title={{ .ProjectName }}'
+      - '--label=org.opencontainers.image.version={{ .Version }}'
+
+archives:
+  - builds:
+      - legitify
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA512SUMS'
+  algorithm: 'sha512'
+
+release:
+  draft: false
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

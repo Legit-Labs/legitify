@@ -1,0 +1,24 @@
+name: Build Docs
+on:
+  push:
+    branches:
+      - main
+jobs:
+  update_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: build docs
+        run: make docs
+      - name: update docs
+        run: |
+          cp -r ./docs ..
+          git fetch origin gh-docs
+          git checkout "gh-docs"
+          rm -rf ./*
+          mv ../docs .
+          git config --global user.name "build docs workflow"
+          git add -A
+          if git commit -m "update docs"; then
+            git push
+          fi
