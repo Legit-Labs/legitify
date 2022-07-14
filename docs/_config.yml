@@ -8,10 +8,10 @@ heading_anchors: true
 
 # Aux links for the upper right navigation
 aux_links:
-  "<img src=\"/assets/GitHub-Mark-32px.png\">&emsp;Legitify on GitHub":
+  "<img src=\"/legitify/assets/GitHub-Mark-32px.png\">&emsp;Legitify on GitHub":
     - "//github.com/Legit-Labs/legitify"
 
 aux_links_new_tab: true
-logo: "/assets/legit_logo.svg"
+logo: "/legitify/assets/legit_logo.svg"
 
 footer_content: "By <a href=\"https://www.legitsecurity.com/\">Legit Security</a>"
