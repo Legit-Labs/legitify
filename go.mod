@@ -8,6 +8,7 @@ require (
 	github.com/google/go-github/v44 v44.1.0
 	github.com/iancoleman/orderedmap v0.2.0
 	github.com/mattn/go-isatty v0.0.14
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/open-policy-agent/opa v0.42.0
 	github.com/ossf/scorecard/v4 v4.4.0
 	github.com/shurcooL/githubv4 v0.0.0-20220520033151-0b4e3294ff00
@@ -57,7 +58,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/moby/buildkit v0.10.3 // indirect
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

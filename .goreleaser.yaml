@@ -1,4 +1,4 @@
-name: Version Releaser
+project_name: legitify
 
 before:
   hooks:
