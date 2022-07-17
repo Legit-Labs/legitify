@@ -12,6 +12,6 @@ aux_links:
     - "//github.com/Legit-Labs/legitify"
 
 aux_links_new_tab: true
-logo: "/legit_logo.svg"
+logo: "/assets/legit_logo.svg"
 
 footer_content: "By <a href=\"https://www.legitsecurity.com/\">Legit Security</a>"
