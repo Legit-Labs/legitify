@@ -127,5 +127,5 @@ Thank you for considering contributing to Legitify! We encourage and appreciate 
 Here are some resources to help you get started:
 - [Contribution Guide](https://github.com/Legit-Labs/legitify/blob/main/CONTRIBUTING.md)
 - [Code of Conduct](https://github.com/Legit-Labs/legitify/blob/main/CODE_OF_CONDUCT.md)
-- [Open a New Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
-- [Open a New Pull Request](https://github.com/Legit-Labs/legitify/compare)
+- [Open an Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
+- [Open an Pull Request](https://github.com/Legit-Labs/legitify/compare)
