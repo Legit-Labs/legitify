@@ -127,3 +127,8 @@ In addition, you can use the `--policies-path (-p)` flag to specificy a custom d
 
 ## Contribution
 Thank you for considering contributing to Legitify! We encourage and appreciate any kind of contribution.
+Here are some resources to help you get started:
+- [Contribution Guide](https://github.com/Legit-Labs/legitify/blob/main/CONTRIBUTING.md)
+- [Code of Conduct](https://github.com/Legit-Labs/legitify/blob/main/CODE_OF_CONDUCT.md)
+- [Open an Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
+- [Open a Pull Request](https://github.com/Legit-Labs/legitify/compare)
