@@ -1,3 +1,5 @@
+name: Version Releaser
+
 before:
   hooks:
     - go mod verify
