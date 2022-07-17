@@ -14,11 +14,11 @@ jobs:
         run: make docs
       - name: update docs
         run: |
-          cp -r ./docs ..
+          mv ./docs/policies ..
           git fetch origin gh-docs
           git checkout "gh-docs"
-          rm -rf ./*
-          mv ../docs .
+          rm -rf ./docs/policies
+          mv ../policies ./docs/
           git config --global user.name "build docs workflow"
           git add -A
           if git commit -m "update docs"; then
