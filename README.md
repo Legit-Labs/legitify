@@ -3,8 +3,7 @@
 [![golangci-lint](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_lint.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_lint.yaml)
 [![goreleaser](https://github.com/Legit-Labs/legitify/actions/workflows/release.yml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/release.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Legit-Labs/legitify)](https://goreportcard.com/report/github.com/Legit-Labs/legitify)
-[![Build](https://img.shields.io/github/workflow/status/Legit-Labs/legitify/golangci-lint)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_lint.yaml)
-[![Test](https://img.shields.io/github/workflow/status/Legit-Labs/legitify/golangci-lint?label=test)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_lint.yaml)
+[![Build and Test](https://img.shields.io/github/workflow/status/Legit-Labs/legitify/golangci-lint?label=build%20%26%20test)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_lint.yaml)
 
 
  <img width="250" alt="Legitify Logo" src="https://user-images.githubusercontent.com/74864790/174815311-746a0c98-9a1f-44a9-808c-035788edfd4d.png">
