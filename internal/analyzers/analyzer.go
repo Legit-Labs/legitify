@@ -106,7 +106,7 @@ func (a *analyzer) resolvePolicyStatus(data collectors.CollectedData, opaResult 
 	if a.skipper.ShouldSkip(data, opaResult) {
 		return PolicySkipped
 	}
-	
+
 	if !opaResult.IsViolation {
 		return PolicyPassed
 	}
