@@ -78,8 +78,8 @@ Note: `--output-format=json` must be specified to output non-default schemes.
 4. `group-by-severity` - Group the policies by their severity.
 
 ### Output Destinations
-- `--output-file (-o)` - full path of the output file (default: no output file, prints to stdout).
-- `--error-file (-e)` - full path of the error logs (default: ./errors.log).
+- `--output-file` - full path of the output file (default: no output file, prints to stdout).
+- `--error-file` - full path of the error logs (default: ./errors.log).
 
 ### Coloring
 When outputing in a human-readable format, legitify support the conventional `--color[=when]` flag, which has the following options:
