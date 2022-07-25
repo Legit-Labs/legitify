@@ -24,10 +24,10 @@ repository_not_maintained {
 
 # METADATA
 # scope: rule
-# title: Repository has too many admins
+# title: Repository Has Too Many Admins
 # description: Repository are admins highly privileged and could create great damage if being compromised, it's recommeneded to limit them to the minimum required (recommended maximum 3 admins).
 # custom:
-#   severity: MEDIUM
+#   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the repository settings page, Press "Collaborators and teams", Select the unwanted admin users, Select "Change Role"]
 #   requiredScopes: [read:org,repo]
 default repository_has_too_many_admins  = false
@@ -38,17 +38,32 @@ repository_has_too_many_admins {
 
 # METADATA
 # scope: rule
-# title: Webhook configured insecurely
-# description: Webhooks that are not configured with a token and SSL verification cannot be authenticated to validate the origin of the request and could make your software vulnerable.
+# title: Webhook Configured Without A Secret
+# description: Webhooks that are not configured with a token authenticated to validate the origin of the request and could make your software vulnerable.
 # custom:
 #   requiredEnrichers: [violatedHooks]
-#   severity: HIGH
-#   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Verify url starts with https, Press on the insecure webhook, Enable "SSL verfication" and confiure a secret , Click "Update webhook"]
+#   severity: LOW
+#   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the insecure webhook, Confiure a secret , Click "Update webhook"]
 #   requiredScopes: [read:repo_hook, repo]
-repository_webhook_is_not_secure[hook] = true {
+repository_webhook_no_secret[hook] = true {
     some index
     hook := input.hooks[index]
-    not webhookUtils.is_secure_hook(hook)
+    not webhookUtils.has_secret(hook)
+}
+
+# METADATA
+# scope: rule
+# title: Webhook Configured Without SSL
+# description: Webhooks that are not configured with SSL enabled could expose your sofware to man in the middle attacks (MITM).
+# custom:
+#   requiredEnrichers: [violatedHooks]
+#   severity: LOW
+#   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Verify url starts with https, Press on the insecure webhook, Enable "SSL verfication", Click "Update webhook"]
+#   requiredScopes: [read:repo_hook, repo]
+repository_webhook_doesnt_require_ssl[hook] = true {
+    some index
+    hook := input.hooks[index]
+    not webhookUtils.ssl_enabled(hook)
 }
 
 # METADATA
@@ -162,7 +177,24 @@ requires_branches_up_to_date_before_merge {
 default dismisses_stale_reviews = false
 dismisses_stale_reviews {
     has_branch_protection_info(input)
+    print(input.repository.name, input.repository.default_branch.branch_protection_rule)
     not input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
+}
+
+# METADATA
+# scope: rule
+# title: Default Branch Doesn't Require Code Review
+# description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository.
+# custom:
+#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
+#   severity: HIGH
+#   requiredScopes: [repo]
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+default code_review_not_required = false
+code_review_not_required {
+    has_branch_protection_info(input)
+    input.repository.default_branch.branch_protection_rule.required_approving_review_count < 1
 }
 
 # METADATA
@@ -175,8 +207,8 @@ dismisses_stale_reviews {
 #   requiredScopes: [repo]
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
-default code_review_not_required = false
-code_review_not_required {
+default code_review_by_two_members_not_required = false
+code_review_by_two_members_not_required {
     has_branch_protection_info(input)
     input.repository.default_branch.branch_protection_rule.required_approving_review_count < 2
 }
@@ -239,8 +271,8 @@ no_signed_commits {
 
 # METADATA
 # scope: rule
-# title: Default Branch Allows Dismissal Of Reviews
-# description: Users might be able to dismiss comments in a review, ignoring Pull Request comments and silently bypassing the conversation. Restrict dismissal of pull request reviews.
+# title: Default Branch Doesn't Restrict Who Can Dismiss Reviews
+# description: Any user with write access to the repository can dismiss pull-request reviews. Pull-request review contains essential information on the work that needs to be done and helps keep track of the changes. Dismissing it might cause a loss of this information and should be restricted to a limited number of users.
 # custom:
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can dismiss pull request reviews", Click "Save changes"]
 #    severity: LOW
