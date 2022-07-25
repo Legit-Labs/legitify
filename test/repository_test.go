@@ -86,7 +86,7 @@ func TestRepositoryAllowDeletion(t *testing.T) {
 
 func TestRepositoryCodeReview(t *testing.T) {
 	name := "repository should have code review required"
-	testedPolicyName := "code_review_not_required"
+	testedPolicyName := "code_review_by_two_members_not_required"
 	makeMockData := func(count int) githubcollected.Repository {
 		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
 			RequiredApprovingReviewCount: github.Int(count),
