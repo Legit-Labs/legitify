@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Default Branch Allows Dismissal Of Reviews
+title: Default Branch Doesn't Restrict Who Can Dismiss Reviews
 parent: Repository Policies
 grand_parent: Policies
 ---
 
 
-## Default Branch Allows Dismissal Of Reviews
+## Default Branch Doesn't Restrict Who Can Dismiss Reviews
 policy name: review_dismissal_allowed
 
 severity: LOW
 
 ### Description
-Users might be able to dismiss comments in a review, ignoring Pull Request comments and silently bypassing the conversation. Restrict dismissal of pull request reviews.
+Any user with write access to the repository can dismiss pull-request reviews. Pull-request review contains essential information on the work that needs to be done and helps keep track of the changes. Dismissing it might cause a loss of this information and should be restricted to a limited number of users.
 
 
 ### Remediation

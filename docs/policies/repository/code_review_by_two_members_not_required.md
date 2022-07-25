@@ -1,15 +1,15 @@
 ---
 layout: default
-title: Default Branch Doesn't Require Code Review
+title: Default Branch Doesn't Require Code Review By At Least Two Reviewers
 parent: Repository Policies
 grand_parent: Policies
 ---
 
 
-## Default Branch Doesn't Require Code Review
-policy name: code_review_not_required
+## Default Branch Doesn't Require Code Review By At Least Two Reviewers
+policy name: code_review_by_two_members_not_required
 
-severity: HIGH
+severity: MEDIUM
 
 ### Description
 In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository.
