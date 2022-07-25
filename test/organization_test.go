@@ -45,7 +45,7 @@ func TestOrganization(t *testing.T) {
 	}{
 		{
 			name:             "webhook secured",
-			policyName:       "organization_webhook_is_not_secure",
+			policyName:       "organization_webhook_no_secret",
 			shouldBeViolated: false,
 			args: organizationMockConfiguration{
 				config: map[string]interface{}{
@@ -56,7 +56,7 @@ func TestOrganization(t *testing.T) {
 		},
 		{
 			name:             "Violate webhook policy no configuration",
-			policyName:       "organization_webhook_is_not_secure",
+			policyName:       "organization_webhook_no_secret",
 			shouldBeViolated: true,
 			args: organizationMockConfiguration{
 				config: map[string]interface{}{},
@@ -64,7 +64,7 @@ func TestOrganization(t *testing.T) {
 		},
 		{
 			name:             "Violate webhook policy no secret",
-			policyName:       "organization_webhook_is_not_secure",
+			policyName:       "organization_webhook_no_secret",
 			shouldBeViolated: true,
 			args: organizationMockConfiguration{
 				config: map[string]interface{}{
@@ -74,7 +74,7 @@ func TestOrganization(t *testing.T) {
 		},
 		{
 			name:             "Violate webhook policy insecure configuration",
-			policyName:       "organization_webhook_is_not_secure",
+			policyName:       "organization_webhook_doesnt_require_ssl",
 			shouldBeViolated: true,
 			args: organizationMockConfiguration{
 				config: map[string]interface{}{
