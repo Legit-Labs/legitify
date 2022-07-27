@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
+	"github.com/Legit-Labs/legitify/internal/common/types"
 	"log"
 	"os"
 	"strings"
@@ -63,6 +64,7 @@ func toOptionsString(options []string) string {
 }
 
 var analyzeArgs args
+var parsedRepositories []types.RepositoryWithOwner
 
 func newAnalyzeCommand() *cobra.Command {
 	analyzeCmd := &cobra.Command{
@@ -131,6 +133,7 @@ func buildContext() (context.Context, error) {
 			return nil, err
 		}
 		ctx = context_utils.NewContextWithRepos(validated)
+		parsedRepositories = validated
 		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
 	} else {
 		ctx = context.Background()
@@ -142,6 +145,7 @@ func buildContext() (context.Context, error) {
 
 	return ctx, nil
 }
+
 func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	if analyzeArgs.Token == "" {
 		analyzeArgs.Token = viper.GetString(common_options.EnvToken)
@@ -183,10 +187,14 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	}
 
 	githubClient, err := github.NewClient(ctx, analyzeArgs.Token,
-		analyzeArgs.Organizations, len(analyzeArgs.Repositories) == 0)
+		analyzeArgs.Organizations, len(parsedRepositories) == 0)
 
 	if err != nil {
 		return err
+	} else if len(parsedRepositories) > 0 {
+		if err = repositoriesAnalyzable(ctx, githubClient, parsedRepositories); err != nil {
+			return err
+		}
 	}
 
 	ctx = context_utils.NewContextWithTokenScopes(ctx, githubClient.Scopes())

@@ -19,6 +19,25 @@ import (
 	"golang.org/x/net/context"
 )
 
+func IsAnalyzable(ctx context.Context, client ghclient.Client, repository types.RepositoryWithOwner) (bool, error) {
+	var repo struct {
+		Repository struct {
+			ViewerPermission githubv4.String
+		} `graphql:"repository(owner: $owner, name: $name)"`
+	}
+	variables := map[string]interface{}{
+		"name":  githubv4.String(repository.Name),
+		"owner": githubv4.String(repository.Owner),
+	}
+
+	err := client.GraphQLClient().Query(ctx, &repo, variables)
+	if err != nil {
+		return false, err
+	}
+
+	return repo.Repository.ViewerPermission == permissions.RepoRoleAdmin, nil
+}
+
 type repositoryCollector struct {
 	baseCollector
 	Client           ghclient.Client

@@ -6,8 +6,10 @@ import (
 	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/shurcooL/githubv4"
 	"github.com/spf13/cobra"
+	"sort"
 
 	"github.com/spf13/viper"
 )
@@ -69,12 +71,90 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	type repository struct {
-		repoWithOwner string
-		permission    string
+	repositories, err := getRepositories(githubClient, ctx)
+	if err != nil {
+		return err
 	}
-	var repositories []repository
 
+	if len(repositories) == 0 {
+		fmt.Printf("No repositories are associated with this PAT.\n")
+	} else {
+		fmt.Printf("Repositories:\n")
+		fmt.Printf("-------------:\n")
+		analyzable, notAnalyzable := groupByAnalyzable(repositories)
+
+		if len(analyzable) > 0 {
+			fmt.Println("Analyze available for the following repositories:")
+			for _, repo := range analyzable {
+				fmt.Printf("  - %s (%s)\n", repo.repoWithOwner, repo.permission)
+			}
+		}
+
+		if len(notAnalyzable) > 0 {
+			fmt.Println("Your permissions are NOT sufficient to analyze the following repositories:")
+			for _, repo := range notAnalyzable {
+				fmt.Printf("  - %s (%s)\n", repo.repoWithOwner, repo.permission)
+			}
+		}
+	}
+
+	return nil
+}
+
+type repository struct {
+	repoWithOwner string
+	permission    string
+}
+
+func unique(slice []repository) []repository {
+	keys := make(map[string]bool)
+	list := []repository{}
+	for _, entry := range slice {
+		key := entry.repoWithOwner
+		if _, value := keys[key]; !value {
+			keys[key] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
+func groupByAnalyzable(repositories []repository) (analyzable []repository, notAnalyzable []repository) {
+	for _, r := range repositories {
+		if r.permission == "ADMIN" {
+			analyzable = append(analyzable, r)
+		} else {
+			notAnalyzable = append(notAnalyzable, r)
+		}
+	}
+
+	sort.Slice(analyzable, func(i, j int) bool {
+		return analyzable[i].repoWithOwner < analyzable[j].repoWithOwner
+	})
+
+	sort.Slice(notAnalyzable, func(i, j int) bool {
+		return notAnalyzable[i].repoWithOwner < notAnalyzable[j].repoWithOwner
+	})
+
+	return
+}
+
+func getRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
+	r1, err := getViewerRepositories(githubClient, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	r2, err := getOrganizationRepositories(githubClient, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return unique(append(r1, r2...)), nil
+}
+
+func getViewerRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
+	var repositories []repository
 	var query struct {
 		Viewer struct {
 			Repositories struct {
@@ -94,7 +174,7 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 	for {
 		err := githubClient.GraphQLClient().Query(ctx, &query, variables)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		for _, r := range query.Viewer.Repositories.Nodes {
 			repositories = append(repositories, repository{
@@ -107,17 +187,59 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 			break
 		}
 
-		variables["$cursor"] = query.Viewer.Repositories.PageInfo.EndCursor
+		variables["cursor"] = query.Viewer.Repositories.PageInfo.EndCursor
 	}
 
-	if len(repositories) == 0 {
-		fmt.Printf("No repositories are associated with this PAT.\n")
-	} else {
-		fmt.Printf("Repositories:\n")
-		for _, repo := range repositories {
-			fmt.Printf("- %s (%s)\n", repo.repoWithOwner, repo.permission)
-		}
+	return repositories, nil
+}
+
+func getOrganizationRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
+	var repositories []repository
+	orgs := githubClient.Orgs()
+	gw := group_waiter.New()
+
+	for _, o := range orgs {
+		o := o
+		gw.Do(func() {
+			var query struct {
+				Organization struct {
+					Repositories struct {
+						PageInfo githubcollected.GitHubQLPageInfo
+						Nodes    []struct {
+							NameWithOwner    string
+							ViewerPermission string
+						}
+					} `graphql:"repositories(first: 50, after: $cursor)"`
+				} `graphql:"organization(login: $login)"`
+			}
+
+			variables := map[string]interface{}{
+				"cursor": (*githubv4.String)(nil),
+				"login":  githubv4.String(o),
+			}
+
+			for {
+				err := githubClient.GraphQLClient().Query(ctx, &query, variables)
+				if err != nil {
+					return
+				}
+
+				for _, r := range query.Organization.Repositories.Nodes {
+					repositories = append(repositories, repository{
+						repoWithOwner: r.NameWithOwner,
+						permission:    r.ViewerPermission,
+					})
+				}
+
+				if !query.Organization.Repositories.PageInfo.HasNextPage {
+					break
+				}
+
+				variables["cursor"] = query.Organization.Repositories.PageInfo.EndCursor
+			}
+		})
 	}
 
-	return nil
+	gw.Wait()
+	return repositories, nil
 }

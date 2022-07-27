@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
+	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/viper"
@@ -75,11 +77,36 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 	if len(orgs) == 0 {
 		fmt.Printf("No organizations are associated with this PAT.\n")
 	} else {
+		owner, member := groupByMembership(orgs)
 		fmt.Printf("Organizations:\n")
-		for _, org := range orgs {
-			fmt.Printf("- %s (%s)\n", *org.Login, org.Role)
+		fmt.Printf("--------------:\n")
+
+		if len(owner) > 0 {
+			fmt.Println("Analyze available for the following organizations:")
+			for _, org := range owner {
+				fmt.Printf("  - %s (%s)\n", *org.Login, org.Role)
+			}
+		}
+
+		if len(member) > 0 {
+			fmt.Println("Partial results available for the following organizations:")
+			for _, org := range member {
+				fmt.Printf("  - %s (%s)\n", *org.Login, org.Role)
+			}
 		}
 	}
 
 	return nil
+}
+
+func groupByMembership(orgs []githubcollected.ExtendedOrg) (owner []githubcollected.ExtendedOrg, member []githubcollected.ExtendedOrg) {
+	for _, o := range orgs {
+		if o.Role == permissions.OrgRoleOwner {
+			owner = append(owner, o)
+		} else {
+			member = append(member, o)
+		}
+	}
+
+	return
 }
