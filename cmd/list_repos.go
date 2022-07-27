@@ -19,7 +19,7 @@ func init() {
 var listReposArgs args
 
 func newListReposCommand() *cobra.Command {
-	listOrgsCmd := &cobra.Command{
+	listReposCmd := &cobra.Command{
 		Use:          "list-repos",
 		Short:        `List GitHub repositories associated with a PAT`,
 		RunE:         executeListReposCommand,
@@ -27,16 +27,16 @@ func newListReposCommand() *cobra.Command {
 	}
 
 	viper.AutomaticEnv()
-	flags := listOrgsCmd.Flags()
-	flags.StringVarP(&listOrgsArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
-	flags.StringVarP(&listOrgsArgs.OutputFile, common_options.ArgOutputFile, "o", "", "output file, defaults to stdout")
-	flags.StringVarP(&listOrgsArgs.ErrorFile, common_options.ArgErrorFile, "e", "error.log", "error log path")
+	flags := listReposCmd.Flags()
+	flags.StringVarP(&listReposArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
+	flags.StringVarP(&listReposArgs.OutputFile, common_options.ArgOutputFile, "o", "", "output file, defaults to stdout")
+	flags.StringVarP(&listReposArgs.ErrorFile, common_options.ArgErrorFile, "e", "error.log", "error log path")
 
-	return listOrgsCmd
+	return listReposCmd
 }
 
 func validateListReposArgs() error {
-	if err := github.IsTokenValid(listOrgsArgs.Token); err != nil {
+	if err := github.IsTokenValid(listReposArgs.Token); err != nil {
 		return err
 	}
 
@@ -44,8 +44,8 @@ func validateListReposArgs() error {
 }
 
 func executeListReposCommand(cmd *cobra.Command, _args []string) error {
-	if listOrgsArgs.Token == "" {
-		listOrgsArgs.Token = viper.GetString(common_options.EnvToken)
+	if listReposArgs.Token == "" {
+		listReposArgs.Token = viper.GetString(common_options.EnvToken)
 	}
 
 	err := validateListReposArgs()
@@ -53,18 +53,18 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	if err = setErrorFile(listOrgsArgs.ErrorFile); err != nil {
+	if err = setErrorFile(listReposArgs.ErrorFile); err != nil {
 		return err
 	}
 
-	err = setOutputFile(listOrgsArgs.OutputFile)
+	err = setOutputFile(listReposArgs.OutputFile)
 	if err != nil {
 		return err
 	}
 
 	ctx := context.Background()
 
-	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, []string{}, true)
+	githubClient, err := github.NewClient(ctx, listReposArgs.Token, []string{}, true)
 	if err != nil {
 		return err
 	}
