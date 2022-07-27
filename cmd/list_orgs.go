@@ -62,7 +62,7 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 
 	ctx := context.Background()
 
-	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, []string{})
+	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, []string{}, true)
 	if err != nil {
 		return err
 	}
