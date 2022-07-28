@@ -2,6 +2,7 @@ package context_utils
 
 import (
 	"context"
+	"github.com/Legit-Labs/legitify/internal/common/types"
 
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 )
@@ -10,10 +11,16 @@ type contextKey string
 
 const (
 	organizationKey     contextKey = "org"
+	repositoryKey       contextKey = "repo"
 	tokenScopesKey      contextKey = "tokenScopes"
 	scorecardEnabledKey contextKey = "scorecardEnabled"
 	scorecardVerboseKey contextKey = "scorecardVerbose"
 )
+
+func NewContextWithRepos(repos []types.RepositoryWithOwner) context.Context {
+	ctx := context.Background()
+	return context.WithValue(ctx, repositoryKey, repos)
+}
 
 func NewContextWithOrg(org []string) context.Context {
 	ctx := context.Background()
@@ -40,4 +47,9 @@ func GetScorecardEnabled(ctx context.Context) bool {
 func GetScorecardVerbose(ctx context.Context) bool {
 	val, ok := ctx.Value(scorecardVerboseKey).(bool)
 	return ok && val
+}
+
+func GetRepositories(ctx context.Context) ([]types.RepositoryWithOwner, bool) {
+	val, ok := ctx.Value(repositoryKey).([]types.RepositoryWithOwner)
+	return val, ok
 }

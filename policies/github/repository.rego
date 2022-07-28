@@ -177,7 +177,6 @@ requires_branches_up_to_date_before_merge {
 default dismisses_stale_reviews = false
 dismisses_stale_reviews {
     has_branch_protection_info(input)
-    print(input.repository.name, input.repository.default_branch.branch_protection_rule)
     not input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
 }
 

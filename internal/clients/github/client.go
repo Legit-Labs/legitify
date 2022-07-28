@@ -56,7 +56,7 @@ func isBadRequest(err error) bool {
 	return err.Error() == "Bad credentials"
 }
 
-func NewClient(ctx context.Context, token string, org []string) (Client, error) {
+func NewClient(ctx context.Context, token string, org []string, fillCache bool) (Client, error) {
 	if token == "" {
 		return nil, fmt.Errorf("token must be provided")
 	}
@@ -80,17 +80,24 @@ func NewClient(ctx context.Context, token string, org []string) (Client, error) 
 		rawClient:     &clientWithAcceptHeader,
 	}
 
-	// fill cache & token scopes
-	_, err := client.CollectOrganizations()
-	if err != nil && isBadRequest(err) {
-		return nil, fmt.Errorf("invalid token (make sure it's not expired or revoked)")
+	scopes, err := client.collectTokenScopes()
+	if err != nil {
+		return nil, err
 	}
+	client.scopes = scopes
 
-	if len(client.orgsCache) == 0 {
-		if len(org) != 0 {
-			return nil, fmt.Errorf("token doesn't have access to the requsted organizations")
-		} else {
-			return nil, fmt.Errorf("token doesn't have access to any organization")
+	if fillCache {
+		_, err = client.CollectOrganizations()
+		if err != nil && isBadRequest(err) {
+			return nil, fmt.Errorf("invalid token (make sure it's not expired or revoked)")
+		}
+
+		if len(client.orgsCache) == 0 {
+			if len(org) != 0 {
+				return nil, fmt.Errorf("token doesn't have access to the requsted organizations")
+			} else {
+				return nil, fmt.Errorf("token doesn't have access to any organization")
+			}
 		}
 	}
 
@@ -141,12 +148,6 @@ func (c *client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
 		return c.orgsCache, nil
 	}
 	c.cacheLock.RUnlock()
-
-	scopes, err := c.collectTokenScopes()
-	if err != nil {
-		return nil, err
-	}
-	c.scopes = scopes
 
 	realOrgs, err := c.collectOrgsList()
 	if err != nil {

@@ -42,11 +42,11 @@ func initBaseCollector(b *baseCollector, c collector) {
 	b.collector = c
 }
 
-func (c baseCollector) collectData(org githubcollected.ExtendedOrg, entity githubcollected.CollectedEntity, canonicalLink string, viewerRoles []permissions.Role) {
+func (b baseCollector) collectData(org githubcollected.ExtendedOrg, entity githubcollected.CollectedEntity, canonicalLink string, viewerRoles []permissions.Role) {
 
-	c.collectedChan <- CollectedData{
+	b.collectedChan <- CollectedData{
 		Entity:        entity,
-		Namespace:     c.Namespace(),
+		Namespace:     b.Namespace(),
 		CanonicalLink: canonicalLink,
 		Context: &collectedDataContext{
 			roles:        viewerRoles,
@@ -55,27 +55,37 @@ func (c baseCollector) collectData(org githubcollected.ExtendedOrg, entity githu
 	}
 }
 
-func (c baseCollector) totalCollectionChange(total int) {
-	c.progressChan <- CollectionMetric{
-		Namespace:             c.Namespace(),
+func (b baseCollector) collectDataWithContext(entity githubcollected.CollectedEntity, canonicalLink string, ctx CollectedDataContext) {
+
+	b.collectedChan <- CollectedData{
+		Entity:        entity,
+		Namespace:     b.Namespace(),
+		CanonicalLink: canonicalLink,
+		Context:       ctx,
+	}
+}
+
+func (b baseCollector) totalCollectionChange(total int) {
+	b.progressChan <- CollectionMetric{
+		Namespace:             b.Namespace(),
 		TotalCollectionChange: total,
 	}
 }
 
-func (c baseCollector) collectionChange(change int) {
-	c.progressChan <- CollectionMetric{
-		Namespace:        c.Namespace(),
+func (b baseCollector) collectionChange(change int) {
+	b.progressChan <- CollectionMetric{
+		Namespace:        b.Namespace(),
 		CollectionChange: change,
 	}
 }
 
-func (c baseCollector) collectionChangeByOne() {
-	c.collectionChange(1)
+func (b baseCollector) collectionChangeByOne() {
+	b.collectionChange(1)
 }
 
-func (c baseCollector) issueMissingPermissions(missingPermissions ...missingPermission) {
+func (b baseCollector) issueMissingPermissions(missingPermissions ...missingPermission) {
 	for _, p := range missingPermissions {
-		c.missingPermChan <- p
+		b.missingPermChan <- p
 	}
 }
 

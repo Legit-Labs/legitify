@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"context"
+	"fmt"
 	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
+	"github.com/Legit-Labs/legitify/internal/common/types"
 	"log"
 	"os"
 	"strings"
@@ -31,6 +34,7 @@ func init() {
 
 const (
 	argOrg          = "org"
+	argRepository   = "repo"
 	argPoliciesPath = "policies-path"
 	argNamespace    = "namespace"
 	argOutputFormat = "output-format"
@@ -42,7 +46,8 @@ const (
 
 type args struct {
 	Token         string
-	Orgs          []string
+	Organizations []string
+	Repositories  []string
 	PoliciesPath  []string
 	Namespaces    []string
 	ColorWhen     string
@@ -59,6 +64,7 @@ func toOptionsString(options []string) string {
 }
 
 var analyzeArgs args
+var parsedRepositories []types.RepositoryWithOwner
 
 func newAnalyzeCommand() *cobra.Command {
 	analyzeCmd := &cobra.Command{
@@ -76,7 +82,8 @@ func newAnalyzeCommand() *cobra.Command {
 	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
 	flags.StringVarP(&analyzeArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
-	flags.StringSliceVarP(&analyzeArgs.Orgs, argOrg, "", nil, "specific organizations to collect")
+	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
+	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
 	flags.StringVarP(&analyzeArgs.OutputFile, common_options.ArgOutputFile, "", "", "output file, defaults to stdout")
@@ -114,6 +121,31 @@ func validateAnalyzeArgs() error {
 	return nil
 }
 
+func buildContext() (context.Context, error) {
+	var ctx context.Context
+	if len(analyzeArgs.Organizations) != 0 && len(analyzeArgs.Repositories) != 0 {
+		return nil, fmt.Errorf("cannot use --org & --repo options together")
+	} else if len(analyzeArgs.Organizations) != 0 {
+		ctx = context_utils.NewContextWithOrg(analyzeArgs.Organizations)
+	} else if len(analyzeArgs.Repositories) != 0 {
+		validated, err := validateRepositories(analyzeArgs.Repositories)
+		if err != nil {
+			return nil, err
+		}
+		ctx = context_utils.NewContextWithRepos(validated)
+		parsedRepositories = validated
+		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
+	} else {
+		ctx = context.Background()
+	}
+
+	ctx = context_utils.NewContextWithScorecard(ctx,
+		IsScorecardEnabled(analyzeArgs.ScorecardWhen),
+		IsScorecardVerbose(analyzeArgs.ScorecardWhen))
+
+	return ctx, nil
+}
+
 func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	if analyzeArgs.Token == "" {
 		analyzeArgs.Token = viper.GetString(common_options.EnvToken)
@@ -145,18 +177,24 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 
 	stdErrLog := log.New(os.Stderr, "", 0)
 
-	ctx := context_utils.NewContextWithOrg(analyzeArgs.Orgs)
-	ctx = context_utils.NewContextWithScorecard(ctx,
-		IsScorecardEnabled(analyzeArgs.ScorecardWhen),
-		IsScorecardVerbose(analyzeArgs.ScorecardWhen))
+	ctx, err := buildContext()
+	if err != nil {
+		return err
+	}
 
 	if !IsScorecardEnabled(analyzeArgs.ScorecardWhen) {
 		stdErrLog.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
 	}
 
-	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Orgs)
+	githubClient, err := github.NewClient(ctx, analyzeArgs.Token,
+		analyzeArgs.Organizations, len(parsedRepositories) == 0)
+
 	if err != nil {
 		return err
+	} else if len(parsedRepositories) > 0 {
+		if err = repositoriesAnalyzable(ctx, githubClient, parsedRepositories); err != nil {
+			return err
+		}
 	}
 
 	ctx = context_utils.NewContextWithTokenScopes(ctx, githubClient.Scopes())
@@ -182,7 +220,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	enrichedDataChan := enricherManager.Enrich(analyzedDataChan)
 	outputWaiter := out.Digest(enrichedDataChan)
 
-	// Wait for progress bars to finish before outputing
+	// Wait for progress bars to finish before outputting
 	pWaiter.Wait()
 
 	// Wait for output to be digested

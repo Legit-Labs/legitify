@@ -2,10 +2,10 @@ package collectors
 
 import (
 	"fmt"
-	"log"
-
+	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
+	"log"
 
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -19,11 +19,31 @@ import (
 	"golang.org/x/net/context"
 )
 
+func IsAnalyzable(ctx context.Context, client ghclient.Client, repository types.RepositoryWithOwner) (bool, error) {
+	var repo struct {
+		Repository struct {
+			ViewerPermission githubv4.String
+		} `graphql:"repository(owner: $owner, name: $name)"`
+	}
+	variables := map[string]interface{}{
+		"name":  githubv4.String(repository.Name),
+		"owner": githubv4.String(repository.Owner),
+	}
+
+	err := client.GraphQLClient().Query(ctx, &repo, variables)
+	if err != nil {
+		return false, err
+	}
+
+	return repo.Repository.ViewerPermission == permissions.RepoRoleAdmin, nil
+}
+
 type repositoryCollector struct {
 	baseCollector
 	Client           ghclient.Client
 	Context          context.Context
 	scorecardEnabled bool
+	contextFactory   *repositoryContextFactory
 }
 
 func newRepositoryCollector(ctx context.Context, client ghclient.Client) collector {
@@ -31,6 +51,7 @@ func newRepositoryCollector(ctx context.Context, client ghclient.Client) collect
 		Client:           client,
 		Context:          ctx,
 		scorecardEnabled: context_utils.GetScorecardEnabled(ctx),
+		contextFactory:   newRepositoryContextFactory(ctx, client),
 	}
 	initBaseCollector(&c.baseCollector, c)
 	return c
@@ -49,6 +70,13 @@ type totalCountRepoQuery struct {
 }
 
 func (rc *repositoryCollector) CollectMetadata() Metadata {
+	repositories, exist := context_utils.GetRepositories(rc.Context)
+	if exist {
+		return Metadata{
+			TotalEntities: len(repositories),
+		}
+	}
+
 	gw := group_waiter.New()
 	orgs, err := rc.Client.CollectOrganizations()
 
@@ -84,6 +112,65 @@ func (rc *repositoryCollector) CollectMetadata() Metadata {
 }
 
 func (rc *repositoryCollector) Collect() subCollectorChannels {
+	repositories, exist := context_utils.GetRepositories(rc.Context)
+
+	if exist {
+		return rc.collectSpecific(repositories)
+	}
+
+	return rc.collectAll()
+}
+
+func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWithOwner) subCollectorChannels {
+	type specificRepoQuery struct {
+		RepositoryOwner struct {
+			Organization struct {
+				ViewerCanAdminister *bool
+			} `graphql:"... on Organization"`
+
+			Login      githubv4.String
+			Repository ghcollected.GitHubQLRepository `graphql:"repository(name: $name)"`
+		} `graphql:"repositoryOwner(login: $login)"`
+	}
+
+	return rc.wrappedCollection(func() {
+		gw := group_waiter.New()
+		for _, r := range repositories {
+			repo := r
+			gw.Do(func() {
+				variables := map[string]interface{}{
+					"login": githubv4.String(repo.Owner),
+					"name":  githubv4.String(repo.Name),
+				}
+
+				query := specificRepoQuery{}
+				err := rc.Client.GraphQLClient().Query(rc.Context, &query, variables)
+				if err != nil {
+					log.Println(err.Error())
+					return
+				}
+
+				var ctx *repositoryContext
+				if query.RepositoryOwner.Organization.ViewerCanAdminister != nil {
+					ctx, err = rc.contextFactory.newRepositoryContextForOrganization(repo.Owner,
+						query.RepositoryOwner.Organization.ViewerCanAdminister, &query.RepositoryOwner.Repository)
+				} else {
+					ctx, err = rc.contextFactory.newRepositoryContextForUser(repo.Owner, &query.RepositoryOwner.Repository)
+				}
+
+				if err != nil {
+					log.Println(err.Error())
+					return
+				}
+
+				rc.collectRepository(&query.RepositoryOwner.Repository, repo.Owner, ctx)
+			})
+		}
+		gw.Wait()
+	})
+}
+
+func (rc *repositoryCollector) collectAll() subCollectorChannels {
 	return rc.wrappedCollection(func() {
 		orgs, err := rc.Client.CollectOrganizations()
 
@@ -138,12 +225,7 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 			for i := range nodes {
 				node := &(nodes[i])
 				extraGw.Do(func() {
-					repo := rc.collectExtraData(org, node)
-					entityName := fullRepoName(*org.Login, repo.Repository.Name)
-					missingPermissions := rc.checkMissingPermissions(repo, entityName)
-					rc.issueMissingPermissions(missingPermissions...)
-					rc.collectData(*org, repo, repo.Repository.Url, []permissions.Role{org.Role, repo.Repository.ViewerPermission})
-					rc.collectionChangeByOne()
+					rc.collectRepository(node, *org.Login, rc.contextFactory.newRepositoryContextForExtendedOrg(org, node))
 				})
 			}
 			extraGw.Wait()
@@ -160,12 +242,22 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 	return nil
 }
 
-func (rc *repositoryCollector) collectExtraData(org *ghcollected.ExtendedOrg, repository *ghcollected.GitHubQLRepository) ghcollected.Repository {
+func (rc *repositoryCollector) collectRepository(repository *ghcollected.GitHubQLRepository, login string, context *repositoryContext) {
+	repo := rc.collectExtraData(login, repository, context)
+	entityName := fullRepoName(login, repo.Repository.Name)
+	missingPermissions := rc.checkMissingPermissions(repo, entityName)
+	rc.issueMissingPermissions(missingPermissions...)
+	rc.collectDataWithContext(repo, repo.Repository.Url, context)
+	rc.collectionChangeByOne()
+}
+
+func (rc *repositoryCollector) collectExtraData(login string,
+	repository *ghcollected.GitHubQLRepository,
+	context *repositoryContext) ghcollected.Repository {
 	var err error
 	repo := ghcollected.Repository{
 		Repository: repository,
 	}
-	login := *org.Login
 
 	repo, err = rc.getVulnerabilityAlerts(repo, login)
 	if err != nil {
@@ -183,8 +275,7 @@ func (rc *repositoryCollector) collectExtraData(org *ghcollected.ExtendedOrg, re
 		log.Printf("error getting repository collaborators for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
 
-	// free plan doesn't support branch protection unless it's a public repository
-	if !repo.Repository.IsPrivate || !org.IsFree() {
+	if context.IsBranchProtectionSupported() {
 		repo, err = rc.fixBranchProtectionInfo(repo, login)
 		if err != nil {
 			// If we can't get branch protection info, rego will ignore it (as nil)
