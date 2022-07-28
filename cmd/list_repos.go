@@ -84,7 +84,7 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 		analyzable, notAnalyzable := groupByAnalyzable(repositories)
 
 		if len(analyzable) > 0 {
-			fmt.Println("Analyze available for the following repositories:")
+			fmt.Println("Full analysis available for the following repositories:")
 			for _, repo := range analyzable {
 				fmt.Printf("  - %s (%s)\n", repo.repoWithOwner, repo.permission)
 			}

@@ -82,7 +82,7 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 		fmt.Printf("--------------:\n")
 
 		if len(owner) > 0 {
-			fmt.Println("Analyze available for the following organizations:")
+			fmt.Println("Full analysis available for the following organizations:")
 			for _, org := range owner {
 				fmt.Printf("  - %s (%s)\n", *org.Login, org.Role)
 			}
