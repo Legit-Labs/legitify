@@ -83,7 +83,7 @@ func newAnalyzeCommand() *cobra.Command {
 	flags := analyzeCmd.Flags()
 	flags.StringVarP(&analyzeArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
 	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
-	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo ossf/scorecard (owner/repo_name)")
+	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
 	flags.StringVarP(&analyzeArgs.OutputFile, common_options.ArgOutputFile, "", "", "output file, defaults to stdout")
