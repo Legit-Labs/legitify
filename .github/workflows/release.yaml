@@ -10,6 +10,8 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
+      - name: Install osslsigncode
+        run: sudo apt-get install osslsigncode=2.0-1
       - uses: 'actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b'
         with:
           fetch-depth: 0
@@ -21,6 +23,8 @@ jobs:
           registry: 'ghcr.io'
           username: '${{ github.actor }}'
           password: '${{ secrets.GITHUB_TOKEN }}'
+      - name: save keys to files
+        run: echo ${{ secrets.WINDOWS_PUBLIC_KEY_B64 }} | base64 -d > /tmp/legit_signature.crt ; echo ${{ secrets.WINDOWS_PRIVATE_KEY_B64 }} | base64 -d > /tmp/legit_signature.key
       - uses: 'goreleaser/goreleaser-action@b953231f81b8dfd023c58e0854a721e35037f28b'
         with:
           version: 'latest'
