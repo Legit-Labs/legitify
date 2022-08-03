@@ -2,7 +2,7 @@ package version
 
 import "fmt"
 
-const (
+var (
 	/* Note: name, version and commit are injected during CI. */
 	Name    = "legitify"
 	Version = "na"
