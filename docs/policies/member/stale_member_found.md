@@ -15,7 +15,7 @@ severity: LOW
 A member didn't do any action in the last 6 months. Stale members can pose a potential risk if they are compromised. Consider removing the user's access completely.
 
 ### Threat Example(s)
-Stale members are most likely not managed and monitored thus increase the possibility of being compromised.
+Stale members are most likely not managed and monitored, increasing the possibility of being compromised.
 
 
 

@@ -16,8 +16,8 @@ When using GitHub Actions, it is recommended to only use actions by Marketplace 
 
 ### Threat Example(s)
 This misconfiguration could lead to the following attack:
-1. Attacker creates a repository with a malicious custom GitHub Action
-2. Developer / Devops engineer uses this malicious action
+1. Attacker creates a repository with a tempting but malicious custom GitHub Action
+2. An innocent developer / DevOps engineer uses this malicious action
 3. The malicious action has access to the developer repository and could steal its secrets or modify its content
 
 

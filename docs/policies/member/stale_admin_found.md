@@ -15,7 +15,7 @@ severity: MEDIUM
 A member with global admin permissions without any activity in the past 6 months. Admin users are extremely powerful and common compliance standards demand keeping the number of admins to a minimum. Consider revoking this member’s admin credentials by downgrading to regular user or removing the user completely.
 
 ### Threat Example(s)
-Stale members are most likely not managed and monitored thus increase the possibility of being compromised.
+Stale admins are most likely not managed and monitored, increasing the possibility of being compromised.
 
 
 

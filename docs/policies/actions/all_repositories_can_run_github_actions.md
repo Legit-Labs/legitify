@@ -16,10 +16,11 @@ By not limiting GitHub Actions to specific repositories, every user in the organ
 
 ### Threat Example(s)
 This misconfiguration could lead to the following attack:
-1. Prerequisites: the attacker is part of your GitHub organization
-2. Create new repository in the organization
-3. Create a workflow file that reads all organization secrets and exfiltrate them
-4. Trigger the workflow
+1. Prerequisite: the attacker is part of your GitHub organization
+2. Attacker creates new repository in the organization
+3. Attacker creates a workflow file that reads all organization secrets and exfiltrate them
+4. Attacker trigger the workflow
+5. Attacker receives all organization secrets and uses them maliciously
 
 
 
