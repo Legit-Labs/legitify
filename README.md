@@ -26,7 +26,7 @@ git clone git@github.com:Legit-Labs/legitify.git
 go run main.go analyze ...
 ```
 ## Requirements
-1. To get the most of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository, in which case you'll be able to see only repository-related policies results.
+1. To get the most out of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository inside an organization, in which case you'll be able to see only repository-related policies results.
 2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`$GITHUB_ENV`).
    The PAT needs the following scopes for full analysis:
   ```
@@ -121,7 +121,7 @@ legitify runs the following scorecard checks:
 
 ## Policies
 legitify comes with a set of policies in the `policies/github` directory.
-These policies are documented [here](https://legit-labs.github.io/legitify/).
+These policies are documented [here](https://legitify.dev/policies.html).
 
 In addition, you can use the `--policies-path (-p)` flag to specificy a custom directory for OPA policies.
 

@@ -8,6 +8,10 @@ package member
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization People page, Select the unwanted owners, Using the "X members selected" - change role to member]
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
+#   threat:
+#     - "1. An organization has a permissive attitude and provides an owner role to all developers."
+#     - "2. One of the developers has decided to collaborate with an evil ransomware gang, and uses his high privileges to add a malicious external collaborator"
+#     - "3. The malicious collaborator, being an owner, has a wide range of destructive operations he can do (e.g. remove security settings)"
 default organization_has_too_many_admins = false
 organization_has_too_many_admins {
     admins := count({member | member := input.members[_]; member.is_admin == false})
@@ -25,7 +29,7 @@ organization_has_too_many_admins {
 #   requiredScopes: [admin:org]
 #   prerequisites: [enterprise]
 #   threat:
-#     - "Stale members are most likely not managed and monitored thus increase the possibility of being compromised."
+#     - "Stale members are most likely not managed and monitored, increasing the possibility of being compromised."
 stale_member_found[mem] = true {
     some member
     mem := input.members[member]
@@ -45,7 +49,7 @@ stale_member_found[mem] = true {
 #   requiredScopes: [admin:org]
 #   prerequisites: [enterprise]
 #   threat:
-#     - "Stale members are most likely not managed and monitored thus increase the possibility of being compromised."
+#     - "Stale admins are most likely not managed and monitored, increasing the possibility of being compromised."
 stale_admin_found[mem] = true {
     some member
     mem := input.members[member]
