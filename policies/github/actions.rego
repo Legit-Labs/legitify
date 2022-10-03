@@ -11,10 +11,11 @@ package actions
 #   requiredScopes: [admin:org]
 #   threat:
 #     - "This misconfiguration could lead to the following attack:"
-#     - "1. Prerequisites: the attacker is part of your GitHub organization"
-#     - "2. Create new repository in the organization"
-#     - "3. Create a workflow file that reads all organization secrets and exfiltrate them"
-#     - "4. Trigger the workflow"
+#     - "1. Prerequisite: the attacker is part of your GitHub organization"
+#     - "2. Attacker creates new repository in the organization"
+#     - "3. Attacker creates a workflow file that reads all organization secrets and exfiltrate them"
+#     - "4. Attacker trigger the workflow"
+#     - "5. Attacker receives all organization secrets and uses them maliciously"
 #   requiredScopes: [admin:org]
 default all_repositories_can_run_github_actions = false
 all_repositories_can_run_github_actions {
@@ -32,8 +33,8 @@ all_repositories_can_run_github_actions {
 #   requiredScopes: [admin:org]
 #   threat:
 #     - "This misconfiguration could lead to the following attack:"
-#     - "1. Attacker creates a repository with a malicious custom GitHub Action"
-#     - "2. Developer / Devops engineer uses this malicious action"
+#     - "1. Attacker creates a repository with a tempting but malicious custom GitHub Action"
+#     - "2. An innocent developer / DevOps engineer uses this malicious action"
 #     - "3. The malicious action has access to the developer repository and could steal its secrets or modify its content"
 default all_github_actions_are_allowed  = false
 all_github_actions_are_allowed {
