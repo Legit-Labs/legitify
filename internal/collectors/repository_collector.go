@@ -363,7 +363,7 @@ func (rc *repositoryCollector) fixBranchProtectionInfo(repository ghcollected.Re
 	branchName := *repository.Repository.DefaultBranchRef.Name
 	_, _, err := rc.Client.Client().Repositories.GetBranchProtection(rc.Context, org, repoName, branchName)
 	if err == nil {
-		log.Printf("incosistent permissions (GitHub bug): graphQL query failed, but branch protection info is available. Ignoring\n")
+		log.Printf("inconsistent permissions (GitHub bug): graphQL query failed, but branch protection info is available. Ignoring\n")
 		return repository, nil
 	}
 

@@ -94,7 +94,7 @@ func NewClient(ctx context.Context, token string, org []string, fillCache bool) 
 
 		if len(client.orgsCache) == 0 {
 			if len(org) != 0 {
-				return nil, fmt.Errorf("token doesn't have access to the requsted organizations")
+				return nil, fmt.Errorf("token doesn't have access to the requested organizations")
 			} else {
 				return nil, fmt.Errorf("token doesn't have access to any organization")
 			}
