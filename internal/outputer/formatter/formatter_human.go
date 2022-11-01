@@ -118,7 +118,7 @@ func (f *HumanFormatter) formatPolicyInfo(policyName string, policyInfo scheme.P
 func (f *HumanFormatter) formatViolation(violation scheme.Violation) {
 	f.sb.WriteString(f.sprintf(2, "%sLink to %s: %s\n", f.indent, violation.ViolationEntityType, violation.CanonicalLink))
 	if len(violation.Aux) > 0 {
-		f.sb.WriteString(f.sprintf(2, "%sAuxilary Info:\n", f.indent))
+		f.sb.WriteString(f.sprintf(2, "%sAuxiliary Info:\n", f.indent))
 		f.formatAux(violation.Aux)
 	}
 }
@@ -129,7 +129,7 @@ func (f *HumanFormatter) formatSummaryTable(output scheme.FlattenedScheme) []byt
 	output = scheme.SortSchemeByNamespace(output, false)
 	tw := tablewriter.NewWriter(&buf)
 
-	headers := []string{"#", "Namspace", "Policy", "Severity", "Passed", "Failed", "Skipped"}
+	headers := []string{"#", "Namespace", "Policy", "Severity", "Passed", "Failed", "Skipped"}
 	for i, h := range headers {
 		headers[i] = bold(h)
 	}

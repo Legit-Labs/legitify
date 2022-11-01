@@ -57,7 +57,7 @@ Currently, the following namespaces are supported:
 3. `member`       - organization members policies (e.g., "Stale Admin Found")
 4. `repository`   - repository level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
 
-By default, legitify will analyze all namespaces. You can limit only to selected ones with the `--namespace` flag, and then a comma seperated list of the selected namespaces.
+By default, legitify will analyze all namespaces. You can limit only to selected ones with the `--namespace` flag, and then a comma separated list of the selected namespaces.
 
 ## Output Options
 By default, legitify will output the results in a human-readable format.
@@ -65,12 +65,12 @@ This includes the list of policy violations listed by severity,
 as well as a summary table that is sorted by namespace.
 
 ### Output Formats
-Using the `--output-format (-f)` flag, legitify supports outputing the results in the following formats:
+Using the `--output-format (-f)` flag, legitify supports outputting the results in the following formats:
 1. `human-readable` - Human-readable text (default).
 2. `json` - Standard JSON.
 
 ### Output Schemes
-Using the `--output-scheme` flag, legitify supports outputing the results in different grouping schemes. 
+Using the `--output-scheme` flag, legitify supports outputting the results in different grouping schemes. 
 Note: `--output-format=json` must be specified to output non-default schemes.
 1. `flattened` - No grouping; A flat listing of the policies, each with its violations (default).
 2. `group-by-namespace` - Group the policies by their namespace.
@@ -82,7 +82,7 @@ Note: `--output-format=json` must be specified to output non-default schemes.
 - `--error-file` - full path of the error logs (default: ./errors.log).
 
 ### Coloring
-When outputing in a human-readable format, legitify support the conventional `--color[=when]` flag, which has the following options:
+When outputting in a human-readable format, legitify support the conventional `--color[=when]` flag, which has the following options:
 - `auto` - colored output if stdout is a terminal, uncolored otherwise (default).
 - `always` - colored output regardless of the output destination.
 - `none` - uncolored output regardless of the output destination.
@@ -123,7 +123,7 @@ legitify runs the following scorecard checks:
 legitify comes with a set of policies in the `policies/github` directory.
 These policies are documented [here](https://legitify.dev/policies.html).
 
-In addition, you can use the `--policies-path (-p)` flag to specificy a custom directory for OPA policies.
+In addition, you can use the `--policies-path (-p)` flag to specify a custom directory for OPA policies.
 
 ## Contribution
 Thank you for considering contributing to Legitify! We encourage and appreciate any kind of contribution.

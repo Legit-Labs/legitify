@@ -8,7 +8,7 @@ import data.common.webhooks as webhookUtils
 # custom:
 #   requiredEnrichers: [violatedHooks]
 #   severity: LOW
-#   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Confiure a secret , Click "Update webhook"]
+#   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Configure a secret , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
 organization_webhook_no_secret[hook] = true {
     some index
@@ -19,11 +19,11 @@ organization_webhook_no_secret[hook] = true {
 # METADATA
 # scope: rule
 # title: Webhook Configured Without SSL
-# description: Webhooks that are not configured with SSL enabled could expose your sofware to man in the middle attacks (MITM).
+# description: Webhooks that are not configured with SSL enabled could expose your software to man in the middle attacks (MITM).
 # custom:
 #   requiredEnrichers: [violatedHooks]
 #   severity: LOW
-#   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Verify url starts with https, Enable "SSL verfication" , Click "Update webhook"]
+#   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Verify url starts with https, Enable "SSL verification" , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
 organization_webhook_doesnt_require_ssl[hook] = true {
     some index
