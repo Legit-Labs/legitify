@@ -20,6 +20,7 @@ type CollectorManager interface {
 
 type manager struct {
 	collectorCreators []newCollectorFunc
+	collectors        []collector
 	ctx               context.Context
 	client            github.Client
 }
@@ -31,18 +32,22 @@ var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
 	namespace.Organization: newOrganizationCollector,
 	namespace.Member:       newMemberCollector,
 	namespace.Actions:      newActionCollector,
+	namespace.Runners:      newRunnersCollector,
 }
 
 func NewCollectorsManager(ctx context.Context, ns []namespace.Namespace, client github.Client) CollectorManager {
 	var selected []newCollectorFunc
+	var collectors []collector
 	for _, n := range ns {
 		selected = append(selected, collectorsMapping[n])
+		collectors = append(collectors, collectorsMapping[n](ctx, client))
 	}
 
 	return &manager{
 		collectorCreators: selected,
 		ctx:               ctx,
 		client:            client,
+		collectors:        collectors,
 	}
 }
 
@@ -54,8 +59,7 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 
 	gw := group_waiter.New()
 	ch := make(chan metaDataPair, len(m.collectorCreators))
-	for _, creator := range m.collectorCreators {
-		c := m.createCollector(creator)
+	for _, c := range m.collectors {
 		gw.Do(func() {
 			ch <- metaDataPair{Namespace: c.Namespace(), Metadata: c.CollectMetadata()}
 		})
@@ -90,8 +94,7 @@ func (m *manager) Collect() CollectorChannels {
 		})
 
 		gw := group_waiter.New()
-		for _, creator := range m.collectorCreators {
-			c := m.createCollector(creator)
+		for _, c := range m.collectors {
 			collectionChannels := c.Collect()
 
 			gw.Do(func() {

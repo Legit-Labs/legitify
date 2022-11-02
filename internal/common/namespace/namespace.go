@@ -9,6 +9,7 @@ const (
 	Repository   Namespace = "repository"
 	Member       Namespace = "member"
 	Actions      Namespace = "actions"
+	Runners      Namespace = "runner"
 )
 
 var All = []Namespace{
@@ -16,6 +17,7 @@ var All = []Namespace{
 	Repository,
 	Member,
 	Actions,
+	Runners,
 }
 
 func ValidateNamespaces(namespace []Namespace) error {
