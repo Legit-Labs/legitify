@@ -52,11 +52,11 @@ func (o Organization) ViolationEntityType() string {
 }
 
 func (o Organization) CanonicalLink() string {
-	return o.CanonicalLink()
+	return o.Organization.CanonicalLink()
 }
 
 func (o Organization) Name() string {
-	return o.Name()
+	return o.Organization.Name()
 }
 
 func (o Organization) ID() int64 {
