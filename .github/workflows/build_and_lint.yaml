@@ -12,12 +12,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
-      - uses: actions/setup-go@84cbf8094393cdc5fe1fe1671ff2647332956b1a # ratchet:actions/setup-go@v3
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
+      - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
           go-version: 1.17
       - name: Lint
-        uses: golangci/golangci-lint-action@537aa1903e5d359d0b27dbc19ddd22c5087f3fbc # ratchet:golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@07db5389c99593f11ad7b44463c2d4233066a9b1 # ratchet:golangci/golangci-lint-action@v3
         with:
           version: v1.29
           args: --timeout=3m
@@ -28,8 +28,8 @@ jobs:
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # ratchet:actions/checkout@v3
-      - uses: actions/setup-go@84cbf8094393cdc5fe1fe1671ff2647332956b1a # ratchet:actions/setup-go@v3
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
+      - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
           go-version: 1.18
       - name: Verify dependencies
