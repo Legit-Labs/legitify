@@ -75,10 +75,6 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 	return res
 }
 
-func (m *manager) createCollector(creator newCollectorFunc) collector {
-	return creator(m.ctx, m.client)
-}
-
 func (m *manager) Collect() CollectorChannels {
 	collectedChan := make(chan CollectedData)
 	progressChan := make(chan CollectionMetric)
