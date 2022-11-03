@@ -19,10 +19,9 @@ type CollectorManager interface {
 }
 
 type manager struct {
-	collectorCreators []newCollectorFunc
-	collectors        []collector
-	ctx               context.Context
-	client            github.Client
+	collectors []collector
+	ctx        context.Context
+	client     github.Client
 }
 
 type newCollectorFunc func(ctx context.Context, client github.Client) collector
@@ -36,18 +35,15 @@ var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
 }
 
 func NewCollectorsManager(ctx context.Context, ns []namespace.Namespace, client github.Client) CollectorManager {
-	var selected []newCollectorFunc
 	var collectors []collector
 	for _, n := range ns {
-		selected = append(selected, collectorsMapping[n])
 		collectors = append(collectors, collectorsMapping[n](ctx, client))
 	}
 
 	return &manager{
-		collectorCreators: selected,
-		ctx:               ctx,
-		client:            client,
-		collectors:        collectors,
+		ctx:        ctx,
+		client:     client,
+		collectors: collectors,
 	}
 }
 
@@ -58,7 +54,7 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 	}
 
 	gw := group_waiter.New()
-	ch := make(chan metaDataPair, len(m.collectorCreators))
+	ch := make(chan metaDataPair, len(m.collectors))
 	for _, c := range m.collectors {
 		gw.Do(func() {
 			ch <- metaDataPair{Namespace: c.Namespace(), Metadata: c.CollectMetadata()}

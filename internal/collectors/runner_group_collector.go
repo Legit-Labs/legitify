@@ -1,15 +1,15 @@
 package collectors
 
 import (
+	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
+	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/google/go-github/v44/github"
-	"log"
-
-	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
-	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"golang.org/x/net/context"
+	"log"
+	"sync"
 )
 
 type runnersCollector struct {
@@ -42,15 +42,16 @@ func (c *runnersCollector) CollectMetadata() Metadata {
 	}
 
 	totalCount := 0
+	var mutex = &sync.RWMutex{}
 	for _, org := range orgs {
 		gw.Do(func() {
 			org := org
 			result := make([]*github.RunnerGroup, 0)
 			err := ghclient.PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
-				runners, resp, err := c.client.Client().Actions.ListOrganizationRunnerGroups(c.context, *org.Login, opts)
+				runners, resp, err := c.client.Client().Actions.ListOrganizationRunnerGroups(c.context, org.Name(), opts)
 
 				if err != nil {
-					log.Printf("err collection runner groups for %s - %v", *org.Login, err)
+					log.Printf("error collecting runner groups for %s - %v", org.Name(), err)
 					return nil, err
 				}
 
@@ -59,10 +60,13 @@ func (c *runnersCollector) CollectMetadata() Metadata {
 			})
 
 			if err != nil {
-				log.Printf("Failed to collected runner group metadata for organization %s", *org.Login)
+				c.issueMissingPermissions(newMissingPermission(permissions.OrgAdmin, org.Name(),
+					"Cannot read organization runner groups", namespace.RunnerGroup))
 			} else {
-				c.cache[*org.Login] = result
+				mutex.Lock()
+				c.cache[org.Name()] = result
 				totalCount = totalCount + len(result)
+				mutex.Unlock()
 			}
 		})
 	}
@@ -83,7 +87,7 @@ func (c *runnersCollector) Collect() subCollectorChannels {
 		}
 
 		for _, org := range orgs {
-			cached := c.cache[*org.Login]
+			cached := c.cache[org.Name()]
 
 			for _, rg := range cached {
 				c.collectionChangeByOne()
@@ -93,7 +97,7 @@ func (c *runnersCollector) Collect() subCollectorChannels {
 						Organization: org,
 						RunnerGroup:  rg,
 					},
-					*org.HTMLURL,
+					org.CanonicalLink(),
 					[]permissions.Role{org.Role})
 			}
 		}

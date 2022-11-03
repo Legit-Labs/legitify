@@ -57,7 +57,7 @@ func (c *memberCollector) CollectMetadata() Metadata {
 		org := org
 		gw.Do(func() {
 			variables := map[string]interface{}{
-				"login": githubv4.String(*org.Login),
+				"login": githubv4.String(org.Name()),
 			}
 
 			totalCountQuery := totalCountMembersQuery{}
@@ -97,7 +97,7 @@ func (c *memberCollector) Collect() subCollectorChannels {
 			c.issueMissingPermissions(missingPermissions...)
 
 			for _, memberType := range []string{"member", "admin"} {
-				res := c.collectMembers(*org.Login, memberType)
+				res := c.collectMembers(org.Name(), memberType)
 				c.collectionChange(len(res))
 
 				if !hasLastActive {
@@ -117,7 +117,7 @@ func (c *memberCollector) Collect() subCollectorChannels {
 					Members:       enrichedMembers,
 					HasLastActive: hasLastActive,
 				},
-				*org.HTMLURL,
+				org.CanonicalLink(),
 				[]permissions.Role{org.Role})
 		}
 	})
@@ -130,7 +130,7 @@ func (c *memberCollector) enrichMembers(org *ghcollected.ExtendedOrg, members []
 	for _, member := range members {
 		localMember := member
 		gw.Do(func() {
-			memberLastActive, err := c.collectMemberLastActiveTime(*org.Login, *localMember.Login)
+			memberLastActive, err := c.collectMemberLastActiveTime(org.Name(), *localMember.Login)
 			if err != nil {
 				perm := c.memberMissingPermission(org, localMember)
 				c.issueMissingPermissions(perm)
@@ -210,13 +210,13 @@ const (
 )
 
 func (c *memberCollector) memberMissingPermission(org *ghcollected.ExtendedOrg, member *github.User) missingPermission {
-	entityName := fmt.Sprintf("%s (%s)", *member.Login, *org.Login)
+	entityName := fmt.Sprintf("%s (%s)", *member.Login, org.Name())
 	return newMissingPermission(permissions.OrgAdmin, entityName, orgMemberLastActiveEffect, namespace.Member)
 }
 
 func (c *memberCollector) checkOrgMissingPermissions(org ghcollected.ExtendedOrg) []missingPermission {
 	missingPermissions := make([]missingPermission, 0)
-	entityName := *org.Login
+	entityName := org.Name()
 
 	if org.Plan == nil {
 		perm := newMissingPermission(permissions.OrgRead, entityName, orgInfoEffect, namespace.Organization)

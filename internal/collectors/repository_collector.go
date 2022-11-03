@@ -90,7 +90,7 @@ func (rc *repositoryCollector) CollectMetadata() Metadata {
 		org := org
 		gw.Do(func() {
 			variables := map[string]interface{}{
-				"login": githubv4.String(*org.Login),
+				"login": githubv4.String(org.Name()),
 			}
 
 			totalCountQuery := totalCountRepoQuery{}
@@ -206,7 +206,7 @@ type repoQuery struct {
 
 func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg) error {
 	variables := map[string]interface{}{
-		"login":            githubv4.String(*org.Login),
+		"login":            githubv4.String(org.Name()),
 		"repositoryCursor": (*githubv4.String)(nil),
 	}
 
@@ -225,7 +225,7 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 			for i := range nodes {
 				node := &(nodes[i])
 				extraGw.Do(func() {
-					rc.collectRepository(node, *org.Login, rc.contextFactory.newRepositoryContextForExtendedOrg(org, node))
+					rc.collectRepository(node, org.Name(), rc.contextFactory.newRepositoryContextForExtendedOrg(org, node))
 				})
 			}
 			extraGw.Wait()
