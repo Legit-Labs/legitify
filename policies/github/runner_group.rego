@@ -19,6 +19,11 @@ package runner_group
 #     - "Press Actions ➝ Runner groups"
 #     - "Select the violating repository"
 #     - "Uncheck Allow public repositories"
+#   threat:
+#     - "Hosted runner are usually part of the organization private network and can be easly misconfigured."
+#     - "If the hosted runner is insecurly configured, any GitHub user could:"
+#     - "1. Create a workflow that runs on the public hosted runner"
+#     - "2. Exploit the misconfiguations to execute code inside the private network"
 default runner_group_can_be_used_by_public_repositories = false
 runner_group_can_be_used_by_public_repositories {
     input.runner_group.allows_public_repositories == true
