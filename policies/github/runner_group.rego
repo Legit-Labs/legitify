@@ -19,7 +19,7 @@ package runner_group
 #     - "Press Actions ➝ Runner groups"
 #     - "Select the violating repository"
 #     - "Uncheck Allow public repositories"
-default public_repos_can_user_runner_group = false
-public_repos_can_user_runner_group {
+default runner_group_can_be_used_by_public_repositories = false
+runner_group_can_be_used_by_public_repositories {
     input.runner_group.allows_public_repositories == true
 }
