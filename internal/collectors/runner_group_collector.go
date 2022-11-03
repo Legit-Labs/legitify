@@ -30,7 +30,7 @@ func newRunnersCollector(ctx context.Context, client ghclient.Client) collector 
 }
 
 func (c *runnersCollector) Namespace() namespace.Namespace {
-	return namespace.Runners
+	return namespace.RunnerGroup
 }
 
 func (c *runnersCollector) CollectMetadata() Metadata {

@@ -32,7 +32,7 @@ var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
 	namespace.Organization: newOrganizationCollector,
 	namespace.Member:       newMemberCollector,
 	namespace.Actions:      newActionCollector,
-	namespace.Runners:      newRunnersCollector,
+	namespace.RunnerGroup:  newRunnersCollector,
 }
 
 func NewCollectorsManager(ctx context.Context, ns []namespace.Namespace, client github.Client) CollectorManager {

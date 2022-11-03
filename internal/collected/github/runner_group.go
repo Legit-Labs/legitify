@@ -11,7 +11,7 @@ type RunnerGroup struct {
 }
 
 func (o RunnerGroup) ViolationEntityType() string {
-	return "runner group"
+	return "runners group"
 }
 
 func (o RunnerGroup) CanonicalLink() string {
