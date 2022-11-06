@@ -46,5 +46,5 @@ func TestPoliciesBundle(t *testing.T) {
 	count, err := countBundles()
 
 	require.Nilf(t, err, "counting files: %v", err)
-	require.Equal(t, count, 5, "Expecting 5 files in bundle")
+	require.Equal(t, count, 6, "Expecting 6 files in bundle")
 }

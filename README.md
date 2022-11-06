@@ -32,7 +32,8 @@ go run main.go analyze ...
   ```
   admin:org, read:enterprise, admin:org_hook, read:org, repo, read:repo_hook
   ```
-See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more info.
+See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+or [Introducing fine-grained personal access tokens](https://github.blog/changelog/2022-10-18-introducing-fine-grained-personal-access-tokens/) for more information
 
 ## Usage
 ```
@@ -56,6 +57,7 @@ Currently, the following namespaces are supported:
 2. `actions`      - organization GitHub Actions policies (e.g., "GitHub Actions Runs Are Not Limited To Verified Actions")
 3. `member`       - organization members policies (e.g., "Stale Admin Found")
 4. `repository`   - repository level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
+5. `runner_group` - runner group policies (e.g, "runner can be used by public repositories")
 
 By default, legitify will analyze all namespaces. You can limit only to selected ones with the `--namespace` flag, and then a comma separated list of the selected namespaces.
 

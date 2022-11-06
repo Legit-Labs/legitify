@@ -59,10 +59,10 @@ func (c *actionCollector) Collect() subCollectorChannels {
 		c.totalCollectionChange(len(orgs))
 
 		for _, org := range orgs {
-			actionsData, _, err := c.client.Client().Organizations.GetActionsPermissions(c.context, *org.Login)
+			actionsData, _, err := c.client.Client().Organizations.GetActionsPermissions(c.context, org.Name())
 
 			if err != nil {
-				entityName := fmt.Sprintf("%s/%s", namespace.Organization, *org.Login)
+				entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
 				perm := newMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
 				c.issueMissingPermissions(perm)
 			}
@@ -74,7 +74,7 @@ func (c *actionCollector) Collect() subCollectorChannels {
 					Organization:       org,
 					ActionsPermissions: actionsData,
 				},
-				*org.HTMLURL,
+				org.CanonicalLink(),
 				[]permissions.Role{org.Role})
 		}
 	})

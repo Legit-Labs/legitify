@@ -80,17 +80,17 @@ func (c *organizationCollector) Collect() subCollectorChannels {
 }
 
 func (c *organizationCollector) collectExtraData(org *ghcollected.ExtendedOrg) ghcollected.Organization {
-	samlEnabled, err := c.collectOrgSamlData(*org.Login)
+	samlEnabled, err := c.collectOrgSamlData(org.Name())
 
 	if err != nil {
 		samlEnabled = nil
-		log.Printf("failed to collect saml data for %s, %s", *org.Login, err)
+		log.Printf("failed to collect saml data for %s, %s", org.Name(), err)
 	}
 
-	hooks, err := c.collectOrgWebhooks(*org.Login)
+	hooks, err := c.collectOrgWebhooks(org.Name())
 	if err != nil {
 		hooks = nil
-		log.Printf("failed to collect webhooks data for %s, %s", *org.Login, err)
+		log.Printf("failed to collect webhooks data for %s, %s", org.Name(), err)
 	}
 
 	return ghcollected.Organization{

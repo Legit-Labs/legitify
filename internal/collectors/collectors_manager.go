@@ -19,9 +19,9 @@ type CollectorManager interface {
 }
 
 type manager struct {
-	collectorCreators []newCollectorFunc
-	ctx               context.Context
-	client            github.Client
+	collectors []collector
+	ctx        context.Context
+	client     github.Client
 }
 
 type newCollectorFunc func(ctx context.Context, client github.Client) collector
@@ -31,18 +31,19 @@ var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
 	namespace.Organization: newOrganizationCollector,
 	namespace.Member:       newMemberCollector,
 	namespace.Actions:      newActionCollector,
+	namespace.RunnerGroup:  newRunnersCollector,
 }
 
 func NewCollectorsManager(ctx context.Context, ns []namespace.Namespace, client github.Client) CollectorManager {
-	var selected []newCollectorFunc
+	var collectors []collector
 	for _, n := range ns {
-		selected = append(selected, collectorsMapping[n])
+		collectors = append(collectors, collectorsMapping[n](ctx, client))
 	}
 
 	return &manager{
-		collectorCreators: selected,
-		ctx:               ctx,
-		client:            client,
+		ctx:        ctx,
+		client:     client,
+		collectors: collectors,
 	}
 }
 
@@ -53,9 +54,8 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 	}
 
 	gw := group_waiter.New()
-	ch := make(chan metaDataPair, len(m.collectorCreators))
-	for _, creator := range m.collectorCreators {
-		c := m.createCollector(creator)
+	ch := make(chan metaDataPair, len(m.collectors))
+	for _, c := range m.collectors {
 		gw.Do(func() {
 			ch <- metaDataPair{Namespace: c.Namespace(), Metadata: c.CollectMetadata()}
 		})
@@ -69,10 +69,6 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 	}
 
 	return res
-}
-
-func (m *manager) createCollector(creator newCollectorFunc) collector {
-	return creator(m.ctx, m.client)
 }
 
 func (m *manager) Collect() CollectorChannels {
@@ -90,8 +86,7 @@ func (m *manager) Collect() CollectorChannels {
 		})
 
 		gw := group_waiter.New()
-		for _, creator := range m.collectorCreators {
-			c := m.createCollector(creator)
+		for _, c := range m.collectors {
 			collectionChannels := c.Collect()
 
 			gw.Do(func() {

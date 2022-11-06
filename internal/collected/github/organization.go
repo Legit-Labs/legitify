@@ -16,6 +16,14 @@ func NewExtendedOrg(org *github.Organization, role permissions.OrganizationRole)
 	return ExtendedOrg{*org, role}
 }
 
+func (e ExtendedOrg) CanonicalLink() string {
+	return e.GetHTMLURL()
+}
+
+func (e ExtendedOrg) Name() string {
+	return *e.Login
+}
+
 func (e ExtendedOrg) IsEnterprise() bool {
 	const orgPlanEnterprise = "enterprise"
 	if e.Plan == nil {
@@ -44,11 +52,11 @@ func (o Organization) ViolationEntityType() string {
 }
 
 func (o Organization) CanonicalLink() string {
-	return *o.Organization.HTMLURL
+	return o.Organization.CanonicalLink()
 }
 
 func (o Organization) Name() string {
-	return *o.Organization.Login
+	return o.Organization.Name()
 }
 
 func (o Organization) ID() int64 {
