@@ -7,5 +7,6 @@ const (
 )
 
 const (
-	EnvToken = "github_token"
+	EnvToken          = "github_token"
+	EnvGitHubEndpoint = "github_endpoint"
 )
