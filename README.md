@@ -32,8 +32,7 @@ go run main.go analyze ...
   ```
   admin:org, read:enterprise, admin:org_hook, read:org, repo, read:repo_hook
   ```
-See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
-or [Introducing fine-grained personal access tokens](https://github.blog/changelog/2022-10-18-introducing-fine-grained-personal-access-tokens/) for more information
+See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information
 
 ## Usage
 ```
