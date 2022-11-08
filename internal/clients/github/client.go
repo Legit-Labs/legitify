@@ -43,6 +43,8 @@ type client struct {
 func IsTokenValid(token string) error {
 	if token == "" {
 		return fmt.Errorf("missing token")
+	} else if strings.HasPrefix(token, "github_pat_") {
+		return fmt.Errorf("GitHub fine-grained tokens are not supported at this moment, please use classic PAT")
 	} else if len(token) != 40 {
 		return fmt.Errorf("GitHub token seems invalid (should have 40 characters)")
 	} else if !strings.HasPrefix(token, "ghp_") {
