@@ -56,6 +56,7 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 	gw := group_waiter.New()
 	ch := make(chan metaDataPair, len(m.collectors))
 	for _, c := range m.collectors {
+		c := c
 		gw.Do(func() {
 			ch <- metaDataPair{Namespace: c.Namespace(), Metadata: c.CollectMetadata()}
 		})
