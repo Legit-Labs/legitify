@@ -56,8 +56,12 @@ func IsTokenValid(token string) error {
 	return nil
 }
 
-func getGitHubEnterpriseGraphURL() string {
+func getGitHubGraphURL() string {
 	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
+	if githubEndpoint == "" {
+		return "https://api.github.com/graphql"
+	}
+	
 	githubEndpoint = strings.TrimRight(githubEndpoint, "/")
 	return githubEndpoint + "/api/graphql"
 }
@@ -95,7 +99,7 @@ func NewClient(ctx context.Context, token string, org []string, fillCache bool) 
 	if githubEndpoint == "" {
 		graphQLClient = githubv4.NewClient(&clientWithAcceptHeader)
 	} else {
-		graphQLClient = githubv4.NewEnterpriseClient(getGitHubEnterpriseGraphURL(), &clientWithAcceptHeader)
+		graphQLClient = githubv4.NewEnterpriseClient(getGitHubGraphURL(), &clientWithAcceptHeader)
 	}
 
 	client := &client{
@@ -243,12 +247,7 @@ func (c *client) getRole(orgName string) (permissions.OrganizationRole, error) {
 }
 
 func (c *client) collectTokenScopes() (permissions.TokenScopes, error) {
-	graphQLUrl := "https://api.github.com/graphql"
-	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
-	if githubEndpoint != "" {
-		graphQLUrl = getGitHubEnterpriseGraphURL()
-	}
-
+	graphQLUrl := getGitHubGraphURL()
 	var buf bytes.Buffer
 	resp, err := c.rawClient.Post(graphQLUrl, "application/json", &buf)
 	if err != nil {
