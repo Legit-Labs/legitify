@@ -3,12 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/Legit-Labs/legitify/cmd/common_options"
-	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
-	"github.com/Legit-Labs/legitify/internal/common/types"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/Legit-Labs/legitify/cmd/common_options"
+	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
+	"github.com/Legit-Labs/legitify/internal/common/types"
 
 	"github.com/Legit-Labs/legitify/internal/opa"
 
@@ -186,6 +187,10 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		stdErrLog.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
 	}
 
+	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
+	if githubEndpoint != "" {
+		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", githubEndpoint)
+	}
 	githubClient, err := github.NewClient(ctx, analyzeArgs.Token,
 		analyzeArgs.Organizations, len(parsedRepositories) == 0)
 

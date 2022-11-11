@@ -9,8 +9,10 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Legit-Labs/legitify/cmd/common_options"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
+	"github.com/spf13/viper"
 
 	"github.com/google/go-github/v44/github"
 	gh "github.com/google/go-github/v44/github"
@@ -54,6 +56,16 @@ func IsTokenValid(token string) error {
 	return nil
 }
 
+func getGitHubGraphURL() string {
+	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
+	if githubEndpoint == "" {
+		return "https://api.github.com/graphql"
+	}
+	
+	githubEndpoint = strings.TrimRight(githubEndpoint, "/")
+	return githubEndpoint + "/api/graphql"
+}
+
 func isBadRequest(err error) bool {
 	return err.Error() == "Bad credentials"
 }
@@ -68,11 +80,27 @@ func NewClient(ctx context.Context, token string, org []string, fillCache bool) 
 	)
 
 	tc := oauth2.NewClient(ctx, ts)
-	ghClient := gh.NewClient(tc)
+	var ghClient *gh.Client
+	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
+	if githubEndpoint == "" {
+		ghClient = gh.NewClient(tc)
+	} else {
+		var err error
+		ghClient, err = gh.NewEnterpriseClient(githubEndpoint, githubEndpoint, tc)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	acceptHeader := experimentalApiAcceptHeader
 	clientWithAcceptHeader := NewClientWithAcceptHeader(tc.Transport, &acceptHeader)
-	graphQLClient := githubv4.NewClient(&clientWithAcceptHeader)
+
+	var graphQLClient *githubv4.Client
+	if githubEndpoint == "" {
+		graphQLClient = githubv4.NewClient(&clientWithAcceptHeader)
+	} else {
+		graphQLClient = githubv4.NewEnterpriseClient(getGitHubGraphURL(), &clientWithAcceptHeader)
+	}
 
 	client := &client{
 		client:        ghClient,
@@ -219,7 +247,7 @@ func (c *client) getRole(orgName string) (permissions.OrganizationRole, error) {
 }
 
 func (c *client) collectTokenScopes() (permissions.TokenScopes, error) {
-	graphQLUrl := "https://api.github.com/graphql"
+	graphQLUrl := getGitHubGraphURL()
 	var buf bytes.Buffer
 	resp, err := c.rawClient.Post(graphQLUrl, "application/json", &buf)
 	if err != nil {

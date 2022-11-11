@@ -50,6 +50,14 @@ GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespaces organiza
 ```
 The above command will test organization and member policies against org1 and org2.
 
+## GitHub Enterprise Support
+You can run legitify against a GitHub Enterprise instance if you set the endpoint URL in the environment variable ``GITHUB_ENDPOINT``:
+
+```sh
+export GITHUB_ENDPOINT="https://github.example.com/"
+GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespaces organization,member
+```
+
 ## Namespaces
 Namespaces in legitify are resources that are collected and run against the policies.
 Currently, the following namespaces are supported:
