@@ -33,8 +33,8 @@ func CloneHeader(in http.Header) http.Header {
 	return out
 }
 
-func NewClientWithAcceptHeader(base http.RoundTripper, acceptHeader *string) http.Client {
-	return http.Client{Transport: &transport{
+func NewClientWithAcceptHeader(base http.RoundTripper, acceptHeader *string) *http.Client {
+	return &http.Client{Transport: &transport{
 		AcceptHeader: acceptHeader,
 		Base:         base,
 	}}

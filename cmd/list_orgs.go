@@ -3,6 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -36,10 +39,6 @@ func newListOrgsCommand() *cobra.Command {
 }
 
 func validateListOrgsArgs() error {
-	if err := github.IsTokenValid(listOrgsArgs.Token); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -62,11 +61,15 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
+	stdErrLog := log.New(os.Stderr, "", 0)
 	ctx := context.Background()
-
-	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, []string{}, true)
+	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
+	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, githubEndpoint, []string{}, true)
 	if err != nil {
 		return err
+	}
+	if !githubClient.IsGithubCloud() {
+		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", githubEndpoint)
 	}
 
 	orgs, err := githubClient.CollectOrganizations()

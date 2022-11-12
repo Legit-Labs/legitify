@@ -3,13 +3,16 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"sort"
+
 	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/shurcooL/githubv4"
 	"github.com/spf13/cobra"
-	"sort"
 
 	"github.com/spf13/viper"
 )
@@ -38,10 +41,6 @@ func newListReposCommand() *cobra.Command {
 }
 
 func validateListReposArgs() error {
-	if err := github.IsTokenValid(listReposArgs.Token); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -65,10 +64,15 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 	}
 
 	ctx := context.Background()
+	stdErrLog := log.New(os.Stderr, "", 0)
+	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
 
-	githubClient, err := github.NewClient(ctx, listReposArgs.Token, []string{}, true)
+	githubClient, err := github.NewClient(ctx, listReposArgs.Token, githubEndpoint, []string{}, true)
 	if err != nil {
 		return err
+	}
+	if !githubClient.IsGithubCloud() {
+		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", githubEndpoint)
 	}
 
 	repositories, err := getRepositories(githubClient, ctx)

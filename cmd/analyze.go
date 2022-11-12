@@ -99,10 +99,6 @@ func newAnalyzeCommand() *cobra.Command {
 }
 
 func validateAnalyzeArgs() error {
-	if err := github.IsTokenValid(analyzeArgs.Token); err != nil {
-		return err
-	}
-
 	if err := namespace.ValidateNamespaces(analyzeArgs.Namespaces); err != nil {
 		return err
 	}
@@ -188,11 +184,11 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	}
 
 	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
-	if githubEndpoint != "" {
+	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, githubEndpoint,
+		analyzeArgs.Organizations, len(parsedRepositories) == 0)
+	if !githubClient.IsGithubCloud() {
 		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", githubEndpoint)
 	}
-	githubClient, err := github.NewClient(ctx, analyzeArgs.Token,
-		analyzeArgs.Organizations, len(parsedRepositories) == 0)
 
 	if err != nil {
 		return err
