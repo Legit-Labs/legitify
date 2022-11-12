@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 
@@ -45,21 +44,6 @@ const (
 	argFailedOnly   = "failed-only"
 )
 
-type args struct {
-	Token         string
-	Organizations []string
-	Repositories  []string
-	PoliciesPath  []string
-	Namespaces    []string
-	ColorWhen     string
-	OutputFile    string
-	ErrorFile     string
-	OutputFormat  string
-	OutputScheme  string
-	ScorecardWhen string
-	FailedOnly    bool
-}
-
 func toOptionsString(options []string) string {
 	return "[" + strings.Join(options, "/") + "]"
 }
@@ -82,13 +66,12 @@ func newAnalyzeCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
-	flags.StringVarP(&analyzeArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
+	analyzeArgs.AddCommonOptions(flags)
+
 	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
-	flags.StringVarP(&analyzeArgs.OutputFile, common_options.ArgOutputFile, "", "", "output file, defaults to stdout")
-	flags.StringVarP(&analyzeArgs.ErrorFile, common_options.ArgErrorFile, "", "error.log", "error log path")
 	flags.StringVarP(&analyzeArgs.OutputFormat, argOutputFormat, "f", formatter.Human, "output format "+formats)
 	flags.StringVarP(&analyzeArgs.OutputScheme, argOutputScheme, "", converter.DefaultScheme, "output scheme "+schemeTypes)
 	flags.StringVarP(&analyzeArgs.ColorWhen, argColor, "", DefaultColorOption, "when to use coloring "+colorWhens)
@@ -144,9 +127,7 @@ func buildContext() (context.Context, error) {
 }
 
 func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
-	if analyzeArgs.Token == "" {
-		analyzeArgs.Token = viper.GetString(common_options.EnvToken)
-	}
+	analyzeArgs.ApplyEnvVars()
 
 	// to make sure scorecard works
 	if err := os.Setenv("GITHUB_AUTH_TOKEN", analyzeArgs.Token); err != nil {
@@ -183,11 +164,10 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		stdErrLog.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
 	}
 
-	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
-	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, githubEndpoint,
+	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Endpoint,
 		analyzeArgs.Organizations, len(parsedRepositories) == 0)
 	if !githubClient.IsGithubCloud() {
-		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", githubEndpoint)
+		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", analyzeArgs.Endpoint)
 	}
 
 	if err != nil {

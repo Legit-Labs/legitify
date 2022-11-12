@@ -7,7 +7,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
@@ -33,9 +32,7 @@ func newListReposCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := listReposCmd.Flags()
-	flags.StringVarP(&listReposArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
-	flags.StringVarP(&listReposArgs.OutputFile, common_options.ArgOutputFile, "o", "", "output file, defaults to stdout")
-	flags.StringVarP(&listReposArgs.ErrorFile, common_options.ArgErrorFile, "e", "error.log", "error log path")
+	listReposArgs.AddCommonOptions(flags)
 
 	return listReposCmd
 }
@@ -45,9 +42,7 @@ func validateListReposArgs() error {
 }
 
 func executeListReposCommand(cmd *cobra.Command, _args []string) error {
-	if listReposArgs.Token == "" {
-		listReposArgs.Token = viper.GetString(common_options.EnvToken)
-	}
+	listReposArgs.ApplyEnvVars()
 
 	err := validateListReposArgs()
 	if err != nil {
@@ -65,14 +60,12 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 
 	ctx := context.Background()
 	stdErrLog := log.New(os.Stderr, "", 0)
-	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
-
-	githubClient, err := github.NewClient(ctx, listReposArgs.Token, githubEndpoint, []string{}, true)
+	githubClient, err := github.NewClient(ctx, listReposArgs.Token, listReposArgs.Endpoint, []string{}, true)
 	if err != nil {
 		return err
 	}
 	if !githubClient.IsGithubCloud() {
-		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", githubEndpoint)
+		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", listReposArgs.Endpoint)
 	}
 
 	repositories, err := getRepositories(githubClient, ctx)
