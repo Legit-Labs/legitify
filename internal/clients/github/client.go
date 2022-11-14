@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -39,7 +40,7 @@ type client struct {
 	cacheLock        sync.RWMutex
 	scopes           permissions.TokenScopes
 	graphQLRawClient *http.Client
-	githubEndpoint   string
+	serverUrl        string
 }
 
 func isBadRequest(err error) bool {
@@ -60,9 +61,9 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 
 func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, fillCache bool) (Client, error) {
 	client := &client{
-		orgs:           org,
-		context:        ctx,
-		githubEndpoint: strings.TrimRight(githubEndpoint, "/"),
+		orgs:      org,
+		context:   ctx,
+		serverUrl: strings.TrimRight(githubEndpoint, "/"),
 	}
 
 	if err := client.initClients(ctx, token); err != nil {
@@ -81,6 +82,12 @@ func NewClient(ctx context.Context, token string, githubEndpoint string, org []s
 		}
 	}
 
+	if client.IsGithubCloud() {
+		log.Printf("Using Github Cloud")
+	} else {
+		log.Printf("Using Github Enterprise Endpoint: %s\n\n", client.serverUrl)
+	}
+
 	return client, nil
 }
 
@@ -93,7 +100,7 @@ func (c *client) GraphQLClient() *githubv4.Client {
 }
 
 func (c *client) IsGithubCloud() bool {
-	return c.githubEndpoint == ""
+	return c.serverUrl == ""
 }
 
 func (c *client) initClients(ctx context.Context, token string) error {
@@ -110,7 +117,7 @@ func (c *client) initClients(ctx context.Context, token string) error {
 		graphQLClient = githubv4.NewClient(graphQLRawClient)
 	} else {
 		var err error
-		ghClient, err = gh.NewEnterpriseClient(c.githubEndpoint, c.githubEndpoint, rawClient)
+		ghClient, err = gh.NewEnterpriseClient(c.serverUrl, c.serverUrl, rawClient)
 		if err != nil {
 			return err
 		}
@@ -124,17 +131,16 @@ func (c *client) initClients(ctx context.Context, token string) error {
 	return nil
 }
 
+// Note: tokens before April 2021 did not have the ghp_ prefix.
+var githubTokenPattern = regexp.MustCompile("(ghp_)?[A-Za-z0-9_]{36}")
+
 func (c *client) validateToken(token string) error {
 	if token == "" {
 		return fmt.Errorf("missing token")
 	} else if strings.HasPrefix(token, "github_pat_") {
 		return fmt.Errorf("GitHub fine-grained tokens are not supported at this moment, please use classic PAT")
-	} else if c.IsGithubCloud() {
-		if len(token) != 40 {
-			return fmt.Errorf("GitHub token seems invalid (should have 40 characters)")
-		} else if !strings.HasPrefix(token, "ghp_") {
-			return fmt.Errorf("GitHub token seems invalid (should start with \"ghp_\"")
-		}
+	} else if !githubTokenPattern.MatchString(token) {
+		return fmt.Errorf("GitHub token seems invalid (expected pattern: '%v')", githubTokenPattern)
 	}
 
 	return nil
@@ -145,7 +151,7 @@ func (c *client) getGitHubGraphURL() string {
 		return "https://api.github.com/graphql"
 	}
 
-	return c.githubEndpoint + "/api/graphql"
+	return c.serverUrl + "/api/graphql"
 }
 
 func (c *client) fillCache() error {

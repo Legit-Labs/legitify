@@ -166,9 +166,6 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 
 	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Endpoint,
 		analyzeArgs.Organizations, len(parsedRepositories) == 0)
-	if !githubClient.IsGithubCloud() {
-		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", analyzeArgs.Endpoint)
-	}
 
 	if err != nil {
 		return err

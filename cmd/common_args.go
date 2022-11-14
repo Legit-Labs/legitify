@@ -25,12 +25,12 @@ const (
 	ArgErrorFile  = "error-file"
 	ArgOutputFile = "output-file"
 	ArgToken      = "github-token"
-	ArgEndpoint   = "github-endpoint"
+	ArgServerUrl  = "server-url"
 )
 
 const (
-	EnvToken          = "github_token"
-	EnvGitHubEndpoint = "github_endpoint"
+	EnvToken     = "github_token"
+	EnvServerUrl = "server_url"
 )
 
 func (a *args) ApplyEnvVars() {
@@ -39,13 +39,13 @@ func (a *args) ApplyEnvVars() {
 	}
 
 	if a.Endpoint == "" {
-		a.Endpoint = viper.GetString(EnvGitHubEndpoint)
+		a.Endpoint = viper.GetString(EnvServerUrl)
 	}
 }
 
 func (a *args) AddCommonOptions(flags *pflag.FlagSet) {
 	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
-	flags.StringVarP(&a.Endpoint, ArgEndpoint, "", "", "github endpoint to use instead of GitHub Cloud (can be set via the environment variable GITHUB_ENDPOINT)")
+	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github endpoint to use instead of GitHub Cloud (can be set via the environment variable GITHUB_ENDPOINT)")
 	flags.StringVarP(&a.OutputFile, ArgOutputFile, "o", "", "output file, defaults to stdout")
 	flags.StringVarP(&a.ErrorFile, ArgErrorFile, "e", "error.log", "error log path")
 }

@@ -3,8 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/Legit-Labs/legitify/internal/clients/github"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -56,14 +54,10 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	stdErrLog := log.New(os.Stderr, "", 0)
 	ctx := context.Background()
 	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, listOrgsArgs.Endpoint, []string{}, true)
 	if err != nil {
 		return err
-	}
-	if !githubClient.IsGithubCloud() {
-		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", listOrgsArgs.Endpoint)
 	}
 
 	orgs, err := githubClient.CollectOrganizations()

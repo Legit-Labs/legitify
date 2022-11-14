@@ -3,8 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 	"sort"
 
 	"github.com/Legit-Labs/legitify/internal/clients/github"
@@ -59,13 +57,9 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 	}
 
 	ctx := context.Background()
-	stdErrLog := log.New(os.Stderr, "", 0)
 	githubClient, err := github.NewClient(ctx, listReposArgs.Token, listReposArgs.Endpoint, []string{}, true)
 	if err != nil {
 		return err
-	}
-	if !githubClient.IsGithubCloud() {
-		stdErrLog.Printf("Using Github Enterprise Endpoint: %s\n\n", listReposArgs.Endpoint)
 	}
 
 	repositories, err := getRepositories(githubClient, ctx)
