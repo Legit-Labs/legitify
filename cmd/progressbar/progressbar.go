@@ -42,7 +42,9 @@ func (pb *ProgressBar) createBars() (*mpb.Progress, map[string]*mpb.Bar) {
 		mpb.WithOutput(os.Stderr))
 
 	for ns, md := range pb.metadata {
-		bars[ns] = createBar(p, md.TotalEntities, ns)
+		if md.TotalEntities > 0 {
+			bars[ns] = createBar(p, md.TotalEntities, ns)
+		}
 	}
 
 	return p, bars
