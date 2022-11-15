@@ -59,10 +59,7 @@ func (c *runnersCollector) CollectMetadata() Metadata {
 				return resp, nil
 			})
 
-			if err != nil {
-				c.issueMissingPermissions(newMissingPermission(permissions.OrgAdmin, org.Name(),
-					"Cannot read organization runner groups", namespace.RunnerGroup))
-			} else {
+			if err == nil {
 				mutex.Lock()
 				c.cache[org.Name()] = result
 				totalCount = totalCount + len(result)
