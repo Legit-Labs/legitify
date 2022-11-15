@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/Legit-Labs/legitify/cmd/common_options"
+
 	"github.com/Legit-Labs/legitify/internal/clients/github"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -28,25 +28,17 @@ func newListOrgsCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := listOrgsCmd.Flags()
-	flags.StringVarP(&listOrgsArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
-	flags.StringVarP(&listOrgsArgs.OutputFile, common_options.ArgOutputFile, "o", "", "output file, defaults to stdout")
-	flags.StringVarP(&listOrgsArgs.ErrorFile, common_options.ArgErrorFile, "e", "error.log", "error log path")
+	listOrgsArgs.AddCommonOptions(flags)
 
 	return listOrgsCmd
 }
 
 func validateListOrgsArgs() error {
-	if err := github.IsTokenValid(listOrgsArgs.Token); err != nil {
-		return err
-	}
-
 	return nil
 }
 
 func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
-	if listOrgsArgs.Token == "" {
-		listOrgsArgs.Token = viper.GetString(common_options.EnvToken)
-	}
+	listOrgsArgs.ApplyEnvVars()
 
 	err := validateListOrgsArgs()
 	if err != nil {
@@ -63,8 +55,7 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 	}
 
 	ctx := context.Background()
-
-	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, []string{}, true)
+	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, listOrgsArgs.Endpoint, []string{}, true)
 	if err != nil {
 		return err
 	}
