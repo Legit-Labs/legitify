@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/Legit-Labs/legitify/cmd/common_options"
 	"os"
 	"sort"
 	"strings"
@@ -24,15 +23,15 @@ const (
 )
 
 func newDocsCommand() *cobra.Command {
-	analyzeCmd := &cobra.Command{
+	docsCmd := &cobra.Command{
 		Use:   cmdDocs,
 		Short: `Generate policies documentation (as a yaml)`,
 		RunE:  executeDocsCommand,
 	}
-	flags := analyzeCmd.Flags()
-	flags.StringP(common_options.ArgOutputFile, "o", "", "output file, defaults to stdout")
+	flags := docsCmd.Flags()
+	flags.StringP(ArgOutputFile, "o", "", "output file, defaults to stdout")
 
-	return analyzeCmd
+	return docsCmd
 }
 
 func executeDocsCommand(cmd *cobra.Command, args []string) error {

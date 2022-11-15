@@ -3,13 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/Legit-Labs/legitify/cmd/common_options"
+	"sort"
+
 	"github.com/Legit-Labs/legitify/internal/clients/github"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/shurcooL/githubv4"
 	"github.com/spf13/cobra"
-	"sort"
 
 	"github.com/spf13/viper"
 )
@@ -30,25 +30,17 @@ func newListReposCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := listReposCmd.Flags()
-	flags.StringVarP(&listReposArgs.Token, common_options.ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
-	flags.StringVarP(&listReposArgs.OutputFile, common_options.ArgOutputFile, "o", "", "output file, defaults to stdout")
-	flags.StringVarP(&listReposArgs.ErrorFile, common_options.ArgErrorFile, "e", "error.log", "error log path")
+	listReposArgs.AddCommonOptions(flags)
 
 	return listReposCmd
 }
 
 func validateListReposArgs() error {
-	if err := github.IsTokenValid(listReposArgs.Token); err != nil {
-		return err
-	}
-
 	return nil
 }
 
 func executeListReposCommand(cmd *cobra.Command, _args []string) error {
-	if listReposArgs.Token == "" {
-		listReposArgs.Token = viper.GetString(common_options.EnvToken)
-	}
+	listReposArgs.ApplyEnvVars()
 
 	err := validateListReposArgs()
 	if err != nil {
@@ -65,8 +57,7 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 	}
 
 	ctx := context.Background()
-
-	githubClient, err := github.NewClient(ctx, listReposArgs.Token, []string{}, true)
+	githubClient, err := github.NewClient(ctx, listReposArgs.Token, listReposArgs.Endpoint, []string{}, true)
 	if err != nil {
 		return err
 	}

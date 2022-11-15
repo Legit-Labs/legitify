@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 
-	"github.com/Legit-Labs/legitify/cmd/common_options"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
-	"github.com/spf13/viper"
 
 	"github.com/google/go-github/v44/github"
 	gh "github.com/google/go-github/v44/github"
@@ -26,88 +25,49 @@ type Client interface {
 	CollectOrganizations() ([]githubcollected.ExtendedOrg, error)
 	Scopes() permissions.TokenScopes
 	Orgs() []string
+	IsGithubCloud() bool
 }
 
 const experimentalApiAcceptHeader = "application/vnd.github.hawkgirl-preview+json"
 const scopeHttpHeader = "X-OAuth-Scopes"
 
 type client struct {
-	client        *gh.Client
-	orgs          []string
-	graphQLClient *githubv4.Client
-	context       context.Context
-	orgsCache     []githubcollected.ExtendedOrg
-	cacheLock     sync.RWMutex
-	scopes        permissions.TokenScopes
-	rawClient     *http.Client
-}
-
-func IsTokenValid(token string) error {
-	if token == "" {
-		return fmt.Errorf("missing token")
-	} else if strings.HasPrefix(token, "github_pat_") {
-		return fmt.Errorf("GitHub fine-grained tokens are not supported at this moment, please use classic PAT")
-	} else if len(token) != 40 {
-		return fmt.Errorf("GitHub token seems invalid (should have 40 characters)")
-	} else if !strings.HasPrefix(token, "ghp_") {
-		return fmt.Errorf("GitHub token seems invalid (should start with \"ghp_\"")
-	}
-
-	return nil
-}
-
-func getGitHubGraphURL() string {
-	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
-	if githubEndpoint == "" {
-		return "https://api.github.com/graphql"
-	}
-	
-	githubEndpoint = strings.TrimRight(githubEndpoint, "/")
-	return githubEndpoint + "/api/graphql"
+	client           *gh.Client
+	orgs             []string
+	graphQLClient    *githubv4.Client
+	context          context.Context
+	orgsCache        []githubcollected.ExtendedOrg
+	cacheLock        sync.RWMutex
+	scopes           permissions.TokenScopes
+	graphQLRawClient *http.Client
+	serverUrl        string
 }
 
 func isBadRequest(err error) bool {
 	return err.Error() == "Bad credentials"
 }
 
-func NewClient(ctx context.Context, token string, org []string, fillCache bool) (Client, error) {
-	if token == "" {
-		return nil, fmt.Errorf("token must be provided")
-	}
-
+func newHttpClients(ctx context.Context, token string) (client *http.Client, graphQL *http.Client) {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-
 	tc := oauth2.NewClient(ctx, ts)
-	var ghClient *gh.Client
-	githubEndpoint := viper.GetString(common_options.EnvGitHubEndpoint)
-	if githubEndpoint == "" {
-		ghClient = gh.NewClient(tc)
-	} else {
-		var err error
-		ghClient, err = gh.NewEnterpriseClient(githubEndpoint, githubEndpoint, tc)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	acceptHeader := experimentalApiAcceptHeader
 	clientWithAcceptHeader := NewClientWithAcceptHeader(tc.Transport, &acceptHeader)
 
-	var graphQLClient *githubv4.Client
-	if githubEndpoint == "" {
-		graphQLClient = githubv4.NewClient(&clientWithAcceptHeader)
-	} else {
-		graphQLClient = githubv4.NewEnterpriseClient(getGitHubGraphURL(), &clientWithAcceptHeader)
+	return tc, clientWithAcceptHeader
+}
+
+func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, fillCache bool) (Client, error) {
+	client := &client{
+		orgs:      org,
+		context:   ctx,
+		serverUrl: strings.TrimRight(githubEndpoint, "/"),
 	}
 
-	client := &client{
-		client:        ghClient,
-		orgs:          org,
-		graphQLClient: graphQLClient,
-		context:       ctx,
-		rawClient:     &clientWithAcceptHeader,
+	if err := client.initClients(ctx, token); err != nil {
+		return nil, err
 	}
 
 	scopes, err := client.collectTokenScopes()
@@ -117,18 +77,15 @@ func NewClient(ctx context.Context, token string, org []string, fillCache bool) 
 	client.scopes = scopes
 
 	if fillCache {
-		_, err = client.CollectOrganizations()
-		if err != nil && isBadRequest(err) {
-			return nil, fmt.Errorf("invalid token (make sure it's not expired or revoked)")
+		if err := client.fillCache(); err != nil {
+			return nil, err
 		}
+	}
 
-		if len(client.orgsCache) == 0 {
-			if len(org) != 0 {
-				return nil, fmt.Errorf("token doesn't have access to the requested organizations")
-			} else {
-				return nil, fmt.Errorf("token doesn't have access to any organization")
-			}
-		}
+	if client.IsGithubCloud() {
+		log.Printf("Using Github Cloud")
+	} else {
+		log.Printf("Using Github Enterprise Endpoint: %s\n\n", client.serverUrl)
 	}
 
 	return client, nil
@@ -140,7 +97,78 @@ func (c *client) Client() *gh.Client {
 
 func (c *client) GraphQLClient() *githubv4.Client {
 	return c.graphQLClient
+}
 
+func (c *client) IsGithubCloud() bool {
+	return c.serverUrl == ""
+}
+
+func (c *client) initClients(ctx context.Context, token string) error {
+	if err := c.validateToken(token); err != nil {
+		return err
+	}
+
+	var ghClient *gh.Client
+	var graphQLClient *githubv4.Client
+
+	rawClient, graphQLRawClient := newHttpClients(ctx, token)
+	if c.IsGithubCloud() {
+		ghClient = gh.NewClient(rawClient)
+		graphQLClient = githubv4.NewClient(graphQLRawClient)
+	} else {
+		var err error
+		ghClient, err = gh.NewEnterpriseClient(c.serverUrl, c.serverUrl, rawClient)
+		if err != nil {
+			return err
+		}
+		graphQLClient = githubv4.NewEnterpriseClient(c.getGitHubGraphURL(), graphQLRawClient)
+
+	}
+
+	c.graphQLRawClient = graphQLRawClient
+	c.client = ghClient
+	c.graphQLClient = graphQLClient
+	return nil
+}
+
+// Note: tokens before April 2021 did not have the ghp_ prefix.
+var githubTokenPattern = regexp.MustCompile("(ghp_)?[A-Za-z0-9_]{36}")
+
+func (c *client) validateToken(token string) error {
+	if token == "" {
+		return fmt.Errorf("missing token")
+	} else if strings.HasPrefix(token, "github_pat_") {
+		return fmt.Errorf("GitHub fine-grained tokens are not supported at this moment, please use classic PAT")
+	} else if !githubTokenPattern.MatchString(token) {
+		return fmt.Errorf("GitHub token seems invalid (expected pattern: '%v')", githubTokenPattern)
+	}
+
+	return nil
+}
+
+func (c *client) getGitHubGraphURL() string {
+	if c.IsGithubCloud() {
+		return "https://api.github.com/graphql"
+	}
+
+	return c.serverUrl + "/api/graphql"
+}
+
+func (c *client) fillCache() error {
+	_, err := c.CollectOrganizations()
+	if err != nil && isBadRequest(err) {
+		return fmt.Errorf("invalid token (make sure it's not expired or revoked)")
+	}
+
+	if len(c.orgsCache) == 0 {
+		if len(c.orgs) != 0 {
+			return fmt.Errorf("token doesn't have access to the requested organizations")
+		} else {
+			return fmt.Errorf("token doesn't have access to any organization")
+		}
+	}
+
+	return nil
 }
 
 func (c *client) Scopes() permissions.TokenScopes {
@@ -247,9 +275,8 @@ func (c *client) getRole(orgName string) (permissions.OrganizationRole, error) {
 }
 
 func (c *client) collectTokenScopes() (permissions.TokenScopes, error) {
-	graphQLUrl := getGitHubGraphURL()
 	var buf bytes.Buffer
-	resp, err := c.rawClient.Post(graphQLUrl, "application/json", &buf)
+	resp, err := c.graphQLRawClient.Post(c.getGitHubGraphURL(), "application/json", &buf)
 	if err != nil {
 		return nil, err
 	}
