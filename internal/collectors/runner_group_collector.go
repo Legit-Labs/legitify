@@ -51,7 +51,6 @@ func (c *runnersCollector) CollectMetadata() Metadata {
 				runners, resp, err := c.client.Client().Actions.ListOrganizationRunnerGroups(c.context, org.Name(), opts)
 
 				if err != nil {
-					log.Printf("error collecting runner groups for %s - %v", org.Name(), err)
 					return nil, err
 				}
 
@@ -59,7 +58,9 @@ func (c *runnersCollector) CollectMetadata() Metadata {
 				return resp, nil
 			})
 
-			if err == nil {
+			if err != nil {
+				log.Printf("Error collecting runner groups for %s - %v", org.Name(), err)
+			} else {
 				mutex.Lock()
 				c.cache[org.Name()] = result
 				totalCount = totalCount + len(result)
