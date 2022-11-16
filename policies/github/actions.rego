@@ -40,3 +40,45 @@ default all_github_actions_are_allowed  = false
 all_github_actions_are_allowed {
     input.actions_permissions.allowed_actions == "all"
 }
+
+# METADATA
+# scope: rule
+# title: Default workflow token permission is not read only
+# description: Your default GitHub Action workflow token permission is set to READ-WRITE. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
+# custom:
+#   requiredEnrichers: [organizationId]
+#   remediationSteps:
+#     - 1. Make sure you have admin permissions
+#     - 2. Go to the org's settings page
+#     - 3. Enter "Actions - General" tab
+#     - 4. Under 'Workflow permissions'
+#     - 5. Select 'Read repository contents permission'
+#     - 6. Click 'Save'
+#   severity: MEDIUM
+#   requiredScopes: [admin:org]
+#   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions) attacker get access to a privileged access token.
+default token_default_permissions_is_read_write  = false
+token_default_permissions_is_read_write {
+    input.token_permissions.default_workflow_permissions != "read"
+}
+
+# METADATA
+# scope: rule
+# title: Workflows Are Allowed To Approve Pull Requests
+# description: Your default GitHub Actions configuration allows for workflows to approve pull requests. This could allows users to bypass code-review restrictions.
+# custom:
+#   requiredEnrichers: [organizationId]
+#   remediationSteps:
+#     - 1. Make sure you have admin permissions
+#     - 2. Go to the org's settings page
+#     - 3. Enter "Actions - General" tab
+#     - 4. Under 'Workflow permissions'
+#     - 5. Uncheck 'Allow GitHub actions to create and approve pull requests.
+#     - 6. Click 'Save'
+#   severity: MEDIUM
+#   requiredScopes: [admin:org]
+#   threat: Attackers can exploit this misconfiguration to bypass code-review restriction by creating a workflow that approve thier own pull request and then merge the pull request without anyone noticing.
+default actions_can_approve_pull_requests  = false
+actions_can_approve_pull_requests {
+    input.token_permissions.can_approve_pull_request_reviews
+}

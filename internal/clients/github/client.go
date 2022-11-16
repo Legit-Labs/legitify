@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"log"
 	"net/http"
 	"regexp"
@@ -13,7 +14,6 @@ import (
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 
-	"github.com/google/go-github/v44/github"
 	gh "github.com/google/go-github/v44/github"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
@@ -26,6 +26,8 @@ type Client interface {
 	Scopes() permissions.TokenScopes
 	Orgs() []string
 	IsGithubCloud() bool
+	GetActionsTokenPermissionsForOrganization(organization string) (*types.TokenPermissions, error)
+	GetActionsTokenPermissionsForRepository(organization string, repository string) (*types.TokenPermissions, error)
 }
 
 const experimentalApiAcceptHeader = "application/vnd.github.hawkgirl-preview+json"
@@ -290,7 +292,7 @@ func (c *client) collectTokenScopes() (permissions.TokenScopes, error) {
 
 func (c *client) collectOrgsList() ([]string, error) {
 	var orgNames []string
-	err := PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
+	err := PaginateResults(func(opts *gh.ListOptions) (*gh.Response, error) {
 		orgs, resp, err := c.Client().Organizations.List(c.context, "", opts)
 
 		if err != nil {
@@ -332,6 +334,30 @@ func (c *client) collectSpecificOrganizations() ([]githubcollected.ExtendedOrg, 
 	}
 
 	return res, nil
+}
+
+func (c *client) GetActionsTokenPermissionsForOrganization(organization string) (*types.TokenPermissions, error) {
+	u := fmt.Sprintf("orgs/%s/actions/permissions/workflow", organization)
+	return c.GetActionsTokenPermissions(u)
+}
+
+func (c *client) GetActionsTokenPermissionsForRepository(organization string, repository string) (*types.TokenPermissions, error) {
+	u := fmt.Sprintf("orgs/%s/%s/actions/permissions/workflow", organization, repository)
+	return c.GetActionsTokenPermissions(u)
+}
+
+func (c *client) GetActionsTokenPermissions(url string) (*types.TokenPermissions, error) {
+	req, err := c.client.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	p := types.TokenPermissions{}
+	_, err = c.client.Do(c.context, req, &p)
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
 }
 
 type samlError struct {
