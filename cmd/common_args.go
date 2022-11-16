@@ -45,7 +45,7 @@ func (a *args) ApplyEnvVars() {
 
 func (a *args) AddCommonOptions(flags *pflag.FlagSet) {
 	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
-	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github endpoint to use instead of GitHub Cloud (can be set via the environment variable GITHUB_ENDPOINT)")
+	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github endpoint to use instead of GitHub Cloud (can be set via the environment variable SERVER_URL)")
 	flags.StringVarP(&a.OutputFile, ArgOutputFile, "o", "", "output file, defaults to stdout")
 	flags.StringVarP(&a.ErrorFile, ArgErrorFile, "e", "error.log", "error log path")
 }
