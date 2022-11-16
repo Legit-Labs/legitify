@@ -342,7 +342,7 @@ func (c *client) GetActionsTokenPermissionsForOrganization(organization string) 
 }
 
 func (c *client) GetActionsTokenPermissionsForRepository(organization string, repository string) (*types.TokenPermissions, error) {
-	u := fmt.Sprintf("orgs/%s/%s/actions/permissions/workflow", organization, repository)
+	u := fmt.Sprintf("repos/%s/%s/actions/permissions/workflow", organization, repository)
 	return c.GetActionsTokenPermissions(u)
 }
 
