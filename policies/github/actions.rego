@@ -75,7 +75,7 @@ token_default_permissions_is_read_write {
 #     - 4. Under 'Workflow permissions'
 #     - 5. Uncheck 'Allow GitHub actions to create and approve pull requests.
 #     - 6. Click 'Save'
-#   severity: MEDIUM
+#   severity: HIGH
 #   requiredScopes: [admin:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restriction by creating a workflow that approve thier own pull request and then merge the pull request without anyone noticing.
 default actions_can_approve_pull_requests  = false
