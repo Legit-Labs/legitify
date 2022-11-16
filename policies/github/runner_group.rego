@@ -28,3 +28,30 @@ default runner_group_can_be_used_by_public_repositories = false
 runner_group_can_be_used_by_public_repositories {
     input.runner_group.allows_public_repositories == true
 }
+
+# METADATA
+# scope: rule
+# title: Runner group is not limited to selected repositories
+# description: |
+#       Not limiting the runner group to selected repositories allows any user in the organization to execute workflows
+#       on the runner group runners.
+#       In case of inadequate security measures implemented on the hosted runner,
+#       malicious insider could create a repository and then create a workflows exploit these vulnerabilities to move laterally inside your network.
+# custom:
+#   severity: MEDIUM
+#   requiredEnrichers: [organizationId]
+#   requiredScopes: [admin:org]
+#   remediationSteps:
+#     - "Go to the organization settings page"
+#     - "Press Actions ➝ Runner groups"
+#     - "Under the 'Repository Access' section, select 'Selected repositories'"
+#     - "Select the required repositories"
+#   threat:
+#     - "Hosted runners are usually part of the organization's private network and can be easily misconfigured."
+#     - "If the hosted runner is insecurely configured, any user in the organization could:"
+#     - "1. Create a workflow that runs on the hosted runner"
+#     - "2. Exploit the misconfigurations to execute code inside the private network"
+default runner_group_not_limited_to_selected_repositories = false
+runner_group_not_limited_to_selected_repositories {
+    input.runner_group.visibility != "selected"
+}
