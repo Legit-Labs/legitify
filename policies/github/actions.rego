@@ -56,7 +56,7 @@ all_github_actions_are_allowed {
 #     - 6. Click 'Save'
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
-#   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions) attacker get access to a privileged access token.
+#   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
 default token_default_permissions_is_read_write  = false
 token_default_permissions_is_read_write {
     input.token_permissions.default_workflow_permissions != "read"
