@@ -77,7 +77,7 @@ token_default_permissions_is_read_write {
 #     - 6. Click 'Save'
 #   severity: HIGH
 #   requiredScopes: [admin:org]
-#   threat: Attackers can exploit this misconfiguration to bypass code-review restriction by creating a workflow that approve thier own pull request and then merge the pull request without anyone noticing.
+#   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
 default actions_can_approve_pull_requests  = false
 actions_can_approve_pull_requests {
     input.token_permissions.can_approve_pull_request_reviews
