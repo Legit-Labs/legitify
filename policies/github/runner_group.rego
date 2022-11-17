@@ -34,7 +34,7 @@ runner_group_can_be_used_by_public_repositories {
 # title: Runner group is not limited to selected repositories
 # description: |
 #       Not limiting the runner group to selected repositories allows any user in the organization to execute workflows
-#       on the runner group runners.
+#       on the group's runners.
 #       In case of inadequate security measures implemented on the hosted runner,
 #       malicious insider could create a repository and then create a workflows exploit these vulnerabilities to move laterally inside your network.
 # custom:
