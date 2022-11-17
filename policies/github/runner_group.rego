@@ -43,7 +43,7 @@ runner_group_can_be_used_by_public_repositories {
 #   requiredScopes: [admin:org]
 #   remediationSteps:
 #     - "Go to the organization settings page"
-#     - "Press Actions ➝ Runner groups"
+#     - "Go to Actions ➝ Runner groups"
 #     - "Under the 'Repository Access' section, select 'Selected repositories'"
 #     - "Select the required repositories"
 #   threat:
