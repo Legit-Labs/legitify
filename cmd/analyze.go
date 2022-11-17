@@ -165,7 +165,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	}
 
 	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Endpoint,
-		analyzeArgs.Organizations, len(parsedRepositories) == 0)
+		analyzeArgs.Organizations, false)
 
 	if err != nil {
 		return err
