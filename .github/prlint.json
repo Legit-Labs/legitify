@@ -1,7 +1,7 @@
 {
   "title": [
     {
-      "pattern": "^(build(\\(deps\\))?|ci|docs|feat|fix|perf|refactor|style|test)([A-Z](.+))?:\\s.+",
+      "pattern": "^(build(\\(deps\\))?|ci|docs|feat|fix|perf|refactor|style|test|policy)([A-Z](.+))?:\\s.+",
       "message": "Your title needs to be prefixed with a topic, see https://www.conventionalcommits.org/en/v1.0.0/"
     }
   ]
