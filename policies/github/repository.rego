@@ -356,7 +356,7 @@ scorecard_score_too_low {
 #     - 6. Click 'Save'
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
-#   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
+#   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
 default token_default_permissions_is_read_write  = false
 token_default_permissions_is_read_write {
     input.actions_token_permissions.default_workflow_permissions != "read"
@@ -365,7 +365,7 @@ token_default_permissions_is_read_write {
 # METADATA
 # scope: rule
 # title: Workflows Are Allowed To Approve Pull Requests
-# description: Your default GitHub Actions configuration allow for workflows to approve pull requests. This could allows users to bypass code-review restrictions.
+# description: Your default GitHub Actions configuration allows for workflows to approve pull requests. This could allow users to bypass code-review restrictions.
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps:
@@ -377,7 +377,7 @@ token_default_permissions_is_read_write {
 #     - 6. Click 'Save'
 #   severity: HIGH
 #   requiredScopes: [admin:org]
-#   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves thier own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
+#   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
 default actions_can_approve_pull_requests  = false
 actions_can_approve_pull_requests {
     input.actions_token_permissions.can_approve_pull_request_reviews
