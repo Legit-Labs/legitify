@@ -52,7 +52,7 @@ archives:
 
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA512SUMS'
-  algorithm: 'sha512'
+  algorithm: 'sha256'
 
 release:
   draft: false
