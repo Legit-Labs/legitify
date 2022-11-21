@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"testing"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -254,5 +255,49 @@ func TestRepositoryDepGraph(t *testing.T) {
 	}
 	for i, flag := range bools {
 		repositoryTestTemplate(t, name, makeMockData(counts[i]), testedPolicyName, flag)
+	}
+}
+
+func TestRepositoryActionsSettingsDefaultTokenPermissions(t *testing.T) {
+	name := "repository actions settings is set to read-write"
+	testedPolicyName := "token_default_permissions_is_read_write"
+	makeMockData := func(flag string) githubcollected.Repository {
+		return githubcollected.Repository{
+			ActionsTokenPermissions: &types.TokenPermissions{
+				DefaultWorkflowPermissions: &flag,
+			},
+		}
+	}
+
+	options := map[bool]string{
+		false: "read",
+		true:  "write",
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure)
+	}
+}
+
+func TestRepositoryActionsSettingsActionsCanApprovePullRequests(t *testing.T) {
+	name := "repository actions can approve pull requests"
+	testedPolicyName := "actions_can_approve_pull_requests"
+	makeMockData := func(flag bool) githubcollected.Repository {
+		return githubcollected.Repository{
+			ActionsTokenPermissions: &types.TokenPermissions{
+				CanApprovePullRequestReviews: &flag,
+			},
+		}
+	}
+
+	options := map[bool]bool{
+		false: false,
+		true:  true,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure)
 	}
 }

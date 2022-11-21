@@ -275,6 +275,11 @@ func (rc *repositoryCollector) collectExtraData(login string,
 		log.Printf("error getting repository collaborators for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
 
+	repo, err = rc.getActionsSettings(repo, login)
+	if err != nil {
+		log.Printf("error getting repository actions settings for %s: %s", fullRepoName(login, repo.Repository.Name), err)
+	}
+
 	if context.IsBranchProtectionSupported() {
 		repo, err = rc.fixBranchProtectionInfo(repo, login)
 		if err != nil {
@@ -296,6 +301,18 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	}
 
 	return repo
+}
+
+func (rc *repositoryCollector) getActionsSettings(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+	settings, err := rc.Client.GetActionsTokenPermissionsForRepository(org, repo.Name())
+	if err != nil {
+		perm := newMissingPermission(permissions.RepoAdmin, fullRepoName(org, repo.Repository.Name),
+			"Cannot read repository actions settings", namespace.Repository)
+		rc.issueMissingPermissions(perm)
+		return repo, err
+	}
+	repo.ActionsTokenPermissions = settings
+	return repo, nil
 }
 
 func (rc *repositoryCollector) getRepositoryHooks(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {

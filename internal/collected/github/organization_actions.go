@@ -2,6 +2,7 @@ package githubcollected
 
 import (
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 
 	"github.com/google/go-github/v44/github"
 )
@@ -9,6 +10,7 @@ import (
 type OrganizationActions struct {
 	Organization       ExtendedOrg                `json:"organization"`
 	ActionsPermissions *github.ActionsPermissions `json:"actions_permissions"`
+	TokenPermissions   *types.TokenPermissions    `json:"token_permissions"`
 }
 
 func (o OrganizationActions) ViolationEntityType() string {
