@@ -1,6 +1,7 @@
 package githubcollected
 
 import (
+	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
 	"github.com/google/go-github/v44/github"
@@ -63,12 +64,13 @@ type GitHubQLBranch struct {
 }
 
 type Repository struct {
-	Repository                   *GitHubQLRepository `json:"repository"`
-	VulnerabilityAlertsEnabled   *bool               `json:"vulnerability_alerts_enabled"`
-	NoBranchProtectionPermission bool                `json:"no_branch_protection_permission"`
-	Scorecard                    *scorecard.Result   `json:"scorecard,omitempty"`
-	Hooks                        []*github.Hook      `json:"hooks"`
-	Collaborators                []*github.User      `json:"collaborators"`
+	Repository                   *GitHubQLRepository     `json:"repository"`
+	VulnerabilityAlertsEnabled   *bool                   `json:"vulnerability_alerts_enabled"`
+	NoBranchProtectionPermission bool                    `json:"no_branch_protection_permission"`
+	Scorecard                    *scorecard.Result       `json:"scorecard,omitempty"`
+	Hooks                        []*github.Hook          `json:"hooks"`
+	Collaborators                []*github.User          `json:"collaborators"`
+	ActionsTokenPermissions      *types.TokenPermissions `json:"actions_token_permissions"`
 }
 
 func (r Repository) ViolationEntityType() string {

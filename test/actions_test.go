@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"testing"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -9,8 +10,10 @@ import (
 )
 
 type organizationActionsMockConfiguration struct {
-	allowedActions      *string
-	enabledRepositories *string
+	allowedActions         *string
+	enabledRepositories    *string
+	tokenDefaultPermission string
+	workflowsCanApprovePRs bool
 }
 
 func newOrganizationActionsMock(config organizationActionsMockConfiguration) githubcollected.OrganizationActions {
@@ -19,6 +22,10 @@ func newOrganizationActionsMock(config organizationActionsMockConfiguration) git
 		ActionsPermissions: &github.ActionsPermissions{
 			EnabledRepositories: config.enabledRepositories,
 			AllowedActions:      config.allowedActions,
+		},
+		TokenPermissions: &types.TokenPermissions{
+			DefaultWorkflowPermissions:   &config.tokenDefaultPermission,
+			CanApprovePullRequestReviews: &config.workflowsCanApprovePRs,
 		},
 	}
 }
@@ -62,6 +69,42 @@ func TestActions(t *testing.T) {
 			shouldBeViolated: false,
 			args: organizationActionsMockConfiguration{
 				enabledRepositories: &selected,
+			},
+		},
+		{
+			name:             "actions can approve pull requests",
+			policyName:       "actions_can_approve_pull_requests",
+			shouldBeViolated: true,
+			args: organizationActionsMockConfiguration{
+				enabledRepositories:    &selected,
+				workflowsCanApprovePRs: true,
+			},
+		},
+		{
+			name:             "actions can not approve pull requests",
+			policyName:       "actions_can_approve_pull_requests",
+			shouldBeViolated: false,
+			args: organizationActionsMockConfiguration{
+				enabledRepositories:    &selected,
+				workflowsCanApprovePRs: false,
+			},
+		},
+		{
+			name:             "workflow token default permissions is not set to read only",
+			policyName:       "token_default_permissions_is_read_write",
+			shouldBeViolated: true,
+			args: organizationActionsMockConfiguration{
+				enabledRepositories:    &selected,
+				tokenDefaultPermission: "write",
+			},
+		},
+		{
+			name:             "workflow token default permissions is set to read only",
+			policyName:       "token_default_permissions_is_read_write",
+			shouldBeViolated: false,
+			args: organizationActionsMockConfiguration{
+				enabledRepositories:    &selected,
+				tokenDefaultPermission: "read",
 			},
 		},
 	}
