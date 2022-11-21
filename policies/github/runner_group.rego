@@ -50,7 +50,7 @@ runner_group_can_be_used_by_public_repositories {
 #     - "Hosted runners are usually part of the organization's private network and can be easily misconfigured."
 #     - "If the hosted runner is insecurely configured, any user in the organization could:"
 #     - "1. Create a workflow that runs on the hosted runner"
-#     - "2. Exploit the misconfigurations to execute code inside the private network"
+#     - "2. Exploit the runner misconfigurations/known CVE's to execute code inside the private network"
 default runner_group_not_limited_to_selected_repositories = false
 runner_group_not_limited_to_selected_repositories {
     input.runner_group.visibility != "selected"
