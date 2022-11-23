@@ -280,6 +280,11 @@ func (rc *repositoryCollector) collectExtraData(login string,
 		log.Printf("error getting repository actions settings for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
 
+	repo, err = rc.getDependencyGraphManifestsCount(repo, login)
+	if err != nil {
+		log.Printf("error getting repository dependency manifests for %s: %s", fullRepoName(login, repo.Repository.Name), err)
+	}
+
 	if context.IsBranchProtectionSupported() {
 		repo, err = rc.fixBranchProtectionInfo(repo, login)
 		if err != nil {
