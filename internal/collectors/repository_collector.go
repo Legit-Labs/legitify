@@ -259,28 +259,28 @@ func (rc *repositoryCollector) collectExtraData(login string,
 		Repository: repository,
 	}
 
-	repo, err = rc.getVulnerabilityAlerts(repo, login)
+	repo, err = rc.withVulnerabilityAlerts(repo, login)
 	if err != nil {
 		// If we can't get vulnerability alerts, rego will ignore it (as nil)
 		log.Printf("error getting vulnerability alerts for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
 
-	repo, err = rc.getRepositoryHooks(repo, login)
+	repo, err = rc.withRepositoryHooks(repo, login)
 	if err != nil {
 		log.Printf("error getting repository hooks for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
 
-	repo, err = rc.getRepoCollaborators(repo, login)
+	repo, err = rc.withRepoCollaborators(repo, login)
 	if err != nil {
 		log.Printf("error getting repository collaborators for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
 
-	repo, err = rc.getActionsSettings(repo, login)
+	repo, err = rc.withActionsSettings(repo, login)
 	if err != nil {
 		log.Printf("error getting repository actions settings for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
 
-	repo, err = rc.getDependencyGraphManifestsCount(repo, login)
+	repo, err = rc.withDependencyGraphManifestsCount(repo, login)
 	if err != nil {
 		log.Printf("error getting repository dependency manifests for %s: %s", fullRepoName(login, repo.Repository.Name), err)
 	}
@@ -308,7 +308,7 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	return repo
 }
 
-func (rc *repositoryCollector) getDependencyGraphManifestsCount(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withDependencyGraphManifestsCount(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
 	var dependencyGraphQuery struct {
 		RepositoryOwner struct {
 			Repository struct {
@@ -332,7 +332,7 @@ func (rc *repositoryCollector) getDependencyGraphManifestsCount(repo ghcollected
 	return repo, nil
 }
 
-func (rc *repositoryCollector) getActionsSettings(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withActionsSettings(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
 	settings, err := rc.Client.GetActionsTokenPermissionsForRepository(org, repo.Name())
 	if err != nil {
 		perm := newMissingPermission(permissions.RepoAdmin, fullRepoName(org, repo.Repository.Name),
@@ -344,7 +344,7 @@ func (rc *repositoryCollector) getActionsSettings(repo ghcollected.Repository, o
 	return repo, nil
 }
 
-func (rc *repositoryCollector) getRepositoryHooks(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
 	var result []*github.Hook
 
 	err := ghclient.PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
@@ -371,7 +371,7 @@ func (rc *repositoryCollector) getRepositoryHooks(repo ghcollected.Repository, o
 	return repo, nil
 }
 
-func (rc *repositoryCollector) getVulnerabilityAlerts(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withVulnerabilityAlerts(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
 	enabled, _, err := rc.Client.Client().Repositories.GetVulnerabilityAlerts(rc.Context, org, repo.Repository.Name)
 
 	if err != nil {
@@ -383,7 +383,7 @@ func (rc *repositoryCollector) getVulnerabilityAlerts(repo ghcollected.Repositor
 	return repo, nil
 }
 
-func (rc *repositoryCollector) getRepoCollaborators(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
 	users, _, err := rc.Client.Client().Repositories.ListCollaborators(rc.Context, org, repo.Repository.Name, &github.ListCollaboratorsOptions{})
 
 	if err != nil {
