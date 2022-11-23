@@ -303,6 +303,30 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	return repo
 }
 
+func (rc *repositoryCollector) getDependencyGraphManifestsCount(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+	var dependencyGraphQuery struct {
+		RepositoryOwner struct {
+			Repository struct {
+				DependencyGraphManifests *ghcollected.GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests" graphql:"dependencyGraphManifests(first: 1)"`
+			} `graphql:"repository(name: $name)"`
+		} `graphql:"repositoryOwner(login: $login)"`
+	}
+
+	variables := map[string]interface{}{
+		"login": githubv4.String(org),
+		"name":  githubv4.String(repo.Name()),
+	}
+
+	err := rc.Client.GraphQLClient().Query(rc.Context, &dependencyGraphQuery, variables)
+
+	if err != nil {
+		return repo, err
+	}
+
+	repo.DependencyGraphManifests = dependencyGraphQuery.RepositoryOwner.Repository.DependencyGraphManifests
+	return repo, nil
+}
+
 func (rc *repositoryCollector) getActionsSettings(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
 	settings, err := rc.Client.GetActionsTokenPermissionsForRepository(org, repo.Name())
 	if err != nil {
@@ -404,7 +428,7 @@ func (rc *repositoryCollector) fixBranchProtectionInfo(repository ghcollected.Re
 }
 
 func (rc *repositoryCollector) checkMissingPermissions(repo ghcollected.Repository, entityName string) []missingPermission {
-	missingPermissions := []missingPermission{}
+	var missingPermissions []missingPermission
 	if repo.NoBranchProtectionPermission {
 		effect := "Cannot read repository branch protection information"
 		perm := newMissingPermission(permissions.RepoAdmin, entityName, effect, namespace.Repository)

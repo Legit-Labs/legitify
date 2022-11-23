@@ -322,7 +322,7 @@ vulnerability_alerts_not_enabled {
 #      - "A user can add dependencies to vulnerable third-party dependencies therefore introducing vulnerabilities to your application."
 default ghas_dependency_review_not_enabled = false
 ghas_dependency_review_not_enabled {
-    input.repository.dependency_graph_manifests.total_count == 0
+    input.dependency_graph_manifests.total_count == 0
 }
 
 # METADATA
