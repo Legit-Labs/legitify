@@ -28,17 +28,16 @@ type GitHubQLRepositoryCollaborators struct {
 }
 
 type GitHubQLRepository struct {
-	Name                     string `json:"name"`
-	RebaseMergeAllowed       bool
-	Url                      string
-	DatabaseId               int64
-	IsPrivate                bool                              `json:"is_private"`
-	ForkingAllowed           bool                              `json:"allow_forking"`
-	IsArchived               bool                              `json:"is_archived"`
-	DefaultBranchRef         *GitHubQLBranch                   `json:"default_branch"`
-	DependencyGraphManifests *GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests" graphql:"dependencyGraphManifests(first: 1)"`
-	PushedAt                 *githubv4.DateTime                `json:"pushed_at"`
-	ViewerPermission         string                            `json:"viewerPermission"`
+	Name               string `json:"name"`
+	RebaseMergeAllowed bool
+	Url                string
+	DatabaseId         int64
+	IsPrivate          bool               `json:"is_private"`
+	ForkingAllowed     bool               `json:"allow_forking"`
+	IsArchived         bool               `json:"is_archived"`
+	DefaultBranchRef   *GitHubQLBranch    `json:"default_branch"`
+	PushedAt           *githubv4.DateTime `json:"pushed_at"`
+	ViewerPermission   string             `json:"viewerPermission"`
 }
 
 type GitHubQLBranchProtectionRule struct {
@@ -64,13 +63,14 @@ type GitHubQLBranch struct {
 }
 
 type Repository struct {
-	Repository                   *GitHubQLRepository     `json:"repository"`
-	VulnerabilityAlertsEnabled   *bool                   `json:"vulnerability_alerts_enabled"`
-	NoBranchProtectionPermission bool                    `json:"no_branch_protection_permission"`
-	Scorecard                    *scorecard.Result       `json:"scorecard,omitempty"`
-	Hooks                        []*github.Hook          `json:"hooks"`
-	Collaborators                []*github.User          `json:"collaborators"`
-	ActionsTokenPermissions      *types.TokenPermissions `json:"actions_token_permissions"`
+	Repository                   *GitHubQLRepository               `json:"repository"`
+	VulnerabilityAlertsEnabled   *bool                             `json:"vulnerability_alerts_enabled"`
+	NoBranchProtectionPermission bool                              `json:"no_branch_protection_permission"`
+	Scorecard                    *scorecard.Result                 `json:"scorecard,omitempty"`
+	Hooks                        []*github.Hook                    `json:"hooks"`
+	Collaborators                []*github.User                    `json:"collaborators"`
+	ActionsTokenPermissions      *types.TokenPermissions           `json:"actions_token_permissions"`
+	DependencyGraphManifests     *GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests"`
 }
 
 func (r Repository) ViolationEntityType() string {
