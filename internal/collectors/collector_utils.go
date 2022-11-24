@@ -2,20 +2,13 @@ package collectors
 
 import (
 	"fmt"
-
+	"github.com/Legit-Labs/legitify/internal/collected"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 )
 
-func fullRepoName(org string, repo string) string {
+func FullRepoName(org string, repo string) string {
 	return fmt.Sprintf("%s/%s", org, repo)
-}
-
-func wrapCollectorChans(collected chan CollectedData, progress chan CollectionMetric) CollectorChannels {
-	return CollectorChannels{
-		Collected: collected,
-		Progress:  progress,
-	}
 }
 
 type collectedDataContext struct {
@@ -31,18 +24,18 @@ func (c *collectedDataContext) Roles() []permissions.Role {
 	return c.roles
 }
 
-type baseCollector struct {
-	collector
+type BaseCollector struct {
+	Collector
 	collectedChan   chan CollectedData
 	progressChan    chan CollectionMetric
-	missingPermChan chan missingPermission
+	missingPermChan chan MissingPermission
 }
 
-func initBaseCollector(b *baseCollector, c collector) {
-	b.collector = c
+func InitBaseCollector(b *BaseCollector, c Collector) {
+	b.Collector = c
 }
 
-func (b baseCollector) collectData(org githubcollected.ExtendedOrg, entity githubcollected.CollectedEntity, canonicalLink string, viewerRoles []permissions.Role) {
+func (b *BaseCollector) CollectData(org githubcollected.ExtendedOrg, entity collected.Entity, canonicalLink string, viewerRoles []permissions.Role) {
 
 	b.collectedChan <- CollectedData{
 		Entity:        entity,
@@ -55,7 +48,7 @@ func (b baseCollector) collectData(org githubcollected.ExtendedOrg, entity githu
 	}
 }
 
-func (b baseCollector) collectDataWithContext(entity githubcollected.CollectedEntity, canonicalLink string, ctx CollectedDataContext) {
+func (b *BaseCollector) CollectDataWithContext(entity collected.Entity, canonicalLink string, ctx CollectedDataContext) {
 
 	b.collectedChan <- CollectedData{
 		Entity:        entity,
@@ -65,50 +58,51 @@ func (b baseCollector) collectDataWithContext(entity githubcollected.CollectedEn
 	}
 }
 
-func (b baseCollector) totalCollectionChange(total int) {
+func (b *BaseCollector) TotalCollectionChange(total int) {
 	b.progressChan <- CollectionMetric{
 		Namespace:             b.Namespace(),
 		TotalCollectionChange: total,
 	}
 }
 
-func (b baseCollector) collectionChange(change int) {
+func (b *BaseCollector) CollectionChange(change int) {
 	b.progressChan <- CollectionMetric{
 		Namespace:        b.Namespace(),
 		CollectionChange: change,
 	}
 }
 
-func (b baseCollector) collectionChangeByOne() {
-	b.collectionChange(1)
+func (b *BaseCollector) CollectionChangeByOne() {
+	b.CollectionChange(1)
 }
 
-func (b baseCollector) issueMissingPermissions(missingPermissions ...missingPermission) {
+func (b *BaseCollector) IssueMissingPermissions(missingPermissions ...MissingPermission) {
 	for _, p := range missingPermissions {
 		b.missingPermChan <- p
 	}
 }
 
-func (b *baseCollector) makeChannels() {
+func (b *BaseCollector) makeChannels() {
 	b.collectedChan = make(chan CollectedData)
 	b.progressChan = make(chan CollectionMetric)
-	b.missingPermChan = make(chan missingPermission)
+	b.missingPermChan = make(chan MissingPermission)
 }
 
-func (b *baseCollector) closeChannels() {
+func (b *BaseCollector) closeChannels() {
 	close(b.collectedChan)
 	close(b.progressChan)
 	close(b.missingPermChan)
 }
 
-func (b *baseCollector) getChannels() subCollectorChannels {
-	return subCollectorChannels{
-		CollectorChannels: wrapCollectorChans(b.collectedChan, b.progressChan),
+func (b *BaseCollector) getChannels() SubCollectorChannels {
+	return SubCollectorChannels{
+		Collected:         b.collectedChan,
+		Progress:          b.progressChan,
 		MissingPermission: b.missingPermChan,
 	}
 }
 
-func (b *baseCollector) wrappedCollection(collection func()) subCollectorChannels {
+func (b *BaseCollector) WrappedCollection(collection func()) SubCollectorChannels {
 	b.makeChannels()
 	go func() {
 		defer b.closeChannels()

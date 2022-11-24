@@ -2,9 +2,9 @@ package enricher
 
 import (
 	"context"
+	githubcollected "github.com/Legit-Labs/legitify/internal/collected"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
@@ -24,7 +24,7 @@ type EnricherManager interface {
 }
 
 type EnrichedData struct {
-	Entity                   githubcollected.CollectedEntity
+	Entity                   githubcollected.Entity
 	Namespace                namespace.Namespace
 	PolicyName               string
 	FullyQualifiedPolicyName string

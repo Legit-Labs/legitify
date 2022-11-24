@@ -1,7 +1,7 @@
 package collectors
 
 import (
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/collected"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 )
@@ -24,18 +24,19 @@ type CollectedDataContext interface {
 
 type CollectedData struct {
 	Context       CollectedDataContext
-	Entity        githubcollected.CollectedEntity
+	Entity        collected.Entity
 	Namespace     namespace.Namespace
 	CanonicalLink string
 }
 
-type subCollectorChannels struct {
-	CollectorChannels
-	MissingPermission <-chan missingPermission
+type SubCollectorChannels struct {
+	Collected         <-chan CollectedData
+	Progress          <-chan CollectionMetric
+	MissingPermission <-chan MissingPermission
 }
 
-type collector interface {
-	Collect() subCollectorChannels
+type Collector interface {
+	Collect() SubCollectorChannels
 	Namespace() namespace.Namespace
 	CollectMetadata() Metadata
 }

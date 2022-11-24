@@ -1,4 +1,4 @@
-package collectors
+package github
 
 import (
 	"context"

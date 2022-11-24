@@ -2,6 +2,7 @@ package scheme_test
 
 import (
 	"encoding/json"
+	"github.com/Legit-Labs/legitify/internal/collected"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -50,7 +51,7 @@ const (
 	policy_2_severity = severity.High
 )
 
-func arbitraryEntity() githubcollected.CollectedEntity {
+func arbitraryEntity() collected.Entity {
 	// TODO move to common test files with enricher
 	var entityID int64 = 666
 	var entityName = "arbitrary"
@@ -70,7 +71,7 @@ func arbitraryEntity() githubcollected.CollectedEntity {
 	return e
 }
 
-func arbitraryEntity2() githubcollected.CollectedEntity {
+func arbitraryEntity2() collected.Entity {
 	// TODO move to common test files with enricher
 	var entityID int64 = 667
 	var entityName = "arbitrary2"

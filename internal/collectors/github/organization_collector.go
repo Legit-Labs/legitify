@@ -1,6 +1,7 @@
-package collectors
+package github
 
 import (
+	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
 
 	"github.com/google/go-github/v44/github"
@@ -15,7 +16,7 @@ import (
 )
 
 type organizationCollector struct {
-	baseCollector
+	collectors.BaseCollector
 	Client  ghclient.Client
 	Context context.Context
 }
@@ -30,12 +31,12 @@ var orgSamlQuery struct {
 	} `graphql:"organization(login: $login)"`
 }
 
-func newOrganizationCollector(ctx context.Context, client ghclient.Client) collector {
+func NewOrganizationCollector(ctx context.Context, client ghclient.Client) collectors.Collector {
 	c := &organizationCollector{
 		Client:  client,
 		Context: ctx,
 	}
-	initBaseCollector(&c.baseCollector, c)
+	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
 }
 
@@ -43,9 +44,9 @@ func (c *organizationCollector) Namespace() namespace.Namespace {
 	return namespace.Organization
 }
 
-func (c *organizationCollector) CollectMetadata() Metadata {
+func (c *organizationCollector) CollectMetadata() collectors.Metadata {
 	orgs, err := c.Client.CollectOrganizations()
-	res := Metadata{}
+	res := collectors.Metadata{}
 
 	if err != nil {
 		log.Printf("failed to collect organizations %s", err)
@@ -56,8 +57,8 @@ func (c *organizationCollector) CollectMetadata() Metadata {
 	return res
 }
 
-func (c *organizationCollector) Collect() subCollectorChannels {
-	return c.wrappedCollection(func() {
+func (c *organizationCollector) Collect() collectors.SubCollectorChannels {
+	return c.WrappedCollection(func() {
 		orgs, err := c.Client.CollectOrganizations()
 
 		if err != nil {
@@ -65,14 +66,14 @@ func (c *organizationCollector) Collect() subCollectorChannels {
 			return
 		}
 
-		c.totalCollectionChange(len(orgs))
+		c.TotalCollectionChange(len(orgs))
 		gw := group_waiter.New()
 		for _, org := range orgs {
 			org := org
 			gw.Do(func() {
 				extend := c.collectExtraData(&org)
-				c.collectData(org, extend, *extend.Organization.HTMLURL, []permissions.Role{org.Role})
-				c.collectionChangeByOne()
+				c.CollectData(org, extend, *extend.Organization.HTMLURL, []permissions.Role{org.Role})
+				c.CollectionChangeByOne()
 			})
 		}
 		gw.Wait()
@@ -107,9 +108,9 @@ func (c *organizationCollector) collectOrgWebhooks(org string) ([]*github.Hook, 
 		hooks, resp, err := c.Client.Client().Organizations.ListHooks(c.Context, org, opts)
 		if err != nil {
 			if resp.Response.StatusCode == 404 {
-				perm := newMissingPermission(permissions.OrgHookAdmin, org,
+				perm := collectors.NewMissingPermission(permissions.OrgHookAdmin, org,
 					"Cannot read organization webhooks", namespace.Organization)
-				c.issueMissingPermissions(perm)
+				c.IssueMissingPermissions(perm)
 			}
 			return nil, err
 		}

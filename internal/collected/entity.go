@@ -1,6 +1,6 @@
-package githubcollected
+package collected
 
-type CollectedEntity interface {
+type Entity interface {
 	ViolationEntityType() string
 	CanonicalLink() string
 	Name() string

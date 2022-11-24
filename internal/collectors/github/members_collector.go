@@ -1,7 +1,8 @@
-package collectors
+package github
 
 import (
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
 	"time"
 
@@ -17,17 +18,17 @@ import (
 )
 
 type memberCollector struct {
-	baseCollector
+	collectors.BaseCollector
 	Client  ghclient.Client
 	Context context.Context
 }
 
-func newMemberCollector(ctx context.Context, client ghclient.Client) collector {
+func NewMemberCollector(ctx context.Context, client ghclient.Client) collectors.Collector {
 	c := &memberCollector{
 		Client:  client,
 		Context: ctx,
 	}
-	initBaseCollector(&c.baseCollector, c)
+	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
 }
 
@@ -43,13 +44,13 @@ type totalCountMembersQuery struct {
 	} `graphql:"organization(login: $login)"`
 }
 
-func (c *memberCollector) CollectMetadata() Metadata {
+func (c *memberCollector) CollectMetadata() collectors.Metadata {
 	gw := group_waiter.New()
 	orgs, err := c.Client.CollectOrganizations()
 
 	if err != nil {
 		log.Printf("failed to collect organization %s", err)
-		return Metadata{}
+		return collectors.Metadata{}
 	}
 
 	var totalCount int32 = 0
@@ -73,13 +74,13 @@ func (c *memberCollector) CollectMetadata() Metadata {
 	}
 	gw.Wait()
 
-	return Metadata{
+	return collectors.Metadata{
 		TotalEntities: int(totalCount),
 	}
 }
 
-func (c *memberCollector) Collect() subCollectorChannels {
-	return c.wrappedCollection(func() {
+func (c *memberCollector) Collect() collectors.SubCollectorChannels {
+	return c.WrappedCollection(func() {
 		orgs, err := c.Client.CollectOrganizations()
 
 		if err != nil {
@@ -87,18 +88,18 @@ func (c *memberCollector) Collect() subCollectorChannels {
 			return
 		}
 
-		c.totalCollectionChange(0)
+		c.TotalCollectionChange(0)
 
 		for _, org := range orgs {
 			hasLastActive := org.IsEnterprise()
 
 			var enrichedMembers []ghcollected.OrganizationMember
 			missingPermissions := c.checkOrgMissingPermissions(org)
-			c.issueMissingPermissions(missingPermissions...)
+			c.IssueMissingPermissions(missingPermissions...)
 
 			for _, memberType := range []string{"member", "admin"} {
 				res := c.collectMembers(org.Name(), memberType)
-				c.collectionChange(len(res))
+				c.CollectionChange(len(res))
 
 				if !hasLastActive {
 					for _, m := range res {
@@ -111,7 +112,7 @@ func (c *memberCollector) Collect() subCollectorChannels {
 
 			}
 
-			c.collectData(org,
+			c.CollectData(org,
 				ghcollected.OrganizationMembers{
 					Organization:  org,
 					Members:       enrichedMembers,
@@ -133,7 +134,7 @@ func (c *memberCollector) enrichMembers(org *ghcollected.ExtendedOrg, members []
 			memberLastActive, err := c.collectMemberLastActiveTime(org.Name(), *localMember.Login)
 			if err != nil {
 				perm := c.memberMissingPermission(org, localMember)
-				c.issueMissingPermissions(perm)
+				c.IssueMissingPermissions(perm)
 				return
 			}
 			if !memberLastActive.IsZero() {
@@ -209,20 +210,20 @@ const (
 	orgNotEnterpriseEffect    = "Some information cannot be collected because the organization is not part of an enterprise"
 )
 
-func (c *memberCollector) memberMissingPermission(org *ghcollected.ExtendedOrg, member *github.User) missingPermission {
+func (c *memberCollector) memberMissingPermission(org *ghcollected.ExtendedOrg, member *github.User) collectors.MissingPermission {
 	entityName := fmt.Sprintf("%s (%s)", *member.Login, org.Name())
-	return newMissingPermission(permissions.OrgAdmin, entityName, orgMemberLastActiveEffect, namespace.Member)
+	return collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgMemberLastActiveEffect, namespace.Member)
 }
 
-func (c *memberCollector) checkOrgMissingPermissions(org ghcollected.ExtendedOrg) []missingPermission {
-	missingPermissions := make([]missingPermission, 0)
+func (c *memberCollector) checkOrgMissingPermissions(org ghcollected.ExtendedOrg) []collectors.MissingPermission {
+	missingPermissions := make([]collectors.MissingPermission, 0)
 	entityName := org.Name()
 
 	if org.Plan == nil {
-		perm := newMissingPermission(permissions.OrgRead, entityName, orgInfoEffect, namespace.Organization)
+		perm := collectors.NewMissingPermission(permissions.OrgRead, entityName, orgInfoEffect, namespace.Organization)
 		missingPermissions = append(missingPermissions, perm)
 	} else if !org.IsEnterprise() {
-		perm := newMissingPermission(permissions.OrgRead, entityName, orgNotEnterpriseEffect, namespace.Organization)
+		perm := collectors.NewMissingPermission(permissions.OrgRead, entityName, orgNotEnterpriseEffect, namespace.Organization)
 		missingPermissions = append(missingPermissions, perm)
 	}
 

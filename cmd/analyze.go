@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/collectors/collectors_manager"
 	"log"
 	"os"
 	"strings"
@@ -17,7 +18,6 @@ import (
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
-	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
 	"github.com/Legit-Labs/legitify/internal/outputer"
@@ -182,7 +182,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	manager := collectors.NewCollectorsManager(ctx, analyzeArgs.Namespaces, githubClient)
+	manager := collectors_manager.NewCollectorsManager(ctx, analyzeArgs.Namespaces, githubClient)
 	analyzer := analyzers.NewAnalyzer(ctx, opaEngine, skippers.NewSkipper(ctx))
 	enricherManager := enricher.NewEnricherManager(ctx)
 	out := outputer.NewOutputer(ctx, analyzeArgs.OutputFormat, analyzeArgs.OutputScheme, analyzeArgs.FailedOnly)

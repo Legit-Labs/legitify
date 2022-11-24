@@ -1,7 +1,9 @@
-package collectors
+package collectors_manager
 
 import (
 	"context"
+	"github.com/Legit-Labs/legitify/internal/collectors"
+	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 
 	"github.com/Legit-Labs/legitify/internal/clients/github"
@@ -9,48 +11,48 @@ import (
 )
 
 type CollectorChannels struct {
-	Collected <-chan CollectedData
-	Progress  <-chan CollectionMetric
+	Collected <-chan collectors.CollectedData
+	Progress  <-chan collectors.CollectionMetric
 }
 
 type CollectorManager interface {
 	Collect() CollectorChannels
-	CollectMetadata() map[namespace.Namespace]Metadata
+	CollectMetadata() map[namespace.Namespace]collectors.Metadata
 }
 
 type manager struct {
-	collectors []collector
+	collectors []collectors.Collector
 	ctx        context.Context
 	client     github.Client
 }
 
-type newCollectorFunc func(ctx context.Context, client github.Client) collector
+type newCollectorFunc func(ctx context.Context, client github.Client) collectors.Collector
 
 var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
-	namespace.Repository:   newRepositoryCollector,
-	namespace.Organization: newOrganizationCollector,
-	namespace.Member:       newMemberCollector,
-	namespace.Actions:      newActionCollector,
-	namespace.RunnerGroup:  newRunnersCollector,
+	namespace.Repository:   github2.NewRepositoryCollector,
+	namespace.Organization: github2.NewOrganizationCollector,
+	namespace.Member:       github2.NewMemberCollector,
+	namespace.Actions:      github2.NewActionCollector,
+	namespace.RunnerGroup:  github2.NewRunnersCollector,
 }
 
 func NewCollectorsManager(ctx context.Context, ns []namespace.Namespace, client github.Client) CollectorManager {
-	var collectors []collector
+	var initiatedCollectors []collectors.Collector
 	for _, n := range ns {
-		collectors = append(collectors, collectorsMapping[n](ctx, client))
+		initiatedCollectors = append(initiatedCollectors, collectorsMapping[n](ctx, client))
 	}
 
 	return &manager{
 		ctx:        ctx,
 		client:     client,
-		collectors: collectors,
+		collectors: initiatedCollectors,
 	}
 }
 
-func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
+func (m *manager) CollectMetadata() map[namespace.Namespace]collectors.Metadata {
 	type metaDataPair struct {
 		Namespace namespace.Namespace
-		Metadata  Metadata
+		Metadata  collectors.Metadata
 	}
 
 	gw := group_waiter.New()
@@ -64,7 +66,7 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 	gw.Wait()
 	close(ch)
 
-	res := make(map[namespace.Namespace]Metadata)
+	res := make(map[namespace.Namespace]collectors.Metadata)
 	for m := range ch {
 		res[m.Namespace] = m.Metadata
 	}
@@ -73,17 +75,17 @@ func (m *manager) CollectMetadata() map[namespace.Namespace]Metadata {
 }
 
 func (m *manager) Collect() CollectorChannels {
-	collectedChan := make(chan CollectedData)
-	progressChan := make(chan CollectionMetric)
+	collectedChan := make(chan collectors.CollectedData)
+	progressChan := make(chan collectors.CollectionMetric)
 
 	go func() {
 		defer close(collectedChan)
 		defer close(progressChan)
 
-		missingPermissionsChannel := make(chan missingPermission)
+		missingPermissionsChannel := make(chan collectors.MissingPermission)
 		permWait := group_waiter.New()
 		permWait.Do(func() {
-			collectMissingPermissions(missingPermissionsChannel)
+			collectors.CollectMissingPermissions(missingPermissionsChannel)
 		})
 
 		gw := group_waiter.New()
@@ -122,7 +124,7 @@ func (m *manager) Collect() CollectorChannels {
 					}
 				}
 
-				progressChan <- CollectionMetric{
+				progressChan <- collectors.CollectionMetric{
 					Finished:  true,
 					Namespace: c.Namespace(),
 				}
@@ -133,5 +135,8 @@ func (m *manager) Collect() CollectorChannels {
 		permWait.Wait()
 	}()
 
-	return wrapCollectorChans(collectedChan, progressChan)
+	return CollectorChannels{
+		Collected: collectedChan,
+		Progress:  progressChan,
+	}
 }

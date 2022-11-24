@@ -3,12 +3,11 @@ package analyzers
 import (
 	"context"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
+	githubcollected "github.com/Legit-Labs/legitify/internal/collected"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"testing"
-
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -29,7 +28,7 @@ func TestAnalyzerSanity(t *testing.T) {
 	require.NotNilf(t, analyzer, "failed to create analyzer")
 
 	type nullEntity struct {
-		githubcollected.CollectedEntity
+		githubcollected.Entity
 	}
 
 	someData := collectors.CollectedData{
