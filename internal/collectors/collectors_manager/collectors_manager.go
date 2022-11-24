@@ -1,12 +1,9 @@
 package collectors_manager
 
 import (
-	"context"
 	"github.com/Legit-Labs/legitify/internal/collectors"
-	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 
-	"github.com/Legit-Labs/legitify/internal/clients/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 )
 
@@ -22,29 +19,10 @@ type CollectorManager interface {
 
 type manager struct {
 	collectors []collectors.Collector
-	ctx        context.Context
-	client     github.Client
 }
 
-type newCollectorFunc func(ctx context.Context, client github.Client) collectors.Collector
-
-var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
-	namespace.Repository:   github2.NewRepositoryCollector,
-	namespace.Organization: github2.NewOrganizationCollector,
-	namespace.Member:       github2.NewMemberCollector,
-	namespace.Actions:      github2.NewActionCollector,
-	namespace.RunnerGroup:  github2.NewRunnersCollector,
-}
-
-func NewCollectorsManager(ctx context.Context, ns []namespace.Namespace, client github.Client) CollectorManager {
-	var initiatedCollectors []collectors.Collector
-	for _, n := range ns {
-		initiatedCollectors = append(initiatedCollectors, collectorsMapping[n](ctx, client))
-	}
-
+func NewCollectorsManager(initiatedCollectors []collectors.Collector) CollectorManager {
 	return &manager{
-		ctx:        ctx,
-		client:     client,
 		collectors: initiatedCollectors,
 	}
 }

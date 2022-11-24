@@ -11,7 +11,9 @@ import (
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
+	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/collectors/collectors_manager"
+	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
@@ -32,7 +34,8 @@ func setupGitHub(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 	if err != nil {
 		return nil, err
 	}
-	collectorManager := provideCollectorsManager(context, analyzeArgs2, client)
+	v := provideCollectors(context, client, analyzeArgs2)
+	collectorManager := collectors_manager.NewCollectorsManager(v)
 	enginer, err := provideOpa(analyzeArgs2)
 	if err != nil {
 		return nil, err
@@ -47,12 +50,20 @@ func setupGitHub(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 
 // inject_github.go:
 
-func provideOutputer(ctx context.Context, analyzeArgs2 *args) outputer.Outputer {
-	return outputer.NewOutputer(ctx, analyzeArgs2.OutputFormat, analyzeArgs2.OutputScheme, analyzeArgs2.FailedOnly)
+func provideCollectors(ctx context.Context, client github.Client, analyzeArgs2 *args) []collectors.Collector {
+	type newCollectorFunc func(ctx context.Context, client github.Client) collectors.Collector
+	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{namespace.Repository: github2.NewRepositoryCollector, namespace.Organization: github2.NewOrganizationCollector, namespace.Member: github2.NewMemberCollector, namespace.Actions: github2.NewActionCollector, namespace.RunnerGroup: github2.NewRunnersCollector}
+
+	var result []collectors.Collector
+	for _, ns := range analyzeArgs2.Namespaces {
+		result = append(result, collectorsMapping[ns](ctx, client))
+	}
+
+	return result
 }
 
-func provideCollectorsManager(ctx context.Context, analyzeArgs2 *args, client github.Client) collectors_manager.CollectorManager {
-	return collectors_manager.NewCollectorsManager(ctx, analyzeArgs2.Namespaces, client)
+func provideOutputer(ctx context.Context, analyzeArgs2 *args) outputer.Outputer {
+	return outputer.NewOutputer(ctx, analyzeArgs2.OutputFormat, analyzeArgs2.OutputScheme, analyzeArgs2.FailedOnly)
 }
 
 func provideOpa(analyzeArgs2 *args) (opa_engine.Enginer, error) {
