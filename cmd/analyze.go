@@ -3,24 +3,15 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/collectors/collectors_manager"
 	"log"
 	"os"
 	"strings"
 
-	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 
-	"github.com/Legit-Labs/legitify/internal/opa"
-
-	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 
-	"github.com/Legit-Labs/legitify/internal/analyzers"
-	"github.com/Legit-Labs/legitify/internal/clients/github"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
-	"github.com/Legit-Labs/legitify/internal/enricher"
-	"github.com/Legit-Labs/legitify/internal/outputer"
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/spf13/cobra"
@@ -98,6 +89,10 @@ func validateAnalyzeArgs() error {
 		return err
 	}
 
+	if len(analyzeArgs.Organizations) != 0 && len(analyzeArgs.Repositories) != 0 {
+		return fmt.Errorf("cannot use --org & --repo options together")
+	}
+
 	return nil
 }
 
@@ -155,59 +150,10 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 
 	stdErrLog := log.New(os.Stderr, "", 0)
 
-	ctx, err := buildContext()
+	executor, err := setupGitHub(&analyzeArgs, stdErrLog)
 	if err != nil {
 		return err
 	}
 
-	if !IsScorecardEnabled(analyzeArgs.ScorecardWhen) {
-		stdErrLog.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
-	}
-
-	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Endpoint,
-		analyzeArgs.Organizations, false)
-
-	if err != nil {
-		return err
-	} else if len(parsedRepositories) > 0 {
-		if err = repositoriesAnalyzable(ctx, githubClient, parsedRepositories); err != nil {
-			return err
-		}
-	}
-
-	ctx = context_utils.NewContextWithTokenScopes(ctx, githubClient.Scopes())
-
-	opaEngine, err := opa.Load(analyzeArgs.PoliciesPath)
-	if err != nil {
-		return err
-	}
-
-	manager := collectors_manager.NewCollectorsManager(ctx, analyzeArgs.Namespaces, githubClient)
-	analyzer := analyzers.NewAnalyzer(ctx, opaEngine, skippers.NewSkipper(ctx))
-	enricherManager := enricher.NewEnricherManager(ctx)
-	out := outputer.NewOutputer(ctx, analyzeArgs.OutputFormat, analyzeArgs.OutputScheme, analyzeArgs.FailedOnly)
-
-	stdErrLog.Printf("Gathering collection metadata...")
-	collectionMetadata := manager.CollectMetadata()
-	progressBar := progressbar.NewProgressBar(collectionMetadata)
-
-	// TODO progressBar should run before collection starts and wait for channels to read from
-	collectionChannels := manager.Collect()
-	pWaiter := progressBar.Run(collectionChannels.Progress)
-	analyzedDataChan := analyzer.Analyze(collectionChannels.Collected)
-	enrichedDataChan := enricherManager.Enrich(analyzedDataChan)
-	outputWaiter := out.Digest(enrichedDataChan)
-
-	// Wait for progress bars to finish before outputting
-	pWaiter.Wait()
-
-	// Wait for output to be digested
-	outputWaiter.Wait()
-
-	err = out.Output(os.Stdout)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return executor.Run()
 }
