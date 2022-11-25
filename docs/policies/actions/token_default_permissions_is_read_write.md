@@ -16,12 +16,12 @@ Your default GitHub Action workflow token permission is set to read-write. When 
 
 
 ### Remediation
-1. 1. Make sure you have admin permissions
-2. 2. Go to the org's settings page
-3. 3. Enter "Actions - General" tab
-4. 4. Under 'Workflow permissions'
-5. 5. Select 'Read repository contents permission'
-6. 6. Click 'Save'
+1. Make sure you have admin permissions
+2. Go to the org's settings page
+3. Enter "Actions - General" tab
+4. Under 'Workflow permissions'
+5. Select 'Read repository contents permission'
+6. Click 'Save'
 
 
 

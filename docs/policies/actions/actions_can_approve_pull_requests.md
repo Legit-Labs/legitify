@@ -16,12 +16,12 @@ Your default GitHub Actions configuration allows for workflows to approve pull r
 
 
 ### Remediation
-1. 1. Make sure you have admin permissions
-2. 2. Go to the org's settings page
-3. 3. Enter "Actions - General" tab
-4. 4. Under 'Workflow permissions'
-5. 5. Uncheck 'Allow GitHub actions to create and approve pull requests.
-6. 6. Click 'Save'
+1. Make sure you have admin permissions
+2. Go to the org's settings page
+3. Enter "Actions - General" tab
+4. Under 'Workflow permissions'
+5. Uncheck 'Allow GitHub actions to create and approve pull requests.
+6. Click 'Save'
 
 
 
