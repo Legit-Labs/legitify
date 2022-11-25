@@ -46,7 +46,7 @@ You can control which resources will be analyzed with command-line flags namespa
 - `--org`: will limit the analysis to the specified organizations
 
 ```
-GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespaces organization,member
+GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
 The above command will test organization and member policies against org1 and org2.
 
@@ -55,7 +55,7 @@ You can run legitify against a GitHub Enterprise instance if you set the endpoin
 
 ```sh
 export SERVER_URL="https://github.example.com/"
-GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespaces organization,member
+GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
 
 ## Namespaces
