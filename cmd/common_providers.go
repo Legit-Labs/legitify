@@ -2,13 +2,25 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
 	"github.com/Legit-Labs/legitify/internal/outputer"
 	"log"
 )
+
+func provideGenericClient(args *args) (Client, error) {
+	if args.ScmType == scm_type.GitHub {
+		return provideGitHubClient(args)
+	} else if args.ScmType == scm_type.GitLab {
+		return provideGitlabClient(args)
+	} else {
+		return nil, fmt.Errorf("invalid scm type")
+	}
+}
 
 func provideOutputer(ctx context.Context, analyzeArgs *args) outputer.Outputer {
 	return outputer.NewOutputer(ctx, analyzeArgs.OutputFormat, analyzeArgs.OutputScheme, analyzeArgs.FailedOnly)
@@ -31,7 +43,7 @@ func provideContext(client Client, logger *log.Logger) (context.Context, error) 
 		if err != nil {
 			return nil, err
 		}
-		if err = repositoriesAnalyzable(ctx, client, validated); err != nil {
+		if err = repositoriesAnalyzable(client, validated); err != nil {
 			return nil, err
 		}
 		ctx = context_utils.NewContextWithRepos(validated)

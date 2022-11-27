@@ -53,7 +53,7 @@ func newAnalyzeCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
-	analyzeArgs.AddCommonOptions(flags)
+	analyzeArgs.addCommonOptions(flags)
 
 	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
@@ -69,6 +69,10 @@ func newAnalyzeCommand() *cobra.Command {
 }
 
 func validateAnalyzeArgs() error {
+	if err := analyzeArgs.validateCommonOptions(); err != nil {
+		return err
+	}
+
 	if err := namespace.ValidateNamespaces(analyzeArgs.Namespaces); err != nil {
 		return err
 	}
@@ -82,10 +86,6 @@ func validateAnalyzeArgs() error {
 	}
 
 	if err := ValidateScorecardOption(analyzeArgs.ScorecardWhen); err != nil {
-		return err
-	}
-
-	if err := scm_type.Validate(analyzeArgs.ScmType); err != nil {
 		return err
 	}
 

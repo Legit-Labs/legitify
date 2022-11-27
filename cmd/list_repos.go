@@ -30,7 +30,7 @@ func newListReposCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := listReposCmd.Flags()
-	listReposArgs.AddCommonOptions(flags)
+	listReposArgs.addCommonOptions(flags)
 
 	return listReposCmd
 }

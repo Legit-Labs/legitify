@@ -33,10 +33,43 @@ func NewClient(ctx context.Context, token string, endpoint string, fillCache boo
 	}, nil
 }
 
-func (c *Client) IsAnalyzable(ctx context.Context, repo types.RepositoryWithOwner) (bool, error) {
-	return false, nil
+func (c *Client) IsAnalyzable(repo types.RepositoryWithOwner) (bool, error) {
+	_, _, err := c.Client().Projects.GetProject(repo.String(), nil)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (c *Client) Scopes() permissions.TokenScopes {
-	return nil
+	return permissions.TokenScopes{}
+}
+
+func (c *Client) Organizations() ([]types.Organization, error) {
+	var result []types.Organization
+
+	dummy := true
+	options := gitlab.ListGroupsOptions{Owned: &dummy}
+
+	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
+		groups, resp, err := c.Client().Groups.ListGroups(&options)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, g := range groups {
+			result = append(result, types.Organization{
+				Name: g.Name,
+				Role: permissions.OrgRoleOwner,
+			})
+		}
+
+		return resp, nil
+	}, &options.ListOptions)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

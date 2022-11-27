@@ -219,6 +219,23 @@ func (c *Client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
 	return orgs, nil
 }
 
+func (c *Client) Organizations() ([]commontypes.Organization, error) {
+	raw, err := c.CollectOrganizations()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []commontypes.Organization
+	for _, o := range raw {
+		result = append(result, commontypes.Organization{
+			Name: o.Name(),
+			Role: o.Role,
+		})
+	}
+
+	return result, nil
+}
+
 type orgPermissionQuery struct {
 	Organization struct {
 		ViewerCanAdminister *bool `graphql:"viewerCanAdminister"`
@@ -350,7 +367,7 @@ func (c *Client) GetActionsTokenPermissions(url string) (*types.TokenPermissions
 	return &p, nil
 }
 
-func (c *Client) IsAnalyzable(ctx context.Context, repository commontypes.RepositoryWithOwner) (bool, error) {
+func (c *Client) IsAnalyzable(repository commontypes.RepositoryWithOwner) (bool, error) {
 	var repo struct {
 		Repository struct {
 			ViewerPermission githubv4.String
@@ -361,7 +378,7 @@ func (c *Client) IsAnalyzable(ctx context.Context, repository commontypes.Reposi
 		"owner": githubv4.String(repository.Owner),
 	}
 
-	err := c.GraphQLClient().Query(ctx, &repo, variables)
+	err := c.GraphQLClient().Query(c.context, &repo, variables)
 	if err != nil {
 		return false, err
 	}
