@@ -35,7 +35,6 @@ func provideContext(client Client, logger *log.Logger) (context.Context, error) 
 			return nil, err
 		}
 		ctx = context_utils.NewContextWithRepos(validated)
-		parsedRepositories = validated
 		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
 	} else {
 		ctx = context.Background()

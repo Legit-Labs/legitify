@@ -93,12 +93,13 @@ func provideGitHubClient(analyzeArgs2 *args) (*github.Client, error) {
 // inject_gitlab.go:
 
 func provideGitlabCollectors(ctx context.Context, client *gitlab.Client, analyzeArgs2 *args) []collectors.Collector {
-	type newCollectorFunc func(ctx context.Context, client gitlab.Client) collectors.Collector
-	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{namespace.Organization: gitlab2.NewGroupCollector}
+	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *gitlab.Client) collectors.Collector{namespace.Organization: gitlab2.NewGroupCollector}
 
 	var result []collectors.Collector
 	for _, ns := range analyzeArgs2.Namespaces {
-		result = append(result, collectorsMapping[ns](ctx, *client))
+		if val, ok := collectorsMapping[ns]; ok {
+			result = append(result, val(ctx, client))
+		}
 	}
 
 	return result

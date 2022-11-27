@@ -24,14 +24,15 @@ func setupGitlab(analyzeArgs *args, log *log.Logger) (*analyzeExecutor, error) {
 }
 
 func provideGitlabCollectors(ctx context.Context, client *glclient.Client, analyzeArgs *args) []collectors.Collector {
-	type newCollectorFunc func(ctx context.Context, client glclient.Client) collectors.Collector
-	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
+	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *glclient.Client) collectors.Collector{
 		namespace.Organization: gitlab.NewGroupCollector,
 	}
 
 	var result []collectors.Collector
 	for _, ns := range analyzeArgs.Namespaces {
-		result = append(result, collectorsMapping[ns](ctx, *client))
+		if val, ok := collectorsMapping[ns]; ok {
+			result = append(result, val(ctx, client))
+		}
 	}
 
 	return result

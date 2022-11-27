@@ -2,11 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"log"
 	"os"
 	"strings"
-
-	"github.com/Legit-Labs/legitify/internal/common/types"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 
@@ -38,7 +37,6 @@ func toOptionsString(options []string) string {
 }
 
 var analyzeArgs args
-var parsedRepositories []types.RepositoryWithOwner
 
 func newAnalyzeCommand() *cobra.Command {
 	analyzeCmd := &cobra.Command{
@@ -87,6 +85,10 @@ func validateAnalyzeArgs() error {
 		return err
 	}
 
+	if err := scm_type.Validate(analyzeArgs.ScmType); err != nil {
+		return err
+	}
+
 	if len(analyzeArgs.Organizations) != 0 && len(analyzeArgs.Repositories) != 0 {
 		return fmt.Errorf("cannot use --org & --repo options together")
 	}
@@ -123,7 +125,16 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 
 	stdErrLog := log.New(os.Stderr, "", 0)
 
-	executor, err := setupGitHub(&analyzeArgs, stdErrLog)
+	var executor = &analyzeExecutor{}
+
+	if analyzeArgs.ScmType == scm_type.GitHub {
+		executor, err = setupGitHub(&analyzeArgs, stdErrLog)
+	} else if analyzeArgs.ScmType == scm_type.GitLab {
+		executor, err = setupGitlab(&analyzeArgs, stdErrLog)
+	} else {
+		// shouldn't happen since scm type is validated before
+	}
+
 	if err != nil {
 		return err
 	}

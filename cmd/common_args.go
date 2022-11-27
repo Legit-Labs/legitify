@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -8,6 +9,7 @@ import (
 type args struct {
 	Token         string
 	Endpoint      string
+	ScmType       scm_type.ScmType
 	Organizations []string
 	Repositories  []string
 	PoliciesPath  []string
@@ -26,6 +28,7 @@ const (
 	ArgOutputFile = "output-file"
 	ArgToken      = "github-token"
 	ArgServerUrl  = "server-url"
+	ScmType       = "scm"
 )
 
 const (
@@ -48,4 +51,5 @@ func (a *args) AddCommonOptions(flags *pflag.FlagSet) {
 	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github endpoint to use instead of GitHub Cloud (can be set via the environment variable SERVER_URL)")
 	flags.StringVarP(&a.OutputFile, ArgOutputFile, "o", "", "output file, defaults to stdout")
 	flags.StringVarP(&a.ErrorFile, ArgErrorFile, "e", "error.log", "error log path")
+	flags.StringVarP(&a.ScmType, ScmType, "", scm_type.GitHub, "server type (GitHub, Gitlab), defaults to GitHub")
 }

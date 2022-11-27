@@ -13,11 +13,11 @@ import (
 
 type organizationCollector struct {
 	collectors.BaseCollector
-	Client  gitlab.Client
+	Client  *gitlab.Client
 	Context context.Context
 }
 
-func NewGroupCollector(ctx context.Context, client gitlab.Client) collectors.Collector {
+func NewGroupCollector(ctx context.Context, client *gitlab.Client) collectors.Collector {
 	c := &organizationCollector{
 		Client:  client,
 		Context: ctx,
