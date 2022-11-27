@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
+	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
 	"log"
 	"net/http"
@@ -384,6 +385,118 @@ func (c *Client) IsAnalyzable(repository commontypes.RepositoryWithOwner) (bool,
 	}
 
 	return repo.Repository.ViewerPermission == permissions.RepoRoleAdmin, nil
+}
+
+func unique(slice []commontypes.RepositoryWithOwner) []commontypes.RepositoryWithOwner {
+	keys := make(map[string]bool)
+	var list []commontypes.RepositoryWithOwner
+	for _, entry := range slice {
+		key := entry.String()
+		if _, value := keys[key]; !value {
+			keys[key] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
+func (c *Client) Repositories() ([]commontypes.RepositoryWithOwner, error) {
+	r1, err := c.getViewerRepositories()
+	if err != nil {
+		return nil, err
+	}
+
+	r2, err := c.getOrganizationsRepositories()
+	if err != nil {
+		return nil, err
+	}
+
+	return unique(append(r1, r2...)), nil
+}
+
+func (c *Client) getViewerRepositories() ([]commontypes.RepositoryWithOwner, error) {
+	var repositories []commontypes.RepositoryWithOwner
+	var query struct {
+		Viewer struct {
+			Repositories struct {
+				PageInfo githubcollected.GitHubQLPageInfo
+				Nodes    []struct {
+					NameWithOwner    string
+					ViewerPermission string
+				}
+			} `graphql:"repositories(first:50, after: $cursor)"`
+		}
+	}
+
+	variables := map[string]interface{}{
+		"cursor": (*githubv4.String)(nil),
+	}
+
+	for {
+		err := c.GraphQLClient().Query(c.context, &query, variables)
+		if err != nil {
+			return nil, err
+		}
+		for _, r := range query.Viewer.Repositories.Nodes {
+			repositories = append(repositories, commontypes.NewRepositoryWithOwner(r.NameWithOwner, r.ViewerPermission))
+		}
+
+		if !query.Viewer.Repositories.PageInfo.HasNextPage {
+			break
+		}
+
+		variables["cursor"] = query.Viewer.Repositories.PageInfo.EndCursor
+	}
+
+	return repositories, nil
+}
+
+func (c *Client) getOrganizationsRepositories() ([]commontypes.RepositoryWithOwner, error) {
+	var repositories []commontypes.RepositoryWithOwner
+	orgs := c.Orgs()
+	gw := group_waiter.New()
+
+	for _, o := range orgs {
+		o := o
+		gw.Do(func() {
+			var query struct {
+				Organization struct {
+					Repositories struct {
+						PageInfo githubcollected.GitHubQLPageInfo
+						Nodes    []struct {
+							NameWithOwner    string
+							ViewerPermission string
+						}
+					} `graphql:"repositories(first: 50, after: $cursor)"`
+				} `graphql:"organization(login: $login)"`
+			}
+
+			variables := map[string]interface{}{
+				"cursor": (*githubv4.String)(nil),
+				"login":  githubv4.String(o),
+			}
+
+			for {
+				err := c.GraphQLClient().Query(c.context, &query, variables)
+				if err != nil {
+					return
+				}
+
+				for _, r := range query.Organization.Repositories.Nodes {
+					repositories = append(repositories, commontypes.NewRepositoryWithOwner(r.NameWithOwner, r.ViewerPermission))
+				}
+
+				if !query.Organization.Repositories.PageInfo.HasNextPage {
+					break
+				}
+
+				variables["cursor"] = query.Organization.Repositories.PageInfo.EndCursor
+			}
+		})
+	}
+
+	gw.Wait()
+	return repositories, nil
 }
 
 type samlError struct {

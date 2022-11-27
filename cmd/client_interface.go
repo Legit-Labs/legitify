@@ -9,4 +9,5 @@ type Client interface {
 	IsAnalyzable(repo types.RepositoryWithOwner) (bool, error)
 	Scopes() permissions.TokenScopes
 	Organizations() ([]types.Organization, error)
+	Repositories() ([]types.RepositoryWithOwner, error)
 }

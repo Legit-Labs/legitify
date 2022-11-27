@@ -73,3 +73,27 @@ func (c *Client) Organizations() ([]types.Organization, error) {
 
 	return result, nil
 }
+
+func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
+	var result []types.RepositoryWithOwner
+
+	dummy := gitlab.MaintainerPermissions
+	options := gitlab.ListProjectsOptions{MinAccessLevel: &dummy}
+	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
+		repos, resp, err := c.Client().Projects.ListProjects(&options)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, r := range repos {
+			result = append(result, types.NewRepositoryWithOwner(r.PathWithNamespace, permissions.RepoRoleAdmin))
+		}
+
+		return resp, nil
+	}, &options.ListOptions)
+
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
