@@ -3,8 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/clients/github"
-	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"strings"
 )
@@ -27,9 +25,9 @@ func validateRepositories(repositories []string) ([]types.RepositoryWithOwner, e
 	return result, nil
 }
 
-func repositoriesAnalyzable(ctx context.Context, client github.Client, repositories []types.RepositoryWithOwner) error {
+func repositoriesAnalyzable(ctx context.Context, client Client, repositories []types.RepositoryWithOwner) error {
 	for _, r := range repositories {
-		analyzable, err := github2.IsAnalyzable(ctx, client, r)
+		analyzable, err := client.IsAnalyzable(ctx, r)
 		if err != nil {
 			return err
 		} else if !analyzable {

@@ -19,11 +19,11 @@ import (
 
 type memberCollector struct {
 	collectors.BaseCollector
-	Client  ghclient.Client
+	Client  *ghclient.Client
 	Context context.Context
 }
 
-func NewMemberCollector(ctx context.Context, client ghclient.Client) collectors.Collector {
+func NewMemberCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &memberCollector{
 		Client:  client,
 		Context: ctx,
@@ -87,8 +87,6 @@ func (c *memberCollector) Collect() collectors.SubCollectorChannels {
 			log.Printf("failed to collect organizations %s", err)
 			return
 		}
-
-		c.TotalCollectionChange(0)
 
 		for _, org := range orgs {
 			hasLastActive := org.IsEnterprise()

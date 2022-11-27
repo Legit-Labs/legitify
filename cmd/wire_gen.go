@@ -11,15 +11,13 @@ import (
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
 	"github.com/Legit-Labs/legitify/internal/clients/github"
+	"github.com/Legit-Labs/legitify/internal/clients/gitlab"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/collectors/collectors_manager"
 	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
+	gitlab2 "github.com/Legit-Labs/legitify/internal/collectors/gitlab"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
-	"github.com/Legit-Labs/legitify/internal/opa"
-	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
-	"github.com/Legit-Labs/legitify/internal/outputer"
 	"log"
 )
 
@@ -34,7 +32,32 @@ func setupGitHub(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 	if err != nil {
 		return nil, err
 	}
-	v := provideCollectors(context, client, analyzeArgs2)
+	v := provideGitHubCollectors(context, client, analyzeArgs2)
+	collectorManager := collectors_manager.NewCollectorsManager(v)
+	enginer, err := provideOpa(analyzeArgs2)
+	if err != nil {
+		return nil, err
+	}
+	skipper := skippers.NewSkipper(context)
+	analyzer := analyzers.NewAnalyzer(context, enginer, skipper)
+	enricherManager := enricher.NewEnricherManager(context)
+	outputer := provideOutputer(context, analyzeArgs2)
+	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer, log2)
+	return cmdAnalyzeExecutor, nil
+}
+
+// Injectors from inject_gitlab.go:
+
+func setupGitlab(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error) {
+	client, err := provideGitlabClient(analyzeArgs2)
+	if err != nil {
+		return nil, err
+	}
+	context, err := provideContext(client, log2)
+	if err != nil {
+		return nil, err
+	}
+	v := provideGitlabCollectors(context, client, analyzeArgs2)
 	collectorManager := collectors_manager.NewCollectorsManager(v)
 	enginer, err := provideOpa(analyzeArgs2)
 	if err != nil {
@@ -50,8 +73,8 @@ func setupGitHub(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 
 // inject_github.go:
 
-func provideCollectors(ctx context.Context, client github.Client, analyzeArgs2 *args) []collectors.Collector {
-	type newCollectorFunc func(ctx context.Context, client github.Client) collectors.Collector
+func provideGitHubCollectors(ctx context.Context, client *github.Client, analyzeArgs2 *args) []collectors.Collector {
+	type newCollectorFunc func(ctx context.Context, client *github.Client) collectors.Collector
 	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{namespace.Repository: github2.NewRepositoryCollector, namespace.Organization: github2.NewOrganizationCollector, namespace.Member: github2.NewMemberCollector, namespace.Actions: github2.NewActionCollector, namespace.RunnerGroup: github2.NewRunnersCollector}
 
 	var result []collectors.Collector
@@ -62,49 +85,25 @@ func provideCollectors(ctx context.Context, client github.Client, analyzeArgs2 *
 	return result
 }
 
-func provideOutputer(ctx context.Context, analyzeArgs2 *args) outputer.Outputer {
-	return outputer.NewOutputer(ctx, analyzeArgs2.OutputFormat, analyzeArgs2.OutputScheme, analyzeArgs2.FailedOnly)
-}
-
-func provideOpa(analyzeArgs2 *args) (opa_engine.Enginer, error) {
-	opaEngine, err := opa.Load(analyzeArgs2.PoliciesPath)
-	if err != nil {
-		return nil, err
-	}
-	return opaEngine, nil
-}
-
-func provideGitHubClient(analyzeArgs2 *args) (github.Client, error) {
+func provideGitHubClient(analyzeArgs2 *args) (*github.Client, error) {
 	return github.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.
 		Organizations, false)
 }
 
-func provideContext(client github.Client, logger *log.Logger) (context.Context, error) {
-	var ctx context.Context
-	if len(analyzeArgs.Organizations) != 0 {
-		ctx = context_utils.NewContextWithOrg(analyzeArgs.Organizations)
-	} else if len(analyzeArgs.Repositories) != 0 {
-		validated, err := validateRepositories(analyzeArgs.Repositories)
-		if err != nil {
-			return nil, err
-		}
-		if err = repositoriesAnalyzable(ctx, client, validated); err != nil {
-			return nil, err
-		}
-		ctx = context_utils.NewContextWithRepos(validated)
-		parsedRepositories = validated
-		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
-	} else {
-		ctx = context.Background()
+// inject_gitlab.go:
+
+func provideGitlabCollectors(ctx context.Context, client *gitlab.Client, analyzeArgs2 *args) []collectors.Collector {
+	type newCollectorFunc func(ctx context.Context, client gitlab.Client) collectors.Collector
+	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{namespace.Organization: gitlab2.NewGroupCollector}
+
+	var result []collectors.Collector
+	for _, ns := range analyzeArgs2.Namespaces {
+		result = append(result, collectorsMapping[ns](ctx, *client))
 	}
 
-	ctx = context_utils.NewContextWithScorecard(ctx,
-		IsScorecardEnabled(analyzeArgs.ScorecardWhen),
-		IsScorecardVerbose(analyzeArgs.ScorecardWhen))
+	return result
+}
 
-	if !IsScorecardEnabled(analyzeArgs.ScorecardWhen) {
-		logger.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
-	}
-
-	return context_utils.NewContextWithTokenScopes(ctx, client.Scopes()), nil
+func provideGitlabClient(analyzeArgs2 *args) (*gitlab.Client, error) {
+	return gitlab.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, false)
 }

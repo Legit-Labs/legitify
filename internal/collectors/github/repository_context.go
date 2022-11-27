@@ -27,10 +27,10 @@ func (rc *repositoryContext) IsBranchProtectionSupported() bool {
 
 type repositoryContextFactory struct {
 	ctx    context.Context
-	client github.Client
+	client *github.Client
 }
 
-func newRepositoryContextFactory(ctx context.Context, client github.Client) *repositoryContextFactory {
+func newRepositoryContextFactory(ctx context.Context, client *github.Client) *repositoryContextFactory {
 	return &repositoryContextFactory{
 		ctx:    ctx,
 		client: client,

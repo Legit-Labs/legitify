@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +10,6 @@ import (
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 
-	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/spf13/cobra"
@@ -94,31 +92,6 @@ func validateAnalyzeArgs() error {
 	}
 
 	return nil
-}
-
-func buildContext() (context.Context, error) {
-	var ctx context.Context
-	if len(analyzeArgs.Organizations) != 0 && len(analyzeArgs.Repositories) != 0 {
-		return nil, fmt.Errorf("cannot use --org & --repo options together")
-	} else if len(analyzeArgs.Organizations) != 0 {
-		ctx = context_utils.NewContextWithOrg(analyzeArgs.Organizations)
-	} else if len(analyzeArgs.Repositories) != 0 {
-		validated, err := validateRepositories(analyzeArgs.Repositories)
-		if err != nil {
-			return nil, err
-		}
-		ctx = context_utils.NewContextWithRepos(validated)
-		parsedRepositories = validated
-		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
-	} else {
-		ctx = context.Background()
-	}
-
-	ctx = context_utils.NewContextWithScorecard(ctx,
-		IsScorecardEnabled(analyzeArgs.ScorecardWhen),
-		IsScorecardVerbose(analyzeArgs.ScorecardWhen))
-
-	return ctx, nil
 }
 
 func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {

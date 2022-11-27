@@ -15,12 +15,12 @@ import (
 
 type runnersCollector struct {
 	collectors.BaseCollector
-	client  ghclient.Client
+	client  *ghclient.Client
 	context context.Context
 	cache   map[string][]*github.RunnerGroup
 }
 
-func NewRunnersCollector(ctx context.Context, client ghclient.Client) collectors.Collector {
+func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &runnersCollector{
 		client:  client,
 		context: ctx,

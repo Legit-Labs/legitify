@@ -11,10 +11,9 @@ type Metadata struct {
 }
 
 type CollectionMetric struct {
-	TotalCollectionChange int
-	CollectionChange      int
-	Finished              bool
-	Namespace             string
+	CollectionChange int
+	Finished         bool
+	Namespace        string
 }
 
 type CollectedDataContext interface {

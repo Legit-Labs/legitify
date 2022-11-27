@@ -17,7 +17,7 @@ import (
 
 type organizationCollector struct {
 	collectors.BaseCollector
-	Client  ghclient.Client
+	Client  *ghclient.Client
 	Context context.Context
 }
 
@@ -31,7 +31,7 @@ var orgSamlQuery struct {
 	} `graphql:"organization(login: $login)"`
 }
 
-func NewOrganizationCollector(ctx context.Context, client ghclient.Client) collectors.Collector {
+func NewOrganizationCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &organizationCollector{
 		Client:  client,
 		Context: ctx,
@@ -66,7 +66,6 @@ func (c *organizationCollector) Collect() collectors.SubCollectorChannels {
 			return
 		}
 
-		c.TotalCollectionChange(len(orgs))
 		gw := group_waiter.New()
 		for _, org := range orgs {
 			org := org

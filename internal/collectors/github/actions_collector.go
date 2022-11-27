@@ -18,11 +18,11 @@ const (
 
 type actionCollector struct {
 	collectors.BaseCollector
-	client  ghclient.Client
+	client  *ghclient.Client
 	context context.Context
 }
 
-func NewActionCollector(ctx context.Context, client ghclient.Client) collectors.Collector {
+func NewActionCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &actionCollector{
 		client:  client,
 		context: ctx,

@@ -130,7 +130,7 @@ func groupByAnalyzable(repositories []repository) (analyzable []repository, notA
 	return
 }
 
-func getRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
+func getRepositories(githubClient *github.Client, ctx context.Context) ([]repository, error) {
 	r1, err := getViewerRepositories(githubClient, ctx)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func getRepositories(githubClient github.Client, ctx context.Context) ([]reposit
 	return unique(append(r1, r2...)), nil
 }
 
-func getViewerRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
+func getViewerRepositories(githubClient *github.Client, ctx context.Context) ([]repository, error) {
 	var repositories []repository
 	var query struct {
 		Viewer struct {
@@ -184,7 +184,7 @@ func getViewerRepositories(githubClient github.Client, ctx context.Context) ([]r
 	return repositories, nil
 }
 
-func getOrganizationRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
+func getOrganizationRepositories(githubClient *github.Client, ctx context.Context) ([]repository, error) {
 	var repositories []repository
 	orgs := githubClient.Orgs()
 	gw := group_waiter.New()

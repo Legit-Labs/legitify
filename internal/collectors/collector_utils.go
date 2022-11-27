@@ -58,13 +58,6 @@ func (b *BaseCollector) CollectDataWithContext(entity collected.Entity, canonica
 	}
 }
 
-func (b *BaseCollector) TotalCollectionChange(total int) {
-	b.progressChan <- CollectionMetric{
-		Namespace:             b.Namespace(),
-		TotalCollectionChange: total,
-	}
-}
-
 func (b *BaseCollector) CollectionChange(change int) {
 	b.progressChan <- CollectionMetric{
 		Namespace:        b.Namespace(),
