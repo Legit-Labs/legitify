@@ -1,6 +1,8 @@
 package gitlab
 
-import "github.com/xanzy/go-gitlab"
+import (
+	"github.com/xanzy/go-gitlab"
+)
 
 func PaginateResults(api func(opts *gitlab.ListOptions) (*gitlab.Response, error),
 	opts *gitlab.ListOptions) error {

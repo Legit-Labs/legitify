@@ -2,6 +2,7 @@ package opa_test
 
 import (
 	"context"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"log"
 	"testing"
 
@@ -10,7 +11,8 @@ import (
 
 func TestEngineSanity(t *testing.T) {
 	ctx := context.Background()
-	engine, err := opa.Load([]string{"./testdata"})
+	// Doesn't matter which scm type we use here
+	engine, err := opa.Load([]string{"./testdata"}, scm_type.GitHub)
 
 	if err != nil {
 		t.Errorf("Unable to engine with policies")

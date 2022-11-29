@@ -5,6 +5,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"testing"
@@ -23,7 +24,8 @@ func TestAnalyzerSanity(t *testing.T) {
 	ctx = context_utils.NewContextWithTokenScopes(ctx, permissions.TokenScopes{})
 	data := make(chan collectors.CollectedData, 3)
 
-	engine, _ := opa.Load([]string{})
+	// Doesn't matter which scm type we use here
+	engine, _ := opa.Load([]string{}, scm_type.GitHub)
 	analyzer := NewAnalyzer(ctx, engine, skippers.NewSkipper(ctx))
 	require.NotNilf(t, analyzer, "failed to create analyzer")
 

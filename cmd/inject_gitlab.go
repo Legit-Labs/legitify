@@ -39,5 +39,5 @@ func provideGitlabCollectors(ctx context.Context, client *glclient.Client, analy
 }
 
 func provideGitlabClient(analyzeArgs *args) (*glclient.Client, error) {
-	return glclient.NewClient(context.Background(), analyzeArgs.Token, analyzeArgs.Endpoint, false)
+	return glclient.NewClient(context.Background(), analyzeArgs.Token, analyzeArgs.Endpoint, analyzeArgs.Organizations, false)
 }

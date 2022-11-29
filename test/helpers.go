@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -15,7 +16,7 @@ import (
 	"github.com/google/go-github/v44/github"
 )
 
-var defaultOrg githubcollected.ExtendedOrg = githubcollected.NewExtendedOrg(&github.Organization{}, permissions.OrgRoleNone)
+var defaultOrg = githubcollected.NewExtendedOrg(&github.Organization{}, permissions.OrgRoleNone)
 
 func FindPolicy(opaResults []opa_engine.QueryResult, policyName string) (*opa_engine.QueryResult, error) {
 	for _, s := range opaResults {
@@ -43,9 +44,13 @@ func AssertQueryResult(opaResults []opa_engine.QueryResult, policyName string, s
 	}
 }
 
-func PolicyTestTemplate(t *testing.T, name string, mockData interface{}, ns namespace.Namespace, testedPolicyName string, expectFailure bool) {
+func PolicyTestTemplateGitHub(t *testing.T, name string, mockData interface{}, ns namespace.Namespace, testedPolicyName string, expectFailure bool) {
+	PolicyTestTemplate(t, name, mockData, ns, testedPolicyName, expectFailure, scm_type.GitHub)
+}
+
+func PolicyTestTemplate(t *testing.T, name string, mockData interface{}, ns namespace.Namespace, testedPolicyName string, expectFailure bool, scmType scm_type.ScmType) {
 	t.Run(name, func(t *testing.T) {
-		engine, err := opa.Load([]string{})
+		engine, err := opa.Load([]string{}, scmType)
 		require.Nil(t, err, "failed initializing opa client")
 		ctx := context.Background()
 		result, err := engine.Query(ctx, ns, mockData)

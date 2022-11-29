@@ -2,11 +2,12 @@ package gitlab
 
 import (
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab"
+	"github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/collectors"
+	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	gitlab2 "github.com/xanzy/go-gitlab"
 	"log"
 
-	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"golang.org/x/net/context"
 )
@@ -45,25 +46,16 @@ func (c *organizationCollector) CollectMetadata() collectors.Metadata {
 
 func (c *organizationCollector) Collect() collectors.SubCollectorChannels {
 	return c.WrappedCollection(func() {
-		groups, response, err := c.Client.Client().Groups.ListGroups(&gitlab2.ListGroupsOptions{})
-		// TODO: support pagination
-		_ = response
-
+		groups, err := c.Client.Groups()
 		if err != nil {
-			log.Printf("failed to collect organizations %s", err)
+			log.Printf("failed to collect groups %s", err)
 			return
 		}
 
-		gw := group_waiter.New()
-		for _, group := range groups {
-			group := group
-			gw.Do(func() {
-				log.Printf(group.Name)
-				//extend := c.collectExtraData(&org)
-				//c.CollectData(org, extend, *extend.Organization.HTMLURL, []permissions.Role{org.Role})
-				c.CollectionChangeByOne()
-			})
+		for _, g := range groups {
+			entity := gitlab_collected.Organization{Group: *g}
+			c.CollectDataWithContext(&entity, g.WebURL, newCollectionContext(g, []permissions.OrganizationRole{permissions.RepoRoleAdmin}))
+			c.CollectionChangeByOne()
 		}
-		gw.Wait()
 	})
 }

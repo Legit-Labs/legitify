@@ -27,7 +27,7 @@ func provideOutputer(ctx context.Context, analyzeArgs *args) outputer.Outputer {
 }
 
 func provideOpa(analyzeArgs *args) (opa_engine.Enginer, error) {
-	opaEngine, err := opa.Load(analyzeArgs.PoliciesPath)
+	opaEngine, err := opa.Load(analyzeArgs.PoliciesPath, analyzeArgs.ScmType)
 	if err != nil {
 		return nil, err
 	}

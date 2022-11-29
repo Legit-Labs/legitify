@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"os"
 	"sort"
 	"strings"
@@ -47,7 +48,8 @@ func executeDocsCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	// loading only built-in policies
-	engine, err := opa.Load([]string{})
+	// TODO: support other scms
+	engine, err := opa.Load([]string{}, scm_type.GitHub)
 	if err != nil {
 		return err
 	}

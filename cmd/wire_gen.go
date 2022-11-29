@@ -106,5 +106,5 @@ func provideGitlabCollectors(ctx context.Context, client *gitlab.Client, analyze
 }
 
 func provideGitlabClient(analyzeArgs2 *args) (*gitlab.Client, error) {
-	return gitlab.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, false)
+	return gitlab.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.Organizations, false)
 }
