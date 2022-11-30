@@ -43,7 +43,6 @@ type GitHubQLRepository struct {
 type GitHubQLBranchProtectionRule struct {
 	AllowsDeletions                *bool `json:"allows_deletions,omitempty"`
 	AllowsForcePushes              *bool `json:"allows_force_pushes,omitempty"`
-	BlocksCreations                *bool `json:"blocks_creations,omitempty"`
 	DismissesStaleReviews          *bool `json:"dismisses_stale_reviews,omitempty"`
 	IsAdminEnforced                *bool `json:"is_admin_enforced,omitempty"`
 	RequiredApprovingReviewCount   *int  `json:"required_approving_review_count,omitempty"`
