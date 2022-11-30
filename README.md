@@ -99,7 +99,7 @@ Note: `--output-format=json` must be specified to output non-default schemes.
 
 ### Output Destinations
 - `--output-file` - full path of the output file (default: no output file, prints to stdout).
-- `--error-file` - full path of the error logs (default: ./errors.log).
+- `--error-file` - full path of the error logs (default: ./error.log).
 
 ### Coloring
 When outputting in a human-readable format, legitify support the conventional `--color[=when]` flag, which has the following options:
