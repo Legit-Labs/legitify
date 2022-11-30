@@ -133,6 +133,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		executor, err = setupGitlab(&analyzeArgs, stdErrLog)
 	} else {
 		// shouldn't happen since scm type is validated before
+		return fmt.Errorf("invalid scm type %s", analyzeArgs.ScmType)
 	}
 
 	if err != nil {
