@@ -16,10 +16,14 @@ func repositoryTestTemplate(t *testing.T, name string, mockData interface{}, tes
 
 var bools = []bool{true, false}
 
-func makeRepo(repo githubcollected.GitHubQLRepository) githubcollected.Repository {
+func makeRepoWithDeps(repo githubcollected.GitHubQLRepository, deps *githubcollected.GitHubQLDependencyGraphManifests) githubcollected.Repository {
 	return githubcollected.Repository{
-		Repository: &repo,
+		Repository:               &repo,
+		DependencyGraphManifests: deps,
 	}
+}
+func makeRepo(repo githubcollected.GitHubQLRepository) githubcollected.Repository {
+	return makeRepoWithDeps(repo, &githubcollected.GitHubQLDependencyGraphManifests{})
 }
 
 func makeRepoForBranch(branch githubcollected.GitHubQLBranch) githubcollected.Repository {
@@ -241,12 +245,9 @@ func TestRepositoryDepGraph(t *testing.T) {
 	name := "repository should have github advanced security disabled"
 	testedPolicyName := "ghas_dependency_review_not_enabled"
 	makeMockData := func(count int) githubcollected.Repository {
-		return makeRepo(githubcollected.GitHubQLRepository{
-			Name: "REPO",
-			DependencyGraphManifests: &githubcollected.GitHubQLDependencyGraphManifests{
-				TotalCount: count,
-			},
-		})
+		return makeRepoWithDeps(githubcollected.GitHubQLRepository{Name: "REPO"},
+			&githubcollected.GitHubQLDependencyGraphManifests{TotalCount: count},
+		)
 	}
 
 	counts := []int{

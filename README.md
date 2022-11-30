@@ -25,6 +25,16 @@ https://user-images.githubusercontent.com/74864790/178964716-825840a6-d714-4b1d-
 git clone git@github.com:Legit-Labs/legitify.git
 go run main.go analyze ...
 ```
+
+## Provenance
+To enhance the software supply chain security of legitify's users, as of v0.1.6, every legitify release contains a [SLSA Level 3 Provenacne](https://github.com/slsa-framework/slsa-github-generator/blob/main/internal/builders/generic/README.md) document.  
+The provenance document refers to all artifacts in the release, as well as the generated docker image.  
+You can use [SLSA framework's official verifier](https://github.com/slsa-framework/slsa-verifier) to verify the provenance.  
+Example of usage for the darwin_arm64 release:  
+```
+./slsa-verifier verify-artifact --source-branch main --builder-id 'https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.2.2' --source-uri "git+https://github.com/legit-labs/legitify" --provenance-path multiple.intoto.jsonl ./legitify_0.1.6_darwin_arm64.tar.gz
+```
+
 ## Requirements
 1. To get the most out of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository inside an organization, in which case you'll be able to see only repository-related policies results.
 2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`$GITHUB_ENV`).
@@ -46,7 +56,7 @@ You can control which resources will be analyzed with command-line flags namespa
 - `--org`: will limit the analysis to the specified organizations
 
 ```
-GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespaces organization,member
+GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
 The above command will test organization and member policies against org1 and org2.
 
@@ -55,7 +65,7 @@ You can run legitify against a GitHub Enterprise instance if you set the endpoin
 
 ```sh
 export SERVER_URL="https://github.example.com/"
-GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespaces organization,member
+GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
 
 ## Namespaces

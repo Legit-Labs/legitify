@@ -322,7 +322,7 @@ vulnerability_alerts_not_enabled {
 #      - "A user can add dependencies to vulnerable third-party dependencies therefore introducing vulnerabilities to your application."
 default ghas_dependency_review_not_enabled = false
 ghas_dependency_review_not_enabled {
-    input.repository.dependency_graph_manifests.total_count == 0
+    input.dependency_graph_manifests.total_count == 0
 }
 
 # METADATA
@@ -348,12 +348,12 @@ scorecard_score_too_low {
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps:
-#     - 1. Make sure you have admin permissions
-#     - 2. Go to the org's settings page
-#     - 3. Enter "Actions - General" tab
-#     - 4. Under 'Workflow permissions'
-#     - 5. Select 'Read repository contents permission'
-#     - 6. Click 'Save'
+#     - Make sure you have admin permissions
+#     - Go to the org's settings page
+#     - Enter "Actions - General" tab
+#     - Under 'Workflow permissions'
+#     - Select 'Read repository contents permission'
+#     - Click 'Save'
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
 #   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
@@ -369,12 +369,12 @@ token_default_permissions_is_read_write {
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps:
-#     - 1. Make sure you have admin permissions
-#     - 2. Go to the org's settings page
-#     - 3. Enter "Actions - General" tab
-#     - 4. Under 'Workflow permissions'
-#     - 5. Uncheck 'Allow GitHub actions to create and approve pull requests.
-#     - 6. Click 'Save'
+#     - Make sure you have admin permissions
+#     - Go to the org's settings page
+#     - Enter "Actions - General" tab
+#     - Under 'Workflow permissions'
+#     - Uncheck 'Allow GitHub actions to create and approve pull requests.
+#     - Click 'Save'
 #   severity: HIGH
 #   requiredScopes: [admin:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
