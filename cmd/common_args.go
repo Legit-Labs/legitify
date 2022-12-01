@@ -33,12 +33,14 @@ const (
 
 const (
 	EnvToken     = "github_token"
-	NewEnvToken  = "legitify_auth_token"
+	NewEnvToken  = "legitify_token"
 	EnvServerUrl = "server_url"
 )
 
 func (a *args) ApplyEnvVars() {
 	if a.Token == "" {
+		// backwards compatibility: support both LEGITIFY_TOKEN and GITHUB_TOKEN environment variables.
+		// In the future we'll remove the GITHUB_TOKEN option
 		a.Token = viper.GetString(NewEnvToken)
 		if a.Token == "" {
 			a.Token = viper.GetString(EnvToken)
