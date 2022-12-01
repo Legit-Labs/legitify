@@ -78,7 +78,7 @@ test: generate_mocks
 		-short \
 		-timeout=5m \
 		-vet="${VETTERS}" \
-		./...
+		`go list ./... | grep -v e2e`
 .PHONY: test
 
 docs: build
