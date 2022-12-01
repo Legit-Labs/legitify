@@ -32,7 +32,7 @@ The provenance document refers to all artifacts in the release, as well as the g
 You can use [SLSA framework's official verifier](https://github.com/slsa-framework/slsa-verifier) to verify the provenance.  
 Example of usage for the darwin_arm64 release:  
 ```
-./slsa-verifier verify-artifact --source-branch main --builder-id 'https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.2.2' --source-uri "git+https://github.com/legit-labs/legitify" --provenance-path multiple.intoto.jsonl ./legitify_0.1.6_darwin_arm64.tar.gz
+./slsa-verifier verify-artifact --source-branch main --builder-id 'https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.2.2' --source-uri "git+https://github.com/Legit-Labs/legitify" --provenance-path multiple.intoto.jsonl ./legitify_0.1.6_darwin_arm64.tar.gz
 ```
 
 ## Requirements
