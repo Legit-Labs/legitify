@@ -19,5 +19,5 @@ jobs:
         run: |
           GITHUB_TOKEN=${{ secrets.E2E_ENV_TOKEN }} go run main.go analyze --output-format json --output-file $REPORT_FILE_PATH
       - name: Run output verification
-        run: go test e2e/e2e_test.go --report-path=$REPORT_FILE_PATH
+        run: go test e2e/e2e_test.go --report_path=$REPORT_FILE_PATH
 
