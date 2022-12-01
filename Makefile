@@ -64,11 +64,11 @@ generate_mocks: instal_mocks
 	~/go/bin/mockgen -destination=mocks/mock_engine.go -package=mocks -source=./internal/opa/opa_engine/engine.go Enginer
 .PHONY: generate_mocks
 
-instal_wire:
+install_wire:
 	go install github.com/google/wire/cmd/wire@latest
-.PHONY: instal_wire
+.PHONY: install_wire
 
-generate_wire: instal_wire
+generate_wire: install_wire
 	~/go/bin/wire gen ./...
 .PHONY: generate_mocks
 

@@ -20,8 +20,8 @@ func NewSkipper(ctx context.Context) Skipper {
 	return &skipper{
 		ctx: ctx,
 		prerequisitesCheckers: map[string]IsPrerequisitesSatisfied{
-			"enterprise": func(data collectors.CollectedData) bool {
-				return data.Context.IsEnterprise()
+			"premium": func(data collectors.CollectedData) bool {
+				return data.Context.Premium()
 			},
 			"scorecard_enabled": func(data collectors.CollectedData) bool {
 				return context_utils.GetScorecardEnabled(ctx)

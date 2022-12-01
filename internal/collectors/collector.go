@@ -17,7 +17,7 @@ type CollectionMetric struct {
 }
 
 type CollectedDataContext interface {
-	IsEnterprise() bool
+	Premium() bool
 	Roles() []permissions.Role
 }
 

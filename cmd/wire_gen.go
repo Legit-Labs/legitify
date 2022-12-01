@@ -48,8 +48,8 @@ func setupGitHub(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 
 // Injectors from inject_gitlab.go:
 
-func setupGitlab(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error) {
-	client, err := provideGitlabClient(analyzeArgs2)
+func setupGitLab(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error) {
+	client, err := provideGitLabClient(analyzeArgs2)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func setupGitlab(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 	if err != nil {
 		return nil, err
 	}
-	v := provideGitlabCollectors(context, client, analyzeArgs2)
+	v := provideGitLabCollectors(context, client, analyzeArgs2)
 	collectorManager := collectors_manager.NewCollectorsManager(v)
 	enginer, err := provideOpa(analyzeArgs2)
 	if err != nil {
@@ -92,19 +92,19 @@ func provideGitHubClient(analyzeArgs2 *args) (*github.Client, error) {
 
 // inject_gitlab.go:
 
-func provideGitlabCollectors(ctx context.Context, client *gitlab.Client, analyzeArgs2 *args) []collectors.Collector {
+func provideGitLabCollectors(ctx context.Context, client *gitlab.Client, analyzeArgs2 *args) []collectors.Collector {
 	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *gitlab.Client) collectors.Collector{namespace.Organization: gitlab2.NewGroupCollector}
 
 	var result []collectors.Collector
 	for _, ns := range analyzeArgs2.Namespaces {
-		if val, ok := collectorsMapping[ns]; ok {
-			result = append(result, val(ctx, client))
+		if creator, ok := collectorsMapping[ns]; ok {
+			result = append(result, creator(ctx, client))
 		}
 	}
 
 	return result
 }
 
-func provideGitlabClient(analyzeArgs2 *args) (*gitlab.Client, error) {
+func provideGitLabClient(analyzeArgs2 *args) (*gitlab.Client, error) {
 	return gitlab.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.Organizations, false)
 }

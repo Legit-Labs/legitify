@@ -8,4 +8,4 @@ import (
 var GitHubBundle embed.FS
 
 //go:embed gitlab/*
-var GitlabBundle embed.FS
+var GitLabBundle embed.FS

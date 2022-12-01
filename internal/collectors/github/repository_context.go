@@ -13,7 +13,7 @@ type repositoryContext struct {
 	isBranchProtectionSupported bool
 }
 
-func (rc *repositoryContext) IsEnterprise() bool {
+func (rc *repositoryContext) Premium() bool {
 	return rc.isEnterprise
 }
 

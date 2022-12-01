@@ -16,7 +16,7 @@ func provideGenericClient(args *args) (Client, error) {
 	if args.ScmType == scm_type.GitHub {
 		return provideGitHubClient(args)
 	} else if args.ScmType == scm_type.GitLab {
-		return provideGitlabClient(args)
+		return provideGitLabClient(args)
 	} else {
 		return nil, fmt.Errorf("invalid scm type")
 	}

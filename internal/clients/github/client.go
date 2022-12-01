@@ -387,12 +387,12 @@ func (c *Client) IsAnalyzable(repository commontypes.RepositoryWithOwner) (bool,
 	return repo.Repository.ViewerPermission == permissions.RepoRoleAdmin, nil
 }
 
-func unique(slice []commontypes.RepositoryWithOwner) []commontypes.RepositoryWithOwner {
+func uniqueRepositories(slice []commontypes.RepositoryWithOwner) []commontypes.RepositoryWithOwner {
 	keys := make(map[string]bool)
 	var list []commontypes.RepositoryWithOwner
 	for _, entry := range slice {
 		key := entry.String()
-		if _, value := keys[key]; !value {
+		if _, found := keys[key]; !found {
 			keys[key] = true
 			list = append(list, entry)
 		}
@@ -411,7 +411,7 @@ func (c *Client) Repositories() ([]commontypes.RepositoryWithOwner, error) {
 		return nil, err
 	}
 
-	return unique(append(r1, r2...)), nil
+	return uniqueRepositories(append(r1, r2...)), nil
 }
 
 func (c *Client) getViewerRepositories() ([]commontypes.RepositoryWithOwner, error) {
@@ -453,7 +453,11 @@ func (c *Client) getViewerRepositories() ([]commontypes.RepositoryWithOwner, err
 
 func (c *Client) getOrganizationsRepositories() ([]commontypes.RepositoryWithOwner, error) {
 	var repositories []commontypes.RepositoryWithOwner
-	orgs := c.Orgs()
+	orgs, err := c.CollectOrganizations()
+	if err != nil {
+		return nil, err
+	}
+
 	gw := group_waiter.New()
 
 	for _, o := range orgs {
@@ -473,7 +477,7 @@ func (c *Client) getOrganizationsRepositories() ([]commontypes.RepositoryWithOwn
 
 			variables := map[string]interface{}{
 				"cursor": (*githubv4.String)(nil),
-				"login":  githubv4.String(o),
+				"login":  githubv4.String(o.Name()),
 			}
 
 			for {

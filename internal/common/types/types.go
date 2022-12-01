@@ -13,10 +13,11 @@ type RepositoryWithOwner struct {
 }
 
 func NewRepositoryWithOwner(repositoryWithOwner string, perms permissions.RepositoryRole) RepositoryWithOwner {
-	split := strings.Split(repositoryWithOwner, ",")
+	owner, name, _ := strings.Cut(repositoryWithOwner, "/")
+
 	return RepositoryWithOwner{
-		Owner: split[0],
-		Name:  split[1],
+		Owner: owner,
+		Name:  name,
 		Role:  perms,
 	}
 }

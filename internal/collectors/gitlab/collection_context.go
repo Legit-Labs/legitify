@@ -17,7 +17,8 @@ func newCollectionContext(group *gitlab.Group, roles []permissions.Role) collect
 	}
 }
 
-func (c collectionContext) IsEnterprise() bool {
+func (c collectionContext) Premium() bool {
+	// TODO: currently we don't know about GitLab policies that required premium account, need to update this once we do.
 	return true
 }
 

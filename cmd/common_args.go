@@ -33,12 +33,16 @@ const (
 
 const (
 	EnvToken     = "github_token"
+	NewEnvToken  = "legitify_auth_token"
 	EnvServerUrl = "server_url"
 )
 
 func (a *args) ApplyEnvVars() {
 	if a.Token == "" {
-		a.Token = viper.GetString(EnvToken)
+		a.Token = viper.GetString(NewEnvToken)
+		if a.Token == "" {
+			a.Token = viper.GetString(EnvToken)
+		}
 	}
 
 	if a.Endpoint == "" {
@@ -47,11 +51,11 @@ func (a *args) ApplyEnvVars() {
 }
 
 func (a *args) addCommonOptions(flags *pflag.FlagSet) {
-	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github (required unless environment variable GITHUB_TOKEN is set)")
+	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github (required unless environment variable LEGITIFY_AUTH_TOKEN is set)")
 	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github/gitlab endpoint to use instead of the Cloud API (can be set via the environment variable SERVER_URL)")
 	flags.StringVarP(&a.OutputFile, ArgOutputFile, "o", "", "output file, defaults to stdout")
 	flags.StringVarP(&a.ErrorFile, ArgErrorFile, "e", "error.log", "error log path")
-	flags.StringVarP(&a.ScmType, ScmType, "", scm_type.GitHub, "server type (GitHub, Gitlab), defaults to GitHub")
+	flags.StringVarP(&a.ScmType, ScmType, "", scm_type.GitHub, "server type (GitHub, GitLab), defaults to GitHub")
 }
 
 func (a *args) validateCommonOptions() error {

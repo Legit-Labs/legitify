@@ -13,31 +13,31 @@ import (
 	"log"
 )
 
-func setupGitlab(analyzeArgs *args, log *log.Logger) (*analyzeExecutor, error) {
+func setupGitLab(analyzeArgs *args, log *log.Logger) (*analyzeExecutor, error) {
 	wire.Build(
 		wire.Bind(new(Client), new(*glclient.Client)),
 		analyzeProviderSet,
-		provideGitlabClient,
-		provideGitlabCollectors,
+		provideGitLabClient,
+		provideGitLabCollectors,
 	)
 	return nil, nil
 }
 
-func provideGitlabCollectors(ctx context.Context, client *glclient.Client, analyzeArgs *args) []collectors.Collector {
+func provideGitLabCollectors(ctx context.Context, client *glclient.Client, analyzeArgs *args) []collectors.Collector {
 	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *glclient.Client) collectors.Collector{
 		namespace.Organization: gitlab.NewGroupCollector,
 	}
 
 	var result []collectors.Collector
 	for _, ns := range analyzeArgs.Namespaces {
-		if val, ok := collectorsMapping[ns]; ok {
-			result = append(result, val(ctx, client))
+		if creator, ok := collectorsMapping[ns]; ok {
+			result = append(result, creator(ctx, client))
 		}
 	}
 
 	return result
 }
 
-func provideGitlabClient(analyzeArgs *args) (*glclient.Client, error) {
+func provideGitLabClient(analyzeArgs *args) (*glclient.Client, error) {
 	return glclient.NewClient(context.Background(), analyzeArgs.Token, analyzeArgs.Endpoint, analyzeArgs.Organizations, false)
 }

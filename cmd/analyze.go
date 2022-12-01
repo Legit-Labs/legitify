@@ -130,7 +130,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	if analyzeArgs.ScmType == scm_type.GitHub {
 		executor, err = setupGitHub(&analyzeArgs, stdErrLog)
 	} else if analyzeArgs.ScmType == scm_type.GitLab {
-		executor, err = setupGitlab(&analyzeArgs, stdErrLog)
+		executor, err = setupGitLab(&analyzeArgs, stdErrLog)
 	} else {
 		// shouldn't happen since scm type is validated before
 		return fmt.Errorf("invalid scm type %s", analyzeArgs.ScmType)

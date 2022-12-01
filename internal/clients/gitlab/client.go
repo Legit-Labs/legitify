@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	orgsCacheKeys = "orgs"
+	orgsCacheKeys   = "orgs"
+	allGroupsFilter = ""
 )
 
 type Client struct {
@@ -34,9 +35,8 @@ func NewClient(ctx context.Context, token string, endpoint string, orgs []string
 		return nil, err
 	}
 
-	// all groups
 	if len(orgs) == 0 {
-		orgs = []string{""}
+		orgs = []string{allGroupsFilter}
 	}
 
 	result := &Client{
@@ -92,8 +92,8 @@ func (c *Client) Organizations() ([]types.Organization, error) {
 func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
 	var result []types.RepositoryWithOwner
 
-	dummy := gitlab.MaintainerPermissions
-	options := gitlab.ListProjectsOptions{MinAccessLevel: &dummy}
+	maintainerPermissions := gitlab.MaintainerPermissions
+	options := gitlab.ListProjectsOptions{MinAccessLevel: &maintainerPermissions}
 	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
 		repos, resp, err := c.Client().Projects.ListProjects(&options)
 		if err != nil {
@@ -135,9 +135,9 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 
 	var result []*gitlab.Group
 
-	dummy := true
+	ownedGroups := true
 	for _, group := range c.orgs {
-		options := gitlab.ListGroupsOptions{Owned: &dummy, Search: &group}
+		options := gitlab.ListGroupsOptions{Owned: &ownedGroups, Search: &group}
 
 		err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
 			groups, resp, err := c.Client().Groups.ListGroups(&options)

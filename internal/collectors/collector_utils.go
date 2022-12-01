@@ -16,7 +16,7 @@ type collectedDataContext struct {
 	roles        []permissions.Role
 }
 
-func (c *collectedDataContext) IsEnterprise() bool {
+func (c *collectedDataContext) Premium() bool {
 	return c.organization.IsEnterprise()
 }
 

@@ -51,10 +51,13 @@ func Load(policyPaths []string, scm scm_type.ScmType) (opa_engine.Enginer, error
 }
 
 func loadModules(scmType scm_type.ScmType) ([]*ast.Module, error) {
-	if scmType == scm_type.GitHub {
+	switch scmType {
+	case scm_type.GitHub:
 		return loadModulesFromFs(policies.GitHubBundle, path.Dir(""))
-	} else {
-		return loadModulesFromFs(policies.GitlabBundle, path.Dir(""))
+	case scm_type.GitLab:
+		return loadModulesFromFs(policies.GitLabBundle, path.Dir(""))
+	default:
+		return nil, fmt.Errorf("unknown scm type %s", scmType)
 	}
 }
 
