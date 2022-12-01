@@ -47,7 +47,7 @@ Fine-grained personal access tokens are currently not supported because they do 
 
 ## Usage
 ```
-GITHUB_TOKEN=<your_token> legitify analyze
+LEGITIFY_TOKEN=<your_token> legitify analyze
 ```
 By default, legitify will check the policies against all your resources (organizations, repositories, members, actions).
 
@@ -56,7 +56,7 @@ You can control which resources will be analyzed with command-line flags namespa
 - `--org`: will limit the analysis to the specified organizations
 
 ```
-GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
+LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
 The above command will test organization and member policies against org1 and org2.
 
@@ -65,7 +65,14 @@ You can run legitify against a GitHub Enterprise instance if you set the endpoin
 
 ```sh
 export SERVER_URL="https://github.example.com/"
-GITHUB_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
+LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
+```
+## GitLab Cloud/Server Support
+To run legitify against GitLab Cloud set the scm flag to gitlab `--scm gitlab`, to run against GitLab Server you need to provide also SERVER_URL:
+
+```sh
+export SERVER_URL="https://gitlab.example.com/"
+LEGITIFY_TOKEN=<your_token> legitify analyze --namespace organization --scm gitlab
 ```
 
 ## Namespaces
