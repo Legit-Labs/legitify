@@ -70,7 +70,7 @@ test: generate_mocks
 		-short \
 		-timeout=5m \
 		-vet="${VETTERS}" \
-		`go list ./... | grep -vE '^github.com/Legit-Labs/legitify/e2e/'`
+		`go list ./... | grep -vE '^github.com/Legit-Labs/legitify/e2e'`
 .PHONY: test
 
 docs: build
