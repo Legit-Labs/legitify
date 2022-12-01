@@ -74,6 +74,7 @@ func TestGitHub(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
+		t.Logf("Testing: %s", test.path)
 		testFormattedPath := test.path + "->violations"
 		jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
 		res := jq.From(testFormattedPath).Where("aux->entityName", "=", test.passedEntity).Where("Status", "=", "PASSED").Count()
