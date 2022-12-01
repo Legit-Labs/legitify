@@ -37,6 +37,6 @@ jobs:
       - name: Build
         run: go build -v ./...
       - name: Test
-        run: go test -count=1 -shuffle=on -timeout=10m -race $(go list ./... | grep -v e2e)
+        run: go test -count=1 -shuffle=on -timeout=10m -race $(go list ./... | grep -vE '^github.com/Legit-Labs/legitify/e2e')
       - name: Vet
         run: go vet -v ./...
