@@ -19,7 +19,7 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@07db5389c99593f11ad7b44463c2d4233066a9b1 # ratchet:golangci/golangci-lint-action@v3
         with:
-          version: v1.29
+          version: v1.46
           args: --timeout=3m
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
   build_and_test:
