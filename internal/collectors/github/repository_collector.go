@@ -1,7 +1,8 @@
-package collectors
+package github
 
 import (
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
@@ -19,41 +20,22 @@ import (
 	"golang.org/x/net/context"
 )
 
-func IsAnalyzable(ctx context.Context, client ghclient.Client, repository types.RepositoryWithOwner) (bool, error) {
-	var repo struct {
-		Repository struct {
-			ViewerPermission githubv4.String
-		} `graphql:"repository(owner: $owner, name: $name)"`
-	}
-	variables := map[string]interface{}{
-		"name":  githubv4.String(repository.Name),
-		"owner": githubv4.String(repository.Owner),
-	}
-
-	err := client.GraphQLClient().Query(ctx, &repo, variables)
-	if err != nil {
-		return false, err
-	}
-
-	return repo.Repository.ViewerPermission == permissions.RepoRoleAdmin, nil
-}
-
 type repositoryCollector struct {
-	baseCollector
-	Client           ghclient.Client
+	collectors.BaseCollector
+	Client           *ghclient.Client
 	Context          context.Context
 	scorecardEnabled bool
 	contextFactory   *repositoryContextFactory
 }
 
-func newRepositoryCollector(ctx context.Context, client ghclient.Client) collector {
+func NewRepositoryCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &repositoryCollector{
 		Client:           client,
 		Context:          ctx,
 		scorecardEnabled: context_utils.GetScorecardEnabled(ctx),
 		contextFactory:   newRepositoryContextFactory(ctx, client),
 	}
-	initBaseCollector(&c.baseCollector, c)
+	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
 }
 
@@ -69,10 +51,10 @@ type totalCountRepoQuery struct {
 	} `graphql:"organization(login: $login)"`
 }
 
-func (rc *repositoryCollector) CollectMetadata() Metadata {
+func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
 	repositories, exist := context_utils.GetRepositories(rc.Context)
 	if exist {
-		return Metadata{
+		return collectors.Metadata{
 			TotalEntities: len(repositories),
 		}
 	}
@@ -82,7 +64,7 @@ func (rc *repositoryCollector) CollectMetadata() Metadata {
 
 	if err != nil {
 		log.Printf("failed to collect organization %s", err)
-		return Metadata{}
+		return collectors.Metadata{}
 	}
 
 	var totalCount int32 = 0
@@ -106,12 +88,12 @@ func (rc *repositoryCollector) CollectMetadata() Metadata {
 	}
 	gw.Wait()
 
-	return Metadata{
+	return collectors.Metadata{
 		TotalEntities: int(totalCount),
 	}
 }
 
-func (rc *repositoryCollector) Collect() subCollectorChannels {
+func (rc *repositoryCollector) Collect() collectors.SubCollectorChannels {
 	repositories, exist := context_utils.GetRepositories(rc.Context)
 
 	if exist {
@@ -121,7 +103,7 @@ func (rc *repositoryCollector) Collect() subCollectorChannels {
 	return rc.collectAll()
 }
 
-func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWithOwner) subCollectorChannels {
+func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWithOwner) collectors.SubCollectorChannels {
 	type specificRepoQuery struct {
 		RepositoryOwner struct {
 			Organization struct {
@@ -133,7 +115,7 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 		} `graphql:"repositoryOwner(login: $login)"`
 	}
 
-	return rc.wrappedCollection(func() {
+	return rc.WrappedCollection(func() {
 		gw := group_waiter.New()
 		for _, r := range repositories {
 			repo := r
@@ -170,16 +152,14 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 	})
 }
 
-func (rc *repositoryCollector) collectAll() subCollectorChannels {
-	return rc.wrappedCollection(func() {
+func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
+	return rc.WrappedCollection(func() {
 		orgs, err := rc.Client.CollectOrganizations()
 
 		if err != nil {
 			log.Printf("failed to collect organizations %s", err)
 			return
 		}
-
-		rc.totalCollectionChange(0)
 
 		gw := group_waiter.New()
 		for _, org := range orgs {
@@ -244,11 +224,11 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 
 func (rc *repositoryCollector) collectRepository(repository *ghcollected.GitHubQLRepository, login string, context *repositoryContext) {
 	repo := rc.collectExtraData(login, repository, context)
-	entityName := fullRepoName(login, repo.Repository.Name)
+	entityName := collectors.FullRepoName(login, repo.Repository.Name)
 	missingPermissions := rc.checkMissingPermissions(repo, entityName)
-	rc.issueMissingPermissions(missingPermissions...)
-	rc.collectDataWithContext(repo, repo.Repository.Url, context)
-	rc.collectionChangeByOne()
+	rc.IssueMissingPermissions(missingPermissions...)
+	rc.CollectDataWithContext(repo, repo.Repository.Url, context)
+	rc.CollectionChangeByOne()
 }
 
 func (rc *repositoryCollector) collectExtraData(login string,
@@ -262,27 +242,27 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	repo, err = rc.withVulnerabilityAlerts(repo, login)
 	if err != nil {
 		// If we can't get vulnerability alerts, rego will ignore it (as nil)
-		log.Printf("error getting vulnerability alerts for %s: %s", fullRepoName(login, repo.Repository.Name), err)
+		log.Printf("error getting vulnerability alerts for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
 	}
 
 	repo, err = rc.withRepositoryHooks(repo, login)
 	if err != nil {
-		log.Printf("error getting repository hooks for %s: %s", fullRepoName(login, repo.Repository.Name), err)
+		log.Printf("error getting repository hooks for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
 	}
 
 	repo, err = rc.withRepoCollaborators(repo, login)
 	if err != nil {
-		log.Printf("error getting repository collaborators for %s: %s", fullRepoName(login, repo.Repository.Name), err)
+		log.Printf("error getting repository collaborators for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
 	}
 
 	repo, err = rc.withActionsSettings(repo, login)
 	if err != nil {
-		log.Printf("error getting repository actions settings for %s: %s", fullRepoName(login, repo.Repository.Name), err)
+		log.Printf("error getting repository actions settings for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
 	}
 
 	repo, err = rc.withDependencyGraphManifestsCount(repo, login)
 	if err != nil {
-		log.Printf("error getting repository dependency manifests for %s: %s", fullRepoName(login, repo.Repository.Name), err)
+		log.Printf("error getting repository dependency manifests for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
 	}
 
 	if context.IsBranchProtectionSupported() {
@@ -292,8 +272,8 @@ func (rc *repositoryCollector) collectExtraData(login string,
 			log.Printf("error getting branch protection info for %s: %s", repository.Name, err)
 		}
 	} else {
-		perm := newMissingPermission(permissions.RepoAdmin, fullRepoName(login, repo.Repository.Name), orgIsFreeEffect, namespace.Repository)
-		rc.issueMissingPermissions(perm)
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(login, repo.Repository.Name), orgIsFreeEffect, namespace.Repository)
+		rc.IssueMissingPermissions(perm)
 	}
 
 	if rc.scorecardEnabled {
@@ -335,9 +315,9 @@ func (rc *repositoryCollector) withDependencyGraphManifestsCount(repo ghcollecte
 func (rc *repositoryCollector) withActionsSettings(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
 	settings, err := rc.Client.GetActionsTokenPermissionsForRepository(org, repo.Name())
 	if err != nil {
-		perm := newMissingPermission(permissions.RepoAdmin, fullRepoName(org, repo.Repository.Name),
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(org, repo.Repository.Name),
 			"Cannot read repository actions settings", namespace.Repository)
-		rc.issueMissingPermissions(perm)
+		rc.IssueMissingPermissions(perm)
 		return repo, err
 	}
 	repo.ActionsTokenPermissions = settings
@@ -351,9 +331,9 @@ func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, 
 		hooks, resp, err := rc.Client.Client().Repositories.ListHooks(rc.Context, org, repo.Repository.Name, opts)
 		if err != nil {
 			if resp.Response.StatusCode == 404 {
-				perm := newMissingPermission(permissions.RepoHookRead, fullRepoName(org, repo.Repository.Name),
+				perm := collectors.NewMissingPermission(permissions.RepoHookRead, collectors.FullRepoName(org, repo.Repository.Name),
 					"Cannot read repository webhooks", namespace.Repository)
-				rc.issueMissingPermissions(perm)
+				rc.IssueMissingPermissions(perm)
 			}
 			return nil, err
 		}
@@ -432,11 +412,11 @@ func (rc *repositoryCollector) fixBranchProtectionInfo(repository ghcollected.Re
 	return repository, nil
 }
 
-func (rc *repositoryCollector) checkMissingPermissions(repo ghcollected.Repository, entityName string) []missingPermission {
-	var missingPermissions []missingPermission
+func (rc *repositoryCollector) checkMissingPermissions(repo ghcollected.Repository, entityName string) []collectors.MissingPermission {
+	var missingPermissions []collectors.MissingPermission
 	if repo.NoBranchProtectionPermission {
 		effect := "Cannot read repository branch protection information"
-		perm := newMissingPermission(permissions.RepoAdmin, entityName, effect, namespace.Repository)
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, entityName, effect, namespace.Repository)
 		missingPermissions = append(missingPermissions, perm)
 	}
 	return missingPermissions

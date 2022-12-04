@@ -3,12 +3,12 @@ package analyzers
 import (
 	"context"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
+	githubcollected "github.com/Legit-Labs/legitify/internal/collected"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"testing"
-
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -24,12 +24,13 @@ func TestAnalyzerSanity(t *testing.T) {
 	ctx = context_utils.NewContextWithTokenScopes(ctx, permissions.TokenScopes{})
 	data := make(chan collectors.CollectedData, 3)
 
-	engine, _ := opa.Load([]string{})
+	// Doesn't matter which scm type we use here
+	engine, _ := opa.Load([]string{}, scm_type.GitHub)
 	analyzer := NewAnalyzer(ctx, engine, skippers.NewSkipper(ctx))
 	require.NotNilf(t, analyzer, "failed to create analyzer")
 
 	type nullEntity struct {
-		githubcollected.CollectedEntity
+		githubcollected.Entity
 	}
 
 	someData := collectors.CollectedData{

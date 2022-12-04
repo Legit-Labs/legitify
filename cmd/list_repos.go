@@ -1,14 +1,10 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/common/types"
 	"sort"
 
-	"github.com/Legit-Labs/legitify/internal/clients/github"
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
-	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
-	"github.com/shurcooL/githubv4"
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/viper"
@@ -23,20 +19,20 @@ var listReposArgs args
 func newListReposCommand() *cobra.Command {
 	listReposCmd := &cobra.Command{
 		Use:          "list-repos",
-		Short:        `List GitHub repositories associated with a PAT`,
+		Short:        `List repositories associated with a PAT`,
 		RunE:         executeListReposCommand,
 		SilenceUsage: true,
 	}
 
 	viper.AutomaticEnv()
 	flags := listReposCmd.Flags()
-	listReposArgs.AddCommonOptions(flags)
+	listReposArgs.addCommonOptions(flags)
 
 	return listReposCmd
 }
 
 func validateListReposArgs() error {
-	return nil
+	return listReposArgs.validateCommonOptions()
 }
 
 func executeListReposCommand(cmd *cobra.Command, _args []string) error {
@@ -56,13 +52,12 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	ctx := context.Background()
-	githubClient, err := github.NewClient(ctx, listReposArgs.Token, listReposArgs.Endpoint, []string{}, true)
+	client, err := provideGenericClient(&listReposArgs)
 	if err != nil {
 		return err
 	}
 
-	repositories, err := getRepositories(githubClient, ctx)
+	repositories, err := client.Repositories()
 	if err != nil {
 		return err
 	}
@@ -77,14 +72,14 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 		if len(analyzable) > 0 {
 			fmt.Println("Full analysis available for the following repositories:")
 			for _, repo := range analyzable {
-				fmt.Printf("  - %s (%s)\n", repo.repoWithOwner, repo.permission)
+				fmt.Printf("  - %s (%s)\n", repo.String(), repo.Role)
 			}
 		}
 
 		if len(notAnalyzable) > 0 {
 			fmt.Println("Your permissions are NOT sufficient to analyze the following repositories:")
 			for _, repo := range notAnalyzable {
-				fmt.Printf("  - %s (%s)\n", repo.repoWithOwner, repo.permission)
+				fmt.Printf("  - %s (%s)\n", repo.String(), repo.Role)
 			}
 		}
 	}
@@ -92,27 +87,9 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 	return nil
 }
 
-type repository struct {
-	repoWithOwner string
-	permission    string
-}
-
-func unique(slice []repository) []repository {
-	keys := make(map[string]bool)
-	list := []repository{}
-	for _, entry := range slice {
-		key := entry.repoWithOwner
-		if _, value := keys[key]; !value {
-			keys[key] = true
-			list = append(list, entry)
-		}
-	}
-	return list
-}
-
-func groupByAnalyzable(repositories []repository) (analyzable []repository, notAnalyzable []repository) {
+func groupByAnalyzable(repositories []types.RepositoryWithOwner) (analyzable []types.RepositoryWithOwner, notAnalyzable []types.RepositoryWithOwner) {
 	for _, r := range repositories {
-		if r.permission == "ADMIN" {
+		if r.Role == "ADMIN" {
 			analyzable = append(analyzable, r)
 		} else {
 			notAnalyzable = append(notAnalyzable, r)
@@ -120,117 +97,12 @@ func groupByAnalyzable(repositories []repository) (analyzable []repository, notA
 	}
 
 	sort.Slice(analyzable, func(i, j int) bool {
-		return analyzable[i].repoWithOwner < analyzable[j].repoWithOwner
+		return analyzable[i].String() < analyzable[j].String()
 	})
 
 	sort.Slice(notAnalyzable, func(i, j int) bool {
-		return notAnalyzable[i].repoWithOwner < notAnalyzable[j].repoWithOwner
+		return notAnalyzable[i].String() < notAnalyzable[j].String()
 	})
 
 	return
-}
-
-func getRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
-	r1, err := getViewerRepositories(githubClient, ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	r2, err := getOrganizationRepositories(githubClient, ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return unique(append(r1, r2...)), nil
-}
-
-func getViewerRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
-	var repositories []repository
-	var query struct {
-		Viewer struct {
-			Repositories struct {
-				PageInfo githubcollected.GitHubQLPageInfo
-				Nodes    []struct {
-					NameWithOwner    string
-					ViewerPermission string
-				}
-			} `graphql:"repositories(first:50, after: $cursor)"`
-		}
-	}
-
-	variables := map[string]interface{}{
-		"cursor": (*githubv4.String)(nil),
-	}
-
-	for {
-		err := githubClient.GraphQLClient().Query(ctx, &query, variables)
-		if err != nil {
-			return nil, err
-		}
-		for _, r := range query.Viewer.Repositories.Nodes {
-			repositories = append(repositories, repository{
-				repoWithOwner: r.NameWithOwner,
-				permission:    r.ViewerPermission,
-			})
-		}
-
-		if !query.Viewer.Repositories.PageInfo.HasNextPage {
-			break
-		}
-
-		variables["cursor"] = query.Viewer.Repositories.PageInfo.EndCursor
-	}
-
-	return repositories, nil
-}
-
-func getOrganizationRepositories(githubClient github.Client, ctx context.Context) ([]repository, error) {
-	var repositories []repository
-	orgs := githubClient.Orgs()
-	gw := group_waiter.New()
-
-	for _, o := range orgs {
-		o := o
-		gw.Do(func() {
-			var query struct {
-				Organization struct {
-					Repositories struct {
-						PageInfo githubcollected.GitHubQLPageInfo
-						Nodes    []struct {
-							NameWithOwner    string
-							ViewerPermission string
-						}
-					} `graphql:"repositories(first: 50, after: $cursor)"`
-				} `graphql:"organization(login: $login)"`
-			}
-
-			variables := map[string]interface{}{
-				"cursor": (*githubv4.String)(nil),
-				"login":  githubv4.String(o),
-			}
-
-			for {
-				err := githubClient.GraphQLClient().Query(ctx, &query, variables)
-				if err != nil {
-					return
-				}
-
-				for _, r := range query.Organization.Repositories.Nodes {
-					repositories = append(repositories, repository{
-						repoWithOwner: r.NameWithOwner,
-						permission:    r.ViewerPermission,
-					})
-				}
-
-				if !query.Organization.Repositories.PageInfo.HasNextPage {
-					break
-				}
-
-				variables["cursor"] = query.Organization.Repositories.PageInfo.EndCursor
-			}
-		})
-	}
-
-	gw.Wait()
-	return repositories, nil
 }

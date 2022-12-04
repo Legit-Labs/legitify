@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/common/types"
 
-	"github.com/Legit-Labs/legitify/internal/clients/github"
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/spf13/cobra"
 
@@ -21,20 +19,20 @@ var listOrgsArgs args
 func newListOrgsCommand() *cobra.Command {
 	listOrgsCmd := &cobra.Command{
 		Use:          "list-orgs",
-		Short:        `List GitHub organizations associated with a PAT`,
+		Short:        `List organizations associated with a PAT`,
 		RunE:         executeListOrgsCommand,
 		SilenceUsage: true,
 	}
 
 	viper.AutomaticEnv()
 	flags := listOrgsCmd.Flags()
-	listOrgsArgs.AddCommonOptions(flags)
+	listOrgsArgs.addCommonOptions(flags)
 
 	return listOrgsCmd
 }
 
 func validateListOrgsArgs() error {
-	return nil
+	return listOrgsArgs.validateCommonOptions()
 }
 
 func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
@@ -54,13 +52,12 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	ctx := context.Background()
-	githubClient, err := github.NewClient(ctx, listOrgsArgs.Token, listOrgsArgs.Endpoint, []string{}, true)
+	client, err := provideGenericClient(&listOrgsArgs)
 	if err != nil {
 		return err
 	}
 
-	orgs, err := githubClient.CollectOrganizations()
+	orgs, err := client.Organizations()
 	if err != nil {
 		return err
 	}
@@ -75,14 +72,14 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 		if len(owner) > 0 {
 			fmt.Println("Full analysis available for the following organizations:")
 			for _, org := range owner {
-				fmt.Printf("  - %s (%s)\n", org.Name(), org.Role)
+				fmt.Printf("  - %s (%s)\n", org.Name, org.Role)
 			}
 		}
 
 		if len(member) > 0 {
 			fmt.Println("Partial results available for the following organizations:")
 			for _, org := range member {
-				fmt.Printf("  - %s (%s)\n", org.Name(), org.Role)
+				fmt.Printf("  - %s (%s)\n", org.Name, org.Role)
 			}
 		}
 	}
@@ -90,7 +87,7 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 	return nil
 }
 
-func groupByMembership(orgs []githubcollected.ExtendedOrg) (owner []githubcollected.ExtendedOrg, member []githubcollected.ExtendedOrg) {
+func groupByMembership(orgs []types.Organization) (owner []types.Organization, member []types.Organization) {
 	for _, o := range orgs {
 		if o.Role == permissions.OrgRoleOwner {
 			owner = append(owner, o)

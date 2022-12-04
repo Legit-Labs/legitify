@@ -1,7 +1,8 @@
-package collectors
+package github
 
 import (
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
@@ -16,17 +17,17 @@ const (
 )
 
 type actionCollector struct {
-	baseCollector
-	client  ghclient.Client
+	collectors.BaseCollector
+	client  *ghclient.Client
 	context context.Context
 }
 
-func newActionCollector(ctx context.Context, client ghclient.Client) collector {
+func NewActionCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &actionCollector{
 		client:  client,
 		context: ctx,
 	}
-	initBaseCollector(&c.baseCollector, c)
+	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
 }
 
@@ -34,9 +35,9 @@ func (c *actionCollector) Namespace() namespace.Namespace {
 	return namespace.Actions
 }
 
-func (c *actionCollector) CollectMetadata() Metadata {
+func (c *actionCollector) CollectMetadata() collectors.Metadata {
 	orgs, err := c.client.CollectOrganizations()
-	res := Metadata{}
+	res := collectors.Metadata{}
 
 	if err != nil {
 		log.Printf("failed to collect organizations %s", err)
@@ -47,8 +48,8 @@ func (c *actionCollector) CollectMetadata() Metadata {
 	return res
 }
 
-func (c *actionCollector) Collect() subCollectorChannels {
-	return c.wrappedCollection(func() {
+func (c *actionCollector) Collect() collectors.SubCollectorChannels {
+	return c.WrappedCollection(func() {
 		orgs, err := c.client.CollectOrganizations()
 
 		if err != nil {
@@ -62,13 +63,13 @@ func (c *actionCollector) Collect() subCollectorChannels {
 
 			if err1 != nil || err2 != nil {
 				entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
-				perm := newMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
-				c.issueMissingPermissions(perm)
+				perm := collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
+				c.IssueMissingPermissions(perm)
 			}
 
-			c.collectionChangeByOne()
+			c.CollectionChangeByOne()
 
-			c.collectData(org,
+			c.CollectData(org,
 				ghcollected.OrganizationActions{
 					Organization:       org,
 					ActionsPermissions: actionsData,

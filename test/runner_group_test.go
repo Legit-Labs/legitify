@@ -47,7 +47,7 @@ func TestRunnerGroup(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		PolicyTestTemplate(t, test.name, newRunnerGroupMock(test.args),
+		PolicyTestTemplateGitHub(t, test.name, newRunnerGroupMock(test.args),
 			namespace.RunnerGroup, test.policyName, test.shouldBeViolated)
 	}
 }

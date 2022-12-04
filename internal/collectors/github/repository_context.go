@@ -1,4 +1,4 @@
-package collectors
+package github
 
 import (
 	"context"
@@ -13,7 +13,7 @@ type repositoryContext struct {
 	isBranchProtectionSupported bool
 }
 
-func (rc *repositoryContext) IsEnterprise() bool {
+func (rc *repositoryContext) Premium() bool {
 	return rc.isEnterprise
 }
 
@@ -27,10 +27,10 @@ func (rc *repositoryContext) IsBranchProtectionSupported() bool {
 
 type repositoryContextFactory struct {
 	ctx    context.Context
-	client github.Client
+	client *github.Client
 }
 
-func newRepositoryContextFactory(ctx context.Context, client github.Client) *repositoryContextFactory {
+func newRepositoryContextFactory(ctx context.Context, client *github.Client) *repositoryContextFactory {
 	return &repositoryContextFactory{
 		ctx:    ctx,
 		client: client,

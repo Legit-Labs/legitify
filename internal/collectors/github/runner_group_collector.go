@@ -1,8 +1,9 @@
-package collectors
+package github
 
 import (
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -13,19 +14,19 @@ import (
 )
 
 type runnersCollector struct {
-	baseCollector
-	client  ghclient.Client
+	collectors.BaseCollector
+	client  *ghclient.Client
 	context context.Context
 	cache   map[string][]*github.RunnerGroup
 }
 
-func newRunnersCollector(ctx context.Context, client ghclient.Client) collector {
+func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &runnersCollector{
 		client:  client,
 		context: ctx,
 		cache:   make(map[string][]*github.RunnerGroup),
 	}
-	initBaseCollector(&c.baseCollector, c)
+	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
 }
 
@@ -33,12 +34,12 @@ func (c *runnersCollector) Namespace() namespace.Namespace {
 	return namespace.RunnerGroup
 }
 
-func (c *runnersCollector) CollectMetadata() Metadata {
+func (c *runnersCollector) CollectMetadata() collectors.Metadata {
 	gw := group_waiter.New()
 	orgs, err := c.client.CollectOrganizations()
 	if err != nil {
 		log.Printf("failed to collection organizations %s", err)
-		return Metadata{}
+		return collectors.Metadata{}
 	}
 
 	totalCount := 0
@@ -70,13 +71,13 @@ func (c *runnersCollector) CollectMetadata() Metadata {
 	}
 
 	gw.Wait()
-	return Metadata{
-		totalCount,
+	return collectors.Metadata{
+		TotalEntities: totalCount,
 	}
 }
 
-func (c *runnersCollector) Collect() subCollectorChannels {
-	return c.wrappedCollection(func() {
+func (c *runnersCollector) Collect() collectors.SubCollectorChannels {
+	return c.WrappedCollection(func() {
 		orgs, err := c.client.CollectOrganizations()
 
 		if err != nil {
@@ -88,9 +89,9 @@ func (c *runnersCollector) Collect() subCollectorChannels {
 			cached := c.cache[org.Name()]
 
 			for _, rg := range cached {
-				c.collectionChangeByOne()
+				c.CollectionChangeByOne()
 
-				c.collectData(org,
+				c.CollectData(org,
 					ghcollected.RunnerGroup{
 						Organization: org,
 						RunnerGroup:  rg,

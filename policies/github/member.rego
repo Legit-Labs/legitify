@@ -27,7 +27,7 @@ organization_has_too_many_admins {
 #   remediationSteps: [Make sure you have admin permissions, Go to the org's People page, Select all stale members, Using the "X members selected" - remove members from organization]
 #   severity: LOW
 #   requiredScopes: [admin:org]
-#   prerequisites: [enterprise]
+#   prerequisites: [premium]
 #   threat:
 #     - "Stale members are most likely not managed and monitored, increasing the possibility of being compromised."
 stale_member_found[mem] = true {
@@ -47,7 +47,7 @@ stale_member_found[mem] = true {
 #   remediationSteps: [Make sure you have admin permissions, Go to the org's People page, Select all stale admins, Using the "X members selected" - remove members from organization]
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
-#   prerequisites: [enterprise]
+#   prerequisites: [premium]
 #   threat:
 #     - "Stale admins are most likely not managed and monitored, increasing the possibility of being compromised."
 stale_admin_found[mem] = true {
