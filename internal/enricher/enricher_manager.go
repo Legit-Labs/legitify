@@ -51,12 +51,13 @@ type enricherManager struct {
 type newEnricherFunc func(ctx context.Context) enrichers.Enricher
 
 var enricherTextToEnricher = map[string]newEnricherFunc{
-	enrichers.EntityId:       enrichers.NewEntityIdEnricher,
-	enrichers.EntityName:     enrichers.NewEntityNameEnricher,
-	enrichers.OrganizationId: enrichers.NewOrganizationIdEnricher,
-	enrichers.Scorecard:      enrichers.NewScorecardEnricher,
-	enrichers.MembersList:    enrichers.NewMembersListEnricher,
-	enrichers.HooksList:      enrichers.NewHooksListEnricher,
+	enrichers.EntityId:              enrichers.NewEntityIdEnricher,
+	enrichers.EntityName:            enrichers.NewEntityNameEnricher,
+	enrichers.OrganizationId:        enrichers.NewOrganizationIdEnricher,
+	enrichers.Scorecard:             enrichers.NewScorecardEnricher,
+	enrichers.MembersList:           enrichers.NewMembersListEnricher,
+	enrichers.HooksList:             enrichers.NewHooksListEnricher,
+	enrichers.GenericEnrichmentList: enrichers.NewGenericListEnricher,
 }
 
 func newEnrichedData(analyzed analyzers.AnalyzedData, enrichments map[string]enrichers.Enrichment) EnrichedData {

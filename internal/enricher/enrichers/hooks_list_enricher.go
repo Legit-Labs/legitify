@@ -11,7 +11,7 @@ import (
 
 const HooksList = "violatedHooks"
 
-func NewHooksListEnricher(ctx context.Context) Enricher {
+func NewHooksListEnricher(_ context.Context) Enricher {
 	return &hooksListEnricher{}
 }
 

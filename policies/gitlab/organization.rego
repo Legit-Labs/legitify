@@ -34,6 +34,24 @@ two_factor_authentication_not_required_for_group {
 #     - Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
 default collaborators_can_fork_repositories_to_external_namespaces = false
 collaborators_can_fork_repositories_to_external_namespaces {
-    print(input.prevent_forking_outside_group)
     input.prevent_forking_outside_group == false
+}
+
+# METADATA
+# scope: rule
+# title: Webhook Configured Without SSL
+# description: Webhooks that are not configured with SSL enabled could expose your software to man in the middle attacks (MITM).
+# custom:
+#   severity: LOW
+#   requiredEnrichers: [genericList]
+#   remediationSteps:
+#     - Go to the group Settings -> Webhooks page
+#     - Find the misconfigured webhook and press "Edit"
+#     - Toggle "Enable SSL verification"
+#     - Press "Save Changes"
+organization_webhook_doesnt_require_ssl[violation] = true {
+    some index
+    hook := input.hooks[index]
+    hook.enable_ssl_verification == false
+    violation := { "name": format_int(hook.id, 10), "url": hook.url }
 }

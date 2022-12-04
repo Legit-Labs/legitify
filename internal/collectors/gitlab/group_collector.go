@@ -64,7 +64,17 @@ func (c *groupCollector) Collect() collectors.SubCollectorChannels {
 					return
 				}
 
-				entity := gitlab_collected.Organization{Group: *fullGroup}
+				hooks, err := c.Client.GroupHooks(fullGroup.ID)
+
+				if err != nil {
+					log.Printf("failed to query group hooks: %d - %s", g.ID, g.Name)
+				}
+
+				entity := gitlab_collected.Organization{
+					Group: fullGroup,
+					Hooks: hooks,
+				}
+
 				c.CollectDataWithContext(&entity, g.WebURL, newCollectionContext(g, []permissions.OrganizationRole{permissions.RepoRoleAdmin}))
 				c.CollectionChangeByOne()
 			})

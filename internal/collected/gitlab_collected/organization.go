@@ -6,7 +6,8 @@ import (
 )
 
 type Organization struct {
-	gitlab.Group
+	*gitlab.Group
+	Hooks []*gitlab.GroupHook `json:"hooks"`
 }
 
 func (o Organization) ViolationEntityType() string {

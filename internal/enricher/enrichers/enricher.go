@@ -19,8 +19,8 @@ func (s *BasicEnrichment) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, s.val)), nil
 }
 
-func (be *BasicEnrichment) HumanReadable(prepend string) string {
-	sb := utils.NewPrependedStringBuilder(prepend)
+func (be *BasicEnrichment) HumanReadable(_ string) string {
+	sb := utils.NewPrependedStringBuilder("")
 	sb.WriteString(be.val)
 	return sb.String()
 }
