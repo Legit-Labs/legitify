@@ -4,10 +4,10 @@ import (
 	"context"
 	"github.com/Legit-Labs/legitify/internal/analyzers/parsing_utils"
 	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
+	githubcollected "github.com/Legit-Labs/legitify/internal/collected"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"log"
 
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
@@ -24,7 +24,7 @@ const (
 )
 
 type AnalyzedData struct {
-	Entity                   githubcollected.CollectedEntity
+	Entity                   githubcollected.Entity
 	Namespace                namespace.Namespace
 	PolicyName               string
 	FullyQualifiedPolicyName string

@@ -86,7 +86,7 @@ func TestMember(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		PolicyTestTemplate(t, test.name, newMemberMock(test.args),
+		PolicyTestTemplateGitHub(t, test.name, newMemberMock(test.args),
 			namespace.Member, test.policyName, test.shouldBeViolated)
 	}
 }

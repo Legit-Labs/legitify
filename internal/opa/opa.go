@@ -3,6 +3,7 @@ package opa
 import (
 	"embed"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"os"
 	"path"
 	"strings"
@@ -14,7 +15,7 @@ import (
 	"github.com/open-policy-agent/opa/loader"
 )
 
-func Load(policyPaths []string) (opa_engine.Enginer, error) {
+func Load(policyPaths []string, scm scm_type.ScmType) (opa_engine.Enginer, error) {
 	loadedPolicies, err := loader.NewFileLoader().
 		WithProcessAnnotation(true).
 		Filtered(policyPaths, isRegoFile)
@@ -29,7 +30,7 @@ func Load(policyPaths []string) (opa_engine.Enginer, error) {
 	modules := loadedPolicies.ParsedModules()
 	compiler := ast.NewCompiler().WithEnablePrintStatements(true)
 
-	bundledModules, err := loadModules()
+	bundledModules, err := loadModules(scm)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +50,15 @@ func Load(policyPaths []string) (opa_engine.Enginer, error) {
 	return engine, nil
 }
 
-func loadModules() ([]*ast.Module, error) {
-	return loadModulesFromFs(policies.Bundle, path.Dir(""))
+func loadModules(scmType scm_type.ScmType) ([]*ast.Module, error) {
+	switch scmType {
+	case scm_type.GitHub:
+		return loadModulesFromFs(policies.GitHubBundle, path.Dir(""))
+	case scm_type.GitLab:
+		return loadModulesFromFs(policies.GitLabBundle, path.Dir(""))
+	default:
+		return nil, fmt.Errorf("unknown scm type %s", scmType)
+	}
 }
 
 func loadModulesFromFs(fs embed.FS, p string) ([]*ast.Module, error) {

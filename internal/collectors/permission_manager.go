@@ -10,15 +10,15 @@ import (
 	"github.com/iancoleman/orderedmap"
 )
 
-type missingPermission struct {
+type MissingPermission struct {
 	Permission string
 	Entity     string
 	Effect     string
 	Namespace  namespace.Namespace
 }
 
-func newMissingPermission(permission, entity, effect string, namespace namespace.Namespace) missingPermission {
-	return missingPermission{
+func NewMissingPermission(permission, entity, effect string, namespace namespace.Namespace) MissingPermission {
+	return MissingPermission{
 		Permission: permission,
 		Entity:     entity,
 		Effect:     effect,
@@ -28,7 +28,7 @@ func newMissingPermission(permission, entity, effect string, namespace namespace
 
 type effectSet = map[string]bool
 
-func collectMissingPermissions(missingPermissionChan chan missingPermission) {
+func CollectMissingPermissions(missingPermissionChan chan MissingPermission) {
 	permMap := orderedmap.New()
 	for permission := range missingPermissionChan {
 		entities, ok := permMap.Get(permission.Permission)

@@ -110,7 +110,7 @@ func TestActions(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		PolicyTestTemplate(t, test.name, newOrganizationActionsMock(test.args),
+		PolicyTestTemplateGitHub(t, test.name, newOrganizationActionsMock(test.args),
 			namespace.Actions, test.policyName, test.shouldBeViolated)
 	}
 }

@@ -33,7 +33,7 @@ func countFiles(fs embed.FS, p string) (int, error) {
 }
 
 func countBundles() (int, error) {
-	count, e := countFiles(Bundle, path.Dir(""))
+	count, e := countFiles(GitHubBundle, path.Dir(""))
 
 	if e != nil {
 		return 0, e

@@ -1,26 +1,14 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"log"
 	"os"
 	"strings"
 
-	"github.com/Legit-Labs/legitify/internal/analyzers/skippers"
-	"github.com/Legit-Labs/legitify/internal/common/types"
-
-	"github.com/Legit-Labs/legitify/internal/opa"
-
-	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 
-	"github.com/Legit-Labs/legitify/internal/analyzers"
-	"github.com/Legit-Labs/legitify/internal/clients/github"
-	"github.com/Legit-Labs/legitify/internal/collectors"
-	"github.com/Legit-Labs/legitify/internal/context_utils"
-	"github.com/Legit-Labs/legitify/internal/enricher"
-	"github.com/Legit-Labs/legitify/internal/outputer"
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/spf13/cobra"
@@ -49,7 +37,6 @@ func toOptionsString(options []string) string {
 }
 
 var analyzeArgs args
-var parsedRepositories []types.RepositoryWithOwner
 
 func newAnalyzeCommand() *cobra.Command {
 	analyzeCmd := &cobra.Command{
@@ -66,7 +53,7 @@ func newAnalyzeCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
-	analyzeArgs.AddCommonOptions(flags)
+	analyzeArgs.addCommonOptions(flags)
 
 	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
@@ -82,6 +69,10 @@ func newAnalyzeCommand() *cobra.Command {
 }
 
 func validateAnalyzeArgs() error {
+	if err := analyzeArgs.validateCommonOptions(); err != nil {
+		return err
+	}
+
 	if err := namespace.ValidateNamespaces(analyzeArgs.Namespaces); err != nil {
 		return err
 	}
@@ -98,32 +89,11 @@ func validateAnalyzeArgs() error {
 		return err
 	}
 
-	return nil
-}
-
-func buildContext() (context.Context, error) {
-	var ctx context.Context
 	if len(analyzeArgs.Organizations) != 0 && len(analyzeArgs.Repositories) != 0 {
-		return nil, fmt.Errorf("cannot use --org & --repo options together")
-	} else if len(analyzeArgs.Organizations) != 0 {
-		ctx = context_utils.NewContextWithOrg(analyzeArgs.Organizations)
-	} else if len(analyzeArgs.Repositories) != 0 {
-		validated, err := validateRepositories(analyzeArgs.Repositories)
-		if err != nil {
-			return nil, err
-		}
-		ctx = context_utils.NewContextWithRepos(validated)
-		parsedRepositories = validated
-		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
-	} else {
-		ctx = context.Background()
+		return fmt.Errorf("cannot use --org & --repo options together")
 	}
 
-	ctx = context_utils.NewContextWithScorecard(ctx,
-		IsScorecardEnabled(analyzeArgs.ScorecardWhen),
-		IsScorecardVerbose(analyzeArgs.ScorecardWhen))
-
-	return ctx, nil
+	return nil
 }
 
 func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
@@ -155,59 +125,20 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 
 	stdErrLog := log.New(os.Stderr, "", 0)
 
-	ctx, err := buildContext()
+	var executor = &analyzeExecutor{}
+
+	if analyzeArgs.ScmType == scm_type.GitHub {
+		executor, err = setupGitHub(&analyzeArgs, stdErrLog)
+	} else if analyzeArgs.ScmType == scm_type.GitLab {
+		executor, err = setupGitLab(&analyzeArgs, stdErrLog)
+	} else {
+		// shouldn't happen since scm type is validated before
+		return fmt.Errorf("invalid scm type %s", analyzeArgs.ScmType)
+	}
+
 	if err != nil {
 		return err
 	}
 
-	if !IsScorecardEnabled(analyzeArgs.ScorecardWhen) {
-		stdErrLog.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
-	}
-
-	githubClient, err := github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Endpoint,
-		analyzeArgs.Organizations, false)
-
-	if err != nil {
-		return err
-	} else if len(parsedRepositories) > 0 {
-		if err = repositoriesAnalyzable(ctx, githubClient, parsedRepositories); err != nil {
-			return err
-		}
-	}
-
-	ctx = context_utils.NewContextWithTokenScopes(ctx, githubClient.Scopes())
-
-	opaEngine, err := opa.Load(analyzeArgs.PoliciesPath)
-	if err != nil {
-		return err
-	}
-
-	manager := collectors.NewCollectorsManager(ctx, analyzeArgs.Namespaces, githubClient)
-	analyzer := analyzers.NewAnalyzer(ctx, opaEngine, skippers.NewSkipper(ctx))
-	enricherManager := enricher.NewEnricherManager(ctx)
-	out := outputer.NewOutputer(ctx, analyzeArgs.OutputFormat, analyzeArgs.OutputScheme, analyzeArgs.FailedOnly)
-
-	stdErrLog.Printf("Gathering collection metadata...")
-	collectionMetadata := manager.CollectMetadata()
-	progressBar := progressbar.NewProgressBar(collectionMetadata)
-
-	// TODO progressBar should run before collection starts and wait for channels to read from
-	collectionChannels := manager.Collect()
-	pWaiter := progressBar.Run(collectionChannels.Progress)
-	analyzedDataChan := analyzer.Analyze(collectionChannels.Collected)
-	enrichedDataChan := enricherManager.Enrich(analyzedDataChan)
-	outputWaiter := out.Digest(enrichedDataChan)
-
-	// Wait for progress bars to finish before outputting
-	pWaiter.Wait()
-
-	// Wait for output to be digested
-	outputWaiter.Wait()
-
-	err = out.Output(os.Stdout)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return executor.Run()
 }

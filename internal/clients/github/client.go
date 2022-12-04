@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
+	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
+	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
 	"log"
 	"net/http"
 	"regexp"
@@ -19,21 +21,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Client interface {
-	Client() *gh.Client
-	GraphQLClient() *githubv4.Client
-	CollectOrganizations() ([]githubcollected.ExtendedOrg, error)
-	Scopes() permissions.TokenScopes
-	Orgs() []string
-	IsGithubCloud() bool
-	GetActionsTokenPermissionsForOrganization(organization string) (*types.TokenPermissions, error)
-	GetActionsTokenPermissionsForRepository(organization string, repository string) (*types.TokenPermissions, error)
-}
-
 const experimentalApiAcceptHeader = "application/vnd.github.hawkgirl-preview+json"
 const scopeHttpHeader = "X-OAuth-Scopes"
 
-type client struct {
+type Client struct {
 	client           *gh.Client
 	orgs             []string
 	graphQLClient    *githubv4.Client
@@ -61,8 +52,8 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 	return tc, clientWithAcceptHeader
 }
 
-func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, fillCache bool) (Client, error) {
-	client := &client{
+func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, fillCache bool) (*Client, error) {
+	client := &Client{
 		orgs:      org,
 		context:   ctx,
 		serverUrl: strings.TrimRight(githubEndpoint, "/"),
@@ -93,19 +84,19 @@ func NewClient(ctx context.Context, token string, githubEndpoint string, org []s
 	return client, nil
 }
 
-func (c *client) Client() *gh.Client {
+func (c *Client) Client() *gh.Client {
 	return c.client
 }
 
-func (c *client) GraphQLClient() *githubv4.Client {
+func (c *Client) GraphQLClient() *githubv4.Client {
 	return c.graphQLClient
 }
 
-func (c *client) IsGithubCloud() bool {
+func (c *Client) IsGithubCloud() bool {
 	return c.serverUrl == ""
 }
 
-func (c *client) initClients(ctx context.Context, token string) error {
+func (c *Client) initClients(ctx context.Context, token string) error {
 	if err := c.validateToken(token); err != nil {
 		return err
 	}
@@ -136,7 +127,7 @@ func (c *client) initClients(ctx context.Context, token string) error {
 // Note: tokens before April 2021 did not have the ghp_ prefix.
 var githubTokenPattern = regexp.MustCompile("(ghp_)?[A-Za-z0-9_]{36}")
 
-func (c *client) validateToken(token string) error {
+func (c *Client) validateToken(token string) error {
 	if token == "" {
 		return fmt.Errorf("missing token")
 	} else if strings.HasPrefix(token, "github_pat_") {
@@ -148,7 +139,7 @@ func (c *client) validateToken(token string) error {
 	return nil
 }
 
-func (c *client) getGitHubGraphURL() string {
+func (c *Client) getGitHubGraphURL() string {
 	if c.IsGithubCloud() {
 		return "https://api.github.com/graphql"
 	}
@@ -156,7 +147,7 @@ func (c *client) getGitHubGraphURL() string {
 	return c.serverUrl + "/api/graphql"
 }
 
-func (c *client) fillCache() error {
+func (c *Client) fillCache() error {
 	_, err := c.CollectOrganizations()
 	if err != nil && isBadRequest(err) {
 		return fmt.Errorf("invalid token (make sure it's not expired or revoked)")
@@ -173,15 +164,15 @@ func (c *client) fillCache() error {
 	return nil
 }
 
-func (c *client) Scopes() permissions.TokenScopes {
+func (c *Client) Scopes() permissions.TokenScopes {
 	return c.scopes
 }
 
-func (c *client) Orgs() []string {
+func (c *Client) Orgs() []string {
 	return c.orgs
 }
 
-func (c *client) setOrgsList(realOrgs []string) error {
+func (c *Client) setOrgsList(realOrgs []string) error {
 	if len(c.orgs) == 0 {
 		c.orgs = realOrgs
 	} else {
@@ -202,7 +193,7 @@ func (c *client) setOrgsList(realOrgs []string) error {
 	return nil
 }
 
-func (c *client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
+func (c *Client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
 	c.cacheLock.RLock()
 	if c.orgsCache != nil {
 		return c.orgsCache, nil
@@ -229,6 +220,23 @@ func (c *client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
 	return orgs, nil
 }
 
+func (c *Client) Organizations() ([]commontypes.Organization, error) {
+	raw, err := c.CollectOrganizations()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []commontypes.Organization
+	for _, o := range raw {
+		result = append(result, commontypes.Organization{
+			Name: o.Name(),
+			Role: o.Role,
+		})
+	}
+
+	return result, nil
+}
+
 type orgPermissionQuery struct {
 	Organization struct {
 		ViewerCanAdminister *bool `graphql:"viewerCanAdminister"`
@@ -253,7 +261,7 @@ func isMissingSamlAuthenticationError(err error) bool {
 	return err != nil && err.Error() == samlErrorMsg
 }
 
-func (c *client) getRole(orgName string) (permissions.OrganizationRole, error) {
+func (c *Client) getRole(orgName string) (permissions.OrganizationRole, error) {
 	variables := map[string]interface{}{
 		"login": githubv4.String(orgName),
 	}
@@ -276,7 +284,7 @@ func (c *client) getRole(orgName string) (permissions.OrganizationRole, error) {
 	return permissions.GetOrgRole(query.Organization.ViewerCanAdminister), nil
 }
 
-func (c *client) collectTokenScopes() (permissions.TokenScopes, error) {
+func (c *Client) collectTokenScopes() (permissions.TokenScopes, error) {
 	var buf bytes.Buffer
 	resp, err := c.graphQLRawClient.Post(c.getGitHubGraphURL(), "application/json", &buf)
 	if err != nil {
@@ -290,7 +298,7 @@ func (c *client) collectTokenScopes() (permissions.TokenScopes, error) {
 	return scopes, nil
 }
 
-func (c *client) collectOrgsList() ([]string, error) {
+func (c *Client) collectOrgsList() ([]string, error) {
 	var orgNames []string
 	err := PaginateResults(func(opts *gh.ListOptions) (*gh.Response, error) {
 		orgs, resp, err := c.Client().Organizations.List(c.context, "", opts)
@@ -315,7 +323,7 @@ func (c *client) collectOrgsList() ([]string, error) {
 	return orgNames, nil
 }
 
-func (c *client) collectSpecificOrganizations() ([]githubcollected.ExtendedOrg, error) {
+func (c *Client) collectSpecificOrganizations() ([]githubcollected.ExtendedOrg, error) {
 	res := make([]githubcollected.ExtendedOrg, 0)
 
 	for _, o := range c.orgs {
@@ -336,17 +344,17 @@ func (c *client) collectSpecificOrganizations() ([]githubcollected.ExtendedOrg, 
 	return res, nil
 }
 
-func (c *client) GetActionsTokenPermissionsForOrganization(organization string) (*types.TokenPermissions, error) {
+func (c *Client) GetActionsTokenPermissionsForOrganization(organization string) (*types.TokenPermissions, error) {
 	u := fmt.Sprintf("orgs/%s/actions/permissions/workflow", organization)
 	return c.GetActionsTokenPermissions(u)
 }
 
-func (c *client) GetActionsTokenPermissionsForRepository(organization string, repository string) (*types.TokenPermissions, error) {
+func (c *Client) GetActionsTokenPermissionsForRepository(organization string, repository string) (*types.TokenPermissions, error) {
 	u := fmt.Sprintf("repos/%s/%s/actions/permissions/workflow", organization, repository)
 	return c.GetActionsTokenPermissions(u)
 }
 
-func (c *client) GetActionsTokenPermissions(url string) (*types.TokenPermissions, error) {
+func (c *Client) GetActionsTokenPermissions(url string) (*types.TokenPermissions, error) {
 	req, err := c.client.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -358,6 +366,141 @@ func (c *client) GetActionsTokenPermissions(url string) (*types.TokenPermissions
 		return nil, err
 	}
 	return &p, nil
+}
+
+func (c *Client) IsAnalyzable(repository commontypes.RepositoryWithOwner) (bool, error) {
+	var repo struct {
+		Repository struct {
+			ViewerPermission githubv4.String
+		} `graphql:"repository(owner: $owner, name: $name)"`
+	}
+	variables := map[string]interface{}{
+		"name":  githubv4.String(repository.Name),
+		"owner": githubv4.String(repository.Owner),
+	}
+
+	err := c.GraphQLClient().Query(c.context, &repo, variables)
+	if err != nil {
+		return false, err
+	}
+
+	return repo.Repository.ViewerPermission == permissions.RepoRoleAdmin, nil
+}
+
+func uniqueRepositories(slice []commontypes.RepositoryWithOwner) []commontypes.RepositoryWithOwner {
+	keys := make(map[string]bool)
+	var list []commontypes.RepositoryWithOwner
+	for _, entry := range slice {
+		key := entry.String()
+		if _, found := keys[key]; !found {
+			keys[key] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
+func (c *Client) Repositories() ([]commontypes.RepositoryWithOwner, error) {
+	r1, err := c.getViewerRepositories()
+	if err != nil {
+		return nil, err
+	}
+
+	r2, err := c.getOrganizationsRepositories()
+	if err != nil {
+		return nil, err
+	}
+
+	return uniqueRepositories(append(r1, r2...)), nil
+}
+
+func (c *Client) getViewerRepositories() ([]commontypes.RepositoryWithOwner, error) {
+	var repositories []commontypes.RepositoryWithOwner
+	var query struct {
+		Viewer struct {
+			Repositories struct {
+				PageInfo githubcollected.GitHubQLPageInfo
+				Nodes    []struct {
+					NameWithOwner    string
+					ViewerPermission string
+				}
+			} `graphql:"repositories(first:50, after: $cursor)"`
+		}
+	}
+
+	variables := map[string]interface{}{
+		"cursor": (*githubv4.String)(nil),
+	}
+
+	for {
+		err := c.GraphQLClient().Query(c.context, &query, variables)
+		if err != nil {
+			return nil, err
+		}
+		for _, r := range query.Viewer.Repositories.Nodes {
+			repositories = append(repositories, commontypes.NewRepositoryWithOwner(r.NameWithOwner, r.ViewerPermission))
+		}
+
+		if !query.Viewer.Repositories.PageInfo.HasNextPage {
+			break
+		}
+
+		variables["cursor"] = query.Viewer.Repositories.PageInfo.EndCursor
+	}
+
+	return repositories, nil
+}
+
+func (c *Client) getOrganizationsRepositories() ([]commontypes.RepositoryWithOwner, error) {
+	var repositories []commontypes.RepositoryWithOwner
+	orgs, err := c.CollectOrganizations()
+	if err != nil {
+		return nil, err
+	}
+
+	gw := group_waiter.New()
+
+	for _, o := range orgs {
+		o := o
+		gw.Do(func() {
+			var query struct {
+				Organization struct {
+					Repositories struct {
+						PageInfo githubcollected.GitHubQLPageInfo
+						Nodes    []struct {
+							NameWithOwner    string
+							ViewerPermission string
+						}
+					} `graphql:"repositories(first: 50, after: $cursor)"`
+				} `graphql:"organization(login: $login)"`
+			}
+
+			variables := map[string]interface{}{
+				"cursor": (*githubv4.String)(nil),
+				"login":  githubv4.String(o.Name()),
+			}
+
+			for {
+				err := c.GraphQLClient().Query(c.context, &query, variables)
+				if err != nil {
+					return
+				}
+
+				for _, r := range query.Organization.Repositories.Nodes {
+					repositories = append(repositories, commontypes.NewRepositoryWithOwner(r.NameWithOwner, r.ViewerPermission))
+				}
+
+				if !query.Organization.Repositories.PageInfo.HasNextPage {
+					break
+				}
+
+				variables["cursor"] = query.Organization.Repositories.PageInfo.EndCursor
+			}
+		})
+	}
+
+	gw.Wait()
+	return repositories, nil
 }
 
 type samlError struct {

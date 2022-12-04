@@ -2,6 +2,7 @@ package enricher_test
 
 import (
 	"context"
+	"github.com/Legit-Labs/legitify/internal/collected"
 	"testing"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -29,7 +30,7 @@ func arrangeEnricher(t *testing.T) EnricherTestRequires {
 	}
 }
 
-func arbitraryEntity() githubcollected.CollectedEntity {
+func arbitraryEntity() collected.Entity {
 	var entityID int64 = 666
 	var entityName string = "arbitrary"
 

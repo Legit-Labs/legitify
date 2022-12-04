@@ -11,7 +11,7 @@ import (
 
 func repositoryTestTemplate(t *testing.T, name string, mockData interface{}, testedPolicyName string, expectFailure bool) {
 	ns := namespace.Repository
-	PolicyTestTemplate(t, name, mockData, ns, testedPolicyName, expectFailure)
+	PolicyTestTemplateGitHub(t, name, mockData, ns, testedPolicyName, expectFailure)
 }
 
 var bools = []bool{true, false}
