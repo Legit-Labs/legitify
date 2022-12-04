@@ -13,7 +13,7 @@ func PaginateResults(api func(opts *gitlab.ListOptions) (*gitlab.Response, error
 			return err
 		}
 
-		if resp.NextPage == resp.TotalPages {
+		if resp.NextPage == 0 {
 			return nil
 		}
 

@@ -69,7 +69,7 @@ install_wire:
 .PHONY: install_wire
 
 generate_wire: install_wire
-	~/go/bin/wire gen ./...
+	~/go/bin/wire gen ./cmd/...
 .PHONY: generate_mocks
 
 test: generate_mocks
