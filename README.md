@@ -30,7 +30,7 @@ go run main.go analyze ...
 To enhance the software supply chain security of legitify's users, as of v0.1.6, every legitify release contains a [SLSA Level 3 Provenacne](https://github.com/slsa-framework/slsa-github-generator/blob/main/internal/builders/generic/README.md) document.  
 The provenance document refers to all artifacts in the release, as well as the generated docker image.  
 You can use [SLSA framework's official verifier](https://github.com/slsa-framework/slsa-verifier) to verify the provenance.  
-Example of usage for the darwin_arm64 release for v0.1.6:
+Example of usage for the darwin_arm64 architecture for the v0.1.6 release:
 ```
 VERSION=0.1.6
 ARCH=darwin_arm64
