@@ -9,10 +9,12 @@ import (
 
 type Enrichment interface {
 	HumanReadable(prepend string) string
+	Name() string
 }
 
 type BasicEnrichment struct {
-	val string
+	val  string
+	name string
 }
 
 func (s *BasicEnrichment) MarshalJSON() ([]byte, error) {
@@ -25,14 +27,18 @@ func (be *BasicEnrichment) HumanReadable(_ string) string {
 	return sb.String()
 }
 
-func NewBasicEnrichment(str string) Enrichment {
+func (be *BasicEnrichment) Name() string {
+	return be.name
+}
+
+func NewBasicEnrichment(str string, name string) Enrichment {
 	return &BasicEnrichment{
-		val: str,
+		val:  str,
+		name: name,
 	}
 }
 
 type Enricher interface {
 	Enrich(data analyzers.AnalyzedData) (enrichment Enrichment, ok bool)
-	ShouldEnrich(requestedEnricher string) bool
 	Name() string
 }

@@ -51,13 +51,12 @@ type enricherManager struct {
 type newEnricherFunc func(ctx context.Context) enrichers.Enricher
 
 var enricherTextToEnricher = map[string]newEnricherFunc{
-	enrichers.EntityId:              enrichers.NewEntityIdEnricher,
-	enrichers.EntityName:            enrichers.NewEntityNameEnricher,
-	enrichers.OrganizationId:        enrichers.NewOrganizationIdEnricher,
-	enrichers.Scorecard:             enrichers.NewScorecardEnricher,
-	enrichers.MembersList:           enrichers.NewMembersListEnricher,
-	enrichers.HooksList:             enrichers.NewHooksListEnricher,
-	enrichers.GenericEnrichmentList: enrichers.NewGenericListEnricher,
+	enrichers.EntityId:       enrichers.NewEntityIdEnricher,
+	enrichers.EntityName:     enrichers.NewEntityNameEnricher,
+	enrichers.OrganizationId: enrichers.NewOrganizationIdEnricher,
+	enrichers.Scorecard:      enrichers.NewScorecardEnricher,
+	enrichers.MembersList:    enrichers.NewMembersListEnricher,
+	enrichers.HooksList:      enrichers.NewHooksListEnricher,
 }
 
 func newEnrichedData(analyzed analyzers.AnalyzedData, enrichments map[string]enrichers.Enrichment) EnrichedData {
@@ -97,16 +96,13 @@ func (e *enricherManager) Enrich(analyzedDataChannel <-chan analyzers.AnalyzedDa
 						}
 
 						enricher := createEnricher(e.ctx)
-						if !enricher.ShouldEnrich(requiredEnricher) {
-							continue
-						}
 
 						enrichment, ok := enricher.Enrich(analyzedData)
 						if !ok {
 							continue
 						}
 
-						enrichments[requiredEnricher] = enrichment
+						enrichments[enrichment.Name()] = enrichment
 					}
 					enrichedData := newEnrichedData(analyzedData, enrichments)
 

@@ -43,7 +43,7 @@ collaborators_can_fork_repositories_to_external_namespaces {
 # description: Webhooks that are not configured with SSL enabled could expose your software to man in the middle attacks (MITM).
 # custom:
 #   severity: LOW
-#   requiredEnrichers: [genericList]
+#   requiredEnrichers: [hooksList]
 #   remediationSteps:
 #     - Go to the group Settings -> Webhooks page
 #     - Find the misconfigured webhook and press "Edit"
@@ -53,5 +53,5 @@ organization_webhook_doesnt_require_ssl[violation] = true {
     some index
     hook := input.hooks[index]
     hook.enable_ssl_verification == false
-    violation := { "name": format_int(hook.id, 10), "url": hook.url }
+    violation := { "id": format_int(hook.id, 10), "url": hook.url }
 }

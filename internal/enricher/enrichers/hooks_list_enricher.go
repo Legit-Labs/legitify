@@ -6,10 +6,9 @@ import (
 	"fmt"
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
-	"github.com/google/go-github/v44/github"
 )
 
-const HooksList = "violatedHooks"
+const HooksList = "hooksList"
 
 func NewHooksListEnricher(_ context.Context) Enricher {
 	return &hooksListEnricher{}
@@ -29,42 +28,51 @@ func (e *hooksListEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, boo
 func createHooksListEnrichment(extraData interface{}) (Enrichment, error) {
 	casted, ok := extraData.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf("invalid membersList extra data")
+		return nil, fmt.Errorf("invalid hookslist extra data")
 	}
+	var result []map[string]string
 
-	var result []github.Hook
 	for k := range casted {
-		var hook github.Hook
-		err := json.Unmarshal([]byte(k), &hook)
+		var hooksEnrichment map[string]string
+
+		err := json.Unmarshal([]byte(k), &hooksEnrichment)
 		if err != nil {
 			return nil, err
 		}
 
-		result = append(result, hook)
+		result = append(result, hooksEnrichment)
 	}
 
-	return &HooksListEnrichment{
-		Hooks: result,
+	return &GenericListEnrichment{
+		GenericEnrichments: result,
 	}, nil
-}
-
-func (e *hooksListEnricher) ShouldEnrich(requestedEnricher string) bool {
-	return requestedEnricher == e.Name()
 }
 
 func (e *hooksListEnricher) Name() string {
 	return HooksList
 }
 
-type HooksListEnrichment struct {
-	Hooks []github.Hook
+type GenericListEnrichment struct {
+	GenericEnrichments []map[string]string
 }
 
-func (se *HooksListEnrichment) HumanReadable(prepend string) string {
+func (se *GenericListEnrichment) Name() string {
+	return HooksList
+}
+
+func (se *GenericListEnrichment) HumanReadable(prepend string) string {
 	sb := utils.NewPrependedStringBuilder(prepend)
 
-	for i, hook := range se.Hooks {
-		sb.WriteString(fmt.Sprintf("%d. %s: %s\n", i+1, *hook.Name, hook.GetURL()))
+	for i, enrichment := range se.GenericEnrichments {
+		first := true
+		for k, v := range enrichment {
+			if first {
+				sb.WriteString(fmt.Sprintf("%d. %s: %s\n", i+1, k, v))
+				first = false
+			} else {
+				sb.WriteString(fmt.Sprintf("   %s: %s\n", k, v))
+			}
+		}
 	}
 
 	return sb.String()

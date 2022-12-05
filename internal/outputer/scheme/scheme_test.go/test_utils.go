@@ -17,16 +17,16 @@ import (
 
 func auxSample() map[string]enrichers.Enrichment {
 	aux := map[string]enrichers.Enrichment{
-		"A": enrichers.NewBasicEnrichment("foo"),
-		"B": enrichers.NewBasicEnrichment("42"),
+		"A": enrichers.NewBasicEnrichment("foo", "A"),
+		"B": enrichers.NewBasicEnrichment("42", "B"),
 	}
 
 	return aux
 }
 func auxSample2() map[string]enrichers.Enrichment {
 	aux := map[string]enrichers.Enrichment{
-		"BAR":  enrichers.NewBasicEnrichment("xxx"),
-		"BLUE": enrichers.NewBasicEnrichment("purple"),
+		"BAR":  enrichers.NewBasicEnrichment("xxx", "BAR"),
+		"BLUE": enrichers.NewBasicEnrichment("purple", "BLUE"),
 	}
 
 	return aux
