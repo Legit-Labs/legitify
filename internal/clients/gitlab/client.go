@@ -157,3 +157,27 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 
 	return result, nil
 }
+
+func (c *Client) GroupHooks(gid int) ([]*gitlab.GroupHook, error) {
+	var result []*gitlab.GroupHook
+
+	options := &gitlab.ListGroupHooksOptions{}
+	casted := (*gitlab.ListOptions)(options)
+
+	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
+		hooks, resp, err := c.Client().Groups.ListGroupHooks(gid, options)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, hooks...)
+
+		return resp, nil
+	}, casted)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

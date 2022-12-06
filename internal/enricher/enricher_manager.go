@@ -96,16 +96,13 @@ func (e *enricherManager) Enrich(analyzedDataChannel <-chan analyzers.AnalyzedDa
 						}
 
 						enricher := createEnricher(e.ctx)
-						if !enricher.ShouldEnrich(requiredEnricher) {
-							continue
-						}
 
 						enrichment, ok := enricher.Enrich(analyzedData)
 						if !ok {
 							continue
 						}
 
-						enrichments[requiredEnricher] = enrichment
+						enrichments[enrichment.Name()] = enrichment
 					}
 					enrichedData := newEnrichedData(analyzedData, enrichments)
 

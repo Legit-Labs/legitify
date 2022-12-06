@@ -6,14 +6,18 @@ import data.common.webhooks as webhookUtils
 # title: Webhook Configured Without A Secret
 # description: Webhooks that are not configured with a token authenticated to validate the origin of the request and could make your software vulnerable.
 # custom:
-#   requiredEnrichers: [violatedHooks]
+#   requiredEnrichers: [hooksList]
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Configure a secret , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
-organization_webhook_no_secret[hook] = true {
+organization_webhook_no_secret[violated] = true {
     some index
     hook := input.hooks[index]
     not webhookUtils.has_secret(hook)
+    violated := {
+        "name": hook.name,
+        "url": hook.url
+    }
 }
 
 # METADATA
@@ -21,14 +25,18 @@ organization_webhook_no_secret[hook] = true {
 # title: Webhook Configured Without SSL
 # description: Webhooks that are not configured with SSL enabled could expose your software to man in the middle attacks (MITM).
 # custom:
-#   requiredEnrichers: [violatedHooks]
+#   requiredEnrichers: [hooksList]
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Verify url starts with https, Enable "SSL verification" , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
-organization_webhook_doesnt_require_ssl[hook] = true {
+organization_webhook_doesnt_require_ssl[violated] = true {
     some index
     hook := input.hooks[index]
     not webhookUtils.ssl_enabled(hook)
+    violated := {
+        "name": hook.name,
+        "url": hook.url
+    }
 }
 
 # METADATA

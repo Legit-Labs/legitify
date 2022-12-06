@@ -49,16 +49,16 @@ func createMembersListEnrichment(extraData interface{}) (Enrichment, error) {
 	}, nil
 }
 
-func (e *membersListEnricher) ShouldEnrich(requestedEnricher string) bool {
-	return requestedEnricher == e.Name()
-}
-
 func (e *membersListEnricher) Name() string {
 	return MembersList
 }
 
 type MembersListEnrichment struct {
 	Members []githubcollected.OrganizationMember
+}
+
+func (se *MembersListEnrichment) Name() string {
+	return MembersList
 }
 
 func (se *MembersListEnrichment) HumanReadable(prepend string) string {
