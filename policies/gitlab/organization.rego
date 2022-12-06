@@ -55,3 +55,23 @@ organization_webhook_doesnt_require_ssl[violation] = true {
     hook.enable_ssl_verification == false
     violation := { "id": format_int(hook.id, 10), "url": hook.url }
 }
+
+# METADATA
+# scope: rule
+# title: Group does not enforce branch protection by default
+# description: You do not have a default full branch protection for a specific group, which means any new repository will be created without it. In fully protected level, developers cannot push new commits, and no one can force push or delete the branch. Protecting branches ensures new code changes must go through a controlled merge process and it allows enforcement of code review and other security tests.
+# custom:
+#   severity: MEDIUM
+#   remediationSteps:
+#     - Go to the group page
+#     - Press Settings -> Repository
+#     - Expand "Default Branch" section
+#     - Toggle the required protection rule
+#     - Press "Save Changes"
+#   threat:
+#     - A developer creates a repository without any branch protection rules
+#     - Attacker that get access to the repository can modify its main branch without any restrictions
+default group_does_not_enforce_branch_protection_by_default  = false
+group_does_not_enforce_branch_protection_by_default {
+    input.default_branch_protection == 0
+}
