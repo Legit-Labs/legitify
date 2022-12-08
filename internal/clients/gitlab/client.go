@@ -113,6 +113,26 @@ func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
 	return result, nil
 }
 
+func (c *Client) GroupMembers(group *gitlab.Group) ([]*gitlab.GroupMember, error) {
+	var result []*gitlab.GroupMember
+
+	options := gitlab.ListGroupMembersOptions{}
+	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
+		members, resp, err := c.Client().Groups.ListGroupMembers(group.ID, &options)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, members...)
+		return resp, nil
+	}, &options.ListOptions)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (c *Client) fillCache() error {
 	if _, found := c.cache.Get(orgsCacheKeys); found {
 		return nil

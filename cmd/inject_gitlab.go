@@ -26,6 +26,7 @@ func setupGitLab(analyzeArgs *args, log *log.Logger) (*analyzeExecutor, error) {
 func provideGitLabCollectors(ctx context.Context, client *glclient.Client, analyzeArgs *args) []collectors.Collector {
 	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *glclient.Client) collectors.Collector{
 		namespace.Organization: gitlab.NewGroupCollector,
+		namespace.Member:       gitlab.NewUserCollector,
 	}
 
 	var result []collectors.Collector
