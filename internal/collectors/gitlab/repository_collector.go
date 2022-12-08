@@ -107,9 +107,7 @@ func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab
 		if err != nil {
 			return nil, err
 		}
-		for _, protectedBranch := range projectProtectedBranches {
-			completeProtectedBranches = append(completeProtectedBranches, protectedBranch)
-		}
+		completeProtectedBranches = append(completeProtectedBranches, projectProtectedBranches...)
 
 		return resp, nil
 	}, (*gitlab2.ListOptions)(&options))
@@ -131,10 +129,7 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 		if err != nil {
 			return nil, err
 		}
-		for _, projectMember := range projectMembers {
-			completeMembersList = append(completeMembersList, projectMember)
-		}
-
+		completeMembersList = append(completeMembersList, projectMembers...)
 		return resp, nil
 	}, &options.ListOptions)
 
@@ -166,9 +161,7 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 				if err != nil {
 					return nil, err
 				}
-				for _, r := range repos {
-					completeProjectsList = append(completeProjectsList, r)
-				}
+				completeProjectsList = append(completeProjectsList, repos...)
 				return resp, nil
 			}, &options.ListOptions)
 			if err != nil {
