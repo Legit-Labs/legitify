@@ -38,7 +38,7 @@ func (c *userCollector) CollectMetadata() collectors.Metadata {
 		return collectors.Metadata{}
 	}
 
-	total := 0
+	totalGroupMembers := 0
 	gw := group_waiter.New()
 	for _, g := range groups {
 		group := g
@@ -48,14 +48,14 @@ func (c *userCollector) CollectMetadata() collectors.Metadata {
 				log.Printf("Failed to get members for group %s", g.Name)
 				return
 			}
-			total += resp.TotalItems
+			totalGroupMembers += resp.TotalItems
 		})
 
 	}
 	gw.Wait()
 
 	return collectors.Metadata{
-		TotalEntities: total,
+		TotalEntities: totalGroupMembers,
 	}
 }
 
@@ -71,7 +71,7 @@ func (c *userCollector) Collect() collectors.SubCollectorChannels {
 		for _, group := range allGroups {
 			g := group
 			gw.Do(func() {
-				c.collectGroup(g)
+				c.collectGroupUsers(g)
 			})
 		}
 
@@ -79,7 +79,7 @@ func (c *userCollector) Collect() collectors.SubCollectorChannels {
 	})
 }
 
-func (c *userCollector) collectGroup(group *gitlab2.Group) {
+func (c *userCollector) collectGroupUsers(group *gitlab2.Group) {
 	gw := group_waiter.New()
 
 	members, err := c.Client.GroupMembers(group)
