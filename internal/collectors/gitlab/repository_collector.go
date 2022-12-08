@@ -140,10 +140,7 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 
 func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
-
-		var completeProjectsList []*gitlab2.Project
 		options := gitlab2.ListProjectsOptions{}
-
 		organizations, err := rc.Client.Organizations()
 		if err != nil {
 			log.Printf("failed to collect list of orgniazations to get repositories  %s", err)
@@ -156,8 +153,7 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 				if err != nil {
 					return nil, err
 				}
-				completeProjectsList = append(completeProjectsList, repos...)
-				for _, completeProject := range completeProjectsList {
+				for _, completeProject := range repos {
 					gw.Do(func() {
 						rc.extendedCollection(completeProject)
 					})
