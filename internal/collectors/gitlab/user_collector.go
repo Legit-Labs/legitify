@@ -48,7 +48,7 @@ func (c *userCollector) CollectMetadata() collectors.Metadata {
 				log.Printf("Failed to get members for group %s", g.Name)
 				return
 			}
-			total = total + resp.TotalItems
+			total += resp.TotalItems
 		})
 
 	}
