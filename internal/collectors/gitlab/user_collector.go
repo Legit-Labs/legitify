@@ -33,54 +33,81 @@ func (c *userCollector) Namespace() namespace.Namespace {
 }
 
 func (c *userCollector) CollectMetadata() collectors.Metadata {
-	opts := &gitlab2.ListUsersOptions{}
-
-	_, resp, err := c.Client.Client().Users.ListUsers(opts)
-
-	res := collectors.Metadata{}
+	groups, err := c.Client.Groups()
 	if err != nil {
-		log.Printf("failed to collect users %s", err)
-	} else {
-		res.TotalEntities = resp.TotalItems
+		return collectors.Metadata{}
 	}
 
-	return res
+	total := 0
+	gw := group_waiter.New()
+	for _, g := range groups {
+		group := g
+		gw.Do(func() {
+			_, resp, err := c.Client.Client().Groups.ListGroupMembers(group.ID, &gitlab2.ListGroupMembersOptions{})
+			if err != nil {
+				log.Printf("Failed to get members for group %s", g.Name)
+				return
+			}
+			total = total + resp.TotalItems
+		})
+
+	}
+	gw.Wait()
+
+	return collectors.Metadata{
+		TotalEntities: total,
+	}
 }
 
 func (c *userCollector) Collect() collectors.SubCollectorChannels {
 	return c.WrappedCollection(func() {
-		userOptions := &gitlab2.ListUsersOptions{}
+		allGroups, err := c.Client.Groups()
+		if err != nil {
+			return
+		}
 
 		gw := group_waiter.New()
 
-		var result []*gitlab2.User
-		err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-			users, resp, err := c.Client.Client().Users.ListUsers(userOptions)
-
-			if err != nil {
-				return nil, err
-			}
-
-			cp := users
+		for _, group := range allGroups {
+			g := group
 			gw.Do(func() {
-				for _, user := range cp {
-					entity := gitlab_collected.Member{
-						User: user,
-					}
-					c.CollectDataWithContext(&entity, entity.CanonicalLink(),
-						newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner}))
-					c.CollectionChangeByOne()
-				}
+				c.collectGroup(g)
 			})
-			result = append(result, users...)
-			return resp, nil
-
-		}, &userOptions.ListOptions)
-		gw.Wait()
-
-		if err != nil {
-			log.Printf("Failed to collect users")
-			return
 		}
+
+		gw.Wait()
 	})
+}
+
+func (c *userCollector) collectGroup(group *gitlab2.Group) {
+	gw := group_waiter.New()
+
+	members, err := c.Client.GroupMembers(group)
+	if err != nil {
+		log.Printf("Failed to collect group members: %s - %s", group.Name, err)
+		return
+	}
+
+	for _, member := range members {
+		m := member
+		gw.Do(func() {
+			u, _, err := c.Client.Client().Users.GetUser(m.ID, gitlab2.GetUsersOptions{})
+			if err != nil {
+				log.Printf("failed to collect user %s - %s", m.Name, err)
+				return
+			}
+			entity := gitlab_collected.Member{
+				User: u,
+			}
+			c.CollectDataWithContext(&entity, entity.CanonicalLink(),
+				newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner}))
+			c.CollectionChangeByOne()
+		})
+	}
+
+	gw.Wait()
+	if err != nil {
+		log.Printf("Failed to collect all users")
+		return
+	}
 }
