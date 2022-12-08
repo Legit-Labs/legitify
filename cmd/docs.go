@@ -47,14 +47,17 @@ func executeDocsCommand(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// loading only built-in policies
-	// TODO: support other scms
-	engine, err := opa.Load([]string{}, scm_type.GitHub)
-	if err != nil {
-		return err
+	result := make(map[scm_type.ScmType]map[string][]PolicyDoc)
+
+	for _, scmType := range scm_type.All {
+		engine, err := opa.Load([]string{}, scmType)
+		if err != nil {
+			return err
+		}
+		docs := generateDocs(&engine)
+		result[scmType] = docs
 	}
 
-	result := generateDocs(&engine)
 	data, err := yaml.Marshal(result)
 	if err != nil {
 		return err
