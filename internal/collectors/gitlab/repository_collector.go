@@ -5,6 +5,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
+	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 
@@ -13,8 +14,6 @@ import (
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"golang.org/x/net/context"
-
-	_ "github.com/xanzy/go-gitlab"
 )
 
 type repositoryCollector struct {
@@ -37,13 +36,34 @@ func (rc *repositoryCollector) Namespace() namespace.Namespace {
 }
 
 func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
-	_, resp, err := rc.Client.Client().Projects.ListProjects(&gitlab2.ListProjectsOptions{Owned: gitlab2.Bool(true)})
 	res := collectors.Metadata{}
 
-	if err != nil {
-		log.Printf("failed to collect metadata for repositories %s", err)
+	repositories, exist := context_utils.GetRepositories(rc.Context)
+
+	if exist {
+		for _, repository := range repositories {
+			_, _, err := rc.Client.Client().Projects.GetProject(repository, &gitlab2.GetProjectOptions{})
+			if err != nil {
+				log.Printf("failed to collect metadata for repository %s", err)
+			} else {
+				res.TotalEntities++
+			}
+		}
 	} else {
-		res.TotalEntities = resp.TotalItems
+		organizations, err := rc.Client.Organizations()
+		if err != nil {
+			log.Printf("failed to collect list of orgniazations to get repositories metadata %s", err)
+			return res
+		}
+		for _, org := range organizations {
+			_, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.Name, &gitlab2.ListGroupProjectsOptions{})
+
+			if err != nil {
+				log.Printf("failed to collect metadata for repositories %s", err)
+			} else {
+				res.TotalEntities = resp.TotalItems
+			}
+		}
 	}
 	return res
 }
@@ -69,13 +89,8 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 					log.Println(err.Error())
 					return
 				}
-				proj := gitlab_collected.Repository{
-					Project:                      project,
-					VulnerabilityAlertsEnabled:   gitlab2.Bool(true),
-					NoBranchProtectionPermission: true,
-				}
-				a := repositoryContext{testParam: true, isEnterprise: false, roles: nil}
-				rc.CollectDataWithContext(proj, proj.Links.Self, &a)
+
+				rc.extendedCollect(project)
 			})
 
 		}
@@ -83,44 +98,99 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 	})
 }
 
+func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab_collected.Repository) gitlab_collected.Repository {
+	var completeProtectedBranches []*gitlab2.ProtectedBranch
+	options := gitlab2.ListProtectedBranchesOptions{}
+
+	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
+		projectProtectedBranches, resp, err := rc.Client.Client().ProtectedBranches.ListProtectedBranches(project.ID, &options)
+		if err != nil {
+			return nil, err
+		}
+		for _, protectedBranch := range projectProtectedBranches {
+			completeProtectedBranches = append(completeProtectedBranches, protectedBranch)
+		}
+
+		return resp, nil
+	}, (*gitlab2.ListOptions)(&options))
+	if err != nil {
+		log.Printf("failed to list projects %s", err)
+	}
+
+	extendedProject := project
+	extendedProject.ProtectedBranches = completeProtectedBranches
+	return extendedProject
+}
+
+func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected.Repository) gitlab_collected.Repository {
+	var completeMembersList []*gitlab2.ProjectMember
+	options := &gitlab2.ListProjectMembersOptions{}
+
+	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
+		projectMembers, resp, err := rc.Client.Client().ProjectMembers.ListAllProjectMembers(project.ID, options)
+		if err != nil {
+			return nil, err
+		}
+		for _, projectMember := range projectMembers {
+			completeMembersList = append(completeMembersList, projectMember)
+		}
+
+		return resp, nil
+	}, &options.ListOptions)
+
+	if err != nil {
+		log.Printf("failed to list projects %s", err)
+	}
+
+	extendedProject := project
+	extendedProject.Members = completeMembersList
+	return extendedProject
+}
+
 func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
 
-		projects, _, err := rc.Client.Client().Projects.ListProjects(&gitlab2.ListProjectsOptions{Owned: gitlab2.Bool(true)})
+		var completeProjectsList []*gitlab2.Project
+		maintainerPermissions := gitlab2.MaintainerPermissions
+		options := gitlab2.ListProjectsOptions{MinAccessLevel: &maintainerPermissions}
 
+		organizations, err := rc.Client.Organizations()
 		if err != nil {
-			log.Printf("failed to collect metadata for repositories %s", err)
+			log.Printf("failed to collect list of orgniazations to get repositories  %s", err)
+			return
 		}
 
-		for _, project := range projects {
+		for _, org := range organizations {
+			err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
+				repos, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.Name, &gitlab2.ListGroupProjectsOptions{})
+				if err != nil {
+					return nil, err
+				}
+				for _, r := range repos {
+					completeProjectsList = append(completeProjectsList, r)
+				}
+				return resp, nil
+			}, &options.ListOptions)
 			if err != nil {
-				log.Println(err.Error())
-				return
+				log.Printf("failed to list projects %s", err)
 			}
-			members, _, err := rc.Client.Client().ProjectMembers.ListAllProjectMembers(project.ID, &gitlab2.ListProjectMembersOptions{})
-
-			if err != nil {
-				log.Printf("failed to collect project %s members: %s", project.Name, err)
-				return
-			}
-
-			protectedBranches, _, err := rc.Client.Client().ProtectedBranches.ListProtectedBranches(project.ID, &gitlab2.ListProtectedBranchesOptions{})
-
-			if err != nil {
-				log.Printf("failed to collect project %s protected branches: %s", project.Name, err)
-				return
-			}
-
-			proj := gitlab_collected.Repository{
-				Project:                      project,
-				Members:                      members,
-				ProtectedBranches:            protectedBranches,
-				VulnerabilityAlertsEnabled:   gitlab2.Bool(true),
-				NoBranchProtectionPermission: true,
-			}
-			a := repositoryContext{testParam: true, isEnterprise: false, roles: nil}
-			rc.CollectDataWithContext(proj, proj.Links.Self, &a)
 		}
 
+		for _, completeProject := range completeProjectsList {
+			rc.extendedCollect(completeProject)
+
+		}
 	})
+}
+
+func (rc *repositoryCollector) extendedCollect(completeProjectsList *gitlab2.Project) {
+	proj := gitlab_collected.Repository{
+		Project: completeProjectsList,
+	}
+	extendedProject := rc.extendProjectWithMembers(proj)
+
+	extendedProject = rc.extendProjectWithProtectedBranches(extendedProject)
+
+	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
+	rc.CollectDataWithContext(extendedProject, extendedProject.Links.Self, &newContext)
 }

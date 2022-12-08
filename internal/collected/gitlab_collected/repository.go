@@ -7,10 +7,8 @@ import (
 
 type Repository struct {
 	*gitlab2.Project
-	Members                      []*gitlab2.ProjectMember   `json:"members"`
-	ProtectedBranches            []*gitlab2.ProtectedBranch `json:"protected_branches"`
-	VulnerabilityAlertsEnabled   *bool                      `json:"vulnerability_alerts_enabled"`
-	NoBranchProtectionPermission bool                       `json:"no_branch_protection_permission"`
+	Members           []*gitlab2.ProjectMember   `json:"members"`
+	ProtectedBranches []*gitlab2.ProtectedBranch `json:"protected_branches"`
 }
 
 func (r Repository) ViolationEntityType() string {

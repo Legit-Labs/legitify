@@ -74,8 +74,8 @@ repository_webhook_doesnt_require_ssl[hook] = true {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "General" tab, Under "Features", Toggle off "Allow forking"]
 #   severity: LOW
 #   requiredScopes: [read:org]
-default allow_forking_enabled = false
-allow_forking_enabled {
+default forking_allowed_for_repository = false
+forking_allowed_for_repository {
     input.repository.is_private == true
     input.repository.allow_forking == true
 }
