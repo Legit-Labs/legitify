@@ -8,7 +8,6 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
-
 	gitlab2 "github.com/xanzy/go-gitlab"
 	"log"
 
@@ -41,14 +40,7 @@ func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
 	repositories, exist := context_utils.GetRepositories(rc.Context)
 
 	if exist {
-		for _, repository := range repositories {
-			_, _, err := rc.Client.Client().Projects.GetProject(repository, &gitlab2.GetProjectOptions{})
-			if err != nil {
-				log.Printf("failed to collect metadata for repository %s", err)
-			} else {
-				res.TotalEntities++
-			}
-		}
+		res.TotalEntities = len(repositories)
 	} else {
 		organizations, err := rc.Client.Organizations()
 		if err != nil {
@@ -61,7 +53,7 @@ func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
 			if err != nil {
 				log.Printf("failed to collect metadata for repositories %s", err)
 			} else {
-				res.TotalEntities = resp.TotalItems
+				res.TotalEntities += resp.TotalItems
 			}
 		}
 	}
@@ -84,18 +76,22 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 		for _, r := range repositories {
 			repo := r
 			gw.Do(func() {
-				project, _, err := rc.Client.Client().Projects.GetProject(repo.Owner+"%2F"+repo.Name, &gitlab2.GetProjectOptions{})
+				project, _, err := rc.Client.Client().Projects.GetProject(getRepositoryEncodedName(repo), &gitlab2.GetProjectOptions{})
 				if err != nil {
 					log.Println(err.Error())
 					return
 				}
 
-				rc.extendedCollect(project)
+				rc.extendedCollection(project)
 			})
 
 		}
 		gw.Wait()
 	})
+}
+
+func getRepositoryEncodedName(repo types.RepositoryWithOwner) string {
+	return repo.Owner + "/" + repo.Name
 }
 
 func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab_collected.Repository) gitlab_collected.Repository {
@@ -146,15 +142,14 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
 
 		var completeProjectsList []*gitlab2.Project
-		maintainerPermissions := gitlab2.MaintainerPermissions
-		options := gitlab2.ListProjectsOptions{MinAccessLevel: &maintainerPermissions}
+		options := gitlab2.ListProjectsOptions{}
 
 		organizations, err := rc.Client.Organizations()
 		if err != nil {
 			log.Printf("failed to collect list of orgniazations to get repositories  %s", err)
 			return
 		}
-
+		gw := group_waiter.New()
 		for _, org := range organizations {
 			err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
 				repos, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.Name, &gitlab2.ListGroupProjectsOptions{})
@@ -162,21 +157,22 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 					return nil, err
 				}
 				completeProjectsList = append(completeProjectsList, repos...)
+				for _, completeProject := range completeProjectsList {
+					gw.Do(func() {
+						rc.extendedCollection(completeProject)
+					})
+				}
 				return resp, nil
 			}, &options.ListOptions)
 			if err != nil {
 				log.Printf("failed to list projects %s", err)
 			}
 		}
-
-		for _, completeProject := range completeProjectsList {
-			rc.extendedCollect(completeProject)
-
-		}
+		gw.Wait()
 	})
 }
 
-func (rc *repositoryCollector) extendedCollect(completeProjectsList *gitlab2.Project) {
+func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.Project) {
 	proj := gitlab_collected.Repository{
 		Project: completeProjectsList,
 	}
@@ -186,4 +182,5 @@ func (rc *repositoryCollector) extendedCollect(completeProjectsList *gitlab2.Pro
 
 	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
 	rc.CollectDataWithContext(extendedProject, extendedProject.Links.Self, &newContext)
+	rc.CollectionChangeByOne()
 }
