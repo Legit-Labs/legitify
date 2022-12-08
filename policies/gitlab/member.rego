@@ -7,7 +7,7 @@ package member
 # custom:
 #   severity: HIGH
 #   remediationSteps:
-#     - Login as with the user credentials
+#     - Login with the user credentials
 #     - Go to the user settings page
 #     - Select "Account" on the left navigation bar
 #     - Press "Enable two-factor authentication"
