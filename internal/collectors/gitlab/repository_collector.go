@@ -154,8 +154,9 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 					return nil, err
 				}
 				for _, completeProject := range repos {
+					k := completeProject
 					gw.Do(func() {
-						rc.extendedCollection(completeProject)
+						rc.extendedCollection(k)
 					})
 				}
 				return resp, nil
