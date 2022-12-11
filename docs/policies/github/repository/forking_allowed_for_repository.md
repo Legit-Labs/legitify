@@ -7,7 +7,7 @@ grand_parent: GitHub Policies
 
 
 ## Forking Allowed for This Repository
-policy name: allow_forking_enabled
+policy name: forking_allowed_for_repository
 
 severity: LOW
 
