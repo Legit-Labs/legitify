@@ -15,6 +15,8 @@ repository_not_maintained {
     diff := time.diff(now, ns)
     monthsIndex := 1
     inactivityMonthsThreshold := 3
+    yearIndex := 0
+    diff[yearIndex] > 0
     diff[monthsIndex] >= inactivityMonthsThreshold
 }
 
