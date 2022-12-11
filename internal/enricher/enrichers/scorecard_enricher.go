@@ -46,10 +46,6 @@ func (e *scorecardEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, boo
 	return nil, false
 }
 
-func (e *scorecardEnricher) ShouldEnrich(requestedEnricher string) bool {
-	return requestedEnricher == e.Name()
-}
-
 func (e *scorecardEnricher) Name() string {
 	return Scorecard
 }
@@ -96,6 +92,10 @@ type ScorecardCheck struct {
 
 type ScorecardEnrichment struct {
 	Checks []ScorecardCheck
+}
+
+func (se *ScorecardEnrichment) Name() string {
+	return Scorecard
 }
 
 func (se *ScorecardEnrichment) HumanReadable(prepend string) string {

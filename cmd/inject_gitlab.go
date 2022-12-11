@@ -27,6 +27,7 @@ func provideGitLabCollectors(ctx context.Context, client *glclient.Client, analy
 	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *glclient.Client) collectors.Collector{
 		namespace.Organization: gitlab.NewGroupCollector,
 		namespace.Repository:   gitlab.NewRepositoryCollector,
+		namespace.Member:       gitlab.NewUserCollector,
 	}
 
 	var result []collectors.Collector

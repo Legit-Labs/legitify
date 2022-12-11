@@ -11,6 +11,8 @@ import (
 type organizationMockConfiguration struct {
 	config     map[string]interface{}
 	ssoEnabled *bool
+	name       string
+	url        string
 }
 
 func newOrganizationMock(config organizationMockConfiguration) githubcollected.Organization {
@@ -22,6 +24,8 @@ func newOrganizationMock(config organizationMockConfiguration) githubcollected.O
 	if config.config != nil {
 		hook := github.Hook{
 			Config: config.config,
+			Name:   &config.name,
+			URL:    &config.url,
 		}
 		hooks = append(hooks, &hook)
 	}
@@ -52,6 +56,8 @@ func TestOrganization(t *testing.T) {
 					"insecure_ssl": "0",
 					"secret":       "123",
 				},
+				name: "test",
+				url:  "test",
 			},
 		},
 		{
@@ -60,6 +66,8 @@ func TestOrganization(t *testing.T) {
 			shouldBeViolated: true,
 			args: organizationMockConfiguration{
 				config: map[string]interface{}{},
+				name:   "test",
+				url:    "test",
 			},
 		},
 		{
@@ -70,6 +78,8 @@ func TestOrganization(t *testing.T) {
 				config: map[string]interface{}{
 					"insecure_ssl": "0", // no secret
 				},
+				name: "test",
+				url:  "test",
 			},
 		},
 		{
@@ -81,6 +91,8 @@ func TestOrganization(t *testing.T) {
 					"insecure_ssl": "1",
 					"secret":       "123",
 				},
+				name: "test",
+				url:  "test",
 			},
 		},
 		// -- SSO tests

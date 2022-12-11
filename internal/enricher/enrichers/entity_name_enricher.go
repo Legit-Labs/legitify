@@ -17,11 +17,7 @@ type entityNameEnricher struct {
 
 func (e *entityNameEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
 	name := data.Entity.Name()
-	return NewBasicEnrichment(name), true
-}
-
-func (e *entityNameEnricher) ShouldEnrich(requestedEnricher string) bool {
-	return requestedEnricher == e.Name()
+	return NewBasicEnrichment(name, EntityName), true
 }
 
 func (e *entityNameEnricher) Name() string {

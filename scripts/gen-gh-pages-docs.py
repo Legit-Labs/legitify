@@ -4,6 +4,10 @@ import sys
 import yaml
 import os
 
+def scm_to_pretty_name(scm):
+    if scm == 'github': return 'GitHub'
+    return 'GitLab'
+
 def get_docs_yaml(docs_file):
     with open(docs_file) as f:
         return yaml.load(f, Loader=yaml.FullLoader)
@@ -58,17 +62,17 @@ grand_parent: {grand_parent}
     with open(file_path, 'w') as f:
         f.write(final)
 
-def create_ns_policies(output_dir, ns, docs_yaml):
-    ns_dir = os.path.join(output_dir, ns)
+def create_ns_policies(output_dir, ns, docs_yaml, parent, grand_parent):
+    ns_dir = os.path.join(output_dir)
     os.mkdir(ns_dir)
     title = f"{ns.title()} Policies"
-    parent = "Policies"
 
     file_path = os.path.join(ns_dir, f"index.md")
     file_header=f"""---
 layout: default
 title: {title}
 parent: {parent}
+grand_parent: {grand_parent}
 has_children: true
 ---
 """
@@ -81,11 +85,32 @@ has_children: true
 
     return ns_dir
 
+def create_scm_policy_docs(scm, docs_yaml, output_dir):
+    scm_outdir = os.path.join(output_dir, scm)
+    os.mkdir(scm_outdir)
+    file_path = os.path.join(scm_outdir, f"index.md")
+    parent = "Policies"
+    title = f"{scm_to_pretty_name(scm)} Policies"
+    file_header=f"""---
+layout: default
+title: {title}
+parent: {parent}
+has_children: true
+---
+"""
+
+    with open(file_path, 'w') as f:
+        f.write(file_header)
+
+    for ns in docs_yaml:
+        store_at = os.path.join(scm_outdir, ns)
+        create_ns_policies(store_at, ns, docs_yaml, title, parent)
+
 def create_policy_docs(docs_file, output_dir):
     docs_yaml = get_docs_yaml(docs_file)
 
-    for ns in docs_yaml:
-        create_ns_policies(output_dir, ns, docs_yaml)
+    for scm in docs_yaml:
+        create_scm_policy_docs(scm, docs_yaml[scm], output_dir)
 
 def print_usage():
     print("python gen-gh-pages-docs.py docs_file output_directory")

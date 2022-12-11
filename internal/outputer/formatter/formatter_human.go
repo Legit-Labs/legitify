@@ -91,7 +91,6 @@ func (f *HumanFormatter) formatAux(m map[string]enrichers.Enrichment) {
 
 		v = strings.TrimSuffix(v, "\n")
 		f.sb.WriteString(f.sprintf(3, format, camelCaseToTitle(k)))
-		v = strings.ToTitle(v)
 		f.sb.WriteString(v)
 		f.sb.WriteString("\n")
 	}
