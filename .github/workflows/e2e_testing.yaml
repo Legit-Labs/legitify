@@ -8,7 +8,8 @@ on:
 permissions:
   contents: read
 env:
-  REPORT_FILE_PATH: /tmp/out.json
+  GITHUB_REPORT_FILE_PATH: /tmp/gh_out.json
+  GITLAB_REPORT_FILE_PATH: /tmp/gl_out.json
 jobs:
   install_and_run:
     runs-on: ubuntu-latest
@@ -19,9 +20,14 @@ jobs:
           go-version: 1.18
       - name: Run GitHub tests
         run: |
-          GITHUB_TOKEN=${{ secrets.E2E_ENV_TOKEN }} go run main.go analyze --output-format json --output-file $REPORT_FILE_PATH
-      - name: Run output verification
-        run: go test e2e/e2e_test.go --report_path=$REPORT_FILE_PATH
+          LEGITIFY_TOKEN=${{ secrets.GITHUB_E2E_ENV_TOKEN }} go run main.go analyze --output-format json --output-file $GITHUB_REPORT_FILE_PATH --scm github
+      - name: Run github output verification
+        run: go test e2e/e2e_test.go -run TestGitHub --report_path=$GITHUB_REPORT_FILE_PATH
+      - name: Run GitLab tests
+        run: |
+          LEGITIFY_TOKEN=${{ secrets.GITLAB_E2E_ENV_TOKEN }} go run main.go analyze --output-format json --output-file GITLAB_REPORT_FILE_PATH --scm gitlab
+      - name: Run gitlab output verification
+        run: go test e2e/e2e_test.go -run TestGitLab --report_path=GITLAB_REPORT_FILE_PATH
       - name: Notify Slack
         uses: rtCamp/action-slack-notify@28e8b353eabda5998a2e1203aed33c5999944779
         if: failure()

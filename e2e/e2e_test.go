@@ -73,6 +73,14 @@ func TestGitHub(t *testing.T) {
 			passedEntity: "Legitify-E2E",
 		},
 	}
+	AssertionLoop(t, tests)
+}
+
+func AssertionLoop(t *testing.T, tests []struct {
+	path         string
+	failedEntity string
+	passedEntity string
+}) {
 	for _, test := range tests {
 		t.Logf("Testing: %s", test.path)
 		testFormattedPath := test.path + "->violations"
@@ -91,4 +99,18 @@ func TestGitHub(t *testing.T) {
 			t.Fail()
 		}
 	}
+}
+
+func TestGitLab(t *testing.T) {
+	tests := []struct {
+		path         string
+		failedEntity string
+		passedEntity string
+	}{{
+		path:         "aa",
+		failedEntity: "aa",
+		passedEntity: "",
+	}}
+	AssertionLoop(t, tests)
+
 }
