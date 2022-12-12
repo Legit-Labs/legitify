@@ -72,3 +72,15 @@ missing_default_branch_protection_force_push {
     rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
 	count(rules_allow_force_push) > 0
 }
+
+# METADATA
+# scope: rule
+# title: Webhook Configured Without SSL Verification
+# description: Webhooks that are not configured with SSL verification enabled could expose your sofware to man in the middle attacks (MITM).
+# custom:
+#   severity: LOW
+#   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
+repository_webhook_doesnt_require_ssl = true {
+    webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
+    count(webhooks_without_ssl_verification) > 0
+}
