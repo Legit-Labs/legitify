@@ -364,16 +364,22 @@ func TestGitlabRepositoryNotMaintained(t *testing.T) {
 	archivedTime := time.Date(
 		2002, 3, 17, 20, 34, 58, 651387237, time.UTC)
 	nowTime := time.Now()
-	falseCase := &gitlab2.Project{Archived: false, LastActivityAt: &nowTime}
-	trueCase := &gitlab2.Project{Public: false, LastActivityAt: &archivedTime}
-	options := map[bool]*gitlab2.Project{
+
+	archived3MonthTime := nowTime.AddDate(0, -5, 0)
+	falseCase := []*gitlab2.Project{&gitlab2.Project{Archived: false, LastActivityAt: &nowTime}}
+	trueCase := []*gitlab2.Project{
+		{Public: false, LastActivityAt: &archivedTime},
+		{Public: false, LastActivityAt: &archived3MonthTime},
+	}
+	options := map[bool][]*gitlab2.Project{
 		false: falseCase,
 		true:  trueCase,
 	}
 
 	for _, expectFailure := range bools {
-		flag := options[expectFailure]
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+		for _, tastCase := range options[expectFailure] {
+			repositoryTestTemplate(t, name, makeMockData(tastCase), testedPolicyName, expectFailure, scm_type.GitLab)
+		}
 	}
 }
 
