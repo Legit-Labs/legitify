@@ -376,3 +376,49 @@ func TestGitlabRepositoryNotMaintained(t *testing.T) {
 		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
 	}
 }
+
+func TestGitlabRepositoryMissingBranchProtection(t *testing.T) {
+	name := "Default Branch Is Not Protected"
+	testedPolicyName := "missing_default_branch_protection"
+
+	makeMockData := func(flag []*gitlab2.ProtectedBranch) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: &gitlab2.Project{DefaultBranch: "default_branch_name"}, ProtectedBranches: flag}
+	}
+
+	defaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "default_branch_name"}
+	nonDefaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "fooBar"}
+	falseCase := []*gitlab2.ProtectedBranch{defaultBranchProtectedMock}
+	trueCase := []*gitlab2.ProtectedBranch{nonDefaultBranchProtectedMock}
+	options := map[bool][]*gitlab2.ProtectedBranch{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabRepositoryMissingForcePushProtection(t *testing.T) {
+	name := "Default Branch Allows Force Pushes"
+	testedPolicyName := "missing_default_branch_protection_force_push"
+
+	makeMockData := func(flag []*gitlab2.ProtectedBranch) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: &gitlab2.Project{DefaultBranch: "default_branch_name"}, ProtectedBranches: flag}
+	}
+
+	defaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "default_branch_name", AllowForcePush: false}
+	DefaultNotBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "sss", AllowForcePush: false}
+	falseCase := []*gitlab2.ProtectedBranch{defaultBranchProtectedMock}
+	trueCase := []*gitlab2.ProtectedBranch{DefaultNotBranchProtectedMock}
+	options := map[bool][]*gitlab2.ProtectedBranch{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
