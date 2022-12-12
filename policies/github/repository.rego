@@ -11,8 +11,6 @@ import data.common.webhooks as webhookUtils
 #   requiredScopes: [repo]
 default repository_not_maintained = false
 repository_not_maintained {
-    not input.repository.is_archived
-    not is_null(input.repository.pushed_at)
     ns := time.parse_rfc3339_ns(input.repository.pushed_at)
     now := time.now_ns()
     diff := time.diff(now, ns)
@@ -22,6 +20,29 @@ repository_not_maintained {
    yearIndex := 0
    diff[yearIndex] > 0
    diff[monthsIndex] >= inactivityMonthsThreshold
+}
+
+default repository_not_maintained = false
+
+repository_not_maintained {
+    not input.repository.is_archived
+    not is_null(input.repository.pushed_at)
+    ns := time.parse_rfc3339_ns(input.repository.pushed_at)
+    now := time.now_ns()
+    diff := time.diff(now, ns)
+    monthsIndex := 1
+    inactivityMonthsThreshold := 3
+    diff[monthsIndex] >= inactivityMonthsThreshold
+}
+
+repository_not_maintained {
+    not input.repository.is_archived
+    not is_null(input.repository.pushed_at)
+    ns := time.parse_rfc3339_ns(input.repository.pushed_at)
+    now := time.now_ns()
+    diff := time.diff(now, ns)
+    yearIndex := 0
+    diff[yearIndex] > 0
 }
 
 # METADATA
