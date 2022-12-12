@@ -44,7 +44,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "all github actions are allowed to run",
 			policyName:       "all_github_actions_are_allowed",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: true,
 			args: organizationActionsMockConfiguration{
 				allowedActions: &all,
@@ -53,7 +52,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "not all github actions are allowed to run",
 			policyName:       "all_github_actions_are_allowed",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: false,
 			args: organizationActionsMockConfiguration{
 				allowedActions: &selected,
@@ -62,7 +60,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "all repositories can run GitHub actions",
 			policyName:       "all_repositories_can_run_github_actions",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: true,
 			args: organizationActionsMockConfiguration{
 				enabledRepositories: &all,
@@ -71,7 +68,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "not all repositories can run GitHub actions",
 			policyName:       "all_repositories_can_run_github_actions",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: false,
 			args: organizationActionsMockConfiguration{
 				enabledRepositories: &selected,
@@ -80,7 +76,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "actions can approve pull requests",
 			policyName:       "actions_can_approve_pull_requests",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: true,
 			args: organizationActionsMockConfiguration{
 				enabledRepositories:    &selected,
@@ -90,7 +85,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "actions can not approve pull requests",
 			policyName:       "actions_can_approve_pull_requests",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: false,
 			args: organizationActionsMockConfiguration{
 				enabledRepositories:    &selected,
@@ -100,7 +94,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "workflow token default permissions is not set to read only",
 			policyName:       "token_default_permissions_is_read_write",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: true,
 			args: organizationActionsMockConfiguration{
 				enabledRepositories:    &selected,
@@ -110,7 +103,6 @@ func TestActions(t *testing.T) {
 		{
 			name:             "workflow token default permissions is set to read only",
 			policyName:       "token_default_permissions_is_read_write",
-			scmType:          scm_type.GitHub,
 			shouldBeViolated: false,
 			args: organizationActionsMockConfiguration{
 				enabledRepositories:    &selected,

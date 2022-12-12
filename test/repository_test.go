@@ -362,7 +362,7 @@ func TestGitlabRepositoryNotMaintained(t *testing.T) {
 		return gitlabcollected.Repository{Project: flag}
 	}
 	archivedTime := time.Date(
-		2009, 12, 17, 20, 34, 58, 651387237, time.UTC)
+		2002, 3, 17, 20, 34, 58, 651387237, time.UTC)
 	nowTime := time.Now()
 	falseCase := &gitlab2.Project{Archived: false, LastActivityAt: &nowTime}
 	trueCase := &gitlab2.Project{Public: false, LastActivityAt: &archivedTime}

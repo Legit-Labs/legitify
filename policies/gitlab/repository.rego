@@ -8,6 +8,7 @@ package repository
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
 #   severity: HIGH
 default repository_not_maintained = false
+
 repository_not_maintained {
     input.archived == false
     ns := time.parse_rfc3339_ns(input.last_activity_at)
@@ -15,10 +16,19 @@ repository_not_maintained {
     diff := time.diff(now, ns)
     monthsIndex := 1
     inactivityMonthsThreshold := 3
-    yearIndex := 0
-    diff[yearIndex] > 0
     diff[monthsIndex] >= inactivityMonthsThreshold
 }
+
+repository_not_maintained {
+    input.archived == false
+    ns := time.parse_rfc3339_ns(input.last_activity_at)
+    now := time.now_ns()
+    diff := time.diff(now, ns)
+    yearIndex := 0
+    diff[yearIndex] > 0
+}
+
+
 
 # METADATA
 # scope: rule
