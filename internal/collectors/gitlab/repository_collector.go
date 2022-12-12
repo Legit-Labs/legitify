@@ -143,11 +143,11 @@ func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collecte
 	options := gitlab2.ListProjectsOptions{}
 
 	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectMembers, resp, err := rc.Client.Client().Projects.ListProjectHooks(int(project.ID()), &gitlab2.ListProjectHooksOptions{})
+		projectWebhooks, resp, err := rc.Client.Client().Projects.ListProjectHooks(int(project.ID()), &gitlab2.ListProjectHooksOptions{})
 		if err != nil {
 			return nil, err
 		}
-		completeProjectWebhookList = append(completeProjectWebhookList, projectMembers...)
+		completeProjectWebhookList = append(completeProjectWebhookList, projectWebhooks...)
 		return resp, nil
 	}, &options.ListOptions)
 	if err != nil {
