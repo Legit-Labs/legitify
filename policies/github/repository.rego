@@ -10,19 +10,6 @@ import data.common.webhooks as webhookUtils
 #   severity: HIGH
 #   requiredScopes: [repo]
 default repository_not_maintained = false
-repository_not_maintained {
-    ns := time.parse_rfc3339_ns(input.repository.pushed_at)
-    now := time.now_ns()
-    diff := time.diff(now, ns)
-
-   monthsIndex := 1
-   inactivityMonthsThreshold := 3
-   yearIndex := 0
-   diff[yearIndex] > 0
-   diff[monthsIndex] >= inactivityMonthsThreshold
-}
-
-default repository_not_maintained = false
 
 repository_not_maintained {
     not input.repository.is_archived
