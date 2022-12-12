@@ -99,7 +99,7 @@ func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab
 	options := gitlab2.ListProtectedBranchesOptions{}
 
 	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectProtectedBranches, resp, err := rc.Client.Client().ProtectedBranches.ListProtectedBranches(project.ID, &options)
+		projectProtectedBranches, resp, err := rc.Client.Client().ProtectedBranches.ListProtectedBranches(int(project.ID()), &options)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +121,7 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 	options := &gitlab2.ListProjectMembersOptions{}
 
 	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectMembers, resp, err := rc.Client.Client().ProjectMembers.ListAllProjectMembers(project.ID, options)
+		projectMembers, resp, err := rc.Client.Client().ProjectMembers.ListAllProjectMembers(int(project.ID()), options)
 		if err != nil {
 			return nil, err
 		}
