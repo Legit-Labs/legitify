@@ -361,15 +361,15 @@ func TestGitlabRepositoryNotMaintained(t *testing.T) {
 	makeMockData := func(flag *gitlab2.Project) gitlabcollected.Repository {
 		return gitlabcollected.Repository{Project: flag}
 	}
-	archivedTime := time.Date(
-		2002, 3, 17, 20, 34, 58, 651387237, time.UTC)
 	nowTime := time.Now()
-
-	archived3MonthTime := nowTime.AddDate(0, -5, 0)
+	// Creating a mock for a project, last active more than 10 years ago.
+	archivedFewYearsTime := nowTime.AddDate(-10, 0, 0)
+	// Creating a mock for a project, last active more than 3 month ago.
+	archived5MonthTime := nowTime.AddDate(0, -5, 0)
 	falseCase := []*gitlab2.Project{&gitlab2.Project{Archived: false, LastActivityAt: &nowTime}}
 	trueCase := []*gitlab2.Project{
-		{Public: false, LastActivityAt: &archivedTime},
-		{Public: false, LastActivityAt: &archived3MonthTime},
+		{Public: false, LastActivityAt: &archivedFewYearsTime},
+		{Public: false, LastActivityAt: &archived5MonthTime},
 	}
 	options := map[bool][]*gitlab2.Project{
 		false: falseCase,
