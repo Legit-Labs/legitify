@@ -108,16 +108,6 @@ func TestGitLab(t *testing.T) {
 		passedEntity string
 	}{
 		{
-			path:         "data.member.two_factor_authentication_is_disabled_for_a_collaborator",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.member.two_factor_authentication_is_disabled_for_an_external_collaborator",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
 			path:         "data.organization.two_factor_authentication_not_required_for_group",
 			failedEntity: "Legitify-E2E-2",
 			passedEntity: "Legitify-E2E",
@@ -136,6 +126,11 @@ func TestGitLab(t *testing.T) {
 			path:         "data.organization.group_does_not_enforce_branch_protection_by_default",
 			failedEntity: "Legitify-E2E-2",
 			passedEntity: "Legitify-E2E",
+		},
+		{
+			path:         "data.repository.missing_default_branch_protection",
+			failedEntity: "failed_repo",
+			passedEntity: "passed_repo",
 		},
 	}
 	AssertionLoop(t, tests)
