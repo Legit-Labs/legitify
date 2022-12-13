@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"testing"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -25,12 +26,14 @@ func TestRunnerGroup(t *testing.T) {
 	tests := []struct {
 		name             string
 		policyName       string
+		scmType          scm_type.ScmType
 		shouldBeViolated bool
 		args             runnerGroupMockConfiguration
 	}{
 		{
 			name:             "runner group is allowed to run by public repositories",
 			policyName:       "runner_group_can_be_used_by_public_repositories",
+			scmType:          scm_type.GitHub,
 			shouldBeViolated: true,
 			args: runnerGroupMockConfiguration{
 				allowedByPublic: true,
@@ -39,6 +42,7 @@ func TestRunnerGroup(t *testing.T) {
 		{
 			name:             "runner group is not allowed to run by public repositoreis",
 			policyName:       "runner_group_can_be_used_by_public_repositories",
+			scmType:          scm_type.GitHub,
 			shouldBeViolated: false,
 			args: runnerGroupMockConfiguration{
 				allowedByPublic: false,
@@ -47,7 +51,7 @@ func TestRunnerGroup(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		PolicyTestTemplateGitHub(t, test.name, newRunnerGroupMock(test.args),
-			namespace.RunnerGroup, test.policyName, test.shouldBeViolated)
+		PolicyTestTemplate(t, test.name, newRunnerGroupMock(test.args),
+			namespace.RunnerGroup, test.policyName, test.shouldBeViolated, test.scmType)
 	}
 }

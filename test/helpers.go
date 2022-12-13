@@ -44,10 +44,6 @@ func AssertQueryResult(opaResults []opa_engine.QueryResult, policyName string, s
 	}
 }
 
-func PolicyTestTemplateGitHub(t *testing.T, name string, mockData interface{}, ns namespace.Namespace, testedPolicyName string, expectFailure bool) {
-	PolicyTestTemplate(t, name, mockData, ns, testedPolicyName, expectFailure, scm_type.GitHub)
-}
-
 func PolicyTestTemplate(t *testing.T, name string, mockData interface{}, ns namespace.Namespace, testedPolicyName string, expectFailure bool, scmType scm_type.ScmType) {
 	t.Run(name, func(t *testing.T) {
 		engine, err := opa.Load([]string{}, scmType)

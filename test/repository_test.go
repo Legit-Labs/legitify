@@ -2,16 +2,20 @@ package test
 
 import (
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
+	gitlab2 "github.com/xanzy/go-gitlab"
 	"testing"
+	"time"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	gitlabcollected "github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/google/go-github/v44/github"
 )
 
-func repositoryTestTemplate(t *testing.T, name string, mockData interface{}, testedPolicyName string, expectFailure bool) {
+func repositoryTestTemplate(t *testing.T, name string, mockData interface{}, testedPolicyName string, expectFailure bool, scmType scm_type.ScmType) {
 	ns := namespace.Repository
-	PolicyTestTemplateGitHub(t, name, mockData, ns, testedPolicyName, expectFailure)
+	PolicyTestTemplate(t, name, mockData, ns, testedPolicyName, expectFailure, scmType)
 }
 
 var bools = []bool{true, false}
@@ -55,7 +59,7 @@ func TestRepositoryBranchProtection(t *testing.T) {
 	}
 
 	for i, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(branches[i]), testedPolicyName, flag)
+		repositoryTestTemplate(t, name, makeMockData(branches[i]), testedPolicyName, flag, scm_type.GitHub)
 	}
 }
 
@@ -70,7 +74,7 @@ func TestRepositoryForcePush(t *testing.T) {
 	}
 
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, flag, scm_type.GitHub)
 	}
 }
 
@@ -85,7 +89,7 @@ func TestRepositoryAllowDeletion(t *testing.T) {
 	}
 
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, flag, scm_type.GitHub)
 	}
 }
 
@@ -102,7 +106,7 @@ func TestRepositoryCodeReview(t *testing.T) {
 		2,
 	}
 	for i, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(counts[i]), testedPolicyName, flag)
+		repositoryTestTemplate(t, name, makeMockData(counts[i]), testedPolicyName, flag, scm_type.GitHub)
 	}
 }
 func TestRepositoryCodeOwnersOnly(t *testing.T) {
@@ -114,7 +118,7 @@ func TestRepositoryCodeOwnersOnly(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 
@@ -127,7 +131,7 @@ func TestRepositoryLinearHistory(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 
@@ -140,7 +144,7 @@ func TestRepositoryReviewDismissal(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 
@@ -153,7 +157,7 @@ func TestRepositoryRestrictPushes(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 
@@ -166,7 +170,7 @@ func TestRepositoryRequireConversationResolution(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 
@@ -179,7 +183,7 @@ func TestRepositoryStaleReviews(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 
@@ -192,7 +196,7 @@ func TestRepositoryStatusChecks(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 
@@ -205,7 +209,7 @@ func TestRepositoryBranchesUpToDate(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 func TestRepositorySignedCommits(t *testing.T) {
@@ -217,7 +221,7 @@ func TestRepositorySignedCommits(t *testing.T) {
 		})
 	}
 	for _, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, !flag, scm_type.GitHub)
 	}
 }
 func TestRepositoryVulnerabilityAlerts(t *testing.T) {
@@ -236,7 +240,7 @@ func TestRepositoryVulnerabilityAlerts(t *testing.T) {
 
 	for _, expectFailure := range bools {
 		for _, flag := range options[expectFailure] {
-			repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure)
+			repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitHub)
 		}
 	}
 }
@@ -255,7 +259,7 @@ func TestRepositoryDepGraph(t *testing.T) {
 		4,
 	}
 	for i, flag := range bools {
-		repositoryTestTemplate(t, name, makeMockData(counts[i]), testedPolicyName, flag)
+		repositoryTestTemplate(t, name, makeMockData(counts[i]), testedPolicyName, flag, scm_type.GitHub)
 	}
 }
 
@@ -277,7 +281,7 @@ func TestRepositoryActionsSettingsDefaultTokenPermissions(t *testing.T) {
 
 	for _, expectFailure := range bools {
 		flag := options[expectFailure]
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitHub)
 	}
 }
 
@@ -299,6 +303,128 @@ func TestRepositoryActionsSettingsActionsCanApprovePullRequests(t *testing.T) {
 
 	for _, expectFailure := range bools {
 		flag := options[expectFailure]
-		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure)
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitHub)
+	}
+}
+
+func TestGitlabRepositoryTooManyAdmins(t *testing.T) {
+	name := "Project Has Too Many Owners"
+	testedPolicyName := "repository_has_too_many_admins"
+
+	makeMockData := func(flag []*gitlab2.ProjectMember) gitlabcollected.Repository {
+		return gitlabcollected.Repository{
+			Members: flag,
+		}
+	}
+
+	tmpMember := &gitlab2.ProjectMember{
+		AccessLevel: 50,
+	}
+	trueCase := []*gitlab2.ProjectMember{tmpMember, tmpMember, tmpMember, tmpMember}
+	falseCase := []*gitlab2.ProjectMember{tmpMember, tmpMember}
+	options := map[bool][]*gitlab2.ProjectMember{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabRepositoryAllowForking(t *testing.T) {
+	name := "Forking Allowed for This Repository"
+	testedPolicyName := "forking_allowed_for_repository"
+
+	makeMockData := func(flag *gitlab2.Project) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: flag}
+	}
+
+	falseCase := &gitlab2.Project{Public: true, ForkingAccessLevel: "disabled"}
+	trueCase := &gitlab2.Project{Public: false, ForkingAccessLevel: "enabled"}
+	options := map[bool]*gitlab2.Project{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabRepositoryNotMaintained(t *testing.T) {
+	name := "Repository not maintained"
+	testedPolicyName := "repository_not_maintained"
+
+	makeMockData := func(flag *gitlab2.Project) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: flag}
+	}
+	nowTime := time.Now()
+	// Creating a mock for a project, last active more than 10 years ago.
+	archivedFewYearsTime := nowTime.AddDate(-10, 0, 0)
+	// Creating a mock for a project, last active more than 3 month ago.
+	archived5MonthTime := nowTime.AddDate(0, -5, 0)
+	falseCase := []*gitlab2.Project{&gitlab2.Project{Archived: false, LastActivityAt: &nowTime}}
+	trueCase := []*gitlab2.Project{
+		{Public: false, LastActivityAt: &archivedFewYearsTime},
+		{Public: false, LastActivityAt: &archived5MonthTime},
+	}
+	options := map[bool][]*gitlab2.Project{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		for _, tastCase := range options[expectFailure] {
+			repositoryTestTemplate(t, name, makeMockData(tastCase), testedPolicyName, expectFailure, scm_type.GitLab)
+		}
+	}
+}
+
+func TestGitlabRepositoryMissingBranchProtection(t *testing.T) {
+	name := "Default Branch Is Not Protected"
+	testedPolicyName := "missing_default_branch_protection"
+
+	makeMockData := func(flag []*gitlab2.ProtectedBranch) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: &gitlab2.Project{DefaultBranch: "default_branch_name"}, ProtectedBranches: flag}
+	}
+
+	defaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "default_branch_name"}
+	nonDefaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "fooBar"}
+	falseCase := []*gitlab2.ProtectedBranch{defaultBranchProtectedMock}
+	trueCase := []*gitlab2.ProtectedBranch{nonDefaultBranchProtectedMock}
+	options := map[bool][]*gitlab2.ProtectedBranch{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabRepositoryMissingForcePushProtection(t *testing.T) {
+	name := "Default Branch Allows Force Pushes"
+	testedPolicyName := "missing_default_branch_protection_force_push"
+
+	makeMockData := func(flag []*gitlab2.ProtectedBranch) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: &gitlab2.Project{DefaultBranch: "default_branch_name"}, ProtectedBranches: flag}
+	}
+
+	defaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "default_branch_name", AllowForcePush: false}
+	DefaultNotBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "sss", AllowForcePush: false}
+	falseCase := []*gitlab2.ProtectedBranch{defaultBranchProtectedMock}
+	trueCase := []*gitlab2.ProtectedBranch{DefaultNotBranchProtectedMock}
+	options := map[bool][]*gitlab2.ProtectedBranch{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
 	}
 }
