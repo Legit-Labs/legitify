@@ -429,19 +429,19 @@ func TestGitlabRepositoryMissingForcePushProtection(t *testing.T) {
 	}
 }
 
-func TestGitlabRepositoryMissingBranchProtection(t *testing.T) {
-	name := "Default Branch Is Not Protected"
-	testedPolicyName := "missing_default_branch_protection"
+func TestGitlabWebhookSSL(t *testing.T) {
+	name := "Webhook Configured Without SSL Verification"
+	testedPolicyName := "repository_webhook_doesnt_require_ssl"
 
-	makeMockData := func(flag []*gitlab2.ProtectedBranch) gitlabcollected.Repository {
-		return gitlabcollected.Repository{Project: &gitlab2.Project{DefaultBranch: "default_branch_name"}, ProtectedBranches: flag}
+	makeMockData := func(flag []*gitlab2.ProjectHook) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Webhooks: flag}
 	}
 
-	defaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "default_branch_name"}
-	nonDefaultBranchProtectedMock := &gitlab2.ProtectedBranch{Name: "fooBar"}
-	falseCase := []*gitlab2.ProtectedBranch{defaultBranchProtectedMock}
-	trueCase := []*gitlab2.ProtectedBranch{nonDefaultBranchProtectedMock}
-	options := map[bool][]*gitlab2.ProtectedBranch{
+	sslNotVerifiedHookMock := &gitlab2.ProjectHook{EnableSSLVerification: false}
+	sslVerifiedHookMock := &gitlab2.ProjectHook{EnableSSLVerification: true}
+	falseCase := []*gitlab2.ProjectHook{sslVerifiedHookMock}
+	trueCase := []*gitlab2.ProjectHook{sslNotVerifiedHookMock}
+	options := map[bool][]*gitlab2.ProjectHook{
 		false: falseCase,
 		true:  trueCase,
 	}
