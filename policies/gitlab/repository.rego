@@ -50,6 +50,8 @@ repository_has_too_many_admins {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the project's settings page, Enter "General" tab, Under "Visibility, project features, permissions", Toggle off "Forks"]
 #   severity: LOW
+#   threat:
+#    - "A user with permissions to the repository could intentionally/accidentally fork a private repository, make it public and cause a code-leak incident"
 default forking_allowed_for_repository = false
 forking_allowed_for_repository {
     input.public == false
@@ -63,6 +65,8 @@ forking_allowed_for_repository {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default missing_default_branch_protection = false
 missing_default_branch_protection {
     default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
@@ -96,6 +100,8 @@ missing_default_branch_protection_force_push {
 # custom:
 #   severity: LOW
 #   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
+#   threat:
+#   - "Attackers could take over a domain or perform a MiTM attack to get data and secrets sent to the webhook"
 default repository_webhook_doesnt_require_ssl = false
 repository_webhook_doesnt_require_ssl = true {
     webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
@@ -109,6 +115,8 @@ repository_webhook_doesnt_require_ssl = true {
 # custom:
 #   severity: MEDIUM
 #   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "Pipelines must succeed", Click "Save changes"]
+#   threat:
+#     - "Users could merge its code without all required checks passes what could lead to insecure code reaching your main branch and production."
 default requires_status_checks = false
 requires_status_checks = true {
     input.only_allow_merge_if_pipeline_succeeds == false
