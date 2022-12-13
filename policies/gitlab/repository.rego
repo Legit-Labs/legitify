@@ -8,6 +8,7 @@ package repository
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
 #   severity: HIGH
 default repository_not_maintained = false
+
 repository_not_maintained {
     input.archived == false
     ns := time.parse_rfc3339_ns(input.last_activity_at)
@@ -17,6 +18,17 @@ repository_not_maintained {
     inactivityMonthsThreshold := 3
     diff[monthsIndex] >= inactivityMonthsThreshold
 }
+
+repository_not_maintained {
+    input.archived == false
+    ns := time.parse_rfc3339_ns(input.last_activity_at)
+    now := time.now_ns()
+    diff := time.diff(now, ns)
+    yearIndex := 0
+    diff[yearIndex] > 0
+}
+
+
 
 # METADATA
 # scope: rule
@@ -66,9 +78,13 @@ missing_default_branch_protection {
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
 default missing_default_branch_protection_force_push = false
+
+missing_default_branch_protection_force_push {
+    missing_default_branch_protection
+}
+
 missing_default_branch_protection_force_push {
     default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-    count(default_protected_branches) > 0
     rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
 	count(rules_allow_force_push) > 0
 }
