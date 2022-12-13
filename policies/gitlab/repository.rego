@@ -102,4 +102,27 @@ repository_webhook_doesnt_require_ssl = true {
     count(webhooks_without_ssl_verification) > 0
 }
 
+# METADATA
+# scope: rule
+# title: Project Doesn’t Require All Pipelines to Succeed
+# description: the checks which validate the quality and security of the code are not required to pass before submitting new changes. It is advised to turn this control on to ensure any existing or future check will be required to pass
+# custom:
+#   severity: MEDIUM
+#   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "Pipelines must succeed", Click "Save changes"]
+default requires_status_checks = false
+requires_status_checks = true {
+    input.only_allow_merge_if_pipeline_succeeds == false
+}
 
+
+# METADATA
+# scope: rule
+# title: Project Doesn't Require All Conversations To Be Resolved Before Merge
+# description: Require all merge request conversations to be resolved before merging. Check this to avoid bypassing/missing a Pull Reuqest comment.
+# custom:
+#   severity: LOW
+#   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "All threads must be resolved", Click "Save changes"]
+default no_conversation_resolution = false
+no_conversation_resolution = true {
+    input.only_allow_merge_if_all_discussions_are_resolved == false
+}
