@@ -428,3 +428,60 @@ func TestGitlabRepositoryMissingForcePushProtection(t *testing.T) {
 		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
 	}
 }
+
+func TestGitlabWebhookSSL(t *testing.T) {
+	name := "Webhook Configured Without SSL Verification"
+	testedPolicyName := "repository_webhook_doesnt_require_ssl"
+
+	makeMockData := func(flag []*gitlab2.ProjectHook) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Webhooks: flag}
+	}
+
+	sslNotVerifiedHookMock := &gitlab2.ProjectHook{EnableSSLVerification: false}
+	sslVerifiedHookMock := &gitlab2.ProjectHook{EnableSSLVerification: true}
+	falseCase := []*gitlab2.ProjectHook{sslVerifiedHookMock}
+	trueCase := []*gitlab2.ProjectHook{sslNotVerifiedHookMock}
+	options := map[bool][]*gitlab2.ProjectHook{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabPipelineStatusCheck(t *testing.T) {
+	name := "Project Does’nt Require All Pipelines to Succeed"
+	testedPolicyName := "requires_status_checks"
+
+	makeMockData := func(flag bool) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: &gitlab2.Project{OnlyAllowMergeIfPipelineSucceeds: flag}}
+	}
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabResolvedThreads(t *testing.T) {
+	name := "Project Doesn't Require All Conversations To Be Resolved Before Merge"
+	testedPolicyName := "no_conversation_resolution"
+
+	makeMockData := func(flag bool) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: &gitlab2.Project{OnlyAllowMergeIfAllDiscussionsAreResolved: flag}}
+	}
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
