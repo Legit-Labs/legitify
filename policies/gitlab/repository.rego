@@ -100,8 +100,6 @@ missing_default_branch_protection_force_push {
 # custom:
 #   severity: LOW
 #   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
-#   threat:
-#   - "Attackers could take over a domain or perform a MiTM attack to get data and secrets sent to the webhook"
 default repository_webhook_doesnt_require_ssl = false
 repository_webhook_doesnt_require_ssl = true {
     webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
