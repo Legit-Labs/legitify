@@ -81,23 +81,24 @@ func AssertionLoop(t *testing.T, tests []struct {
 	failedEntity string
 	passedEntity string
 }) {
+	jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
 	for _, test := range tests {
 		t.Logf("Testing: %s", test.path)
 		testFormattedPath := test.path + "->violations"
-		jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
 		res := jq.From(testFormattedPath).Where("aux->entityName", "=", test.passedEntity).Where("Status", "=", "PASSED").Count()
 
 		if res != 1 {
 			t.Logf("Failed on test %s, Entity %s did not pass", test.path, test.passedEntity)
 			t.Fail()
 		}
-		jq = gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
+		jq.Reset()
 		res = jq.From(testFormattedPath).Where("aux->entityName", "=", test.failedEntity).Where("Status", "=", "FAILED").Count()
 
 		if res != 1 {
 			t.Logf("Failed on test: %s, Entity: %s did not failed", test.path, test.failedEntity)
 			t.Fail()
 		}
+		jq.Reset()
 	}
 }
 

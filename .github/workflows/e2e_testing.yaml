@@ -18,14 +18,21 @@ jobs:
       - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
           go-version: 1.18
+      - name: Build
+        run: |
+          make build
       - name: Run GitHub tests
         run: |
-          LEGITIFY_TOKEN=${{ secrets.GITHUB_E2E_ENV_TOKEN }} go run main.go analyze --output-format json --output-file $GITHUB_REPORT_FILE_PATH --scm github
+          ./legitify analyze --output-format json --output-file $GITHUB_REPORT_FILE_PATH --scm github
+        env:
+          LEGITIFY_TOKEN: ${{ secrets.GITHUB_E2E_ENV_TOKEN }}
       - name: Run github output verification
         run: go test e2e/e2e_test.go -run TestGitHub --report_path=$GITHUB_REPORT_FILE_PATH
       - name: Run GitLab tests
         run: |
-          LEGITIFY_TOKEN=${{ secrets.GITLAB_E2E_ENV_TOKEN }} go run main.go analyze --output-format json --output-file GITLAB_REPORT_FILE_PATH --scm gitlab
+          ./legitify analyze --output-format json --output-file GITLAB_REPORT_FILE_PATH --scm gitlab
+        env:
+          LEGITIFY_TOKEN: ${{ secrets.GITLAB_E2E_ENV_TOKEN }}
       - name: Run gitlab output verification
         run: go test e2e/e2e_test.go -run TestGitLab --report_path=GITLAB_REPORT_FILE_PATH
       - name: Notify Slack
