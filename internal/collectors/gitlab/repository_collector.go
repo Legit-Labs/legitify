@@ -138,6 +138,27 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 	return extendedProject
 }
 
+func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collected.Repository) gitlab_collected.Repository {
+	var completeProjectWebhookList []*gitlab2.ProjectHook
+	options := gitlab2.ListProjectHooksOptions{}
+
+	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
+		projectWebhooks, resp, err := rc.Client.Client().Projects.ListProjectHooks(int(project.ID()), &options)
+		if err != nil {
+			return nil, err
+		}
+		completeProjectWebhookList = append(completeProjectWebhookList, projectWebhooks...)
+		return resp, nil
+	}, (*gitlab2.ListOptions)(&options))
+	if err != nil {
+		log.Printf("failed to list project: %s webhook. error message: %s", project.Name(), err)
+	}
+
+	extendedProject := project
+	extendedProject.Webhooks = completeProjectWebhookList
+	return extendedProject
+}
+
 func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
 		options := gitlab2.ListProjectsOptions{}
@@ -176,6 +197,8 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 	extendedProject := rc.extendProjectWithMembers(proj)
 
 	extendedProject = rc.extendProjectWithProtectedBranches(extendedProject)
+
+	extendedProject = rc.extendProjectWithWebhooks(extendedProject)
 
 	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
 	rc.CollectDataWithContext(extendedProject, extendedProject.Links.Self, &newContext)

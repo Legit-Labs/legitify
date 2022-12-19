@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"testing"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -36,6 +37,7 @@ func TestActions(t *testing.T) {
 	tests := []struct {
 		name             string
 		policyName       string
+		scmType          scm_type.ScmType
 		shouldBeViolated bool
 		args             organizationActionsMockConfiguration
 	}{
@@ -110,7 +112,7 @@ func TestActions(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		PolicyTestTemplateGitHub(t, test.name, newOrganizationActionsMock(test.args),
-			namespace.Actions, test.policyName, test.shouldBeViolated)
+		PolicyTestTemplate(t, test.name, newOrganizationActionsMock(test.args),
+			namespace.Actions, test.policyName, test.shouldBeViolated, scm_type.GitHub)
 	}
 }
