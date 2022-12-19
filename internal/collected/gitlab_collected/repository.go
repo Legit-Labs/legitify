@@ -9,6 +9,7 @@ type Repository struct {
 	*gitlab2.Project
 	Members           []*gitlab2.ProjectMember   `json:"members"`
 	ProtectedBranches []*gitlab2.ProtectedBranch `json:"protected_branches"`
+	PushRules         *gitlab2.ProjectPushRules  `json:"push_rules"`
 }
 
 func (r Repository) ViolationEntityType() string {

@@ -88,3 +88,15 @@ missing_default_branch_protection_force_push {
     rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
 	count(rules_allow_force_push) > 0
 }
+
+# METADATA
+# scope: rule
+# title: Unsinged Commits Are Not Allowed
+# description: Require all commits to be signed and verified
+# custom:
+#   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Push Rules" tab. Set the "Reject unsigned commits" checkbox ]
+#   severity: LOW
+default no_signed_commits = false
+no_signed_commits {
+    input.push_rules.reject_unsigned_commits == false
+}
