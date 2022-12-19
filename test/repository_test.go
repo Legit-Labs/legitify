@@ -485,3 +485,24 @@ func TestGitlabResolvedThreads(t *testing.T) {
 		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
 	}
 }
+
+func TestGitlabRepositoryMissingSignedCommitsVerifications(t *testing.T) {
+	name := "Unsigned Commits Are Not Allowed"
+	testedPolicyName := "no_signed_commits"
+
+	makeMockData := func(flag *gitlab2.ProjectPushRules) gitlabcollected.Repository {
+		return gitlabcollected.Repository{PushRules: flag}
+	}
+
+	falseCase := &gitlab2.ProjectPushRules{RejectUnsignedCommits: true}
+	trueCase := &gitlab2.ProjectPushRules{RejectUnsignedCommits: false}
+	options := map[bool]*gitlab2.ProjectPushRules{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
