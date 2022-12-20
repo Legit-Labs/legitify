@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/google/go-github/v44/github"
 	"testing"
 
@@ -115,7 +116,7 @@ func TestOrganization(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		PolicyTestTemplateGitHub(t, test.name, newOrganizationMock(test.args),
-			namespace.Organization, test.policyName, test.shouldBeViolated)
+		PolicyTestTemplate(t, test.name, newOrganizationMock(test.args),
+			namespace.Organization, test.policyName, test.shouldBeViolated, scm_type.GitHub)
 	}
 }

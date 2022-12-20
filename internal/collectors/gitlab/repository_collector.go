@@ -99,7 +99,7 @@ func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab
 	options := gitlab2.ListProtectedBranchesOptions{}
 
 	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectProtectedBranches, resp, err := rc.Client.Client().ProtectedBranches.ListProtectedBranches(project.ID, &options)
+		projectProtectedBranches, resp, err := rc.Client.Client().ProtectedBranches.ListProtectedBranches(int(project.ID()), &options)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +121,7 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 	options := &gitlab2.ListProjectMembersOptions{}
 
 	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectMembers, resp, err := rc.Client.Client().ProjectMembers.ListAllProjectMembers(project.ID, options)
+		projectMembers, resp, err := rc.Client.Client().ProjectMembers.ListAllProjectMembers(int(project.ID()), options)
 		if err != nil {
 			return nil, err
 		}
@@ -135,6 +135,27 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 
 	extendedProject := project
 	extendedProject.Members = completeMembersList
+	return extendedProject
+}
+
+func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collected.Repository) gitlab_collected.Repository {
+	var completeProjectWebhookList []*gitlab2.ProjectHook
+	options := gitlab2.ListProjectHooksOptions{}
+
+	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
+		projectWebhooks, resp, err := rc.Client.Client().Projects.ListProjectHooks(int(project.ID()), &options)
+		if err != nil {
+			return nil, err
+		}
+		completeProjectWebhookList = append(completeProjectWebhookList, projectWebhooks...)
+		return resp, nil
+	}, (*gitlab2.ListOptions)(&options))
+	if err != nil {
+		log.Printf("failed to list project: %s webhook. error message: %s", project.Name(), err)
+	}
+
+	extendedProject := project
+	extendedProject.Webhooks = completeProjectWebhookList
 	return extendedProject
 }
 
@@ -176,6 +197,8 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 	extendedProject := rc.extendProjectWithMembers(proj)
 
 	extendedProject = rc.extendProjectWithProtectedBranches(extendedProject)
+
+	extendedProject = rc.extendProjectWithWebhooks(extendedProject)
 
 	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
 	rc.CollectDataWithContext(extendedProject, extendedProject.Links.Self, &newContext)

@@ -8,6 +8,7 @@ package repository
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
 #   severity: HIGH
 default repository_not_maintained = false
+
 repository_not_maintained {
     input.archived == false
     ns := time.parse_rfc3339_ns(input.last_activity_at)
@@ -17,6 +18,17 @@ repository_not_maintained {
     inactivityMonthsThreshold := 3
     diff[monthsIndex] >= inactivityMonthsThreshold
 }
+
+repository_not_maintained {
+    input.archived == false
+    ns := time.parse_rfc3339_ns(input.last_activity_at)
+    now := time.now_ns()
+    diff := time.diff(now, ns)
+    yearIndex := 0
+    diff[yearIndex] > 0
+}
+
+
 
 # METADATA
 # scope: rule
@@ -38,6 +50,8 @@ repository_has_too_many_admins {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the project's settings page, Enter "General" tab, Under "Visibility, project features, permissions", Toggle off "Forks"]
 #   severity: LOW
+#   threat:
+#    - "A user with permissions to the repository could intentionally/accidentally fork a private repository, make it public and cause a code-leak incident"
 default forking_allowed_for_repository = false
 forking_allowed_for_repository {
     input.public == false
@@ -51,6 +65,8 @@ forking_allowed_for_repository {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default missing_default_branch_protection = false
 missing_default_branch_protection {
     default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
@@ -66,9 +82,53 @@ missing_default_branch_protection {
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
 default missing_default_branch_protection_force_push = false
+
+missing_default_branch_protection_force_push {
+    missing_default_branch_protection
+}
+
 missing_default_branch_protection_force_push {
     default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-    count(default_protected_branches) > 0
     rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
 	count(rules_allow_force_push) > 0
+}
+
+# METADATA
+# scope: rule
+# title: Webhook Configured Without SSL Verification
+# description: Webhooks that are not configured with SSL verification enabled could expose your sofware to man in the middle attacks (MITM).
+# custom:
+#   severity: LOW
+#   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
+default repository_webhook_doesnt_require_ssl = false
+repository_webhook_doesnt_require_ssl = true {
+    webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
+    count(webhooks_without_ssl_verification) > 0
+}
+
+# METADATA
+# scope: rule
+# title: Project Doesn’t Require All Pipelines to Succeed
+# description: the checks which validate the quality and security of the code are not required to pass before submitting new changes. It is advised to turn this control on to ensure any existing or future check will be required to pass
+# custom:
+#   severity: MEDIUM
+#   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "Pipelines must succeed", Click "Save changes"]
+#   threat:
+#     - "Users could merge its code without all required checks passes what could lead to insecure code reaching your main branch and production."
+default requires_status_checks = false
+requires_status_checks = true {
+    input.only_allow_merge_if_pipeline_succeeds == false
+}
+
+
+# METADATA
+# scope: rule
+# title: Project Doesn't Require All Conversations To Be Resolved Before Merge
+# description: Require all merge request conversations to be resolved before merging. Check this to avoid bypassing/missing a Pull Reuqest comment.
+# custom:
+#   severity: LOW
+#   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "All threads must be resolved", Click "Save changes"]
+default no_conversation_resolution = false
+no_conversation_resolution = true {
+    input.only_allow_merge_if_all_discussions_are_resolved == false
 }
