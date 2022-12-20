@@ -26,6 +26,14 @@ func NewSkipper(ctx context.Context) Skipper {
 			"scorecard_enabled": func(data collectors.CollectedData) bool {
 				return context_utils.GetScorecardEnabled(ctx)
 			},
+			"has_branch_protection_permission": func(data collectors.CollectedData) bool {
+				repositoryContext, ok := data.Context.(collectors.CollectedDataRepositoryContext)
+				if !ok {
+					log.Printf("invalid type %s", data.Context)
+					return false
+				}
+				return repositoryContext.HasBranchProtectionPermission()
+			},
 		},
 	}
 }

@@ -92,13 +92,8 @@ is_null(x) {
     x == null
 }
 
-has_branch_protection_permission(_input) {
-    _input.no_branch_protection_permission == false
-}
-
 has_branch_protection_info(_input) {
-    has_branch_protection_permission(_input)
-    not is_null(_input.repository.default_branch) # protect against empty repos 
+    not is_null(_input.repository.default_branch) # protect against empty repos
 }
 
 # METADATA
@@ -109,9 +104,9 @@ has_branch_protection_info(_input) {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Add rule", Set "Branch name pattern" as the default branch name (usually "main" or "master"), Set desired protections, Click "Create" and save the rule]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 default missing_default_branch_protection = false
 missing_default_branch_protection {
-    has_branch_protection_info(input)
     is_null(input.repository.default_branch.branch_protection_rule)
 }
 
@@ -123,11 +118,15 @@ missing_default_branch_protection {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab ,Under "Branch protection rules", Click "Edit" on the default branch rule, Uncheck "Allow deletions", Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 #   threat:
 #     - "Users could merge code without any restrictions which could lead to insecure code reaching your main branch and production."
 default missing_default_branch_protection_deletion = false
 missing_default_branch_protection_deletion {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+
+missing_default_branch_protection_deletion {
 	input.repository.default_branch.branch_protection_rule.allows_deletions == true
 }
 
@@ -139,9 +138,12 @@ missing_default_branch_protection_deletion {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Uncheck "Allow force pushes", Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 default missing_default_branch_protection_force_push = false
 missing_default_branch_protection_force_push {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+missing_default_branch_protection_force_push {
 	input.repository.default_branch.branch_protection_rule.allows_force_pushes == true
 }
 
@@ -153,13 +155,17 @@ missing_default_branch_protection_force_push {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", "Add the required checks that must pass before merging (tests, lint, etc...)", Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 #   threat:
 #     - "Users could merge its code without all required checks passes what could lead to insecure code reaching your main branch and production."
 default requires_status_checks = false
 requires_status_checks {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+requires_status_checks {
     input.repository.default_branch.branch_protection_rule.requires_status_checks == false
 }
+
 # METADATA
 # scope: rule
 # title: Default Branch Doesn’t Require Branches To Be Up To Date Before Merge
@@ -168,9 +174,12 @@ requires_status_checks {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", Check "Require branches to be up to date before merging", Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 default requires_branches_up_to_date_before_merge = false
 requires_branches_up_to_date_before_merge {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+requires_branches_up_to_date_before_merge {
     input.repository.default_branch.branch_protection_rule.requires_strict_status_checks == false
 }
 
@@ -182,9 +191,12 @@ requires_branches_up_to_date_before_merge {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Dismiss stale pull request approvals when new commits are pushed", Click "Save changes"]
 #   severity: LOW
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 default dismisses_stale_reviews = false
 dismisses_stale_reviews {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+dismisses_stale_reviews {
     not input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
 }
 
@@ -196,11 +208,19 @@ dismisses_stale_reviews {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
 #   severity: HIGH
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_not_required = false
 code_review_not_required {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+
+code_review_not_required {
+	is_null(input.repository.default_branch.branch_protection_rule.required_approving_review_count)
+}
+
+code_review_not_required {
     input.repository.default_branch.branch_protection_rule.required_approving_review_count < 1
 }
 
@@ -212,11 +232,14 @@ code_review_not_required {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_by_two_members_not_required = false
 code_review_by_two_members_not_required {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+code_review_by_two_members_not_required {
     input.repository.default_branch.branch_protection_rule.required_approving_review_count < 2
 }
 
@@ -228,9 +251,12 @@ code_review_by_two_members_not_required {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require review from Code Owners", Click "Save changes"]
 #   severity: LOW
 #   requiredScopes: [repo]
+#   prerequisites: [has_branch_protection_permission]
 default code_review_not_limited_to_code_owners = false
 code_review_not_limited_to_code_owners {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+code_review_not_limited_to_code_owners {
     input.repository.default_branch.branch_protection_rule.requires_code_owner_reviews == false
 }
 
@@ -242,9 +268,12 @@ code_review_not_limited_to_code_owners {
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require linear history", Click "Save changes"]
 #    severity: MEDIUM
 #    requiredScopes: [repo]
+#    prerequisites: [has_branch_protection_permission]
 default non_linear_history = false
 non_linear_history {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+non_linear_history {
     input.repository.default_branch.branch_protection_rule.requires_linear_history == false
 }
 
@@ -256,9 +285,12 @@ non_linear_history {
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require conversation resolution before merging", Click "Save changes"]
 #    severity: LOW
 #    requiredScopes: [repo]
+#    prerequisites: [has_branch_protection_permission]
 default no_conversation_resolution = false
 no_conversation_resolution {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+no_conversation_resolution {
     input.repository.default_branch.branch_protection_rule.requires_conversation_resolution == false
 }
 
@@ -270,9 +302,12 @@ no_conversation_resolution {
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require signed commits", Click "Save changes"]
 #    severity: LOW
 #    requiredScopes: [repo]
+#    prerequisites: [has_branch_protection_permission]
 default no_signed_commits = false
 no_signed_commits {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+no_signed_commits {
     input.repository.default_branch.branch_protection_rule.requires_commit_signatures == false
 }
 
@@ -284,9 +319,12 @@ no_signed_commits {
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can dismiss pull request reviews", Click "Save changes"]
 #    severity: LOW
 #    requiredScopes: [repo]
+#    prerequisites: [has_branch_protection_permission]
 default review_dismissal_allowed = false
 review_dismissal_allowed {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+review_dismissal_allowed {
     input.repository.default_branch.branch_protection_rule.restricts_review_dismissals == false
 }
 
@@ -298,9 +336,12 @@ review_dismissal_allowed {
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can push to matching branches", Click "Save changes"]
 #    severity: MEDIUM
 #    requiredScopes: [repo]
+#    prerequisites: [has_branch_protection_permission]
 default pushes_are_not_restricted = false
 pushes_are_not_restricted {
-    has_branch_protection_info(input)
+	missing_default_branch_protection
+}
+pushes_are_not_restricted {
     input.repository.default_branch.branch_protection_rule.restricts_pushes == false
 }
 

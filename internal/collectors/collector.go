@@ -21,6 +21,11 @@ type CollectedDataContext interface {
 	Roles() []permissions.Role
 }
 
+type CollectedDataRepositoryContext interface {
+	CollectedDataContext
+	HasBranchProtectionPermission() bool
+}
+
 type CollectedData struct {
 	Context       CollectedDataContext
 	Entity        collected.Entity

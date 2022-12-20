@@ -327,21 +327,33 @@ func (c *Client) collectSpecificOrganizations() ([]githubcollected.ExtendedOrg, 
 	res := make([]githubcollected.ExtendedOrg, 0)
 
 	for _, o := range c.orgs {
-		org, _, err := c.Client().Organizations.Get(c.context, o)
+		org, err := c.Organization(o)
 
 		if err != nil {
 			return nil, err
 		}
 
-		role, err := c.getRole(*org.Login)
-		if err != nil {
-			log.Println(err.Error())
-		} else {
-			res = append(res, githubcollected.NewExtendedOrg(org, role))
-		}
+		res = append(res, *org)
 	}
 
 	return res, nil
+}
+
+func (c *Client) Organization(login string) (*githubcollected.ExtendedOrg, error) {
+	org, _, err := c.Client().Organizations.Get(c.context, login)
+
+	if err != nil {
+		return nil, err
+	}
+
+	role, err := c.getRole(*org.Login)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+	result := githubcollected.NewExtendedOrg(org, role)
+
+	return &result, nil
 }
 
 func (c *Client) GetActionsTokenPermissionsForOrganization(organization string) (*types.TokenPermissions, error) {
