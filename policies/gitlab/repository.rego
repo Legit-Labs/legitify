@@ -144,3 +144,7 @@ default no_signed_commits = false
 no_signed_commits {
     input.push_rules.reject_unsigned_commits == false
 }
+
+no_signed_commits {
+    is_null(input.push_rules)
+}

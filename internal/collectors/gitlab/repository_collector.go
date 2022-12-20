@@ -159,10 +159,11 @@ func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collecte
 	return extendedProject
 }
 
-func (rc *repositoryCollector) extendProjectWithPushRul(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithPushRules(project gitlab_collected.Repository) gitlab_collected.Repository {
 	rules, _, err := rc.Client.Client().Projects.GetProjectPushRules(project.ID)
 	if err != nil {
 		log.Printf("failed to get project push rule %s", err)
+		return project
 	}
 	extendedProject := project
 	extendedProject.PushRules = rules
@@ -210,7 +211,7 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 
 	extendedProject = rc.extendProjectWithWebhooks(extendedProject)
 
-	extendedProject = rc.extendProjectWithPushRul(extendedProject)
+	extendedProject = rc.extendProjectWithPushRules(extendedProject)
 
 	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
 	rc.CollectDataWithContext(extendedProject, extendedProject.Links.Self, &newContext)
