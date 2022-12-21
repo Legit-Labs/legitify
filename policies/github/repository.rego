@@ -352,6 +352,7 @@ pushes_are_not_restricted {
 	missing_default_branch_protection
 }
 pushes_are_not_restricted {
+    code_review_not_required
     input.repository.default_branch.branch_protection_rule.restricts_pushes == false
 }
 
