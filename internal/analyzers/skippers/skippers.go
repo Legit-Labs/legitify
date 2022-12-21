@@ -29,7 +29,7 @@ func NewSkipper(ctx context.Context) Skipper {
 			"has_branch_protection_permission": func(data collectors.CollectedData) bool {
 				repositoryContext, ok := data.Context.(collectors.CollectedDataRepositoryContext)
 				if !ok {
-					log.Printf("invalid type %s", data.Context)
+					log.Printf("invalid type %T", data.Context)
 					return false
 				}
 				return repositoryContext.HasBranchProtectionPermission()

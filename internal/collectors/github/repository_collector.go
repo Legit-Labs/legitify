@@ -140,11 +140,13 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 						return
 					}
 
+					hasBp := hasBranchProtection(org, query.RepositoryOwner.Repository.IsPrivate)
 					collectionContext = newRepositoryContext([]permissions.Role{org.Role, query.RepositoryOwner.Repository.ViewerPermission},
-						hasBranchProtection(org, query.RepositoryOwner.Repository.IsPrivate), org.IsEnterprise(), false)
+						hasBp, org.IsEnterprise(), false)
 				} else {
+					hasBp := rc.hasBranchProtectionForUser(repo.Owner, query.RepositoryOwner.Repository.IsPrivate)
 					collectionContext = newRepositoryContext([]permissions.Role{query.RepositoryOwner.Repository.ViewerPermission},
-						rc.hasBranchProtectionForUser(repo.Owner, query.RepositoryOwner.Repository.IsPrivate), false, false)
+						hasBp, false, false)
 				}
 
 				rc.collectRepository(&query.RepositoryOwner.Repository, repo.Owner, collectionContext)
