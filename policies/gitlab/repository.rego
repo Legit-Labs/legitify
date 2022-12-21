@@ -148,3 +148,43 @@ no_signed_commits {
 no_signed_commits {
     is_null(input.push_rules)
 }
+
+
+# METADATA
+# scope: rule
+# title: Project Doesn't Require Code Review
+# description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement
+# custom:
+#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 1 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]
+#   severity: HIGH
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+default code_review_not_required = false
+code_review_not_required {
+	missing_default_branch_protection
+}
+
+code_review_not_required {
+	is_null(input.repository.default_branch.branch_protection_rule.required_approving_review_count)
+}
+
+code_review_not_required {
+    input.minimum_required_approvals < 1
+}
+
+# METADATA
+# scope: rule
+# title: Project Doesn't Require Code Review By At Least Two Reviewers
+# description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement
+# custom:
+#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 2 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]
+#   severity: MEDIUM
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+default code_review_by_two_members_not_required = false
+code_review_by_two_members_not_required {
+	missing_default_branch_protection
+}
+code_review_by_two_members_not_required {
+    input.minimum_required_approvals < 2
+}

@@ -170,6 +170,45 @@ func (rc *repositoryCollector) extendProjectWithPushRules(project gitlab_collect
 	return extendedProject
 }
 
+func (rc *repositoryCollector) extendProjectWithMergeRequestApprovalRules(project gitlab_collected.Repository) gitlab_collected.Repository {
+	rules, _, err := rc.Client.Client().Projects.GetProjectApprovalRules(project.ID)
+	if err != nil {
+		log.Printf("failed to get project merge request approval rules %s", err)
+		return project
+	}
+	extendedProject := project
+	extendedProject.ApprovalRules = rules
+	return extendedProject
+}
+
+func (rc *repositoryCollector) extendProjectWithApprovalConfiguration(project gitlab_collected.Repository) gitlab_collected.Repository {
+	config, _, err := rc.Client.Client().Projects.GetApprovalConfiguration(project.ID)
+	if err != nil {
+		log.Printf("failed to get project approval configuration %s", err)
+		return project
+	}
+	extendedProject := project
+	extendedProject.ApprovalConfiguration = config
+	return extendedProject
+}
+
+func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project gitlab_collected.Repository) gitlab_collected.Repository {
+	// Initialize minimum required approvals to 0
+	minRequiredApprovals := 0
+
+	// Iterate through the merge request approval rules
+	for _, rule := range project.ApprovalRules {
+		// If the rule requires more approvals than the current minimum required approvals, update the minimum required approvals
+		if rule.ApprovalsRequired > minRequiredApprovals {
+			minRequiredApprovals = rule.ApprovalsRequired
+		}
+	}
+
+	// Set the minimum required approvals for the project
+	project.DefaultBranchMinimumRequiredApprovals = minRequiredApprovals
+	return project
+}
+
 func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
 		options := gitlab2.ListProjectsOptions{}
@@ -212,6 +251,12 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 	extendedProject = rc.extendProjectWithWebhooks(extendedProject)
 
 	extendedProject = rc.extendProjectWithPushRules(extendedProject)
+
+	extendedProject = rc.extendProjectWithMergeRequestApprovalRules(extendedProject)
+
+	extendedProject = rc.extendProjectWithApprovalConfiguration(extendedProject)
+
+	extendedProject = rc.extendProjectWithMinimumRequiredApprovals(extendedProject)
 
 	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
 	rc.CollectDataWithContext(extendedProject, extendedProject.Links.Self, &newContext)

@@ -7,10 +7,13 @@ import (
 
 type Repository struct {
 	*gitlab2.Project
-	Members           []*gitlab2.ProjectMember   `json:"members"`
-	ProtectedBranches []*gitlab2.ProtectedBranch `json:"protected_branches"`
-	Webhooks          []*gitlab2.ProjectHook     `json:"webhooks"`
-	PushRules         *gitlab2.ProjectPushRules  `json:"push_rules"`
+	Members                               []*gitlab2.ProjectMember       `json:"members"`
+	ProtectedBranches                     []*gitlab2.ProtectedBranch     `json:"protected_branches"`
+	Webhooks                              []*gitlab2.ProjectHook         `json:"webhooks"`
+	PushRules                             *gitlab2.ProjectPushRules      `json:"push_rules"`
+	ApprovalConfiguration                 *gitlab2.ProjectApprovals      `json:"approval_configuration"`
+	ApprovalRules                         []*gitlab2.ProjectApprovalRule `json:"approval_rules"`
+	DefaultBranchMinimumRequiredApprovals int                            `json:"minimum_required_approvals"`
 }
 
 func (r Repository) ViolationEntityType() string {
