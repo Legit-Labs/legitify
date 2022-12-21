@@ -7,21 +7,37 @@ on:
     types: [ published ]
 permissions:
   contents: read
-env:
-  REPORT_FILE_PATH: /tmp/out.json
 jobs:
-  install_and_run:
+  install_and_run_e2e_tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - scm_token: E2E_ENV_TOKEN_GITHUB
+            report_file_path: /tmp/gh_out.json
+            scm: github
+            test_plan: TestGitHub
+          - scm_token: E2E_ENV_TOKEN_GITLAB
+            report_file_path: /tmp/gl_out.json
+            scm: gitlab
+            test_plan: TestGitLab
+
     steps:
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
       - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
           go-version: 1.18
-      - name: Run GitHub tests
+      - name: Build
         run: |
-          GITHUB_TOKEN=${{ secrets.E2E_ENV_TOKEN }} go run main.go analyze --output-format json --output-file $REPORT_FILE_PATH
+          make build
+      - name: Run tests
+        run: |
+          ./legitify analyze --output-format json --output-file ${{ matrix.report_file_path }} --scm ${{ matrix.scm }}
+        env:
+          LEGITIFY_TOKEN: ${{ secrets[matrix.scm_token] }}
       - name: Run output verification
-        run: go test e2e/e2e_test.go --report_path=$REPORT_FILE_PATH
+        run: go test e2e/e2e_test.go -run ${{ matrix.test_plan }} --report_path=${{ matrix.report_file_path }}
+
       - name: Notify Slack
         uses: rtCamp/action-slack-notify@28e8b353eabda5998a2e1203aed33c5999944779
         if: failure()
@@ -31,5 +47,3 @@ jobs:
           SLACK_COLOR: ${{ job.status }}
           SLACK_MESSAGE: E2E Tests failed - ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SLACK_TITLE: "Legitify periodic E2E test failed"
-
-
