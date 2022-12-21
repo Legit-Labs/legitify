@@ -1,16 +1,14 @@
 package github
 
 import (
-	"context"
-	"github.com/Legit-Labs/legitify/internal/clients/github"
-	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 )
 
 type repositoryContext struct {
-	roles                       []permissions.Role
-	isEnterprise                bool
-	isBranchProtectionSupported bool
+	roles                         []permissions.Role
+	isEnterprise                  bool
+	isBranchProtectionSupported   bool
+	hasBranchProtectionPermission bool
 }
 
 func (rc *repositoryContext) Premium() bool {
@@ -25,45 +23,19 @@ func (rc *repositoryContext) IsBranchProtectionSupported() bool {
 	return rc.isBranchProtectionSupported
 }
 
-type repositoryContextFactory struct {
-	ctx    context.Context
-	client *github.Client
+func (rc *repositoryContext) SetHasBranchProtectionPermission(value bool) {
+	rc.hasBranchProtectionPermission = value
 }
 
-func newRepositoryContextFactory(ctx context.Context, client *github.Client) *repositoryContextFactory {
-	return &repositoryContextFactory{
-		ctx:    ctx,
-		client: client,
-	}
+func (rc *repositoryContext) HasBranchProtectionPermission() bool {
+	return rc.hasBranchProtectionPermission
 }
 
-func (rcf *repositoryContextFactory) newRepositoryContextForOrganization(login string, viewerCanAdminister *bool, repository *githubcollected.GitHubQLRepository) (*repositoryContext, error) {
-	org, _, err := rcf.client.Client().Organizations.Get(rcf.ctx, login)
-	if err != nil {
-		return nil, err
-	}
-	role := permissions.GetOrgRole(viewerCanAdminister)
-	extendedOrg := githubcollected.NewExtendedOrg(org, role)
-	return rcf.newRepositoryContextForExtendedOrg(&extendedOrg, repository), nil
-}
-
-func (rcf *repositoryContextFactory) newRepositoryContextForExtendedOrg(org *githubcollected.ExtendedOrg, repository *githubcollected.GitHubQLRepository) *repositoryContext {
+func newRepositoryContext(roles []permissions.RepositoryRole, isBranchProtectionSupported bool, isEnterprise bool, hasBranchProtectionPermission bool) *repositoryContext {
 	return &repositoryContext{
-		roles:                       []permissions.Role{org.Role, repository.ViewerPermission},
-		isEnterprise:                org.IsEnterprise(),
-		isBranchProtectionSupported: org.IsEnterprise() || !repository.IsPrivate,
+		roles:                         roles,
+		isEnterprise:                  isEnterprise,
+		isBranchProtectionSupported:   isBranchProtectionSupported,
+		hasBranchProtectionPermission: hasBranchProtectionPermission,
 	}
-}
-
-func (rcf *repositoryContextFactory) newRepositoryContextForUser(login string, repository *githubcollected.GitHubQLRepository) (*repositoryContext, error) {
-	user, _, err := rcf.client.Client().Users.Get(rcf.ctx, login)
-	if err != nil {
-		return nil, err
-	}
-
-	return &repositoryContext{
-		roles:                       []permissions.Role{repository.ViewerPermission},
-		isEnterprise:                false,
-		isBranchProtectionSupported: !repository.IsPrivate || (user.Plan != nil && *user.Plan.Name != "free"),
-	}, nil
 }

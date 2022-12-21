@@ -25,7 +25,6 @@ type repositoryCollector struct {
 	Client           *ghclient.Client
 	Context          context.Context
 	scorecardEnabled bool
-	contextFactory   *repositoryContextFactory
 }
 
 func NewRepositoryCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
@@ -33,7 +32,6 @@ func NewRepositoryCollector(ctx context.Context, client *ghclient.Client) collec
 		Client:           client,
 		Context:          ctx,
 		scorecardEnabled: context_utils.GetScorecardEnabled(ctx),
-		contextFactory:   newRepositoryContextFactory(ctx, client),
 	}
 	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
@@ -132,22 +130,29 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 					return
 				}
 
-				var ctx *repositoryContext
+				var collectionContext *repositoryContext
+
 				if query.RepositoryOwner.Organization.ViewerCanAdminister != nil {
-					ctx, err = rc.contextFactory.newRepositoryContextForOrganization(repo.Owner,
-						query.RepositoryOwner.Organization.ViewerCanAdminister, &query.RepositoryOwner.Repository)
+
+					org, err := rc.Client.Organization(repo.Owner)
+					if err != nil {
+						log.Println(err.Error())
+						return
+					}
+
+					hasBp := hasBranchProtection(org, query.RepositoryOwner.Repository.IsPrivate)
+					collectionContext = newRepositoryContext([]permissions.Role{org.Role, query.RepositoryOwner.Repository.ViewerPermission},
+						hasBp, org.IsEnterprise(), false)
 				} else {
-					ctx, err = rc.contextFactory.newRepositoryContextForUser(repo.Owner, &query.RepositoryOwner.Repository)
+					hasBp := rc.hasBranchProtectionForUser(repo.Owner, query.RepositoryOwner.Repository.IsPrivate)
+					collectionContext = newRepositoryContext([]permissions.Role{query.RepositoryOwner.Repository.ViewerPermission},
+						hasBp, false, false)
 				}
 
-				if err != nil {
-					log.Println(err.Error())
-					return
-				}
-
-				rc.collectRepository(&query.RepositoryOwner.Repository, repo.Owner, ctx)
+				rc.collectRepository(&query.RepositoryOwner.Repository, repo.Owner, collectionContext)
 			})
 		}
+
 		gw.Wait()
 	})
 }
@@ -205,7 +210,9 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 			for i := range nodes {
 				node := &(nodes[i])
 				extraGw.Do(func() {
-					rc.collectRepository(node, org.Name(), rc.contextFactory.newRepositoryContextForExtendedOrg(org, node))
+					collectionContext := newRepositoryContext([]permissions.Role{org.Role, node.ViewerPermission},
+						hasBranchProtection(org, node.IsPrivate), org.IsEnterprise(), false)
+					rc.collectRepository(node, org.Name(), collectionContext)
 				})
 			}
 			extraGw.Wait()
@@ -222,18 +229,19 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 	return nil
 }
 
-func (rc *repositoryCollector) collectRepository(repository *ghcollected.GitHubQLRepository, login string, context *repositoryContext) {
-	repo := rc.collectExtraData(login, repository, context)
+func (rc *repositoryCollector) collectRepository(repository *ghcollected.GitHubQLRepository, login string, collectionContext *repositoryContext) {
+	repo := rc.collectExtraData(login, repository, collectionContext.isBranchProtectionSupported)
 	entityName := collectors.FullRepoName(login, repo.Repository.Name)
 	missingPermissions := rc.checkMissingPermissions(repo, entityName)
 	rc.IssueMissingPermissions(missingPermissions...)
-	rc.CollectDataWithContext(repo, repo.Repository.Url, context)
+	collectionContext.SetHasBranchProtectionPermission(!repo.NoBranchProtectionPermission)
+	rc.CollectDataWithContext(repo, repo.Repository.Url, collectionContext)
 	rc.CollectionChangeByOne()
 }
 
 func (rc *repositoryCollector) collectExtraData(login string,
 	repository *ghcollected.GitHubQLRepository,
-	context *repositoryContext) ghcollected.Repository {
+	isBranchProtectionSupported bool) ghcollected.Repository {
 	var err error
 	repo := ghcollected.Repository{
 		Repository: repository,
@@ -265,7 +273,7 @@ func (rc *repositoryCollector) collectExtraData(login string,
 		log.Printf("error getting repository dependency manifests for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
 	}
 
-	if context.IsBranchProtectionSupported() {
+	if isBranchProtectionSupported {
 		repo, err = rc.fixBranchProtectionInfo(repo, login)
 		if err != nil {
 			// If we can't get branch protection info, rego will ignore it (as nil)
@@ -286,6 +294,23 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	}
 
 	return repo
+}
+
+func hasBranchProtection(org *ghcollected.ExtendedOrg, isPrivateRepository bool) bool {
+	return org.IsEnterprise() || !isPrivateRepository
+}
+
+func (rc *repositoryCollector) hasBranchProtectionForUser(userLogin string, isPrivateRepository bool) bool {
+	if isPrivateRepository {
+		return true
+	}
+
+	user, _, err := rc.Client.Client().Users.Get(rc.Context, userLogin)
+	if err != nil {
+		return false
+	}
+
+	return user.Plan != nil && *user.Plan.Name != "free"
 }
 
 func (rc *repositoryCollector) withDependencyGraphManifestsCount(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
@@ -394,7 +419,7 @@ func (rc *repositoryCollector) fixBranchProtectionInfo(repository ghcollected.Re
 	}
 
 	isNoPermErr := func(err error) bool {
-		// Inspired by github.isBranchNotProtected()
+		// Inspired by gitHub.isBranchNotProtected()
 		const noPermMessage = "Not Found"
 		errorResponse, ok := err.(*github.ErrorResponse)
 		return ok && errorResponse.Message == noPermMessage
