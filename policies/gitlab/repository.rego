@@ -132,3 +132,19 @@ default no_conversation_resolution = false
 no_conversation_resolution = true {
     input.only_allow_merge_if_all_discussions_are_resolved == false
 }
+
+# METADATA
+# scope: rule
+# title: Unsinged Commits Are Not Allowed
+# description: Require all commits to be signed and verified
+# custom:
+#   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Push Rules" tab. Set the "Reject unsigned commits" checkbox ]
+#   severity: LOW
+default no_signed_commits = false
+no_signed_commits {
+    input.push_rules.reject_unsigned_commits == false
+}
+
+no_signed_commits {
+    is_null(input.push_rules)
+}
