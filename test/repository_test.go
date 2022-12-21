@@ -366,7 +366,7 @@ func TestGitlabRepositoryNotMaintained(t *testing.T) {
 	archivedFewYearsTime := nowTime.AddDate(-10, 0, 0)
 	// Creating a mock for a project, last active more than 3 month ago.
 	archived5MonthTime := nowTime.AddDate(0, -5, 0)
-	falseCase := []*gitlab2.Project{&gitlab2.Project{Archived: false, LastActivityAt: &nowTime}}
+	falseCase := []*gitlab2.Project{{Archived: false, LastActivityAt: &nowTime}}
 	trueCase := []*gitlab2.Project{
 		{Public: false, LastActivityAt: &archivedFewYearsTime},
 		{Public: false, LastActivityAt: &archived5MonthTime},
@@ -377,8 +377,8 @@ func TestGitlabRepositoryNotMaintained(t *testing.T) {
 	}
 
 	for _, expectFailure := range bools {
-		for _, tastCase := range options[expectFailure] {
-			repositoryTestTemplate(t, name, makeMockData(tastCase), testedPolicyName, expectFailure, scm_type.GitLab)
+		for _, testCase := range options[expectFailure] {
+			repositoryTestTemplate(t, name, makeMockData(testCase), testedPolicyName, expectFailure, scm_type.GitLab)
 		}
 	}
 }
@@ -483,5 +483,32 @@ func TestGitlabResolvedThreads(t *testing.T) {
 	for _, expectFailure := range bools {
 		flag := options[expectFailure]
 		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabRepositoryMissingSignedCommitsVerifications(t *testing.T) {
+	name := "Unsigned Commits Are Not Allowed"
+	testedPolicyName := "no_signed_commits"
+
+	makeMockData := func(flag *gitlab2.ProjectPushRules) gitlabcollected.Repository {
+		return gitlabcollected.Repository{PushRules: flag}
+	}
+
+	falseCase := []*gitlab2.ProjectPushRules{
+		{RejectUnsignedCommits: true},
+	}
+	trueCase := []*gitlab2.ProjectPushRules{
+		{RejectUnsignedCommits: false},
+		nil,
+	}
+	options := map[bool][]*gitlab2.ProjectPushRules{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		for _, testCase := range options[expectFailure] {
+			repositoryTestTemplate(t, name, makeMockData(testCase), testedPolicyName, expectFailure, scm_type.GitLab)
+		}
 	}
 }
