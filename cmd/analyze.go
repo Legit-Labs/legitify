@@ -99,12 +99,12 @@ func validateAnalyzeArgs() error {
 
 type setupFn func(analyzeArgs *args) (*analyzeExecutor, error)
 
-func getSetupFunction(scmType string) (setupFn, error) {
-	switch scmType {
+func setup(analyzeArgs *args) (*analyzeExecutor, error) {
+	switch analyzeArgs.ScmType {
 	case scm_type.GitHub:
-		return setupGitHub, nil
+		return setupGitHub(analyzeArgs)
 	case scm_type.GitLab:
-		return setupGitLab, nil
+		return setupGitLab(analyzeArgs)
 	default:
 		// shouldn't happen since scm type is validated before
 		return nil, fmt.Errorf("invalid scm type %s", analyzeArgs.ScmType)
@@ -145,12 +145,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	setupFn, err := getSetupFunction(analyzeArgs.ScmType)
-	if err != nil {
-		return err
-	}
-
-	executor, err := setupFn(&analyzeArgs)
+	executor, err := setup(&analyzeArgs)
 	if err != nil {
 		return err
 	}
