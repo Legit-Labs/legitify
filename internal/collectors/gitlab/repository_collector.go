@@ -197,18 +197,14 @@ func (rc *repositoryCollector) extendProjectWithApprovalConfiguration(project gi
 }
 
 func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	// Initialize minimum required approvals to 0
 	minRequiredApprovals := 0
 
-	// Iterate through the merge request approval rules
 	for _, rule := range project.ApprovalRules {
-		// If the rule requires more approvals than the current minimum required approvals, update the minimum required approvals
 		if rule.ApprovalsRequired > minRequiredApprovals {
 			minRequiredApprovals = rule.ApprovalsRequired
 		}
 	}
 
-	// Set the minimum required approvals for the project
 	project.MinimumRequiredApprovals = minRequiredApprovals
 	return project, nil
 }
@@ -257,18 +253,16 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 		rc.extendProjectWithApprovalConfiguration,
 		rc.extendProjectWithMinimumRequiredApprovals,
 	}
-	completedWithoutErrors := true
 	var err error
 	for _, f := range extensionFunctions {
 		proj, err = f(proj)
 		if err != nil {
-			fmt.Println("Error occurred:", err)
-			completedWithoutErrors = false
+			fmt.Printf("Project '%s' collection failed with error:%s", proj.Name(), err)
 			break
 		}
 	}
 
-	if completedWithoutErrors {
+	if err == nil {
 		newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
 		rc.CollectDataWithContext(proj, proj.Links.Self, &newContext)
 	}
