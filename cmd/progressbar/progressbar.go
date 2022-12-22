@@ -1,16 +1,14 @@
 package progressbar
 
 import (
-	"fmt"
 	"io"
 	"log"
-	"os"
 	"sync"
 
-	"github.com/Legit-Labs/legitify/cmd/tty"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
+	"github.com/Legit-Labs/legitify/internal/screen"
 	"github.com/vbauerster/mpb"
 	"github.com/vbauerster/mpb/decor"
 )
@@ -23,7 +21,7 @@ type ProgressBar struct {
 func NewProgressBar(md map[namespace.Namespace]collectors.Metadata) *ProgressBar {
 	return &ProgressBar{
 		metadata: md,
-		disabled: !tty.IsStderrTty(),
+		disabled: !screen.IsTty(),
 	}
 }
 
@@ -45,7 +43,7 @@ func (pb *ProgressBar) createBars() (*mpb.Progress, map[string]*mpb.Bar) {
 	if pb.disabled {
 		outputFile = io.Discard
 	} else {
-		outputFile = os.Stderr
+		outputFile = screen.Writer()
 	}
 
 	bars := make(map[string]*mpb.Bar)
@@ -64,7 +62,7 @@ func (pb *ProgressBar) createBars() (*mpb.Progress, map[string]*mpb.Bar) {
 
 func (pb *ProgressBar) Run(progress <-chan collectors.CollectionMetric) group_waiter.Waitable {
 	if pb.disabled {
-		fmt.Fprintf(os.Stderr, "Progress bar is disabled because stderr is not a terminal. Starting collection...\n")
+		screen.Printf("Progress bar is disabled because stderr is not a terminal. Starting collection...\n")
 	}
 
 	p, bars := pb.createBars()
@@ -81,7 +79,7 @@ func (pb *ProgressBar) Run(progress <-chan collectors.CollectionMetric) group_wa
 				if data.Finished {
 					val.SetTotal(int64(pb.metadata[displayName].TotalEntities), true)
 					if pb.disabled {
-						fmt.Fprintf(os.Stderr, "Finished collecting %s\n", displayName)
+						screen.Printf("Finished collecting %s\n", displayName)
 					}
 				}
 			} else {

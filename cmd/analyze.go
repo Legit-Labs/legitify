@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/common/scm_type"
-	"log"
 	"os"
 	"strings"
+
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
+	"github.com/Legit-Labs/legitify/internal/screen"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 
@@ -96,6 +97,20 @@ func validateAnalyzeArgs() error {
 	return nil
 }
 
+type setupFn func(analyzeArgs *args) (*analyzeExecutor, error)
+
+func getSetupFunction(scmType string) (setupFn, error) {
+	switch scmType {
+	case scm_type.GitHub:
+		return setupGitHub, nil
+	case scm_type.GitLab:
+		return setupGitLab, nil
+	default:
+		// shouldn't happen since scm type is validated before
+		return nil, fmt.Errorf("invalid scm type %s", analyzeArgs.ScmType)
+	}
+}
+
 func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 	analyzeArgs.ApplyEnvVars()
 
@@ -109,9 +124,16 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	if err = setErrorFile(analyzeArgs.ErrorFile); err != nil {
+	errFile, err := setErrorFile(analyzeArgs.ErrorFile)
+	if err != nil {
 		return err
 	}
+	defer func() {
+		_ = errFile.Sync()
+		if stat, err := errFile.Stat(); err != nil || stat.Size() > 0 {
+			screen.Printf("Some errors raised during the execution. Check %s for more details", errFile.Name())
+		}
+	}()
 
 	err = setOutputFile(analyzeArgs.OutputFile)
 	if err != nil {
@@ -123,19 +145,12 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	stdErrLog := log.New(os.Stderr, "", 0)
-
-	var executor = &analyzeExecutor{}
-
-	if analyzeArgs.ScmType == scm_type.GitHub {
-		executor, err = setupGitHub(&analyzeArgs, stdErrLog)
-	} else if analyzeArgs.ScmType == scm_type.GitLab {
-		executor, err = setupGitLab(&analyzeArgs, stdErrLog)
-	} else {
-		// shouldn't happen since scm type is validated before
-		return fmt.Errorf("invalid scm type %s", analyzeArgs.ScmType)
+	setupFn, err := getSetupFunction(analyzeArgs.ScmType)
+	if err != nil {
+		return err
 	}
 
+	executor, err := setupFn(&analyzeArgs)
 	if err != nil {
 		return err
 	}

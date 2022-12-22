@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/common/types"
 	"sort"
+
+	"github.com/Legit-Labs/legitify/internal/common/types"
 
 	"github.com/spf13/cobra"
 
@@ -43,7 +44,7 @@ func executeListReposCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	if err = setErrorFile(listReposArgs.ErrorFile); err != nil {
+	if _, err = setErrorFile(listReposArgs.ErrorFile); err != nil {
 		return err
 	}
 

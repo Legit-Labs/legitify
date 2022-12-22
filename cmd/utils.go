@@ -5,14 +5,14 @@ import (
 	"os"
 )
 
-func setErrorFile(path string) error {
+func setErrorFile(path string) (*os.File, error) {
 	file, err := openForWrite(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	log.SetOutput(file)
-	return nil
+	return file, err
 }
 
 func openForWrite(path string) (*os.File, error) {

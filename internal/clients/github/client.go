@@ -4,14 +4,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/clients/github/types"
-	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
-	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/Legit-Labs/legitify/internal/clients/github/types"
+	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
+	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
+	"github.com/Legit-Labs/legitify/internal/screen"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -75,11 +77,13 @@ func NewClient(ctx context.Context, token string, githubEndpoint string, org []s
 		}
 	}
 
+	var instanceTypeMsg string
 	if client.IsGithubCloud() {
-		log.Printf("Using Github Cloud")
+		instanceTypeMsg = "Using Github Cloud"
 	} else {
-		log.Printf("Using Github Enterprise Endpoint: %s\n\n", client.serverUrl)
+		instanceTypeMsg = fmt.Sprintf("Using Github Enterprise Endpoint: %s\n\n", client.serverUrl)
 	}
+	screen.Printf("%s\n", instanceTypeMsg)
 
 	return client, nil
 }
