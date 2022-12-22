@@ -24,8 +24,8 @@ func Init(writer io.Writer, isTty bool) {
 	singletone.isTty = isTty
 }
 
-func Printf(fmt string, args ...interface{}) {
-	singletone.log.Printf(fmt, args...)
+func Printf(format string, args ...interface{}) {
+	singletone.log.Printf(format, args...)
 }
 
 func Writer() io.Writer {

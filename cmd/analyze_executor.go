@@ -7,6 +7,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/collectors/collectors_manager"
 	"github.com/Legit-Labs/legitify/internal/enricher"
+	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/Legit-Labs/legitify/internal/outputer"
 	"github.com/Legit-Labs/legitify/internal/screen"
 )
@@ -47,6 +48,8 @@ func (r *analyzeExecutor) Run() error {
 
 	// Wait for output to be digested
 	outputWaiter.Wait()
+
+	errlog.FlushAll()
 
 	return r.out.Output(os.Stdout)
 }

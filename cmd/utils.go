@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"log"
 	"os"
+
+	"github.com/Legit-Labs/legitify/internal/errlog"
 )
 
 func setErrorFile(path string) (*os.File, error) {
@@ -11,7 +12,7 @@ func setErrorFile(path string) (*os.File, error) {
 		return nil, err
 	}
 
-	log.SetOutput(file)
+	errlog.SetOutput(file)
 	return file, err
 }
 

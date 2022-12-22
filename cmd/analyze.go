@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
+	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/Legit-Labs/legitify/internal/screen"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
@@ -129,8 +130,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 	defer func() {
-		_ = errFile.Sync()
-		if stat, err := errFile.Stat(); err != nil || stat.Size() > 0 {
+		if errlog.HadErrors() {
 			screen.Printf("Some errors raised during the execution. Check %s for more details", errFile.Name())
 		}
 	}()
