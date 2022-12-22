@@ -119,6 +119,7 @@ func policiesSortByNamespaceLess(i, j *orderedmap.Pair) bool {
 		namespace.Actions:      1,
 		namespace.Member:       2,
 		namespace.Repository:   3,
+		namespace.RunnerGroup:  4,
 	}
 
 	iNamespace := i.Value().(OutputData).PolicyInfo.Namespace
