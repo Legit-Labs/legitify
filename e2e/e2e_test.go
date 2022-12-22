@@ -26,19 +26,38 @@ func AssertionLoop(t *testing.T, tests []testCase) {
 	for _, test := range tests {
 		t.Logf("Testing: %s", test.path)
 		testFormattedPath := test.path + "->violations"
-		res := jq.From(testFormattedPath).Where("aux->entityName", "=", test.passedEntity).Where("Status", "=", "PASSED").Count()
 
-		if res != 1 {
-			t.Logf("Failed on test %s, Entity %s did not pass", test.path, test.passedEntity)
-			t.Fail()
+		if test.passedEntity != "" {
+			res := jq.From(testFormattedPath).Where("aux->entityName", "=", test.passedEntity).Where("Status", "=", "PASSED").Count()
+
+			if res != 1 {
+				t.Logf("Failed on test %s, Entity %s did not pass", test.path, test.passedEntity)
+				t.Fail()
+			}
 		}
+
 		jq.Reset()
-		res = jq.From(testFormattedPath).Where("aux->entityName", "=", test.failedEntity).Where("Status", "=", "FAILED").Count()
 
-		if res != 1 {
-			t.Logf("Failed on test: %s, Entity: %s did not failed", test.path, test.failedEntity)
-			t.Fail()
+		if test.failedEntity != "" {
+			res := jq.From(testFormattedPath).Where("aux->entityName", "=", test.failedEntity).Where("Status", "=", "FAILED").Count()
+
+			if res != 1 {
+				t.Logf("Failed on test: %s, Entity: %s did not failed", test.path, test.failedEntity)
+				t.Fail()
+			}
 		}
+
+		jq.Reset()
+
+		if test.skippedEntity != "" {
+			res := jq.From(testFormattedPath).Where("aux->entityName", "=", test.skippedEntity).Where("Status", "=", "SKIPPED").Count()
+
+			if res != 1 {
+				t.Logf("Failed on test: %s, Entity: %s did not skip", test.path, test.skippedEntity)
+				t.Fail()
+			}
+		}
+
 		jq.Reset()
 	}
 }
@@ -70,7 +89,14 @@ func TestGitLab(t *testing.T) {
 			failedEntity: "failed_repo",
 			passedEntity: "passed_repo",
 		},
+		{
+			path:          "data.member.two_factor_authentication_is_disabled_for_a_collaborator",
+			skippedEntity: "https://gitlab.com/legitify-test",
+		},
+		{
+			path:          "data.member.two_factor_authentication_is_disabled_for_an_external_collaborator",
+			skippedEntity: "https://gitlab.com/legitify-test",
+		},
 	}
 	AssertionLoop(t, tests)
-
 }
