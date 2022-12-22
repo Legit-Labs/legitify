@@ -17,7 +17,7 @@ jobs:
             report_file_path: /tmp/gh_out.json
             scm: github
             test_plan: TestGitHub
-            extra: --org legitify-e2e, legitify-e2e-2
+            extra: --org legitify-e2e,legitify-e2e-2
           - scm_token: E2E_ENV_TOKEN_GITLAB
             report_file_path: /tmp/gl_out.json
             scm: gitlab
