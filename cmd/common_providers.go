@@ -60,5 +60,7 @@ func provideContext(client Client, logger *log.Logger) (context.Context, error) 
 		logger.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
 	}
 
+	ctx = context_utils.NewContextWithIsCloud(ctx, analyzeArgs.Endpoint == "")
+
 	return context_utils.NewContextWithTokenScopes(ctx, client.Scopes()), nil
 }

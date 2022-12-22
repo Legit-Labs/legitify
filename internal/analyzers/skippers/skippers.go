@@ -34,6 +34,9 @@ func NewSkipper(ctx context.Context) Skipper {
 				}
 				return repositoryContext.HasBranchProtectionPermission()
 			},
+			"enterprise": func(_ collectors.CollectedData) bool {
+				return !context_utils.GetIsCloud(ctx)
+			},
 		},
 	}
 }
