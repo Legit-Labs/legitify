@@ -14,11 +14,12 @@ import (
 )
 
 func provideGenericClient(args *args) (Client, error) {
-	if args.ScmType == scm_type.GitHub {
+	switch args.ScmType {
+	case scm_type.GitHub:
 		return provideGitHubClient(args)
-	} else if args.ScmType == scm_type.GitLab {
+	case scm_type.GitLab:
 		return provideGitLabClient(args)
-	} else {
+	default:
 		return nil, fmt.Errorf("invalid scm type")
 	}
 }
