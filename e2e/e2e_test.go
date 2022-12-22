@@ -153,6 +153,21 @@ func TestGitLab(t *testing.T) {
 			failedEntity: "failed_repo",
 			passedEntity: "passed_repo",
 		},
+		{
+			path:         "data.repository.repository_require_code_owner_reviews_policy",
+			failedEntity: "failed_repo",
+			passedEntity: "passed_repo",
+		},
+		{
+			path:         "data.repository.repository_allows_committer_approvals_policy",
+			failedEntity: "failed_repo",
+			passedEntity: "passed_repo",
+		},
+		{
+			path:         "data.repository.repository_dismiss_stale_reviews",
+			failedEntity: "failed_repo",
+			passedEntity: "passed_repo",
+		},
 	}
 	AssertionLoop(t, tests)
 

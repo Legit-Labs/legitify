@@ -95,6 +95,25 @@ missing_default_branch_protection_force_push {
 
 # METADATA
 # scope: rule
+# title: Code review is not limited to code-owners only
+# description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the repository.
+# custom:
+#   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Check the "Code owner approval"]
+#   severity: LOW
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+default repository_require_code_owner_reviews_policy = false
+repository_require_code_owner_reviews_policy{
+    missing_default_branch_protection
+}
+repository_require_code_owner_reviews_policy {
+    default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
+    rules_allow_force_push := [rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required == false]
+    count(rules_allow_force_push) > 0
+}
+
+# METADATA
+# scope: rule
 # title: Webhook Configured Without SSL Verification
 # description: Webhooks that are not configured with SSL verification enabled could expose your sofware to man in the middle attacks (MITM).
 # custom:
@@ -206,3 +225,28 @@ repository_allows_overriding_approvers {
     input.approval_configuration.disable_overriding_approvers_per_merge_request == false
 }
 
+# METADATA
+# scope: rule
+# title: Repository Allows Committer Approvals Policy
+# description: The repository allows merge request contributors (that aren't the merge request author), to approve the merge request. To ensure merge request review is done objectively, it is recommended to toggle this option off.
+# custom:
+#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Prevent approvals by users who add commits", Click "Save Changes"]
+#   severity: LOW
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+default repository_allows_committer_approvals_policy = false
+repository_allows_committer_approvals_policy {
+    input.approval_configuration.merge_requests_disable_committers_approval == false
+}
+
+# METADATA
+# scope: rule
+# title: Repository Dismiss Stale Reviews
+# description: New code changes after approval are not required to be re-approved
+# custom:
+#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Remove all approvals", Click "Save Changes"]
+#   severity: LOW
+default repository_dismiss_stale_reviews = false
+repository_dismiss_stale_reviews {
+    input.approval_configuration.reset_approvals_on_push == false
+}
