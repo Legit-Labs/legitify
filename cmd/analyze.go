@@ -98,8 +98,6 @@ func validateAnalyzeArgs() error {
 	return nil
 }
 
-type setupFn func(analyzeArgs *args) (*analyzeExecutor, error)
-
 func setup(analyzeArgs *args) (*analyzeExecutor, error) {
 	switch analyzeArgs.ScmType {
 	case scm_type.GitHub:
