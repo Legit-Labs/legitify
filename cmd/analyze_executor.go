@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"log"
+	"os"
+
 	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/collectors/collectors_manager"
 	"github.com/Legit-Labs/legitify/internal/enricher"
 	"github.com/Legit-Labs/legitify/internal/outputer"
-	"log"
-	"os"
 )
 
 type analyzeExecutor struct {
