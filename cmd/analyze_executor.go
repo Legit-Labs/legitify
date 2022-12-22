@@ -32,6 +32,8 @@ func initializeAnalyzeExecutor(manager collectors_manager.CollectorManager,
 }
 
 func (r *analyzeExecutor) Run() error {
+	defer errlog.FlushAll()
+
 	screen.Printf("Gathering collection metadata...")
 	collectionMetadata := r.manager.CollectMetadata()
 	progressBar := progressbar.NewProgressBar(collectionMetadata)
@@ -48,8 +50,6 @@ func (r *analyzeExecutor) Run() error {
 
 	// Wait for output to be digested
 	outputWaiter.Wait()
-
-	errlog.FlushAll()
 
 	return r.out.Output(os.Stdout)
 }
