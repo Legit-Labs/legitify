@@ -68,6 +68,7 @@ func (m *manager) Collect() CollectorChannels {
 
 		gw := group_waiter.New()
 		for _, c := range m.collectors {
+			c := c
 			collectionChannels := c.Collect()
 
 			gw.Do(func() {
