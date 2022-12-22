@@ -40,6 +40,12 @@ jobs:
       - name: Run output verification
         run: go test ./e2e/... -run ${{ matrix.test_plan }} --report_path=${{ matrix.report_file_path }}
 
+      - name: Upload error log
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb
+        with:
+          name: error-log-${{ matrix.scm }}
+          path: error.log
+
       - name: Notify Slack
         uses: rtCamp/action-slack-notify@28e8b353eabda5998a2e1203aed33c5999944779
         if: failure()
