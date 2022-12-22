@@ -15,13 +15,13 @@ import (
 
 type ProgressBar struct {
 	metadata map[namespace.Namespace]collectors.Metadata
-	disabled bool
+	enabled  bool
 }
 
 func NewProgressBar(md map[namespace.Namespace]collectors.Metadata) *ProgressBar {
 	return &ProgressBar{
 		metadata: md,
-		disabled: !screen.IsTty(),
+		enabled:  screen.IsTty(),
 	}
 }
 
@@ -40,10 +40,10 @@ func createBar(progress *mpb.Progress, totalCount int, displayName string) *mpb.
 func (pb *ProgressBar) createBars() (*mpb.Progress, map[string]*mpb.Bar) {
 	var wg sync.WaitGroup
 	var outputFile io.Writer
-	if pb.disabled {
-		outputFile = io.Discard
-	} else {
+	if pb.enabled {
 		outputFile = screen.Writer()
+	} else {
+		outputFile = io.Discard
 	}
 
 	bars := make(map[string]*mpb.Bar)
@@ -61,7 +61,7 @@ func (pb *ProgressBar) createBars() (*mpb.Progress, map[string]*mpb.Bar) {
 }
 
 func (pb *ProgressBar) Run(progress <-chan collectors.CollectionMetric) group_waiter.Waitable {
-	if pb.disabled {
+	if !pb.enabled {
 		screen.Printf("Progress bar is disabled because stderr is not a terminal. Starting collection...\n")
 	}
 
@@ -78,7 +78,7 @@ func (pb *ProgressBar) Run(progress <-chan collectors.CollectionMetric) group_wa
 
 				if data.Finished {
 					val.SetTotal(int64(pb.metadata[displayName].TotalEntities), true)
-					if pb.disabled {
+					if !pb.enabled {
 						screen.Printf("Finished collecting %s\n", displayName)
 					}
 				}
