@@ -160,7 +160,7 @@ func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collecte
 }
 
 func (rc *repositoryCollector) extendProjectWithPushRules(project gitlab_collected.Repository) gitlab_collected.Repository {
-	rules, _, err := rc.Client.Client().Projects.GetProjectPushRules(project.ID)
+	rules, _, err := rc.Client.Client().Projects.GetProjectPushRules(int(project.ID()))
 	if err != nil {
 		log.Printf("failed to get project push rule %s", err)
 		return project
@@ -171,7 +171,7 @@ func (rc *repositoryCollector) extendProjectWithPushRules(project gitlab_collect
 }
 
 func (rc *repositoryCollector) extendProjectWithMergeRequestApprovalRules(project gitlab_collected.Repository) gitlab_collected.Repository {
-	rules, _, err := rc.Client.Client().Projects.GetProjectApprovalRules(project.ID)
+	rules, _, err := rc.Client.Client().Projects.GetProjectApprovalRules(int(project.ID()))
 	if err != nil {
 		log.Printf("failed to get project merge request approval rules %s", err)
 		return project
@@ -182,7 +182,7 @@ func (rc *repositoryCollector) extendProjectWithMergeRequestApprovalRules(projec
 }
 
 func (rc *repositoryCollector) extendProjectWithApprovalConfiguration(project gitlab_collected.Repository) gitlab_collected.Repository {
-	config, _, err := rc.Client.Client().Projects.GetApprovalConfiguration(project.ID)
+	config, _, err := rc.Client.Client().Projects.GetApprovalConfiguration(int(project.ID()))
 	if err != nil {
 		log.Printf("failed to get project approval configuration %s", err)
 		return project
@@ -205,7 +205,7 @@ func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project
 	}
 
 	// Set the minimum required approvals for the project
-	project.DefaultBranchMinimumRequiredApprovals = minRequiredApprovals
+	project.MinimumRequiredApprovals = minRequiredApprovals
 	return project
 }
 

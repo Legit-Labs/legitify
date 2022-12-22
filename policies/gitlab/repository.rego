@@ -161,14 +161,6 @@ no_signed_commits {
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_not_required = false
 code_review_not_required {
-	missing_default_branch_protection
-}
-
-code_review_not_required {
-	is_null(input.repository.default_branch.branch_protection_rule.required_approving_review_count)
-}
-
-code_review_not_required {
     input.minimum_required_approvals < 1
 }
 
@@ -183,8 +175,34 @@ code_review_not_required {
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_by_two_members_not_required = false
 code_review_by_two_members_not_required {
-	missing_default_branch_protection
-}
-code_review_by_two_members_not_required {
     input.minimum_required_approvals < 2
 }
+
+# METADATA
+# scope: rule
+# title: Repository Allows Review Requester To Approve Their Own Request
+# description: A pull request owner can approve their own request. To comply with separation of duties and enforce secure code practices, the repository should prohibit pull request owners from approving their own changes.
+# custom:
+#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Prevent approval by author", Click "Save Changes"]
+#   severity: MEDIUM
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+default repository_allows_review_requester_to_approve_their_own_request = false
+repository_allows_review_requester_to_approve_their_own_request {
+    input.approval_configuration.merge_requests_author_approval == true
+}
+
+# METADATA
+# scope: rule
+# title: Merge request authors may override the approvers list
+# description: The repository allows all merge request authors to freely edit the list of required approvers. To enforce code review only by authorized personnel, the option to override the list of valid approvers for the merge request must be toggled off.
+# custom:
+#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Prevent editing approval rules in merge requests", Click "Save Changes"]
+#   severity: MEDIUM
+#   threat:
+#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+default repository_allows_overriding_approvers = false
+repository_allows_overriding_approvers {
+    input.approval_configuration.disable_overriding_approvers_per_merge_request == false
+}
+

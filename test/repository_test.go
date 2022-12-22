@@ -512,3 +512,85 @@ func TestGitlabRepositoryMissingSignedCommitsVerifications(t *testing.T) {
 		}
 	}
 }
+
+func TestGitlabRepositoryRequiredReview(t *testing.T) {
+	name := "Project Doesn't Require Code Review"
+	testedPolicyName := "code_review_not_required"
+
+	makeMockData := func(flag int) gitlabcollected.Repository {
+		return gitlabcollected.Repository{MinimumRequiredApprovals: flag}
+	}
+
+	falseCase := []int{1, 2}
+	trueCase := []int{0}
+	options := map[bool][]int{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		for _, testCase := range options[expectFailure] {
+			repositoryTestTemplate(t, name, makeMockData(testCase), testedPolicyName, expectFailure, scm_type.GitLab)
+		}
+	}
+}
+
+func TestGitlabRepositoryMinimum2RequiredReview(t *testing.T) {
+	name := "Project Doesn't Require Code Review By At Least Two Reviewers"
+	testedPolicyName := "code_review_by_two_members_not_required"
+
+	makeMockData := func(flag int) gitlabcollected.Repository {
+		return gitlabcollected.Repository{MinimumRequiredApprovals: flag}
+	}
+
+	falseCase := []int{2, 3}
+	trueCase := []int{0, 1}
+	options := map[bool][]int{
+		false: falseCase,
+		true:  trueCase,
+	}
+
+	for _, expectFailure := range bools {
+		for _, testCase := range options[expectFailure] {
+			repositoryTestTemplate(t, name, makeMockData(testCase), testedPolicyName, expectFailure, scm_type.GitLab)
+		}
+	}
+}
+
+func TestGitlabRepositoryAllowsReviewRequesterToApproveTheirOwnRequest(t *testing.T) {
+	name := "Repository Allows Review Requester To Approve Their Own Request"
+	testedPolicyName := "repository_allows_review_requester_to_approve_their_own_request"
+
+	makeMockData := func(flag bool) gitlabcollected.Repository {
+		return gitlabcollected.Repository{ApprovalConfiguration: &gitlab2.ProjectApprovals{MergeRequestsAuthorApproval: flag}}
+	}
+
+	options := map[bool]bool{
+		false: false,
+		true:  true,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
+
+func TestGitlabRepositoryAllowsOverridingApproversPolicy(t *testing.T) {
+	name := "Merge request authors may override the approvers list"
+	testedPolicyName := "repository_allows_overriding_approvers"
+
+	makeMockData := func(flag bool) gitlabcollected.Repository {
+		return gitlabcollected.Repository{ApprovalConfiguration: &gitlab2.ProjectApprovals{DisableOverridingApproversPerMergeRequest: flag}}
+	}
+
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}
