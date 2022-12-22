@@ -189,7 +189,13 @@ default requires_branches_up_to_date_before_merge = false
 requires_branches_up_to_date_before_merge {
 	missing_default_branch_protection
 }
+
 requires_branches_up_to_date_before_merge {
+    requires_status_checks
+}
+
+requires_branches_up_to_date_before_merge {
+    input.repository.default_branch.branch_protection_rule.requires_status_checks == true
     input.repository.default_branch.branch_protection_rule.requires_strict_status_checks == false
 }
 
@@ -227,7 +233,7 @@ code_review_not_required {
 }
 
 code_review_not_required {
-	is_null(input.repository.default_branch.branch_protection_rule.required_approving_review_count)
+	not input.repository.default_branch.branch_protection_rule.required_approving_review_count
 }
 
 code_review_not_required {
@@ -249,6 +255,11 @@ default code_review_by_two_members_not_required = false
 code_review_by_two_members_not_required {
 	missing_default_branch_protection
 }
+
+code_review_by_two_members_not_required {
+    not input.repository.default_branch.branch_protection_rule.required_approving_review_count
+}
+
 code_review_by_two_members_not_required {
     input.repository.default_branch.branch_protection_rule.required_approving_review_count < 2
 }
@@ -352,6 +363,7 @@ pushes_are_not_restricted {
 	missing_default_branch_protection
 }
 pushes_are_not_restricted {
+    code_review_not_required
     input.repository.default_branch.branch_protection_rule.restricts_pushes == false
 }
 
