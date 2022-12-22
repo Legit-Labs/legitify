@@ -206,6 +206,7 @@ func TestRepositoryBranchesUpToDate(t *testing.T) {
 	makeMockData := func(flag bool) githubcollected.Repository {
 		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
 			RequiresStrictStatusChecks: github.Bool(flag),
+			RequiresStatusChecks:       github.Bool(flag),
 		})
 	}
 	for _, flag := range bools {

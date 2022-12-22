@@ -9,78 +9,19 @@ import (
 var reportPath = flag.String("report_path", "/tmp/out.json", "legitify report output path")
 
 func TestGitHub(t *testing.T) {
-	tests := []struct {
-		path         string
-		failedEntity string
-		passedEntity string
-	}{
-		// actions tests
-		{
-			path:         "data.actions.token_default_permissions_is_read_write",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.actions.all_repositories_can_run_github_actions",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.actions.all_github_actions_are_allowed",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.actions.actions_can_approve_pull_requests",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		// runner group tests
-		{
-			path:         "data.runner_group.runner_group_can_be_used_by_public_repositories",
-			failedEntity: "test fail",
-			passedEntity: "test pass",
-		},
-		{
-			path:         "data.runner_group.runner_group_not_limited_to_selected_repositories",
-			failedEntity: "test fail",
-			passedEntity: "test pass",
-		},
-		// organization tests
-		{
-			path:         "data.organization.non_admins_can_create_public_repositories",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.organization.default_repository_permission_is_not_none",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.organization.two_factor_authentication_not_required_for_org",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.organization.organization_webhook_no_secret",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.organization.organization_webhook_doesnt_require_ssl",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
+	tests := [][]testCase{
+		testCasesGitHubOrganization,
+		testCasesGitHubActions,
+		testCasesGitHubRunnerGroup,
+		testCasesGitHubRepository,
 	}
-	AssertionLoop(t, tests)
+
+	for _, testCases := range tests {
+		AssertionLoop(t, testCases)
+	}
 }
 
-func AssertionLoop(t *testing.T, tests []struct {
-	path         string
-	failedEntity string
-	passedEntity string
-}) {
+func AssertionLoop(t *testing.T, tests []testCase) {
 	jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
 	for _, test := range tests {
 		t.Logf("Testing: %s", test.path)
@@ -103,11 +44,7 @@ func AssertionLoop(t *testing.T, tests []struct {
 }
 
 func TestGitLab(t *testing.T) {
-	tests := []struct {
-		path         string
-		failedEntity string
-		passedEntity string
-	}{
+	tests := []testCase{
 		{
 			path:         "data.organization.two_factor_authentication_not_required_for_group",
 			failedEntity: "Legitify-E2E-2",
