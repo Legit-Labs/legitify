@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab"
 	"github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/collectors"
@@ -94,7 +95,7 @@ func getRepositoryEncodedName(repo types.RepositoryWithOwner) string {
 	return repo.Owner + "/" + repo.Name
 }
 
-func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	var completeProtectedBranches []*gitlab2.ProtectedBranch
 	options := gitlab2.ListProtectedBranchesOptions{}
 
@@ -109,14 +110,15 @@ func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab
 	}, (*gitlab2.ListOptions)(&options))
 	if err != nil {
 		log.Printf("failed to list projects %s", err)
+		return project, err
 	}
 
 	extendedProject := project
 	extendedProject.ProtectedBranches = completeProtectedBranches
-	return extendedProject
+	return extendedProject, nil
 }
 
-func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	var completeMembersList []*gitlab2.ProjectMember
 	options := &gitlab2.ListProjectMembersOptions{}
 
@@ -131,14 +133,15 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 
 	if err != nil {
 		log.Printf("failed to list projects %s", err)
+		return project, err
 	}
 
 	extendedProject := project
 	extendedProject.Members = completeMembersList
-	return extendedProject
+	return extendedProject, nil
 }
 
-func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	var completeProjectWebhookList []*gitlab2.ProjectHook
 	options := gitlab2.ListProjectHooksOptions{}
 
@@ -152,47 +155,48 @@ func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collecte
 	}, (*gitlab2.ListOptions)(&options))
 	if err != nil {
 		log.Printf("failed to list project: %s webhook. error message: %s", project.Name(), err)
+		return project, err
 	}
 
 	extendedProject := project
 	extendedProject.Webhooks = completeProjectWebhookList
-	return extendedProject
+	return extendedProject, nil
 }
 
-func (rc *repositoryCollector) extendProjectWithPushRules(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithPushRules(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	rules, _, err := rc.Client.Client().Projects.GetProjectPushRules(int(project.ID()))
 	if err != nil {
 		log.Printf("failed to get project push rule %s", err)
-		return project
+		return project, err
 	}
 	extendedProject := project
 	extendedProject.PushRules = rules
-	return extendedProject
+	return extendedProject, nil
 }
 
-func (rc *repositoryCollector) extendProjectWithMergeRequestApprovalRules(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithMergeRequestApprovalRules(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	rules, _, err := rc.Client.Client().Projects.GetProjectApprovalRules(int(project.ID()))
 	if err != nil {
 		log.Printf("failed to get project merge request approval rules %s", err)
-		return project
+		return project, err
 	}
 	extendedProject := project
 	extendedProject.ApprovalRules = rules
-	return extendedProject
+	return extendedProject, nil
 }
 
-func (rc *repositoryCollector) extendProjectWithApprovalConfiguration(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithApprovalConfiguration(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	config, _, err := rc.Client.Client().Projects.GetApprovalConfiguration(int(project.ID()))
 	if err != nil {
 		log.Printf("failed to get project approval configuration %s", err)
-		return project
+		return project, err
 	}
 	extendedProject := project
 	extendedProject.ApprovalConfiguration = config
-	return extendedProject
+	return extendedProject, nil
 }
 
-func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project gitlab_collected.Repository) gitlab_collected.Repository {
+func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	// Initialize minimum required approvals to 0
 	minRequiredApprovals := 0
 
@@ -206,7 +210,7 @@ func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project
 
 	// Set the minimum required approvals for the project
 	project.MinimumRequiredApprovals = minRequiredApprovals
-	return project
+	return project, nil
 }
 
 func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
@@ -244,21 +248,29 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 	proj := gitlab_collected.Repository{
 		Project: completeProjectsList,
 	}
-	extendedProject := rc.extendProjectWithMembers(proj)
+	extensionFunctions := []func(gitlab_collected.Repository) (gitlab_collected.Repository, error){
+		rc.extendProjectWithMembers,
+		rc.extendProjectWithProtectedBranches,
+		rc.extendProjectWithWebhooks,
+		rc.extendProjectWithPushRules,
+		rc.extendProjectWithMergeRequestApprovalRules,
+		rc.extendProjectWithApprovalConfiguration,
+		rc.extendProjectWithMinimumRequiredApprovals,
+	}
+	completedWithoutErrors := true
+	var err error
+	for _, f := range extensionFunctions {
+		proj, err = f(proj)
+		if err != nil {
+			fmt.Println("Error occurred:", err)
+			completedWithoutErrors = false
+			break
+		}
+	}
 
-	extendedProject = rc.extendProjectWithProtectedBranches(extendedProject)
-
-	extendedProject = rc.extendProjectWithWebhooks(extendedProject)
-
-	extendedProject = rc.extendProjectWithPushRules(extendedProject)
-
-	extendedProject = rc.extendProjectWithMergeRequestApprovalRules(extendedProject)
-
-	extendedProject = rc.extendProjectWithApprovalConfiguration(extendedProject)
-
-	extendedProject = rc.extendProjectWithMinimumRequiredApprovals(extendedProject)
-
-	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
-	rc.CollectDataWithContext(extendedProject, extendedProject.Links.Self, &newContext)
+	if completedWithoutErrors {
+		newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
+		rc.CollectDataWithContext(proj, proj.Links.Self, &newContext)
+	}
 	rc.CollectionChangeByOne()
 }
