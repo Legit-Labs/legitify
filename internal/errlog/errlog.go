@@ -47,11 +47,15 @@ func PrereqIssueF(format string, args ...interface{}) {
 }
 
 func FlushAll() {
-	singletone.log.Printf("%s\n%s", "Missing permissions errors:", singletone.permLogs.String())
-	singletone.permLogs.Reset()
+	if singletone.permLogs.Len() > 0 {
+		singletone.log.Printf("%s\n%s", "Missing permissions errors:", singletone.permLogs.String())
+		singletone.permLogs.Reset()
+	}
 
-	singletone.log.Printf("%s\n%s", "Unmet Prerequisites errors", singletone.prereqLogs.String())
-	singletone.prereqLogs.Reset()
+	if singletone.prereqLogs.Len() > 0 {
+		singletone.log.Printf("%s\n%s", "Unmet Prerequisites errors", singletone.prereqLogs.String())
+		singletone.prereqLogs.Reset()
+	}
 }
 
 func HadErrors() bool {
