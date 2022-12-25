@@ -55,6 +55,10 @@ func (c *memberCollector) CollectMetadata() collectors.Metadata {
 
 	var totalCount int32 = 0
 	for _, org := range orgs {
+		if org.Role != "OWNER" {
+			continue
+		}
+
 		org := org
 		gw.Do(func() {
 			variables := map[string]interface{}{
@@ -89,6 +93,9 @@ func (c *memberCollector) Collect() collectors.SubCollectorChannels {
 		}
 
 		for _, org := range orgs {
+			if org.Role != "OWNER" {
+				continue
+			}
 			hasLastActive := org.IsEnterprise()
 
 			var enrichedMembers []ghcollected.OrganizationMember
