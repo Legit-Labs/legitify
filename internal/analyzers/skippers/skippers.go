@@ -2,12 +2,14 @@ package skippers
 
 import (
 	"context"
+	"log"
+
 	"github.com/Legit-Labs/legitify/internal/analyzers/parsing_utils"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
+	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
-	"log"
 )
 
 type Skipper interface {
@@ -48,7 +50,7 @@ func (sm *skipper) ShouldSkip(data collectors.CollectedData, violation opa_engin
 
 	sufficient, missingPrerequisite := sm.arePrerequisitesSatisfied(prerequisites, data)
 	if !sufficient {
-		log.Printf("Skipping policy: %s, missing prerequisite: %s\n", violation.PolicyName, missingPrerequisite)
+		errlog.PrereqIssueF("Skipping policy: %s, missing prerequisite: %s\n", violation.PolicyName, missingPrerequisite)
 		return true
 	}
 
@@ -57,7 +59,7 @@ func (sm *skipper) ShouldSkip(data collectors.CollectedData, violation opa_engin
 
 	sufficient, missingScope := sufficientScopes(data.Context.Roles(), currentScopes, scopes)
 	if !sufficient {
-		log.Printf("Skipping policy: %s, missing scope: %s\n", violation.PolicyName, missingScope)
+		errlog.PrereqIssueF("Skipping policy: %s, missing scope: %s\n", violation.PolicyName, missingScope)
 		return true
 	}
 
