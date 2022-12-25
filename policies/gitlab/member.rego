@@ -6,6 +6,7 @@ package member
 # description: Collaborator's two factor authentication is disabled. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 # custom:
 #   severity: HIGH
+#   prerequisites: [enterprise]
 #   remediationSteps:
 #     - Login with the user credentials
 #     - Go to the user settings page
@@ -22,6 +23,7 @@ two_factor_authentication_is_disabled_for_a_collaborator {
 # description: External collaborator's two factor authentication is disabled at the source code management system. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 # custom:
 #   severity: HIGH
+#   prerequisites: [enterprise]
 #   remediationSteps:
 #     - Login with the user credentials
 #     - Go to the user settings page
