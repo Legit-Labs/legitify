@@ -1,4 +1,5 @@
 package organization
+
 import data.common.webhooks as webhookUtils
 
 # METADATA
@@ -10,14 +11,17 @@ import data.common.webhooks as webhookUtils
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Configure a secret , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
+#   threat: 
+#     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
+#     - "This allows attackers to masquerade as your repository, potentially creating an unstable or insecure state in other systems."
 organization_webhook_no_secret[violated] = true {
-    some index
-    hook := input.hooks[index]
-    not webhookUtils.has_secret(hook)
-    violated := {
-        "name": hook.name,
-        "url": hook.url
-    }
+	some index
+	hook := input.hooks[index]
+	not webhookUtils.has_secret(hook)
+	violated := {
+		"name": hook.name,
+		"url": hook.url,
+	}
 }
 
 # METADATA
@@ -29,14 +33,17 @@ organization_webhook_no_secret[violated] = true {
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Verify url starts with https, Enable "SSL verification" , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
+#   threat:
+#     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
+#     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
 organization_webhook_doesnt_require_ssl[violated] = true {
-    some index
-    hook := input.hooks[index]
-    not webhookUtils.ssl_enabled(hook)
-    violated := {
-        "name": hook.name,
-        "url": hook.url
-    }
+	some index
+	hook := input.hooks[index]
+	not webhookUtils.ssl_enabled(hook)
+	violated := {
+		"name": hook.name,
+		"url": hook.url,
+	}
 }
 
 # METADATA
@@ -49,9 +56,10 @@ organization_webhook_doesnt_require_ssl[violated] = true {
 #   requiredScopes: [admin:org]
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
-default two_factor_authentication_not_required_for_org  = false
+default two_factor_authentication_not_required_for_org = false
+
 two_factor_authentication_not_required_for_org {
-    input.organization.two_factor_requirement_enabled == false
+	input.organization.two_factor_requirement_enabled == false
 }
 
 # METADATA
@@ -65,8 +73,9 @@ two_factor_authentication_not_required_for_org {
 #   threat:
 #     - "A member of the organization could inadvertently or maliciously make public an internal repository exposing confidential data."
 default non_admins_can_create_public_repositories = false
+
 non_admins_can_create_public_repositories {
-    input.organization.members_can_create_public_repositories == true
+	input.organization.members_can_create_public_repositories == true
 }
 
 # METADATA
@@ -80,8 +89,9 @@ non_admins_can_create_public_repositories {
 #   threat:
 #     - "Organization members can see the content of freshly created repositories, even if they should be restricted."
 default default_repository_permission_is_not_none = false
+
 default_repository_permission_is_not_none {
-    input.organization.default_repository_permission != "none"
+	input.organization.default_repository_permission != "none"
 }
 
 # METADATA
@@ -93,7 +103,9 @@ default_repository_permission_is_not_none {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Enter "Authentication security" tab, Toggle on "Enable SAML authentication", Fill in the remaining SSO configuration as instructed on the screen, Click "Save"]
 #   requiredScopes: [admin:org]
+#   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions accross different systems, prevents the organization from defining a common password policy, and makes it challenging to audit different aspects of the user's behavior.
 default organization_not_using_single_sign_on = false
+
 organization_not_using_single_sign_on {
-    input.saml_enabled == false
+	input.saml_enabled == false
 }

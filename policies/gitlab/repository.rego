@@ -7,28 +7,27 @@ package repository
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
 #   severity: HIGH
+#   threat: As new vulnerabilities are found over time, unmaintained repositories are more likely to point to dependencies that have known vulnerabilities, exposing these repositories to 1-day attacks.
 default repository_not_maintained = false
 
 repository_not_maintained {
-    input.archived == false
-    ns := time.parse_rfc3339_ns(input.last_activity_at)
-    now := time.now_ns()
-    diff := time.diff(now, ns)
-    monthsIndex := 1
-    inactivityMonthsThreshold := 3
-    diff[monthsIndex] >= inactivityMonthsThreshold
+	input.archived == false
+	ns := time.parse_rfc3339_ns(input.last_activity_at)
+	now := time.now_ns()
+	diff := time.diff(now, ns)
+	monthsIndex := 1
+	inactivityMonthsThreshold := 3
+	diff[monthsIndex] >= inactivityMonthsThreshold
 }
 
 repository_not_maintained {
-    input.archived == false
-    ns := time.parse_rfc3339_ns(input.last_activity_at)
-    now := time.now_ns()
-    diff := time.diff(now, ns)
-    yearIndex := 0
-    diff[yearIndex] > 0
+	input.archived == false
+	ns := time.parse_rfc3339_ns(input.last_activity_at)
+	now := time.now_ns()
+	diff := time.diff(now, ns)
+	yearIndex := 0
+	diff[yearIndex] > 0
 }
-
-
 
 # METADATA
 # scope: rule
@@ -37,10 +36,14 @@ repository_not_maintained {
 # custom:
 #   severity: LOW
 #   remediationSteps: [Make sure you have owner permissions, Go to the Project Information -> Members page, Select the unwanted owner users and remove the selected owners]
-default repository_has_too_many_admins  = false
+#   threat:
+#     - "A compromised user with owner permissions can initiate a supply chain attack in a plethora of ways."
+#     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past.
+default repository_has_too_many_admins = false
+
 repository_has_too_many_admins {
-    admins := [admin | admin := input.members[_]; admin.access_level == 50]
-    count(admins) > 3
+	admins := [admin | admin := input.members[_]; admin.access_level == 50]
+	count(admins) > 3
 }
 
 # METADATA
@@ -50,12 +53,12 @@ repository_has_too_many_admins {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the project's settings page, Enter "General" tab, Under "Visibility, project features, permissions", Toggle off "Forks"]
 #   severity: LOW
-#   threat:
-#    - "A user with permissions to the repository could intentionally/accidentally fork a private repository, make it public and cause a code-leak incident"
+#   threat: Forked repositories may leak important code assets or sensitive secrets embedded in the code to anyone outside your organization, as the code becomes publicy-accessible
 default forking_allowed_for_repository = false
+
 forking_allowed_for_repository {
-    input.public == false
-    input.forking_access_level == "enabled"
+	input.public == false
+	input.forking_access_level == "enabled"
 }
 
 # METADATA
@@ -65,14 +68,13 @@ forking_allowed_for_repository {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
-#   threat:
-#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+#   threat: Any contributor with write access may push potentially dangerous code to this repository, making it easier to compromise and difficult to audit.
 default missing_default_branch_protection = false
-missing_default_branch_protection {
-    default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-    count(default_protected_branches) == 0
-}
 
+missing_default_branch_protection {
+	default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
+	count(default_protected_branches) == 0
+}
 
 # METADATA
 # scope: rule
@@ -81,15 +83,16 @@ missing_default_branch_protection {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
+#   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
 default missing_default_branch_protection_force_push = false
 
 missing_default_branch_protection_force_push {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 missing_default_branch_protection_force_push {
-    default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-    rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
+	default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
+	rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
 	count(rules_allow_force_push) > 0
 }
 
@@ -100,16 +103,17 @@ missing_default_branch_protection_force_push {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Check the "Code owner approval"]
 #   severity: LOW
-#   threat:
-#    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
+#   threat: A pull request may be approved by any contributor with write access. Specifying specific code owners can ensure review is only done by individuals with the correct expertise required for the review of the changed files, potentially preventing bugs and security risks.
 default repository_require_code_owner_reviews_policy = false
-repository_require_code_owner_reviews_policy{
-    missing_default_branch_protection
-}
+
 repository_require_code_owner_reviews_policy {
-    default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-    rules_allow_force_push := [rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required == false]
-    count(rules_allow_force_push) > 0
+	missing_default_branch_protection
+}
+
+repository_require_code_owner_reviews_policy {
+	default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
+	rules_allow_force_push := [rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required == false]
+	count(rules_allow_force_push) > 0
 }
 
 # METADATA
@@ -119,26 +123,29 @@ repository_require_code_owner_reviews_policy {
 # custom:
 #   severity: LOW
 #   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
+#   threat:
+#     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
+#     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
 default repository_webhook_doesnt_require_ssl = false
-repository_webhook_doesnt_require_ssl = true {
-    webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
-    count(webhooks_without_ssl_verification) > 0
+
+repository_webhook_doesnt_require_ssl {
+	webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
+	count(webhooks_without_ssl_verification) > 0
 }
 
 # METADATA
 # scope: rule
 # title: Project Doesn’t Require All Pipelines to Succeed
-# description: the checks which validate the quality and security of the code are not required to pass before submitting new changes. It is advised to turn this control on to ensure any existing or future check will be required to pass
+# description: Checks that validate the quality and security of the code are not required to pass before submitting new changes. It is advised to turn this flag on to ensure any existing or future check will be required to pass.
 # custom:
 #   severity: MEDIUM
 #   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "Pipelines must succeed", Click "Save changes"]
-#   threat:
-#     - "Users could merge its code without all required checks passes what could lead to insecure code reaching your main branch and production."
+#   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
 default requires_status_checks = false
-requires_status_checks = true {
-    input.only_allow_merge_if_pipeline_succeeds == false
-}
 
+requires_status_checks {
+	input.only_allow_merge_if_pipeline_succeeds == false
+}
 
 # METADATA
 # scope: rule
@@ -147,27 +154,30 @@ requires_status_checks = true {
 # custom:
 #   severity: LOW
 #   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "All threads must be resolved", Click "Save changes"]
+#   threat: Allowing the merging of code without resolving all conversations can promote poor and vulnerable code, as important comments may be forgotten or deliberately ignored when the code is merged.
 default no_conversation_resolution = false
-no_conversation_resolution = true {
-    input.only_allow_merge_if_all_discussions_are_resolved == false
+
+no_conversation_resolution {
+	input.only_allow_merge_if_all_discussions_are_resolved == false
 }
 
 # METADATA
 # scope: rule
-# title: Unsinged Commits Are Not Allowed
+# title: Unsigned Commits Are Allowed
 # description: Require all commits to be signed and verified
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Push Rules" tab. Set the "Reject unsigned commits" checkbox ]
 #   severity: LOW
+#   threat: A commit containing malicious code may be crafted by a malicious actor that has acquried write access to the repository to initate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
 default no_signed_commits = false
+
 no_signed_commits {
-    input.push_rules.reject_unsigned_commits == false
+	input.push_rules.reject_unsigned_commits == false
 }
 
 no_signed_commits {
-    is_null(input.push_rules)
+	is_null(input.push_rules)
 }
-
 
 # METADATA
 # scope: rule
@@ -179,8 +189,9 @@ no_signed_commits {
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_not_required = false
+
 code_review_not_required {
-    input.minimum_required_approvals < 1
+	input.minimum_required_approvals < 1
 }
 
 # METADATA
@@ -193,8 +204,9 @@ code_review_not_required {
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_by_two_members_not_required = false
+
 code_review_by_two_members_not_required {
-    input.minimum_required_approvals < 2
+	input.minimum_required_approvals < 2
 }
 
 # METADATA
@@ -207,13 +219,14 @@ code_review_by_two_members_not_required {
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_review_requester_to_approve_their_own_request = false
+
 repository_allows_review_requester_to_approve_their_own_request {
-    input.approval_configuration.merge_requests_author_approval == true
+	input.approval_configuration.merge_requests_author_approval == true
 }
 
 # METADATA
 # scope: rule
-# title: Merge request authors may override the approvers list
+# title: Merge Request Authors Nay Override the Approvers List
 # description: The repository allows all merge request authors to freely edit the list of required approvers. To enforce code review only by authorized personnel, the option to override the list of valid approvers for the merge request must be toggled off.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Prevent editing approval rules in merge requests", Click "Save Changes"]
@@ -221,8 +234,9 @@ repository_allows_review_requester_to_approve_their_own_request {
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_overriding_approvers = false
+
 repository_allows_overriding_approvers {
-    input.approval_configuration.disable_overriding_approvers_per_merge_request == false
+	input.approval_configuration.disable_overriding_approvers_per_merge_request == false
 }
 
 # METADATA
@@ -235,8 +249,9 @@ repository_allows_overriding_approvers {
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_committer_approvals_policy = false
+
 repository_allows_committer_approvals_policy {
-    input.approval_configuration.merge_requests_disable_committers_approval == false
+	input.approval_configuration.merge_requests_disable_committers_approval == false
 }
 
 # METADATA
@@ -246,7 +261,9 @@ repository_allows_committer_approvals_policy {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Remove all approvals", Click "Save Changes"]
 #   severity: LOW
+#   threat: Buggy or insecure code may be committed after approval and will reach the main branch without review. Alternatively, an attacker can attempt a just-in-time attack to introduce dangerous code just before merge.
 default repository_dismiss_stale_reviews = false
+
 repository_dismiss_stale_reviews {
-    input.approval_configuration.reset_approvals_on_push == false
+	input.approval_configuration.reset_approvals_on_push == false
 }
