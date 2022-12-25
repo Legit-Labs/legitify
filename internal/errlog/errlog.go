@@ -27,9 +27,6 @@ var singletone errlog
 func init() {
 	singletone.log = log.New(os.Stderr, "", log.LstdFlags)
 	log.SetOutput(&forwarder{})
-
-	PermIssueF("Missing permissions errors:\n")
-	PrereqIssueF("Unmet Prerequisites errors:\n")
 }
 
 func SetOutput(writer io.Writer) {
@@ -50,10 +47,10 @@ func PrereqIssueF(format string, args ...interface{}) {
 }
 
 func FlushAll() {
-	singletone.log.Printf(singletone.permLogs.String())
+	singletone.log.Printf("%s\n%s", "Missing permissions errors:", singletone.permLogs.String())
 	singletone.permLogs.Reset()
 
-	singletone.log.Printf(singletone.prereqLogs.String())
+	singletone.log.Printf("%s\n%s", "Unmet Prerequisites errors", singletone.prereqLogs.String())
 	singletone.prereqLogs.Reset()
 }
 
