@@ -15,6 +15,7 @@ const (
 	tokenScopesKey      contextKey = "tokenScopes"
 	scorecardEnabledKey contextKey = "scorecardEnabled"
 	scorecardVerboseKey contextKey = "scorecardVerbose"
+	isCloudKey          contextKey = "isCloud"
 )
 
 func NewContextWithRepos(repos []types.RepositoryWithOwner) context.Context {
@@ -35,6 +36,10 @@ func NewContextWithTokenScopes(ctx context.Context, tokenScopes permissions.Toke
 	return context.WithValue(ctx, tokenScopesKey, tokenScopes)
 }
 
+func NewContextWithIsCloud(ctx context.Context, isCloud bool) context.Context {
+	return context.WithValue(ctx, isCloudKey, isCloud)
+}
+
 func GetTokenScopes(ctx context.Context) permissions.TokenScopes {
 	return ctx.Value(tokenScopesKey).(permissions.TokenScopes)
 }
@@ -52,4 +57,8 @@ func GetScorecardVerbose(ctx context.Context) bool {
 func GetRepositories(ctx context.Context) ([]types.RepositoryWithOwner, bool) {
 	val, ok := ctx.Value(repositoryKey).([]types.RepositoryWithOwner)
 	return val, ok
+}
+func GetIsCloud(ctx context.Context) bool {
+	val, ok := ctx.Value(isCloudKey).(bool)
+	return ok && val
 }
