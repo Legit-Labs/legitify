@@ -98,7 +98,7 @@ func validateAnalyzeArgs() error {
 	return nil
 }
 
-func setup(analyzeArgs *args) (*analyzeExecutor, error) {
+func setupExecutor(analyzeArgs *args) (*analyzeExecutor, error) {
 	switch analyzeArgs.ScmType {
 	case scm_type.GitHub:
 		return setupGitHub(analyzeArgs)
@@ -143,7 +143,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	executor, err := setup(&analyzeArgs)
+	executor, err := setupExecutor(&analyzeArgs)
 	if err != nil {
 		return err
 	}

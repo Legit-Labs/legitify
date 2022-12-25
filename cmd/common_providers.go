@@ -37,7 +37,7 @@ func provideOpa(analyzeArgs *args) (opa_engine.Enginer, error) {
 }
 
 func provideContext(client Client) (context.Context, error) {
-	var ctx = context.Background()
+	ctx := context.Background()
 
 	if len(analyzeArgs.Organizations) != 0 {
 		ctx = context_utils.NewContextWithOrg(analyzeArgs.Organizations)
