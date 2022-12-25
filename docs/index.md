@@ -8,5 +8,13 @@ nav_order: 1
 <img src="/legitify/assets/legitify_logo.png" width="300" height="300" />
 </div>
 
-Strengthen the security posture of your GitHub / GitLab assets!
+Strengthen the security posture of your source code management platforms.
 Detect and remediate misconfigurations, security and compliance issues with ease 🔥
+
+Supporting:
+
+* GitHub
+* GitHub Enterprise
+* GitLab
+* GitLab Server
+* More to come
