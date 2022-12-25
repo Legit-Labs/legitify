@@ -18,17 +18,16 @@ import (
 	gitlab2 "github.com/Legit-Labs/legitify/internal/collectors/gitlab"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/enricher"
-	"log"
 )
 
 // Injectors from inject_github.go:
 
-func setupGitHub(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error) {
+func setupGitHub(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	client, err := provideGitHubClient(analyzeArgs2)
 	if err != nil {
 		return nil, err
 	}
-	context, err := provideContext(client, log2)
+	context, err := provideContext(client)
 	if err != nil {
 		return nil, err
 	}
@@ -42,18 +41,18 @@ func setupGitHub(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 	analyzer := analyzers.NewAnalyzer(context, enginer, skipper)
 	enricherManager := enricher.NewEnricherManager(context)
 	outputer := provideOutputer(context, analyzeArgs2)
-	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer, log2)
+	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer)
 	return cmdAnalyzeExecutor, nil
 }
 
 // Injectors from inject_gitlab.go:
 
-func setupGitLab(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error) {
+func setupGitLab(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	client, err := provideGitLabClient(analyzeArgs2)
 	if err != nil {
 		return nil, err
 	}
-	context, err := provideContext(client, log2)
+	context, err := provideContext(client)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +66,7 @@ func setupGitLab(analyzeArgs2 *args, log2 *log.Logger) (*analyzeExecutor, error)
 	analyzer := analyzers.NewAnalyzer(context, enginer, skipper)
 	enricherManager := enricher.NewEnricherManager(context)
 	outputer := provideOutputer(context, analyzeArgs2)
-	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer, log2)
+	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer)
 	return cmdAnalyzeExecutor, nil
 }
 

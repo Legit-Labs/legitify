@@ -3,21 +3,23 @@ package cmd
 import (
 	"context"
 	"fmt"
+
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
 	"github.com/Legit-Labs/legitify/internal/outputer"
-	"log"
+	"github.com/Legit-Labs/legitify/internal/screen"
 )
 
 func provideGenericClient(args *args) (Client, error) {
-	if args.ScmType == scm_type.GitHub {
+	switch args.ScmType {
+	case scm_type.GitHub:
 		return provideGitHubClient(args)
-	} else if args.ScmType == scm_type.GitLab {
+	case scm_type.GitLab:
 		return provideGitLabClient(args)
-	} else {
+	default:
 		return nil, fmt.Errorf("invalid scm type")
 	}
 }
@@ -34,8 +36,9 @@ func provideOpa(analyzeArgs *args) (opa_engine.Enginer, error) {
 	return opaEngine, nil
 }
 
-func provideContext(client Client, logger *log.Logger) (context.Context, error) {
-	var ctx context.Context
+func provideContext(client Client) (context.Context, error) {
+	ctx := context.Background()
+
 	if len(analyzeArgs.Organizations) != 0 {
 		ctx = context_utils.NewContextWithOrg(analyzeArgs.Organizations)
 	} else if len(analyzeArgs.Repositories) != 0 {
@@ -48,8 +51,6 @@ func provideContext(client Client, logger *log.Logger) (context.Context, error) 
 		}
 		ctx = context_utils.NewContextWithRepos(validated)
 		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
-	} else {
-		ctx = context.Background()
 	}
 
 	ctx = context_utils.NewContextWithScorecard(ctx,
@@ -57,7 +58,7 @@ func provideContext(client Client, logger *log.Logger) (context.Context, error) 
 		IsScorecardVerbose(analyzeArgs.ScorecardWhen))
 
 	if !IsScorecardEnabled(analyzeArgs.ScorecardWhen) {
-		logger.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
+		screen.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
 	}
 
 	ctx = context_utils.NewContextWithIsCloud(ctx, analyzeArgs.Endpoint == "")

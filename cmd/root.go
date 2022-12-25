@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 
+	"github.com/Legit-Labs/legitify/internal/screen"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -31,7 +31,7 @@ func Execute() {
 	if len(os.Args) > 1 && os.Args[1] != versionCmdText {
 		logoColored := color.New(color.FgMagenta, color.Bold).Sprintf("%s", logo)
 		brandColored := color.New(color.Bold).Sprintf("%s", brand)
-		fmt.Fprintf(os.Stderr, "%s\nBy %s\n\n", logoColored, brandColored)
+		screen.Printf("%s\nBy %s\n\n", logoColored, brandColored)
 	}
 	err := rootCmd.Execute()
 	if err != nil {
