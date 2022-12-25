@@ -10,10 +10,9 @@ import (
 	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/google/wire"
-	"log"
 )
 
-func setupGitHub(analyzeArgs *args, log *log.Logger) (*analyzeExecutor, error) {
+func setupGitHub(analyzeArgs *args) (*analyzeExecutor, error) {
 	wire.Build(
 		wire.Bind(new(Client), new(*github.Client)),
 		analyzeProviderSet,

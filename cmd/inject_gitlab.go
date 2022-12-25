@@ -10,10 +10,9 @@ import (
 	"github.com/Legit-Labs/legitify/internal/collectors/gitlab"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/google/wire"
-	"log"
 )
 
-func setupGitLab(analyzeArgs *args, log *log.Logger) (*analyzeExecutor, error) {
+func setupGitLab(analyzeArgs *args) (*analyzeExecutor, error) {
 	wire.Build(
 		wire.Bind(new(Client), new(*glclient.Client)),
 		analyzeProviderSet,
