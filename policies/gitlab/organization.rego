@@ -15,9 +15,8 @@ package organization
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
 default two_factor_authentication_not_required_for_group = false
-
 two_factor_authentication_not_required_for_group {
-	input.require_two_factor_authentication == false
+  input.require_two_factor_authentication == false
 }
 
 # METADATA
@@ -34,9 +33,8 @@ two_factor_authentication_not_required_for_group {
 #   threat:
 #     - Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
 default collaborators_can_fork_repositories_to_external_namespaces = false
-
 collaborators_can_fork_repositories_to_external_namespaces {
-	input.prevent_forking_outside_group == false
+  input.prevent_forking_outside_group == false
 }
 
 # METADATA
@@ -55,10 +53,10 @@ collaborators_can_fork_repositories_to_external_namespaces {
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
 #     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
 organization_webhook_doesnt_require_ssl[violation] = true {
-	some index
-	hook := input.hooks[index]
-	hook.enable_ssl_verification == false
-	violation := {"id": format_int(hook.id, 10), "url": hook.url}
+  some index
+  hook := input.hooks[index]
+  hook.enable_ssl_verification == false
+  violation := {"id": format_int(hook.id, 10), "url": hook.url}
 }
 
 # METADATA
@@ -77,7 +75,6 @@ organization_webhook_doesnt_require_ssl[violation] = true {
 #     - A developer creates a repository without any branch protection rules
 #     - Attacker that get access to the repository can modify its main branch without any restrictions
 default group_does_not_enforce_branch_protection_by_default = false
-
 group_does_not_enforce_branch_protection_by_default {
-	input.default_branch_protection == 0
+  input.default_branch_protection == 0
 }
