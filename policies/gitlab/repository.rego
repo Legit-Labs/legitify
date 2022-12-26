@@ -10,22 +10,22 @@ package repository
 #   threat: As new vulnerabilities are found over time, unmaintained repositories are more likely to point to dependencies that have known vulnerabilities, exposing these repositories to 1-day attacks.
 default repository_not_maintained = false
 repository_not_maintained {
-  input.archived == false
-  ns := time.parse_rfc3339_ns(input.last_activity_at)
-  now := time.now_ns()
-  diff := time.diff(now, ns)
-  monthsIndex := 1
-  inactivityMonthsThreshold := 3
-  diff[monthsIndex] >= inactivityMonthsThreshold
+    input.archived == false
+    ns := time.parse_rfc3339_ns(input.last_activity_at)
+    now := time.now_ns()
+    diff := time.diff(now, ns)
+    monthsIndex := 1
+    inactivityMonthsThreshold := 3
+    diff[monthsIndex] >= inactivityMonthsThreshold
 }
 
 repository_not_maintained {
-  input.archived == false
-  ns := time.parse_rfc3339_ns(input.last_activity_at)
-  now := time.now_ns()
-  diff := time.diff(now, ns)
-  yearIndex := 0
-  diff[yearIndex] > 0
+    input.archived == false
+    ns := time.parse_rfc3339_ns(input.last_activity_at)
+    now := time.now_ns()
+    diff := time.diff(now, ns)
+    yearIndex := 0
+    diff[yearIndex] > 0
 }
 
 # METADATA
@@ -40,8 +40,8 @@ repository_not_maintained {
 #     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past.
 default repository_has_too_many_admins = false
 repository_has_too_many_admins {
-  admins := [admin | admin := input.members[_]; admin.access_level == 50]
-  count(admins) > 3
+    admins := [admin | admin := input.members[_]; admin.access_level == 50]
+    count(admins) > 3
 }
 
 # METADATA
@@ -54,8 +54,8 @@ repository_has_too_many_admins {
 #   threat: Forked repositories may leak important code assets or sensitive secrets embedded in the code to anyone outside your organization, as the code becomes publicy-accessible
 default forking_allowed_for_repository = false
 forking_allowed_for_repository {
-  input.public == false
-  input.forking_access_level == "enabled"
+    input.public == false
+    input.forking_access_level == "enabled"
 }
 
 # METADATA
@@ -68,8 +68,8 @@ forking_allowed_for_repository {
 #   threat: Any contributor with write access may push potentially dangerous code to this repository, making it easier to compromise and difficult to audit.
 default missing_default_branch_protection = false
 missing_default_branch_protection {
-  default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-  count(default_protected_branches) == 0
+    default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
+    count(default_protected_branches) == 0
 }
 
 # METADATA
@@ -82,13 +82,13 @@ missing_default_branch_protection {
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
 default missing_default_branch_protection_force_push = false
 missing_default_branch_protection_force_push {
-  missing_default_branch_protection
+    missing_default_branch_protection
 }
 
 missing_default_branch_protection_force_push {
-  default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-  rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
-  count(rules_allow_force_push) > 0
+    default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
+    rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
+    count(rules_allow_force_push) > 0
 }
 
 # METADATA
@@ -101,13 +101,13 @@ missing_default_branch_protection_force_push {
 #   threat: A pull request may be approved by any contributor with write access. Specifying specific code owners can ensure review is only done by individuals with the correct expertise required for the review of the changed files, potentially preventing bugs and security risks.
 default repository_require_code_owner_reviews_policy = false
 repository_require_code_owner_reviews_policy {
-  missing_default_branch_protection
+    missing_default_branch_protection
 }
 
 repository_require_code_owner_reviews_policy {
-  default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-  rules_allow_force_push := [rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required == false]
-  count(rules_allow_force_push) > 0
+    default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
+    rules_allow_force_push := [rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required == false]
+    count(rules_allow_force_push) > 0
 }
 
 # METADATA
@@ -122,8 +122,8 @@ repository_require_code_owner_reviews_policy {
 #     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
 default repository_webhook_doesnt_require_ssl = false
 repository_webhook_doesnt_require_ssl {
-  webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
-  count(webhooks_without_ssl_verification) > 0
+    webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
+    count(webhooks_without_ssl_verification) > 0
 }
 
 # METADATA
@@ -136,7 +136,7 @@ repository_webhook_doesnt_require_ssl {
 #   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
 default requires_status_checks = false
 requires_status_checks {
-  input.only_allow_merge_if_pipeline_succeeds == false
+    input.only_allow_merge_if_pipeline_succeeds == false
 }
 
 # METADATA
@@ -149,7 +149,7 @@ requires_status_checks {
 #   threat: Allowing the merging of code without resolving all conversations can promote poor and vulnerable code, as important comments may be forgotten or deliberately ignored when the code is merged.
 default no_conversation_resolution = false
 no_conversation_resolution {
-  input.only_allow_merge_if_all_discussions_are_resolved == false
+    input.only_allow_merge_if_all_discussions_are_resolved == false
 }
 
 # METADATA
@@ -162,11 +162,11 @@ no_conversation_resolution {
 #   threat: A commit containing malicious code may be crafted by a malicious actor that has acquried write access to the repository to initate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
 default no_signed_commits = false
 no_signed_commits {
-  input.push_rules.reject_unsigned_commits == false
+    input.push_rules.reject_unsigned_commits == false
 }
 
 no_signed_commits {
-  is_null(input.push_rules)
+    is_null(input.push_rules)
 }
 
 # METADATA
@@ -180,7 +180,7 @@ no_signed_commits {
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_not_required = false
 code_review_not_required {
-  input.minimum_required_approvals < 1
+    input.minimum_required_approvals < 1
 }
 
 # METADATA
@@ -194,7 +194,7 @@ code_review_not_required {
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_by_two_members_not_required = false
 code_review_by_two_members_not_required {
-  input.minimum_required_approvals < 2
+    input.minimum_required_approvals < 2
 }
 
 # METADATA
@@ -208,7 +208,7 @@ code_review_by_two_members_not_required {
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_review_requester_to_approve_their_own_request = false
 repository_allows_review_requester_to_approve_their_own_request {
-  input.approval_configuration.merge_requests_author_approval == true
+    input.approval_configuration.merge_requests_author_approval == true
 }
 
 # METADATA
@@ -222,7 +222,7 @@ repository_allows_review_requester_to_approve_their_own_request {
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_overriding_approvers = false
 repository_allows_overriding_approvers {
-  input.approval_configuration.disable_overriding_approvers_per_merge_request == false
+    input.approval_configuration.disable_overriding_approvers_per_merge_request == false
 }
 
 # METADATA
@@ -236,7 +236,7 @@ repository_allows_overriding_approvers {
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_committer_approvals_policy = false
 repository_allows_committer_approvals_policy {
-  input.approval_configuration.merge_requests_disable_committers_approval == false
+    input.approval_configuration.merge_requests_disable_committers_approval == false
 }
 
 # METADATA
@@ -249,5 +249,5 @@ repository_allows_committer_approvals_policy {
 #   threat: Buggy or insecure code may be committed after approval and will reach the main branch without review. Alternatively, an attacker can attempt a just-in-time attack to introduce dangerous code just before merge.
 default repository_dismiss_stale_reviews = false
 repository_dismiss_stale_reviews {
-  input.approval_configuration.reset_approvals_on_push == false
+    input.approval_configuration.reset_approvals_on_push == false
 }
