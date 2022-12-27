@@ -27,7 +27,7 @@ func assertTestStatus(t *testing.T, jq *gojsonq.JSONQ, testPath, entityName, exp
 	jq.Reset()
 	testFormattedPath := testPath + "->violations"
 	res := jq.From(testFormattedPath).Where(pathToEntityName, "=", entityName).Where("Status", "=", expectedStatus).Count()
-	if res != 1 {
+	if res == 0 {
 		t.Logf("Failed on test %s Entity %s did not pass expected %s count %d", testPath, entityName, expectedStatus, res)
 		t.Fail()
 	}
