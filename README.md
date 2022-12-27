@@ -9,7 +9,7 @@
 
  <img width="250" alt="Legitify Logo" src="https://user-images.githubusercontent.com/74864790/174815311-746a0c98-9a1f-44a9-808c-035788edfd4d.png">
  
-Strengthen the security posture of your organization! <br/>
+Strengthen the security posture of your GitHub/GitLab servers <br/>
 Detect and remediate misconfigurations, security and compliance issues across all your code management platforms with ease 🔥 <br/>
  by [Legit Security](https://www.legitsecurity.com/)
 </div>
