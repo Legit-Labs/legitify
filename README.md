@@ -9,8 +9,8 @@
 
  <img width="250" alt="Legitify Logo" src="https://user-images.githubusercontent.com/74864790/174815311-746a0c98-9a1f-44a9-808c-035788edfd4d.png">
  
-Strengthen the security posture of your GitHub organization! <br/>
-Detect and remediate misconfigurations, security and compliance issues across all your GitHub assets with ease 🔥 <br/>
+Strengthen the security posture of your organization! <br/>
+Detect and remediate misconfigurations, security and compliance issues across all your code management platforms with ease 🔥 <br/>
  by [Legit Security](https://www.legitsecurity.com/)
 </div>
 
@@ -37,7 +37,7 @@ ARCH=darwin_arm64
 ./slsa-verifier verify-artifact --source-branch main --builder-id 'https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.2.2' --source-uri "git+https://github.com/Legit-Labs/legitify" --provenance-path multiple.intoto.jsonl ./legitify_${VERSION}_${ARCH}.tar.gz
 ```
 
-## Requirements
+## GitHub Requirements
 1. To get the most out of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository inside an organization, in which case you'll be able to see only repository-related policies results.
 2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`$GITHUB_ENV`).
    The PAT needs the following scopes for full analysis:
