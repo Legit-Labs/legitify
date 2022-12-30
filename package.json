@@ -1,0 +1,28 @@
+{
+  "name": "ac",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Legit-Labs/legitify-github-action.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Legit-Labs/legitify-github-action/issues"
+  },
+  "homepage": "https://github.com/Legit-Labs/legitify-github-action#readme",
+  "dependencies": {
+    "@actions/artifact": "^1.1.0",
+    "@actions/core": "^1.10.0",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^5.1.1",
+    "node-fetch": "^3.3.0",
+    "request": "^2.88.2",
+    "tar-fs": "^2.1.1"
+  }
+}
