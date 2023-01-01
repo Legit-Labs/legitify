@@ -47,6 +47,7 @@ By default, legitify will check the policies against all your resources (organiz
 You can control which resources will be analyzed with command-line flags namespace and org:
 - `--namespace (-n)`: will analyze policies that relate to the specified resources 
 - `--org`: will limit the analysis to the specified organizations
+- `--scm`: will analyze a specific source code management platform. Possible values are: `github` or `gitlab`
 
 ```
 LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
@@ -54,9 +55,9 @@ LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organiz
 The above command will test organization and member policies against org1 and org2.
 
 ## Requirements
-### GitHub Cloud 
+### GitHub (Cloud and Enterprise Server)
 1. To get the most out of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository inside an organization, in which case you'll be able to see only repository-related policies results.
-2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`$GITHUB_ENV`).
+2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`LEGITIFY_TOKEN`).
    The PAT needs the following scopes for full analysis:
   ```
   admin:org, read:enterprise, admin:org_hook, read:org, repo, read:repo_hook
@@ -72,6 +73,13 @@ export SERVER_URL="https://github.example.com/"
 LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
 ## GitLab Cloud/Server Support
+1. As mentioned in the previous section, you need to be an owner of at least one GitLab group. Otherwise, you can still use the tool if you're an admin of at least one project inside a group, in which case you'll be able to see only repository-related policies results.
+2. legitify requires a GitLab personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`LEGITIFY_TOKEN`).
+  The PAT needs the following scopes for full analysis:
+    ```
+    read_api, read_user, read_repository, read_registry
+    ```
+  See [Creating a Personal Access Token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) for more information.  
 To run legitify against GitLab Cloud set the scm flag to gitlab `--scm gitlab`, to run against GitLab Server you need to provide also SERVER_URL:
 
 ```sh
