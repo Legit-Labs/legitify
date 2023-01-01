@@ -20,7 +20,7 @@ two_factor_authentication_is_disabled_for_a_collaborator {
 
 # METADATA
 # scope: rule
-# title: Two Factor Authentication Is Disabled For a Collaborator
+# title: Two Factor Authentication Is Disabled For an External Collaborator
 # description: An external collaborator's two factor authentication is disabled at the source code management system. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 # custom:
 #   severity: HIGH
@@ -30,7 +30,9 @@ two_factor_authentication_is_disabled_for_a_collaborator {
 #     - Go to the user settings page
 #     - Select "Account" on the left navigation bar
 #     - Press "Enable two-factor authentication"
-#   threat: Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password.
+#   threat: 
+#     - "Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password."
+#     - "This is doubly important for external collaborators, as these are identities that aren't likely managed by you or your organization and may be easier to compromise."
 default two_factor_authentication_is_disabled_for_an_external_collaborator = false
 two_factor_authentication_is_disabled_for_an_external_collaborator {
     input.external == true

@@ -54,7 +54,7 @@ repository_has_too_many_admins {
 # METADATA
 # scope: rule
 # title: Webhook Configured Without A Secret
-# description: Webhooks that are not configured with a token authenticated to validate the origin of the request and could make your software vulnerable.
+# description: Webhooks are not configured with an authenticated token to validate the origin of the request and could make your software vulnerable.
 # custom:
 #   requiredEnrichers: [hooksList]
 #   severity: LOW
@@ -84,7 +84,7 @@ repository_webhook_no_secret[violated] = true {
 #   requiredScopes: [read:repo_hook, repo]
 #   threat:
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
-#     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
+#     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
 repository_webhook_doesnt_require_ssl[violated] = true {
     some index
     hook := input.hooks[index]
@@ -103,7 +103,7 @@ repository_webhook_doesnt_require_ssl[violated] = true {
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "General" tab, Under "Features", Toggle off "Allow forking"]
 #   severity: LOW
 #   requiredScopes: [read:org]
-#   threat: Forked repositories may leak important code assets or sensitive secrets embedded in the code to anyone outside your organization, as the code becomes publicy-accessible
+#   threat: Forked repositories cause more code and secret sprawl in the organization as forks are independent copies of the repository and need to be tracked separately, making it more difficult to keep track of sensitive assets and contain potential incidents.
 default forking_allowed_for_repository = false
 forking_allowed_for_repository {
     input.repository.is_private == true
@@ -265,7 +265,9 @@ code_review_not_required {
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
-#   threat: Users can merge code without being reviewed, which can lead to insecure code reaching the main branch and production.
+#   threat:
+#     - "Users can merge code without being reviewed, which can lead to insecure code reaching the main branch and production."
+#     - "Requiring code review by at least two reviewers further decreases the risk of an insider threat (as merging code requires compromising at least 2 identities with write permissions), and decreases the likelihood of human error in the review process."
 default code_review_by_two_members_not_required = false
 code_review_by_two_members_not_required {
     missing_default_branch_protection
@@ -345,7 +347,7 @@ no_conversation_resolution {
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
-#    threat: A commit containing malicious code may be crafted by a malicious actor that has acquried write access to the repository to initate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
+#    threat: A commit containing malicious code may be crafted by a malicious actor that has acquired write access to the repository to initiate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
 default no_signed_commits = false
 no_signed_commits {
     missing_default_branch_protection

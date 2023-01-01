@@ -5,7 +5,7 @@ import data.common.webhooks as webhookUtils
 # METADATA
 # scope: rule
 # title: Webhook Configured Without A Secret
-# description: Webhooks that are not configured with a token authenticated to validate the origin of the request and could make your software vulnerable.
+# description: Webhooks are not configured with an authenticated token to validate the origin of the request and could make your software vulnerable.
 # custom:
 #   requiredEnrichers: [hooksList]
 #   severity: LOW
@@ -13,7 +13,7 @@ import data.common.webhooks as webhookUtils
 #   requiredScopes: [admin:org_hook]
 #   threat: 
 #     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
-#     - "This allows attackers to masquerade as your repository, potentially creating an unstable or insecure state in other systems."
+#     - "This allows attackers to masquerade as your organization, potentially creating an unstable or insecure state in other systems."
 organization_webhook_no_secret[violated] = true {
     some index
     hook := input.hooks[index]
@@ -35,7 +35,7 @@ organization_webhook_no_secret[violated] = true {
 #   requiredScopes: [admin:org_hook]
 #   threat:
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
-#     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
+#     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
 organization_webhook_doesnt_require_ssl[violated] = true {
     some index
     hook := input.hooks[index]

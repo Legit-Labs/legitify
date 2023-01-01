@@ -119,7 +119,7 @@ repository_require_code_owner_reviews_policy {
 #   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
 #   threat:
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
-#     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
+#     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
 default repository_webhook_doesnt_require_ssl = false
 repository_webhook_doesnt_require_ssl {
     webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
@@ -159,7 +159,7 @@ no_conversation_resolution {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Push Rules" tab. Set the "Reject unsigned commits" checkbox ]
 #   severity: LOW
-#   threat: A commit containing malicious code may be crafted by a malicious actor that has acquried write access to the repository to initate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
+#   threat: A commit containing malicious code may be crafted by a malicious actor that has acquired write access to the repository to initiate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
 default no_signed_commits = false
 no_signed_commits {
     input.push_rules.reject_unsigned_commits == false
@@ -241,8 +241,8 @@ repository_allows_committer_approvals_policy {
 
 # METADATA
 # scope: rule
-# title: Repository Dismiss Stale Reviews
-# description: New code changes after approval are not required to be re-approved
+# title: Default Branch Doesn't Require New Code Changes After Approval To Be Re-Approved
+# description: This security control prevents merging code that was approved but later on changed. Turning it on ensures new changes are required to be reviewed again. This setting is part of branch protection and code-review settings, and hardens the review process. If turned off - a developer can change the code after approval, and push code that is different from the one that was previously allowed. This option is found in the branch protection setting for the repository.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Remove all approvals", Click "Save Changes"]
 #   severity: LOW
