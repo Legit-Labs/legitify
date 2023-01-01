@@ -63,8 +63,8 @@ The above command will test organization and member policies against org1 and or
 See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information.  
 Fine-grained personal access tokens are currently not supported because they do not support GitHub's GraphQL (https://github.blog/2022-10-18-introducing-fine-grained-personal-access-tokens-for-github/)
 
-## GitHub Enterprise Support
-You can run legitify against a GitHub Enterprise instance if you set the endpoint URL in the environment variable ``SERVER_URL``:
+### GitHub Enterprise Server
+You can run legitify against a GitHub Enterprise Server instance if you set the endpoint URL in the environment variable ``SERVER_URL``:
 
 ```sh
 export SERVER_URL="https://github.example.com/"
