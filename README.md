@@ -53,7 +53,8 @@ LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organiz
 ```
 The above command will test organization and member policies against org1 and org2.
 
-## GitHub Requirements
+## Requirements
+### GitHub Cloud 
 1. To get the most out of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository inside an organization, in which case you'll be able to see only repository-related policies results.
 2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`$GITHUB_ENV`).
    The PAT needs the following scopes for full analysis:
