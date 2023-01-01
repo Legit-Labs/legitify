@@ -172,7 +172,7 @@ no_signed_commits {
 # METADATA
 # scope: rule
 # title: Project Doesn't Require Code Review
-# description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement
+# description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. An even safer option is to require 2 separate reviewers, which is enforced in the Legitify policy "Project Doesn't Require Code Review By At Least Two Reviewers".
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 1 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]
 #   severity: HIGH
