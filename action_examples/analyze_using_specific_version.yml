@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Legitify Action
-        uses: Legit-Labs/legitify@main
+        uses: Legit-Labs/legitify@main # it is recommended to use a specific commit hash
         with:
           github_token: ${{ secrets.PAT_FOR_LEGITIFY }}
           legitify_version: "0.1.6"
