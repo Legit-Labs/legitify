@@ -47,7 +47,8 @@ By default, legitify will check the policies against all your resources (organiz
 You can control which resources will be analyzed with command-line flags namespace and org:
 - `--namespace (-n)`: will analyze policies that relate to the specified resources 
 - `--org`: will limit the analysis to the specified organizations
-- `--scm`: will analyze a specific source code management platform. Possible values are: `github` or `gitlab`
+- `--repo`: will limit the analysis to the specified repositories
+- `--scm`: specify the source code management platform. Possible values are: `github` or `gitlab`. Defaults to `github`. Please note: when running on GitLab, `--scm gitlab` is required.
 
 ```
 LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
