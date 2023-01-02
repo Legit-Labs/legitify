@@ -1,0 +1,21 @@
+# This workflow will run legitify analyze using a specific version of legitify.
+# In this example, 0.1.6. For all versions, see https://github.com/Legit-Labs/legitify/releases
+name: Legitify Analyze
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs "At 11:00 on every day-of-week from Monday through Friday"
+    - cron: "0 11 * * 1-5"
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Legitify Action
+        uses: Legit-Labs/legitify@main # it is recommended to use a specific commit hash
+        with:
+          github_token: ${{ secrets.PAT_FOR_LEGITIFY }}
+          legitify_version: "0.1.6"
+          analyze_self_only: "true"

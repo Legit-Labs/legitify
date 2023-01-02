@@ -1,7 +1,7 @@
 package common.webhooks
 
 has_key(x, k) {
-	_ = x[k]
+  _ = x[k]
 }
 
 ssl_enabled(hook) {

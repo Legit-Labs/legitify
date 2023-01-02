@@ -1,0 +1,20 @@
+name: "Legitify Analyze"
+description: "Legitify GitHub Action"
+inputs:
+  github_token:
+    description: "GitHub Personal Access Token"
+    required: true
+  analyze_self_only:
+    description: "If this is set, only the repo where this action is called from will be analyzed"
+    required: false
+    default: "false"
+  repositories:
+    description: "Strings of owner/repo. If this is set, only selected repositories will be analyzed"
+    required: false
+  legitify_base_version:
+    description: "The base version of legitify to use. Non breaking changes will be auto updated."
+    required: false
+    default: "0.1"
+runs:
+  using: "node16"
+  main: "index.js"
