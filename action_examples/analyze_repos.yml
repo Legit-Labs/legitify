@@ -1,0 +1,19 @@
+# Analyze two specific repositories: 'owner1/repo1' and 'owner1/repo2'
+name: Legitify Analyze
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs "At 11:00 on every day-of-week from Monday through Friday"
+    - cron: "0 11 * * 1-5"
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Legitify Action
+        uses: Legit-Labs/legitify@main # it is recommended to use a specific commit hash
+        with:
+          github_token: ${{ secrets.PAT_FOR_LEGITIFY }}
+          repositories: owner1/repo1 owner1/repo2
