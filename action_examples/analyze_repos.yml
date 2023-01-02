@@ -1,3 +1,4 @@
+# Analyze two specific repositories: 'owner1/repo1' and 'owner1/repo2'
 name: Legitify Analyze
 on:
   workflow_dispatch:
