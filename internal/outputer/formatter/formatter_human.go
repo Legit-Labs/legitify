@@ -100,6 +100,20 @@ func (f *HumanFormatter) colorByPolicy(policyInfo scheme.PolicyInfo) color.Attri
 	return severityToColor[policyInfo.Severity]
 }
 
+func (f *HumanFormatter) writeList(list []string, title string, numbered bool) {
+	if len(list) == 0 {
+		return
+	}
+	indent := "-"
+	f.sb.WriteString(f.sprintf(1, "%s:\n", title))
+	for i, step := range list {
+		if numbered {
+			indent = fmt.Sprintf("%d.", i+1)
+		}
+		f.sb.WriteString(f.sprintf(2, "%s %s\n", indent, step))
+	}
+}
+
 func (f *HumanFormatter) formatPolicyInfo(policyName string, policyInfo scheme.PolicyInfo) {
 	f.sb.WriteString(f.sprintfWithColor(0, f.colorByPolicy(policyInfo), "%s\n", policyInfo.Title))
 	f.sb.WriteString(strings.Repeat("-", len(policyInfo.Title)) + "\n")
@@ -108,10 +122,8 @@ func (f *HumanFormatter) formatPolicyInfo(policyName string, policyInfo scheme.P
 	f.sb.WriteString(f.sprintf(1, "Policy Name: %s\n", policyName))
 	f.sb.WriteString(f.sprintf(1, "Namespace: %s\n", policyInfo.Namespace))
 	f.sb.WriteString(f.sprintfWithColor(1, f.colorByPolicy(policyInfo), "Severity: %s\n", policyInfo.Severity))
-	f.sb.WriteString(f.sprintf(1, "Remediation Steps:\n"))
-	for i, step := range policyInfo.RemediationSteps {
-		f.sb.WriteString(f.sprintf(2, "%d. %s\n", i+1, step))
-	}
+	f.writeList(policyInfo.Threat, "Threat", false)
+	f.writeList(policyInfo.RemediationSteps, "Remediation Steps", true)
 }
 
 func (f *HumanFormatter) formatViolation(violation scheme.Violation) {

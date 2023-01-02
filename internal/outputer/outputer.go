@@ -41,6 +41,7 @@ func enrichedDataToPolicyInfo(enrichedData enricher.EnrichedData) scheme.PolicyI
 		PolicyName:               enrichedData.PolicyName,
 		FullyQualifiedPolicyName: enrichedData.FullyQualifiedPolicyName,
 		Severity:                 enrichedData.Severity,
+		Threat:                   enrichedData.Threat,
 		RemediationSteps:         enrichedData.RemediationSteps,
 		Namespace:                enrichedData.Namespace,
 	}

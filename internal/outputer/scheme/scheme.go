@@ -19,6 +19,7 @@ type PolicyInfo struct {
 	PolicyName               string              `json:"policyName"`
 	FullyQualifiedPolicyName string              `json:"fullyQualifiedPolicyName"`
 	Severity                 severity.Severity   `json:"severity"`
+	Threat                   []string            `json:"threat"`
 	RemediationSteps         []string            `json:"remediationSteps"`
 	Namespace                namespace.Namespace `json:"namespace"`
 }
