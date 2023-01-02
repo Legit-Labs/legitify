@@ -2,8 +2,8 @@ package member
 
 # METADATA
 # scope: rule
-# title: Two Factor Authentication Is Disabled For A Collaborator
-# description: Collaborator's two factor authentication is disabled. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
+# title: Two Factor Authentication Is Disabled For a Collaborator
+# description: A collaborator's two factor authentication is disabled at the source code management system. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 # custom:
 #   severity: HIGH
 #   prerequisites: [enterprise]
@@ -12,6 +12,7 @@ package member
 #     - Go to the user settings page
 #     - Select "Account" on the left navigation bar
 #     - Press "Enable two-factor authentication"
+#   threat: Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password.
 default two_factor_authentication_is_disabled_for_a_collaborator = false
 two_factor_authentication_is_disabled_for_a_collaborator {
     input.two_factor_enabled == false
@@ -19,8 +20,8 @@ two_factor_authentication_is_disabled_for_a_collaborator {
 
 # METADATA
 # scope: rule
-# title: Two factor authentication is disabled for an external collaborator
-# description: External collaborator's two factor authentication is disabled at the source code management system. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
+# title: Two Factor Authentication Is Disabled For an External Collaborator
+# description: An external collaborator's two factor authentication is disabled at the source code management system. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 # custom:
 #   severity: HIGH
 #   prerequisites: [enterprise]
@@ -29,6 +30,9 @@ two_factor_authentication_is_disabled_for_a_collaborator {
 #     - Go to the user settings page
 #     - Select "Account" on the left navigation bar
 #     - Press "Enable two-factor authentication"
+#   threat: 
+#     - "Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password."
+#     - "This is doubly important for external collaborators, as these are identities that aren't likely managed by you or your organization and may be easier to compromise."
 default two_factor_authentication_is_disabled_for_an_external_collaborator = false
 two_factor_authentication_is_disabled_for_an_external_collaborator {
     input.external == true
@@ -58,6 +62,7 @@ stale_admin_found {
 isStale(target_last_active, count_months) {
     now := time.now_ns()
     diff := time.diff(now, target_last_active)
+
     # diff[1] the months index
     diff[1] >= count_months
 }
