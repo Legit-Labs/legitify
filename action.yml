@@ -12,7 +12,7 @@ inputs:
     description: "Strings of owner/repo. If this is set, only selected repositories will be analyzed"
     required: false
   legitify_base_version:
-    description: "The base version of legitify to use. non breaking changes will be auto updated."
+    description: "The base version of legitify to use. Non breaking changes will be auto updated."
     required: false
     default: "0.1"
 runs:
