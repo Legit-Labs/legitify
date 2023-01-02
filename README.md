@@ -72,7 +72,7 @@ You can run legitify against a GitHub Enterprise Server instance if you set the 
 export SERVER_URL="https://github.example.com/"
 LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
-## GitLab Cloud/Server Support
+### GitLab Cloud/Server
 1. As mentioned in the previous section, you need to be an owner of at least one GitLab group. Otherwise, you can still use the tool if you're an admin of at least one project inside a group, in which case you'll be able to see only repository-related policies results.
 2. legitify requires a GitLab personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`LEGITIFY_TOKEN`).
   The PAT needs the following scopes for full analysis:
