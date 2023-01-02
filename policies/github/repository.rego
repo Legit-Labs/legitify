@@ -44,7 +44,7 @@ repository_not_maintained {
 #   requiredScopes: [read:org,repo]
 #   threat: 
 #     - "A compromised user with admin permissions can initiate a supply chain attack in a plethora of ways."
-#     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past.
+#     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past."
 default repository_has_too_many_admins = false
 repository_has_too_many_admins {
     admins := [admin | admin := input.collaborators[_]; admin.permissions["admin"]]
