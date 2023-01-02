@@ -1,14 +1,15 @@
 package cmd
 
 import (
-	"log"
 	"os"
 
 	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/collectors/collectors_manager"
 	"github.com/Legit-Labs/legitify/internal/enricher"
+	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/Legit-Labs/legitify/internal/outputer"
+	"github.com/Legit-Labs/legitify/internal/screen"
 )
 
 type analyzeExecutor struct {
@@ -16,25 +17,24 @@ type analyzeExecutor struct {
 	analyzer        analyzers.Analyzer
 	enricherManager enricher.EnricherManager
 	out             outputer.Outputer
-	log             *log.Logger
 }
 
 func initializeAnalyzeExecutor(manager collectors_manager.CollectorManager,
 	analyzer analyzers.Analyzer,
 	enricherManager enricher.EnricherManager,
-	outputer outputer.Outputer,
-	log *log.Logger) *analyzeExecutor {
+	outputer outputer.Outputer) *analyzeExecutor {
 	return &analyzeExecutor{
 		manager:         manager,
 		analyzer:        analyzer,
 		enricherManager: enricherManager,
 		out:             outputer,
-		log:             log,
 	}
 }
 
 func (r *analyzeExecutor) Run() error {
-	r.log.Printf("Gathering collection metadata...")
+	defer errlog.FlushAll()
+
+	screen.Printf("Gathering collection metadata...")
 	collectionMetadata := r.manager.CollectMetadata()
 	progressBar := progressbar.NewProgressBar(collectionMetadata)
 

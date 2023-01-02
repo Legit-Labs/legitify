@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/Legit-Labs/legitify/internal/common/types"
 
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -43,7 +44,7 @@ func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	if err = setErrorFile(listOrgsArgs.ErrorFile); err != nil {
+	if _, err = setErrorFile(listOrgsArgs.ErrorFile); err != nil {
 		return err
 	}
 

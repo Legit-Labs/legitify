@@ -1,15 +1,19 @@
 package organization
+
 import data.common.webhooks as webhookUtils
 
 # METADATA
 # scope: rule
 # title: Webhook Configured Without A Secret
-# description: Webhooks that are not configured with a token authenticated to validate the origin of the request and could make your software vulnerable.
+# description: Webhooks are not configured with an authenticated token to validate the origin of the request and could make your software vulnerable.
 # custom:
 #   requiredEnrichers: [hooksList]
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Configure a secret , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
+#   threat: 
+#     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
+#     - "This allows attackers to masquerade as your organization, potentially creating an unstable or insecure state in other systems."
 organization_webhook_no_secret[violated] = true {
     some index
     hook := input.hooks[index]
@@ -29,6 +33,9 @@ organization_webhook_no_secret[violated] = true {
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Verify url starts with https, Enable "SSL verification" , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
+#   threat:
+#     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
+#     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
 organization_webhook_doesnt_require_ssl[violated] = true {
     some index
     hook := input.hooks[index]
@@ -49,7 +56,8 @@ organization_webhook_doesnt_require_ssl[violated] = true {
 #   requiredScopes: [admin:org]
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
-default two_factor_authentication_not_required_for_org  = false
+default two_factor_authentication_not_required_for_org = false
+
 two_factor_authentication_not_required_for_org {
     input.organization.two_factor_requirement_enabled == false
 }
@@ -93,6 +101,7 @@ default_repository_permission_is_not_none {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Enter "Authentication security" tab, Toggle on "Enable SAML authentication", Fill in the remaining SSO configuration as instructed on the screen, Click "Save"]
 #   requiredScopes: [admin:org]
+#   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions accross different systems, prevents the organization from defining a common password policy, and makes it challenging to audit different aspects of the user's behavior.
 default organization_not_using_single_sign_on = false
 organization_not_using_single_sign_on {
     input.saml_enabled == false

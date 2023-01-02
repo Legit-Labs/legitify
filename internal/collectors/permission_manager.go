@@ -2,11 +2,11 @@ package collectors
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/iancoleman/orderedmap"
 )
 
@@ -62,9 +62,8 @@ func CollectMissingPermissions(missingPermissionChan chan MissingPermission) {
 	}
 
 	// Build missing permissions string
-	var sb strings.Builder
 	for _, permission := range permMap.Keys() {
-		sb.WriteString(fmt.Sprintf("missing permission: \"%s\" on:\n", permission))
+		errlog.PermIssueF("missing permission: \"%s\" on:\n", permission)
 		entity := utils.UnsafeGet(permMap, permission).(*orderedmap.OrderedMap)
 		for _, entityName := range entity.Keys() {
 			effects := utils.UnsafeGet(entity, entityName).(effectSet)
@@ -76,8 +75,7 @@ func CollectMissingPermissions(missingPermissionChan chan MissingPermission) {
 				filteredEffects = append(filteredEffects, effect)
 			}
 			effectString := strings.Join(filteredEffects, ", ")
-			sb.WriteString(fmt.Sprintf("    - %s [%s]\n", entityName, effectString))
+			errlog.PermIssueF("    - %s [%s]\n", entityName, effectString)
 		}
 	}
-	log.Print(sb.String())
 }

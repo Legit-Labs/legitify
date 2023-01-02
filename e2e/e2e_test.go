@@ -8,6 +8,8 @@ import (
 
 var reportPath = flag.String("report_path", "/tmp/out.json", "legitify report output path")
 
+const pathToEntityName = "aux->entityName"
+
 func TestGitHub(t *testing.T) {
 	tests := [][]testCase{
 		testCasesGitHubOrganization,
@@ -17,29 +19,36 @@ func TestGitHub(t *testing.T) {
 	}
 
 	for _, testCases := range tests {
-		AssertionLoop(t, testCases)
+		assertionLoop(t, testCases)
 	}
 }
 
-func AssertionLoop(t *testing.T, tests []testCase) {
+func assertTestStatus(t *testing.T, jq *gojsonq.JSONQ, testPath, entityName, expectedStatus string) {
+	jq.Reset()
+	testFormattedPath := testPath + "->violations"
+	res := jq.From(testFormattedPath).Where(pathToEntityName, "=", entityName).Where("Status", "=", expectedStatus).Count()
+	if res == 0 {
+		t.Logf("Failed on test %s Entity %s did not pass expected %s count %d", testPath, entityName, expectedStatus, res)
+		t.Fail()
+	}
+}
+
+func assertionLoop(t *testing.T, tests []testCase) {
 	jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
 	for _, test := range tests {
 		t.Logf("Testing: %s", test.path)
-		testFormattedPath := test.path + "->violations"
-		res := jq.From(testFormattedPath).Where("aux->entityName", "=", test.passedEntity).Where("Status", "=", "PASSED").Count()
 
-		if res != 1 {
-			t.Logf("Failed on test %s, Entity %s did not pass", test.path, test.passedEntity)
-			t.Fail()
+		if test.passedEntity != "" {
+			assertTestStatus(t, jq, test.path, test.passedEntity, "PASSED")
 		}
-		jq.Reset()
-		res = jq.From(testFormattedPath).Where("aux->entityName", "=", test.failedEntity).Where("Status", "=", "FAILED").Count()
 
-		if res != 1 {
-			t.Logf("Failed on test: %s, Entity: %s did not failed", test.path, test.failedEntity)
-			t.Fail()
+		if test.failedEntity != "" {
+			assertTestStatus(t, jq, test.path, test.failedEntity, "FAILED")
 		}
-		jq.Reset()
+
+		if test.skippedEntity != "" {
+			assertTestStatus(t, jq, test.path, test.skippedEntity, "SKIPPED")
+		}
 	}
 }
 
@@ -69,6 +78,14 @@ func TestGitLab(t *testing.T) {
 			path:         "data.repository.missing_default_branch_protection",
 			failedEntity: "failed_repo",
 			passedEntity: "passed_repo",
+		},
+		{
+			path:          "data.member.two_factor_authentication_is_disabled_for_a_collaborator",
+			skippedEntity: "legitify-test",
+		},
+		{
+			path:          "data.member.two_factor_authentication_is_disabled_for_an_external_collaborator",
+			skippedEntity: "legitify-test",
 		},
 		{
 			path:         "data.repository.code_review_by_two_members_not_required",
@@ -106,6 +123,5 @@ func TestGitLab(t *testing.T) {
 			passedEntity: "passed_repo",
 		},
 	}
-	AssertionLoop(t, tests)
-
+	assertionLoop(t, tests)
 }
