@@ -33,6 +33,7 @@ type AnalyzedData struct {
 	Annotations              *ast.Annotations
 	RequiredEnrichers        []string
 	RemediationSteps         []string
+	Threat                   []string
 	Severity                 severity.Severity
 	CanonicalLink            string
 	ExtraData                interface{}
@@ -68,6 +69,7 @@ func newAnalyzedData(collectedData collectors.CollectedData, result opa_engine.Q
 		Description:              result.Annotations.Description,
 		RequiredEnrichers:        parsing_utils.ResolveAnnotation(result.Annotations.Custom["requiredEnrichers"]),
 		RemediationSteps:         parsing_utils.ResolveAnnotation(result.Annotations.Custom["remediationSteps"]),
+		Threat:                   parsing_utils.ResolveAnnotation(result.Annotations.Custom["threat"]),
 		Severity:                 resolveSeverity(result),
 		CanonicalLink:            collectedData.Entity.CanonicalLink(),
 		ExtraData:                result.ExtraData,

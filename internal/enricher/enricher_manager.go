@@ -32,6 +32,7 @@ type EnrichedData struct {
 	Title                    string
 	Description              string
 	Enrichers                map[string]enrichers.Enrichment
+	Threat                   []string
 	RemediationSteps         []string
 	Severity                 severity.Severity
 	CanonicalLink            string
@@ -69,6 +70,7 @@ func newEnrichedData(analyzed analyzers.AnalyzedData, enrichments map[string]enr
 		Title:                    analyzed.Title,
 		Description:              analyzed.Description,
 		Enrichers:                enrichments,
+		Threat:                   analyzed.Threat,
 		Severity:                 analyzed.Severity,
 		RemediationSteps:         analyzed.RemediationSteps,
 		CanonicalLink:            analyzed.CanonicalLink,
