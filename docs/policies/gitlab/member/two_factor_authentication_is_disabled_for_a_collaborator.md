@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Two Factor Authentication Is Disabled For A Collaborator
+title: Two Factor Authentication Is Disabled For a Collaborator
 parent: Member Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Two Factor Authentication Is Disabled For A Collaborator
+## Two Factor Authentication Is Disabled For a Collaborator
 policy name: two_factor_authentication_is_disabled_for_a_collaborator
 
 severity: HIGH
 
 ### Description
-Collaborator's two factor authentication is disabled. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
+A collaborator's two factor authentication is disabled at the source code management system. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 
 
 ### Remediation

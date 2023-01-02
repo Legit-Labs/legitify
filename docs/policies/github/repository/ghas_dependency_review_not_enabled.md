@@ -14,10 +14,6 @@ severity: MEDIUM
 ### Description
 Enable GitHub Advanced Security dependency review to avoid introducing new vulnerabilities
 
-### Threat Example(s)
-A user can add dependencies to vulnerable third-party dependencies therefore introducing vulnerabilities to your application.
-
-
 
 ### Remediation
 1. Make sure you have admin permissions

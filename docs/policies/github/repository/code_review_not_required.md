@@ -12,11 +12,7 @@ policy name: code_review_not_required
 severity: HIGH
 
 ### Description
-In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository.
-
-### Threat Example(s)
-Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production.
-
+In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository. An even safer option is to require 2 separate reviewers, which is enforced in the Legitify policy "Default Branch Doesn't Require Code Review By At Least Two Reviewers".
 
 
 ### Remediation

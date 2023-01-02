@@ -14,10 +14,6 @@ severity: LOW
 ### Description
 It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the repository.
 
-### Threat Example(s)
-Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production.
-
-
 
 ### Remediation
 1. Make sure you have owner permissions

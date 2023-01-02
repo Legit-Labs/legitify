@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Merge request authors may override the approvers list
+title: Merge Request Authors Nay Override the Approvers List
 parent: Repository Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Merge request authors may override the approvers list
+## Merge Request Authors Nay Override the Approvers List
 policy name: repository_allows_overriding_approvers
 
 severity: MEDIUM

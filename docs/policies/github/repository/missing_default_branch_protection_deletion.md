@@ -14,10 +14,6 @@ severity: MEDIUM
 ### Description
 The history of the default branch is not protected against deletion for this repository.
 
-### Threat Example(s)
-Users could merge code without any restrictions which could lead to insecure code reaching your main branch and production.
-
-
 
 ### Remediation
 1. Make sure you have admin permissions

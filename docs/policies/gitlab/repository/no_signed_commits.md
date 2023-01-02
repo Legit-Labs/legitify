@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Unsinged Commits Are Not Allowed
+title: Unsigned Commits Are Allowed
 parent: Repository Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Unsinged Commits Are Not Allowed
+## Unsigned Commits Are Allowed
 policy name: no_signed_commits
 
 severity: LOW

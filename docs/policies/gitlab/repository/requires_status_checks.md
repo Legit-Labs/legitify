@@ -12,11 +12,7 @@ policy name: requires_status_checks
 severity: MEDIUM
 
 ### Description
-the checks which validate the quality and security of the code are not required to pass before submitting new changes. It is advised to turn this control on to ensure any existing or future check will be required to pass
-
-### Threat Example(s)
-Users could merge its code without all required checks passes what could lead to insecure code reaching your main branch and production.
-
+Checks that validate the quality and security of the code are not required to pass before submitting new changes. It is advised to turn this flag on to ensure any existing or future check will be required to pass.
 
 
 ### Remediation

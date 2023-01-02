@@ -12,11 +12,7 @@ policy name: requires_status_checks
 severity: MEDIUM
 
 ### Description
-Branch protection is enabled, however, the checks which validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures code is up-to-date in order to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass. This option is found in the branch protection setting for the repository.
-
-### Threat Example(s)
-Users could merge its code without all required checks passes what could lead to insecure code reaching your main branch and production.
-
+Branch protection is enabled. However, the checks which validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures code is up-to-date in order to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass. This option is found in the branch protection setting for the repository.
 
 
 ### Remediation

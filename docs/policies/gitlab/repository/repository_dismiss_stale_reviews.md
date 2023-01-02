@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Repository Dismiss Stale Reviews
+title: Default Branch Doesn't Require New Code Changes After Approval To Be Re-Approved
 parent: Repository Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Repository Dismiss Stale Reviews
+## Default Branch Doesn't Require New Code Changes After Approval To Be Re-Approved
 policy name: repository_dismiss_stale_reviews
 
 severity: LOW
 
 ### Description
-New code changes after approval are not required to be re-approved
+This security control prevents merging code that was approved but later on changed. Turning it on ensures new changes are required to be reviewed again. This setting is part of the Merge request approval settings, and hardens the code-review process. If turned off - a developer can change the code after approval, and push code that is different from the one that was previously allowed.
 
 
 ### Remediation
