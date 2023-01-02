@@ -46,8 +46,8 @@ By default, legitify will check the policies against all your resources (organiz
 
 You can control which resources will be analyzed with command-line flags namespace and org:
 - `--namespace (-n)`: will analyze policies that relate to the specified resources 
-- `--org`: will limit the analysis to the specified organizations
-- `--repo`: will limit the analysis to the specified repositories
+- `--org`: will limit the analysis to the specified GitHub organizations or GitLab group
+- `--repo`: will limit the analysis to the specified GitHub repositories or GitLab projects
 - `--scm`: specify the source code management platform. Possible values are: `github` or `gitlab`. Defaults to `github`. Please note: when running on GitLab, `--scm gitlab` is required.
 
 ```
@@ -74,7 +74,7 @@ export SERVER_URL="https://github.example.com/"
 LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
 ### GitLab Cloud/Server
-1. As mentioned in the previous section, you need to be an owner of at least one GitLab group. Otherwise, you can still use the tool if you're an admin of at least one project inside a group, in which case you'll be able to see only repository-related policies results.
+1. As mentioned in the previous section, you need to be an owner of at least one GitLab group. Otherwise, you can still use the tool if you're an admin of at least one project inside a group, in which case you'll be able to see only project-related policies results.
 2. legitify requires a GitLab personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`LEGITIFY_TOKEN`).
   The PAT needs the following scopes for full analysis:
     ```
@@ -91,10 +91,10 @@ LEGITIFY_TOKEN=<your_token> legitify analyze --namespace organization --scm gitl
 ## Namespaces
 Namespaces in legitify are resources that are collected and run against the policies.
 Currently, the following namespaces are supported:
-1. `organization` - organization level policies (e.g., "Two-Factor Authentication Is Not Enforced for the Organization")
+1. `organization` - GitHub organization (or GitLab group) level policies (e.g., "Two-Factor Authentication Is Not Enforced for the Organization")
 2. `actions`      - organization GitHub Actions policies (e.g., "GitHub Actions Runs Are Not Limited To Verified Actions")
-3. `member`       - organization members policies (e.g., "Stale Admin Found")
-4. `repository`   - repository level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
+3. `member`       - GitHub organization (or GitLab group) members policies (e.g., "Stale Admin Found")
+4. `repository`   - GitHub repository (or GitLab Project) level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
 5. `runner_group` - runner group policies (e.g, "runner can be used by public repositories")
 
 By default, legitify will analyze all namespaces. You can limit only to selected ones with the `--namespace` flag, and then a comma separated list of the selected namespaces.
@@ -130,7 +130,7 @@ When outputting in a human-readable format, legitify support the conventional `-
 ### Misc
 - Use the `--failed-only` flag to filter-out passed/skipped checks from the result.
 
-## Scorecard Support
+## Scorecard Support - Only for GitHub server/cloud repositories
 [scorecard](https://github.com/ossf/scorecard) is an OSSF's open-source project:
 > Scorecards is an automated tool that assesses a number of important heuristics ("checks") associated with software security and assigns each check a score of 0-10. You can use these scores to understand specific areas to improve in order to strengthen the security posture of your project. You can also assess the risks that dependencies introduce, and make informed decisions about accepting these risks, evaluating alternative solutions, or working with the maintainers to make improvements.
 
@@ -160,7 +160,7 @@ legitify runs the following scorecard checks:
 |Webhooks|V|V|
 
 ## Policies
-legitify comes with a set of policies in the `policies/github` directory.
+legitify comes with a set of policies for each SCM in the `policies/` directory.
 These policies are documented [here](https://legitify.dev/policies.html).
 
 In addition, you can use the `--policies-path (-p)` flag to specify a custom directory for OPA policies.
