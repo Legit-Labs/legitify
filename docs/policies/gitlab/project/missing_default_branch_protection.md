@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Default Branch Is Not Protected
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Unsigned Commits Are Allowed
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

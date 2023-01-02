@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Merge Request Authors Nay Override the Approvers List
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

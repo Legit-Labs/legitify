@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Project Has Too Many Owners
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

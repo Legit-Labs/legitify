@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Repository Allows Review Requester To Approve Their Own Request
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Default Branch Allows Force Pushes
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Project Doesn’t Require All Pipelines to Succeed
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

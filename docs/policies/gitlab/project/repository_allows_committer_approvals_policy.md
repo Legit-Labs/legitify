@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Repository Allows Committer Approvals Policy
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

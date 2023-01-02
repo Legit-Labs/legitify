@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Project Doesn't Require All Conversations To Be Resolved Before Merge
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

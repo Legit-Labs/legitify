@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Group does not enforce branch protection by default
-parent: Organization Policies
+parent: Group Policies
 grand_parent: GitLab Policies
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Project Doesn't Require Code Review
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

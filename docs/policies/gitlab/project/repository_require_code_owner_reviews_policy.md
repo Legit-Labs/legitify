@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Code review is not limited to code-owners only
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

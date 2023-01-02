@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Webhook Configured Without SSL Verification
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

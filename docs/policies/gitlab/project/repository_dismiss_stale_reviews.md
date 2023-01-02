@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Default Branch Doesn't Require New Code Changes After Approval To Be Re-Approved
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

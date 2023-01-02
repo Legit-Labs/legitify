@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Forking Allowed for This Repository
-parent: Repository Policies
+parent: Project Policies
 grand_parent: GitLab Policies
 ---
 

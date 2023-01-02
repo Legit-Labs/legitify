@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Collaborators Can Fork Repositories To External Namespaces
-parent: Organization Policies
+parent: Group Policies
 grand_parent: GitLab Policies
 ---
 

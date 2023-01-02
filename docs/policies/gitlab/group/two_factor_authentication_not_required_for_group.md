@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Two-Factor Authentication Is Not Enforced For The Group
-parent: Organization Policies
+parent: Group Policies
 grand_parent: GitLab Policies
 ---
 
