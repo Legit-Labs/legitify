@@ -1,4 +1,4 @@
-# This workflow will run legitify analyze against the org from which the workflow is running from, using a specific version of legitify.
+# This workflow will run legitify analyze using a specific version of legitify.
 # In this example, 0.1.6. For all versions, see https://github.com/Legit-Labs/legitify/releases
 name: Legitify Analyze
 on:
