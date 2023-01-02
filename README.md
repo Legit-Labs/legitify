@@ -93,7 +93,7 @@ Namespaces in legitify are resources that are collected and run against the poli
 Currently, the following namespaces are supported:
 1. `organization` - GitHub organization (or GitLab group) level policies (e.g., "Two-Factor Authentication Is Not Enforced for the Organization")
 2. `actions`      - organization GitHub Actions policies (e.g., "GitHub Actions Runs Are Not Limited To Verified Actions")
-3. `member`       - GitHub organization (or GitLab group) members policies (e.g., "Stale Admin Found")
+3. `member`       - contributor level policies (e.g., "Stale Admin Found")
 4. `repository`   - GitHub repository (or GitLab Project) level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
 5. `runner_group` - runner group policies (e.g, "runner can be used by public repositories")
 
