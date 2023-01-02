@@ -6,9 +6,7 @@ type Namespace = string
 
 const (
 	Organization Namespace = "organization"
-	Group        Namespace = "group"
 	Repository   Namespace = "repository"
-	Project      Namespace = "project"
 	Member       Namespace = "member"
 	Actions      Namespace = "actions"
 	RunnerGroup  Namespace = "runner_group"

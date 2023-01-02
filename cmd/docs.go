@@ -24,10 +24,10 @@ const (
 	argDocsOutputFile = "output-file"
 )
 
-var translationMapping = map[scm_type.ScmType]map[namespace.Namespace]namespace.Namespace{
+var translationMapping = map[scm_type.ScmType]map[namespace.Namespace]string{
 	scm_type.GitLab: {
-		namespace.Organization: namespace.Group,
-		namespace.Repository:   namespace.Project,
+		namespace.Organization: "group",
+		namespace.Repository:   "project",
 	},
 }
 
@@ -114,14 +114,15 @@ func resolveStringArray(customField interface{}) []string {
 }
 
 func translator(scmType scm_type.ScmType, module string) string {
-	val, ok := translationMapping[scmType]
-	if ok {
-		translatedModule, ok := val[module]
-		if ok {
-			return translatedModule
-		}
+	scmMap, ok := translationMapping[scmType]
+	if !ok {
+		return module
 	}
-	return module
+	translatedModule, ok := scmMap[module]
+	if !ok {
+		return module
+	}
+	return translatedModule
 }
 
 func generateDocs(engine *opa_engine.Enginer, scmType scm_type.ScmType) map[string][]PolicyDoc {
