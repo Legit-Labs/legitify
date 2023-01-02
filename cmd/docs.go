@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"os"
 	"sort"
@@ -22,6 +23,13 @@ const (
 	cmdDocs           = "generate-docs"
 	argDocsOutputFile = "output-file"
 )
+
+var translationMapping = map[scm_type.ScmType]map[namespace.Namespace]namespace.Namespace{
+	scm_type.GitLab: {
+		namespace.Organization: namespace.Group,
+		namespace.Repository:   namespace.Project,
+	},
+}
 
 func newDocsCommand() *cobra.Command {
 	docsCmd := &cobra.Command{
@@ -54,7 +62,7 @@ func executeDocsCommand(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		docs := generateDocs(&engine)
+		docs := generateDocs(&engine, scmType)
 		result[scmType] = docs
 	}
 
@@ -105,14 +113,25 @@ func resolveStringArray(customField interface{}) []string {
 	return retval
 }
 
-func generateDocs(engine *opa_engine.Enginer) map[string][]PolicyDoc {
+func translator(scmType scm_type.ScmType, module string) string {
+	val, ok := translationMapping[scmType]
+	if ok {
+		translatedModule, ok := val[module]
+		if ok {
+			return translatedModule
+		}
+	}
+	return module
+}
+
+func generateDocs(engine *opa_engine.Enginer, scmType scm_type.ScmType) map[string][]PolicyDoc {
 	result := make(map[string][]PolicyDoc)
 	annotations := (*engine).Annotations().Flatten()
 
 	for _, a := range annotations {
 		policy := a.GetRule()
 		module := policy.Module.Package.Path.String()
-		module = strings.Replace(module, "data.", "", 1)
+		module = translator(scmType, strings.Replace(module, "data.", "", 1))
 
 		if _, ok := result[module]; !ok {
 			result[module] = []PolicyDoc{}
