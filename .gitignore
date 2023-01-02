@@ -18,7 +18,7 @@ legitify
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-dist/
+/dist/
 .idea/
 error.log
 .vscode
