@@ -7,7 +7,7 @@ grand_parent: GitLab Policies
 
 
 ## Project Has Too Many Owners
-policy name: repository_has_too_many_admins
+policy name: project_has_too_many_admins
 
 severity: LOW
 

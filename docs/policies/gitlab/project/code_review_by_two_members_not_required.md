@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Project Doesn't Require Code Review By At Least Two Reviewers
+title: Project Doesn't Require Code Review By At Least Two Reviewers For Default Branch
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Project Doesn't Require Code Review By At Least Two Reviewers
+## Project Doesn't Require Code Review By At Least Two Reviewers For Default Branch
 policy name: code_review_by_two_members_not_required
 
 severity: MEDIUM

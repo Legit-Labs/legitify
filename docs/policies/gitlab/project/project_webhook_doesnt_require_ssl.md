@@ -7,7 +7,7 @@ grand_parent: GitLab Policies
 
 
 ## Webhook Configured Without SSL Verification
-policy name: repository_webhook_doesnt_require_ssl
+policy name: project_webhook_doesnt_require_ssl
 
 severity: LOW
 
@@ -21,8 +21,8 @@ In the case of GitLab Self-Managed, it may be sufficient only to control the DNS
 
 
 ### Remediation
-1. Make sure you can manage webhooks for the repository
-2. Go to the repository settings page
+1. Make sure you can manage webhooks for the project
+2. Go to the project's settings page
 3. Select "Webhooks"
 4. Press on the "Enable SSL verfication"
 5. Click "Save changes"

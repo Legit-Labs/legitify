@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Project Doesn't Require Code Review
+title: Project Doesn't Require Code Review For Default Branch
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Project Doesn't Require Code Review
+## Project Doesn't Require Code Review For Default Branch
 policy name: code_review_not_required
 
 severity: HIGH

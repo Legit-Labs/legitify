@@ -1,13 +1,13 @@
 ---
 layout: default
-title: Repository not maintained
+title: Project not maintained
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Repository not maintained
-policy name: repository_not_maintained
+## Project not maintained
+policy name: project_not_maintained
 
 severity: HIGH
 
@@ -17,7 +17,7 @@ The project was not active in the last 3 months. A project which is not active m
 
 ### Remediation
 1. Make sure you have admin permissions
-2. Either Delete or Archive the repository
+2. Either Delete or Archive the project
 
 
 
