@@ -8,12 +8,13 @@
 
  <img width="250" alt="Legitify Logo" src="https://user-images.githubusercontent.com/74864790/174815311-746a0c98-9a1f-44a9-808c-035788edfd4d.png">
  
-Strengthen the security posture of your GitHub organization! <br/>
-Detect and remediate misconfigurations, security and compliance issues across all your GitHub assets with ease 🔥 <br/>
+Strengthen the security posture of your source-code management! <br/>
+Detect and remediate misconfigurations, security and compliance issues across all your GitHub and GitLab assets with ease 🔥 <br/>
  by [Legit Security](https://www.legitsecurity.com/)
 </div>
 
-https://user-images.githubusercontent.com/74864790/178964716-825840a6-d714-4b1d-a41e-efa2728507a6.mp4
+
+https://user-images.githubusercontent.com/107790206/210334552-eee03c72-da1f-4c23-8d64-3f07fc271631.mov
 
 ## Installation
 
@@ -42,18 +43,6 @@ ARCH=darwin_arm64
 ./slsa-verifier verify-artifact --source-branch main --builder-id 'https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.2.2' --source-uri "git+https://github.com/Legit-Labs/legitify" --provenance-path multiple.intoto.jsonl ./legitify_${VERSION}_${ARCH}.tar.gz
 ```
 
-## Requirements
-
-1. To get the most out of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository inside an organization, in which case you'll be able to see only repository-related policies results.
-2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`$GITHUB_ENV`).
-   The PAT needs the following scopes for full analysis:
-
-```
-admin:org, read:enterprise, admin:org_hook, read:org, repo, read:repo_hook
-```
-
-See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information.  
-Fine-grained personal access tokens are currently not supported because they do not support GitHub's GraphQL (https://github.blog/2022-10-18-introducing-fine-grained-personal-access-tokens-for-github/)
 
 ## CLI Usage
 
@@ -64,9 +53,11 @@ LEGITIFY_TOKEN=<your_token> legitify analyze
 By default, legitify will check the policies against all your resources (organizations, repositories, members, actions).
 
 You can control which resources will be analyzed with command-line flags namespace and org:
+- `--namespace (-n)`: will analyze policies that relate to the specified resources 
+- `--org`: will limit the analysis to the specified GitHub organizations or GitLab group
+- `--repo`: will limit the analysis to the specified GitHub repositories or GitLab projects
+- `--scm`: specify the source code management platform. Possible values are: `github` or `gitlab`. Defaults to `github`. Please note: when running on GitLab, `--scm gitlab` is required.
 
-- `--namespace (-n)`: will analyze policies that relate to the specified resources
-- `--org`: will limit the analysis to the specified organizations
 
 ```
 LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
@@ -78,17 +69,34 @@ The above command will test organization and member policies against org1 and or
 
 You can also run legitify as a GitHub action in your workflows, see the **action_examples** directory for concrete examples.
 
-## GitHub Enterprise Support
 
-You can run legitify against a GitHub Enterprise instance if you set the endpoint URL in the environment variable `SERVER_URL`:
+## Requirements
+### GitHub (Cloud and Enterprise Server)
+1. To get the most out of legitify, you need to be an owner of at least one GitHub organization. Otherwise, you can still use the tool if you're an admin of at least one repository inside an organization, in which case you'll be able to see only repository-related policies results.
+2. legitify requires a GitHub personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`LEGITIFY_TOKEN`).
+   The PAT needs the following scopes for full analysis:
+  ```
+  admin:org, read:enterprise, admin:org_hook, read:org, repo, read:repo_hook
+  ```
+See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information.  
+Fine-grained personal access tokens are currently not supported because they do not support GitHub's GraphQL (https://github.blog/2022-10-18-introducing-fine-grained-personal-access-tokens-for-github/)
+
+### GitHub Enterprise Server
+You can run legitify against a GitHub Enterprise Server instance if you set the endpoint URL in the environment variable ``SERVER_URL``:
+
 
 ```sh
 export SERVER_URL="https://github.example.com/"
 LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organization,member
 ```
-
-## GitLab Cloud/Server Support
-
+### GitLab Cloud/Server
+1. As mentioned in the previous section, you need to be an owner of at least one GitLab group. Otherwise, you can still use the tool if you're an admin of at least one project inside a group, in which case you'll be able to see only project-related policies results.
+2. legitify requires a GitLab personal access token (PAT) to analyze your resources successfully, which can be either provided as an argument (`-t`) or as an environment variable (`LEGITIFY_TOKEN`).
+  The PAT needs the following scopes for full analysis:
+    ```
+    read_api, read_user, read_repository, read_registry
+    ```
+  See [Creating a Personal Access Token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) for more information.  
 To run legitify against GitLab Cloud set the scm flag to gitlab `--scm gitlab`, to run against GitLab Server you need to provide also SERVER_URL:
 
 ```sh
@@ -100,11 +108,10 @@ LEGITIFY_TOKEN=<your_token> legitify analyze --namespace organization --scm gitl
 
 Namespaces in legitify are resources that are collected and run against the policies.
 Currently, the following namespaces are supported:
-
-1. `organization` - organization level policies (e.g., "Two-Factor Authentication Is Not Enforced for the Organization")
-2. `actions` - organization GitHub Actions policies (e.g., "GitHub Actions Runs Are Not Limited To Verified Actions")
-3. `member` - organization members policies (e.g., "Stale Admin Found")
-4. `repository` - repository level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
+1. `organization` - GitHub organization (or GitLab group) level policies (e.g., "Two-Factor Authentication Is Not Enforced for the Organization")
+2. `actions`      - organization GitHub Actions policies (e.g., "GitHub Actions Runs Are Not Limited To Verified Actions")
+3. `member`       - contributor level policies (e.g., "Stale Admin Found")
+4. `repository`   - GitHub repository (or GitLab Project) level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
 5. `runner_group` - runner group policies (e.g, "runner can be used by public repositories")
 
 By default, legitify will analyze all namespaces. You can limit only to selected ones with the `--namespace` flag, and then a comma separated list of the selected namespaces.
@@ -149,8 +156,7 @@ When outputting in a human-readable format, legitify support the conventional `-
 
 - Use the `--failed-only` flag to filter-out passed/skipped checks from the result.
 
-## Scorecard Support
-
+## Scorecard Support - Only for GitHub server/cloud repositories
 [scorecard](https://github.com/ossf/scorecard) is an OSSF's open-source project:
 
 > Scorecards is an automated tool that assesses a number of important heuristics ("checks") associated with software security and assigns each check a score of 0-10. You can use these scores to understand specific areas to improve in order to strengthen the security posture of your project. You can also assess the risks that dependencies introduce, and make informed decisions about accepting these risks, evaluating alternative solutions, or working with the maintainers to make improvements.
@@ -182,8 +188,8 @@ legitify runs the following scorecard checks:
 |Webhooks|V|V|
 
 ## Policies
+legitify comes with a set of policies for each SCM in the `policies/` directory.
 
-legitify comes with a set of policies in the `policies/github` directory.
 These policies are documented [here](https://legitify.dev/policies.html).
 
 In addition, you can use the `--policies-path (-p)` flag to specify a custom directory for OPA policies.
