@@ -13,7 +13,8 @@ Detect and remediate misconfigurations, security and compliance issues across al
  by [Legit Security](https://www.legitsecurity.com/)
 </div>
 
-https://user-images.githubusercontent.com/74864790/178964716-825840a6-d714-4b1d-a41e-efa2728507a6.mp4
+
+https://user-images.githubusercontent.com/107790206/210334552-eee03c72-da1f-4c23-8d64-3f07fc271631.mov
 
 ## Installation
 
