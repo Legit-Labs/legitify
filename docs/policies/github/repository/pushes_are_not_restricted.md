@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Default Branch Allows Pushes to Protected Branch
+title: Default Branch Doesn't Restrict Who Can Push
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Allows Pushes to Protected Branch
+## Default Branch Doesn't Restrict Who Can Push
 policy name: pushes_are_not_restricted
 
-severity: MEDIUM
+severity: LOW
 
 ### Description
-By default, commits can be pushed directly to protected branches, without going through a Pull Request. Restrict pushes to protected branches so that commits can be added only via merges, which require Pull Request.
+By default, commits can be pushed directly to protected branches, without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
 
 
 ### Remediation
@@ -22,7 +22,8 @@ By default, commits can be pushed directly to protected branches, without going 
 4. Under "Branch protection rules"
 5. Click "Edit" on the default branch rule
 6. Check "Restrict who can push to matching branches"
-7. Click "Save changes"
+7. Choose who should be allowed to push
+8. Click "Save changes"
 
 
 
