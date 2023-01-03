@@ -378,11 +378,11 @@ review_dismissal_allowed {
 
 # METADATA
 # scope: rule
-# title: Default Branch Allows Pushes to Protected Branch
-# description: By default, commits can be pushed directly to protected branches, without going through a Pull Request. Restrict pushes to protected branches so that commits can be added only via merges, which require Pull Request.
+# title: Default Branch Doesn't Restrict Who Can Push
+# description: By default, commits can be pushed directly to protected branches, without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
 # custom:
-#    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can push to matching branches", Click "Save changes"]
-#    severity: MEDIUM
+#    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can push to matching branches", Choose who should be allowed to push, Click "Save changes"]
+#    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
 #    threat: An attacker with write credentials may introduce vulnerabilities to your code without your knowledge. Alternatively, contributors may commit unsafe code that is buggy or easy to exploit that could have been caught using a review process.
