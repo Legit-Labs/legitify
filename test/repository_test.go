@@ -310,7 +310,7 @@ func TestRepositoryActionsSettingsActionsCanApprovePullRequests(t *testing.T) {
 
 func TestGitlabRepositoryTooManyAdmins(t *testing.T) {
 	name := "Project Has Too Many Owners"
-	testedPolicyName := "repository_has_too_many_admins"
+	testedPolicyName := "project_has_too_many_admins"
 
 	makeMockData := func(flag []*gitlab2.ProjectMember) gitlabcollected.Repository {
 		return gitlabcollected.Repository{
@@ -357,7 +357,7 @@ func TestGitlabRepositoryAllowForking(t *testing.T) {
 
 func TestGitlabRepositoryNotMaintained(t *testing.T) {
 	name := "Repository not maintained"
-	testedPolicyName := "repository_not_maintained"
+	testedPolicyName := "project_not_maintained"
 
 	makeMockData := func(flag *gitlab2.Project) gitlabcollected.Repository {
 		return gitlabcollected.Repository{Project: flag}
@@ -432,7 +432,7 @@ func TestGitlabRepositoryMissingForcePushProtection(t *testing.T) {
 
 func TestGitlabWebhookSSL(t *testing.T) {
 	name := "Webhook Configured Without SSL Verification"
-	testedPolicyName := "repository_webhook_doesnt_require_ssl"
+	testedPolicyName := "project_webhook_doesnt_require_ssl"
 
 	makeMockData := func(flag []*gitlab2.ProjectHook) gitlabcollected.Repository {
 		return gitlabcollected.Repository{Webhooks: flag}
