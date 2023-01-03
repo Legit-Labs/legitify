@@ -2,14 +2,14 @@ package repository
 
 # METADATA
 # scope: rule
-# title: Repository not maintained
+# title: Project not maintained
 # description: The project was not active in the last 3 months. A project which is not active might not be patched against security issues within its code and dependencies, and is therefore at higher risk of including unpatched vulnerabilities.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
+#   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the project]
 #   severity: HIGH
 #   threat: As new vulnerabilities are found over time, unmaintained repositories are more likely to point to dependencies that have known vulnerabilities, exposing these repositories to 1-day attacks.
-default repository_not_maintained = false
-repository_not_maintained {
+default project_not_maintained = false
+project_not_maintained {
     input.archived == false
     ns := time.parse_rfc3339_ns(input.last_activity_at)
     now := time.now_ns()
@@ -19,7 +19,7 @@ repository_not_maintained {
     diff[monthsIndex] >= inactivityMonthsThreshold
 }
 
-repository_not_maintained {
+project_not_maintained {
     input.archived == false
     ns := time.parse_rfc3339_ns(input.last_activity_at)
     now := time.now_ns()
@@ -38,8 +38,8 @@ repository_not_maintained {
 #   threat:
 #     - "A compromised user with owner permissions can initiate a supply chain attack in a plethora of ways."
 #     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past."
-default repository_has_too_many_admins = false
-repository_has_too_many_admins {
+default project_has_too_many_admins = false
+project_has_too_many_admins {
     admins := [admin | admin := input.members[_]; admin.access_level == 50]
     count(admins) > 3
 }
@@ -94,7 +94,7 @@ missing_default_branch_protection_force_push {
 # METADATA
 # scope: rule
 # title: Code review is not limited to code-owners only
-# description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the repository.
+# description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the project.
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Check the "Code owner approval"]
 #   severity: LOW
@@ -116,12 +116,12 @@ repository_require_code_owner_reviews_policy {
 # description: Webhooks that are not configured with SSL verification enabled could expose your sofware to man in the middle attacks (MITM).
 # custom:
 #   severity: LOW
-#   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
+#   remediationSteps: [Make sure you can manage webhooks for the project, Go to the project's settings page, Select "Webhooks", Press on the "Enable SSL verfication", Click "Save changes"]
 #   threat:
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
 #     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
-default repository_webhook_doesnt_require_ssl = false
-repository_webhook_doesnt_require_ssl {
+default project_webhook_doesnt_require_ssl = false
+project_webhook_doesnt_require_ssl {
     webhooks_without_ssl_verification := [webhook_without_verification | webhook_without_verification := input.webhooks[_]; webhook_without_verification.enable_ssl_verification == false]
     count(webhooks_without_ssl_verification) > 0
 }
