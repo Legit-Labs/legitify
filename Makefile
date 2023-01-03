@@ -83,9 +83,7 @@ test: generate_mocks
 
 docs: build
 	./legitify generate-docs -o generated-docs.yaml
-	rm -rf ./docs/policies
-	mkdir ./docs/policies
-	./scripts/gen-gh-pages-docs.py generated-docs.yaml ./docs/policies
+	rm -rf ./docs/github
+	rm -rf ./docs/gitlab
+	./scripts/gen-gh-pages-docs.py generated-docs.yaml ./docs/
 .PHONY: docs
-
-all: clean test staticcheck spellcheck fmtcheck build_and_install_deps verify install
