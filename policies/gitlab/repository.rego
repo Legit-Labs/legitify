@@ -61,7 +61,7 @@ forking_allowed_for_repository {
 # METADATA
 # scope: rule
 # title: Default Branch Is Not Protected
-# description: Branch protection is not enabled for this repository’s default branch. Protecting branches ensures new code changes must go through a controlled merge process and allows enforcement of code review as well as other security tests. This issue is raised if the default branch protection is turned off.
+# description: Default branch protection is not enabled for this repository’s default branch. Protecting branches ensures new code changes must go through a controlled merge process and allows enforcement of code review as well as other security tests. This issue is raised if the default branch protection is turned off.
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
@@ -93,7 +93,7 @@ missing_default_branch_protection_force_push {
 
 # METADATA
 # scope: rule
-# title: Code review is not limited to code-owners only
+# title: Code review is not limited to code-owners only in default branch
 # description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the project.
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Check the "Code owner approval"]
@@ -171,7 +171,7 @@ no_signed_commits {
 
 # METADATA
 # scope: rule
-# title: Project Doesn't Require Code Review
+# title: Project Doesn't Require Code Review For Default Branch
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. An even safer option is to require 2 separate reviewers, which is enforced in the Legitify policy "Project Doesn't Require Code Review By At Least Two Reviewers".
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 1 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]
@@ -185,7 +185,7 @@ code_review_not_required {
 
 # METADATA
 # scope: rule
-# title: Project Doesn't Require Code Review By At Least Two Reviewers
+# title: Project Doesn't Require Code Review By At Least Two Reviewers For Default Branch
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 2 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]
