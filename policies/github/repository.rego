@@ -4,7 +4,7 @@ import data.common.webhooks as webhookUtils
 
 # METADATA
 # scope: rule
-# title: Repository not maintained
+# title: Repository Not Maintained
 # description: There hasn't been any commits in tha last 3 months. A project which is not active might not be patched against security issues within its code and dependencies, and is therefore at higher risk of including unpatched vulnerabilities.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
@@ -427,7 +427,7 @@ ghas_dependency_review_not_enabled {
 
 # METADATA
 # scope: rule
-# title: Low scorecard score for repository indicates poor security posture
+# title: Low Scorecard Score for Repository Indicates Poor Security Posture
 # description: Scorecard is an open-source tool from OSSF that helps to asses the security posture of repositories, Low scorecard score means your repository may be under risk.
 # custom:
 #    requiredEnrichers: [scorecard]
@@ -444,7 +444,7 @@ scorecard_score_too_low {
 
 # METADATA
 # scope: rule
-# title: Default workflow token permission is not read only
+# title: Default Workflow Token Permission Is Not Read Only
 # description: Your default GitHub Action workflow token permission is set to read-write. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
 # custom:
 #   requiredEnrichers: [organizationId]
