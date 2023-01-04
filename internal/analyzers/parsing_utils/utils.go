@@ -10,6 +10,9 @@ func ResolveAnnotation(customField interface{}) []string {
 				retval = append(retval, ts)
 			}
 		}
+	case string:
+		retval = append(retval, t)
 	}
+
 	return retval
 }
