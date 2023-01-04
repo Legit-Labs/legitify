@@ -13,8 +13,12 @@ Detect and remediate misconfigurations, security and compliance issues with ease
 
 Supporting:
 
-* GitHub
-* GitHub Enterprise
-* GitLab
+* GitHub Cloud
+* GitHub Enterprise Server
+* GitLab Cloud
 * GitLab Server
-* More to come
+
+And More to come...
+
+---
+> ℹ️ **NOTE:** This webpage describes only the policies which Legitify supports. To learn more about how to use the cli tool, or contribute the source code, visit [Legitify's GitHub page](https://github.com/Legit-Labs/legitify).
