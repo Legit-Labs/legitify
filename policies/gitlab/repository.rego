@@ -2,7 +2,7 @@ package repository
 
 # METADATA
 # scope: rule
-# title: Project not maintained
+# title: Project Not Maintained
 # description: The project was not active in the last 3 months. A project which is not active might not be patched against security issues within its code and dependencies, and is therefore at higher risk of including unpatched vulnerabilities.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the project]
@@ -93,7 +93,7 @@ missing_default_branch_protection_force_push {
 
 # METADATA
 # scope: rule
-# title: Code review is not limited to code-owners only in default branch
+# title: Code Review Is Not Limited to Code-Owners Only in Default Branch
 # description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the project.
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Check the "Code owner approval"]

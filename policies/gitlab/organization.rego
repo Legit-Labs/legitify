@@ -61,7 +61,7 @@ organization_webhook_doesnt_require_ssl[violation] = true {
 
 # METADATA
 # scope: rule
-# title: Group does not enforce branch protection by default
+# title: Group Does Not Enforce Branch Protection by Default
 # description: You do not have a default full branch protection for a specific group, which means any new repository will be created without it. In fully protected level, developers cannot push new commits, and no one can force push or delete the branch. Protecting branches ensures new code changes must go through a controlled merge process and it allows enforcement of code review and other security tests.
 # custom:
 #   severity: MEDIUM
