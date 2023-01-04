@@ -14,7 +14,11 @@ Detect and remediate misconfigurations, security and compliance issues across al
 </div>
 
 
-https://user-images.githubusercontent.com/107790206/210334552-eee03c72-da1f-4c23-8d64-3f07fc271631.mov
+
+
+https://user-images.githubusercontent.com/107790206/210517013-0d4aac8e-c6fd-4ff4-bc5c-b6ea4fefabe0.mov
+
+
 
 ## Installation
 
