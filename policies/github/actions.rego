@@ -43,7 +43,7 @@ all_github_actions_are_allowed {
 
 # METADATA
 # scope: rule
-# title: Default workflow token permission is not read only
+# title: Default Workflow Token Permission Is Not Read Only
 # description: Your default GitHub Action workflow token permission is set to read-write. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
 # custom:
 #   requiredEnrichers: [organizationId]

@@ -41,7 +41,7 @@ two_factor_authentication_is_disabled_for_an_external_collaborator {
 
 # METADATA
 # scope: rule
-# title: Stale admin detected
+# title: Stale Admin Detected
 # description: A collaborator with global admin permissions didn't do any action in the last 6 months. Admin users are extremely powerful and common compliance standards demand keeping the number of admins at minimum. Consider revoking this collaborator admin credentials (downgrade to regular user), or remove the user completely.
 # custom:
 #   severity: MEDIUM

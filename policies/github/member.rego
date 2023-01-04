@@ -2,7 +2,7 @@ package member
 
 # METADATA
 # scope: rule
-# title: Organization has too many owners
+# title: Organization Has Too Many Owners
 # description: Organization owners are highly privileged and could create great damage if being compromised, it's recommended to limit them to the minimum needed (recommended maximum 3 owners).
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization People page, Select the unwanted owners, Using the "X members selected" - change role to member]
