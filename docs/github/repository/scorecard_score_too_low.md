@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Low scorecard score for repository indicates poor security posture
+title: Low Scorecard Score for Repository Indicates Poor Security Posture
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Low scorecard score for repository indicates poor security posture
+## Low Scorecard Score for Repository Indicates Poor Security Posture
 policy name: scorecard_score_too_low
 
 severity: MEDIUM

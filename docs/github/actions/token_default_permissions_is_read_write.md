@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default workflow token permission is not read only
+title: Default Workflow Token Permission Is Not Read Only
 parent: Actions Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default workflow token permission is not read only
+## Default Workflow Token Permission Is Not Read Only
 policy name: token_default_permissions_is_read_write
 
 severity: MEDIUM

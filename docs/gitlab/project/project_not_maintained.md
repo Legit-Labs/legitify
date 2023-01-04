@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Project not maintained
+title: Project Not Maintained
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Project not maintained
+## Project Not Maintained
 policy name: project_not_maintained
 
 severity: HIGH

@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Group does not enforce branch protection by default
+title: Group Does Not Enforce Branch Protection by Default
 parent: Group Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Group does not enforce branch protection by default
+## Group Does Not Enforce Branch Protection by Default
 policy name: group_does_not_enforce_branch_protection_by_default
 
 severity: MEDIUM

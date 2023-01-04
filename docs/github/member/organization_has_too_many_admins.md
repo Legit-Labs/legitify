@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Organization has too many owners
+title: Organization Has Too Many Owners
 parent: Member Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Organization has too many owners
+## Organization Has Too Many Owners
 policy name: organization_has_too_many_admins
 
 severity: MEDIUM

@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Runner group is not limited to selected repositories
+title: Runner Group Is Not Limited to Selected Repositories
 parent: Runner_Group Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Runner group is not limited to selected repositories
+## Runner Group Is Not Limited to Selected Repositories
 policy name: runner_group_not_limited_to_selected_repositories
 
 severity: MEDIUM

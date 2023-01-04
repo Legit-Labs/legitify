@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Repository not maintained
+title: Repository Not Maintained
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Repository not maintained
+## Repository Not Maintained
 policy name: repository_not_maintained
 
 severity: HIGH

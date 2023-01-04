@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Stale admin detected
+title: Stale Admin Detected
 parent: Member Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Stale admin detected
+## Stale Admin Detected
 policy name: stale_admin_found
 
 severity: MEDIUM
