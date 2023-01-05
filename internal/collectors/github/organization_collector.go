@@ -4,7 +4,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
 
-	"github.com/google/go-github/v44/github"
+	"github.com/google/go-github/v49/github"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"

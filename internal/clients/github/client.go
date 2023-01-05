@@ -18,7 +18,7 @@ import (
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 
-	gh "github.com/google/go-github/v44/github"
+	gh "github.com/google/go-github/v49/github"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
 )
