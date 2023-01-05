@@ -1,6 +1,6 @@
 package github
 
-import "github.com/google/go-github/v44/github"
+import "github.com/google/go-github/v49/github"
 
 func PaginateResults(api func(opts *github.ListOptions) (*github.Response, error)) error {
 	var opts github.ListOptions

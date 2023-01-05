@@ -7,7 +7,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
-	"github.com/google/go-github/v44/github"
+	"github.com/google/go-github/v49/github"
 	"golang.org/x/net/context"
 	"log"
 	"sync"
@@ -49,7 +49,11 @@ func (c *runnersCollector) CollectMetadata() collectors.Metadata {
 			org := org
 			result := make([]*github.RunnerGroup, 0)
 			err := ghclient.PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
-				runners, resp, err := c.client.Client().Actions.ListOrganizationRunnerGroups(c.context, org.Name(), opts)
+				options := &github.ListOrgRunnerGroupOptions{
+					ListOptions: *opts,
+				}
+
+				runners, resp, err := c.client.Client().Actions.ListOrganizationRunnerGroups(c.context, org.Name(), options)
 
 				if err != nil {
 					return nil, err

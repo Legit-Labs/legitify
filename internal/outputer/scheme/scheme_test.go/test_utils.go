@@ -7,7 +7,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/enricher/enrichers"
-	"github.com/google/go-github/v44/github"
+	"github.com/google/go-github/v49/github"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
