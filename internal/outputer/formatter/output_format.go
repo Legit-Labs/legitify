@@ -9,9 +9,10 @@ import (
 type FormatName = string
 
 const (
-	Human FormatName = "human"
-	Json  FormatName = "json"
-	Sarif FormatName = "sarif"
+	Human    FormatName = "human"
+	Json     FormatName = "json"
+	Sarif    FormatName = "sarif"
+	Markdown FormatName = "markdown"
 )
 
 type OutputFormatter interface {
@@ -19,25 +20,24 @@ type OutputFormatter interface {
 	IsSchemeSupported(schemeType string) bool
 }
 
-const DefaultOutputIndent = "  "
-
-type NewFormatFunc func(indent string) OutputFormatter
+type NewFormatFunc func() OutputFormatter
 
 var outputFormatters = map[FormatName]NewFormatFunc{
-	Human: NewHumanFormatter,
-	Json:  NewJsonFormatter,
-	Sarif: nil, // TODO pending implementation of Sarif output
+	Human:    NewHumanFormatter,
+	Json:     NewJsonFormatter,
+	Markdown: NewMarkdownFormatter,
+	Sarif:    nil, // TODO pending implementation of Sarif output
 }
 
 func ValidateOutputFormat(outputFormat FormatName, schemeType converter.SchemeType) error {
 	creator, ok := outputFormatters[outputFormat]
 	if !ok {
-		return fmt.Errorf("Unsupported output format: %s", outputFormat)
+		return fmt.Errorf("unsupported output format: %s", outputFormat)
 	}
 
-	formatter := creator(DefaultOutputIndent)
+	formatter := creator()
 	if !formatter.IsSchemeSupported(schemeType) {
-		return fmt.Errorf("Scheme Type (%s) does not support output format: %s", schemeType, outputFormat)
+		return fmt.Errorf("scheme Type (%s) does not support output format: %s", schemeType, outputFormat)
 	}
 
 	return nil
@@ -58,10 +58,10 @@ func OutputFormats() []FormatName {
 func Format(outputFormat FormatName, outputIndent string, scheme interface{}, failedOnly bool) ([]byte, error) {
 	outputFormatterCreator := outputFormatters[outputFormat]
 	if outputFormatterCreator == nil {
-		return nil, fmt.Errorf("No output generator for %s", outputFormat)
+		return nil, fmt.Errorf("no output generator for %s", outputFormat)
 	}
 
-	outputFormatter := outputFormatterCreator(outputIndent)
+	outputFormatter := outputFormatterCreator()
 
 	output, err := outputFormatter.Format(scheme, failedOnly)
 	if err != nil {
@@ -76,5 +76,5 @@ type UnsupportedScheme struct {
 }
 
 func (e UnsupportedScheme) Error() string {
-	return fmt.Sprintf("Unsupported scheme type: %T", e.scheme)
+	return fmt.Sprintf("unsupported scheme type: %T", e.scheme)
 }
