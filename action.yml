@@ -1,5 +1,8 @@
 name: "Legitify Analyze"
 description: "Legitify GitHub Action"
+branding:
+  color: "purple"
+  icon: "target"
 inputs:
   github_token:
     description: "GitHub Personal Access Token"
