@@ -17,7 +17,7 @@ type HumanFormatter struct {
 	colorizer humanColorizer
 }
 
-func NewHumanFormatter() OutputFormatter {
+func newHumanFormatter() OutputFormatter {
 	return &HumanFormatter{
 		colorizer: humanColorizer{},
 	}
@@ -25,14 +25,14 @@ func NewHumanFormatter() OutputFormatter {
 
 func (f *HumanFormatter) formatSummaryTable(output scheme.FlattenedScheme) []byte {
 	tf := newHumanTableWriter()
-	tw := NewTableContent(tf, f.colorizer)
+	tw := newTableContent(tf, f.colorizer)
 	return tw.FormatSummary(output)
 }
 
 func (f *HumanFormatter) formatFailedPolicies(output scheme.FlattenedScheme) []byte {
 	failedPolicies := scheme.OnlyFailedViolations(output)
 	pf := newHumanPolicyFormatter()
-	pc := NewPoliciesContent(pf, f.colorizer)
+	pc := newPoliciesContent(pf, f.colorizer)
 	return pc.FormatFailedPolicies(failedPolicies)
 }
 

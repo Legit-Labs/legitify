@@ -25,7 +25,7 @@ type policiesContent struct {
 	depth     int
 }
 
-func NewPoliciesContent(pf policiesFormatter, colorizer colorizer) *policiesContent {
+func newPoliciesContent(pf policiesFormatter, colorizer colorizer) *policiesContent {
 	return &policiesContent{
 		pf:        pf,
 		colorizer: colorizer,

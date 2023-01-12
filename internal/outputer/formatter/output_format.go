@@ -23,9 +23,9 @@ type OutputFormatter interface {
 type NewFormatFunc func() OutputFormatter
 
 var outputFormatters = map[FormatName]NewFormatFunc{
-	Human:    NewHumanFormatter,
+	Human:    newHumanFormatter,
 	Json:     NewJsonFormatter,
-	Markdown: NewMarkdownFormatter,
+	Markdown: newMarkdownFormatter,
 	Sarif:    nil, // TODO pending implementation of Sarif output
 }
 

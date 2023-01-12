@@ -17,7 +17,7 @@ type tableContent struct {
 	colorizer colorizer
 }
 
-func NewTableContent(tf tableFormatter, colorizer colorizer) *tableContent {
+func newTableContent(tf tableFormatter, colorizer colorizer) *tableContent {
 	return &tableContent{
 		tf:        tf,
 		colorizer: colorizer,
