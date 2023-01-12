@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"log"
-	"os"
 
 	"github.com/Legit-Labs/legitify/internal/screen"
 	"github.com/fatih/color"
@@ -28,7 +27,7 @@ const logo = ` ___      _______  _______  ___   _______  ___   _______  __   __
 const brand = `Legit Security`
 
 func Execute() {
-	if len(os.Args) > 1 && os.Args[1] != versionCmdText {
+	if screen.IsTty() {
 		logoColored := color.New(color.FgMagenta, color.Bold).Sprintf("%s", logo)
 		brandColored := color.New(color.Bold).Sprintf("%s", brand)
 		screen.Printf("%s\nBy %s\n\n", logoColored, brandColored)
