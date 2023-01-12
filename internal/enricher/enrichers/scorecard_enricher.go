@@ -98,22 +98,22 @@ func (se *ScorecardEnrichment) Name() string {
 	return Scorecard
 }
 
-func (se *ScorecardEnrichment) HumanReadable(prepend string) string {
+func (se *ScorecardEnrichment) HumanReadable(prepend string, linebreak string) string {
 	sb := utils.NewPrependedStringBuilder(prepend)
 
 	for j, checkResult := range se.Checks {
-		sb.WriteString(fmt.Sprintf("%d. %s:\n", j+1, checkResult.Reason))
-		sb.WriteString(fmt.Sprintf("docs: %s\n", checkResult.DocsUrl))
+		sb.WriteString(fmt.Sprintf("%d. %s:%s", j+1, checkResult.Reason, linebreak))
+		sb.WriteString(fmt.Sprintf("docs: %s%s", checkResult.DocsUrl, linebreak))
 
 		if len(checkResult.Details) > 0 {
 			sb.WriteString(fmt.Sprintln("details: "))
 			for i, detail := range checkResult.Details {
 				clean := strings.Replace(detail, "\t", "", -1)
 				clean = strings.Replace(clean, "\n", " ", -1)
-				sb.WriteString(fmt.Sprintf("  %d. %s\n", i+1, clean))
+				sb.WriteString(fmt.Sprintf("  %d. %s%s", i+1, clean, linebreak))
 			}
 		}
 	}
 
-	return sb.String()
+	return linebreak + sb.String()
 }

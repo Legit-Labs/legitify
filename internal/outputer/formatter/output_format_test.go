@@ -27,10 +27,17 @@ func TestOutputFormats(t *testing.T) {
 			log.Printf("Human-Readable output:\n%s", output)
 			continue // Cannot test human formatter - by definition not machine readable
 
+		case formatter.Markdown:
+			log.Printf("Markdown output:\n%s", output)
+			continue // Cannot test markdown formatter - by definition not machine readable
+
 		case formatter.Json:
 			reversed, err = formatter_test.DeserializeJson(output)
 			require.Nilf(t, err, "Error deserializing json: %v", err)
 			require.NotNil(t, output, "Error deserializing json")
+
+		default:
+			t.Fatalf("unexpected format: %s", name)
 		}
 
 		require.Equal(t, mapped, reversed, "Expecting output to be the same as the input")

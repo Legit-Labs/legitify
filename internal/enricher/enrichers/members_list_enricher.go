@@ -61,11 +61,11 @@ func (se *MembersListEnrichment) Name() string {
 	return MembersList
 }
 
-func (se *MembersListEnrichment) HumanReadable(prepend string) string {
+func (se *MembersListEnrichment) HumanReadable(prepend string, linebreak string) string {
 	sb := utils.NewPrependedStringBuilder(prepend)
 
 	for i, member := range se.Members {
-		sb.WriteString(fmt.Sprintf("%d. %s (%d)\n", i+1, *member.User.HTMLURL, *member.User.ID))
+		sb.WriteString(fmt.Sprintf("%d. %s (%d)%s", i+1, *member.User.HTMLURL, *member.User.ID, linebreak))
 	}
 
 	return sb.String()

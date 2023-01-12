@@ -5,15 +5,14 @@ import (
 )
 
 type JsonFormatter struct {
-	indent string
 }
 
-func NewJsonFormatter(indent string) OutputFormatter {
-	return &JsonFormatter{indent: indent}
+func NewJsonFormatter() OutputFormatter {
+	return &JsonFormatter{}
 }
 
 func (f *JsonFormatter) Format(scheme interface{}, failedOnly bool) ([]byte, error) {
-	bytes, err := json.MarshalIndent(scheme, "", f.indent)
+	bytes, err := json.MarshalIndent(scheme, "", DefaultOutputIndent)
 	if err != nil {
 		return nil, err
 	}

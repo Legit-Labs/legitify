@@ -8,7 +8,7 @@ import (
 )
 
 type Enrichment interface {
-	HumanReadable(prepend string) string
+	HumanReadable(prepend string, linebreak string) string
 	Name() string
 }
 
@@ -21,7 +21,7 @@ func (s *BasicEnrichment) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, s.val)), nil
 }
 
-func (be *BasicEnrichment) HumanReadable(_ string) string {
+func (be *BasicEnrichment) HumanReadable(_ string, _ string) string {
 	sb := utils.NewPrependedStringBuilder("")
 	sb.WriteString(be.val)
 	return sb.String()
