@@ -128,7 +128,7 @@ func (pc *policiesContent) auxAsList(m map[string]enrichers.Enrichment) []string
 
 	for k, v := range m {
 		key := camelCaseToTitle(k)
-		prefix := pc.pf.Indent(pc.depth + 1)
+		prefix := pc.pf.Indent(pc.depth)
 		vText := strings.TrimSuffix(v.HumanReadable(prefix, pc.pf.Linebreak()), pc.pf.Linebreak())
 		formatted := fmt.Sprintf("%s: %v", pc.bold(key), vText)
 		asList = append(asList, formatted)

@@ -11,20 +11,20 @@ func amplifyIndent(depth int) string {
 	return strings.Repeat(DefaultOutputIndent, depth)
 }
 func indentMultiline(depth int, str string) string {
-	return indentMultilineSpecial(depth, str, DefaultOutputIndent)
+	return indentMultilineSpecial(depth, str, DefaultOutputIndent, "\n")
 }
 
 func amplifyIndentSpecial(depth int, indent string) string {
 	return strings.Repeat(indent, depth)
 }
-func indentMultilineSpecial(depth int, str string, indent string) string {
+func indentMultilineSpecial(depth int, str string, indent string, linebreak string) string {
 	indent = amplifyIndentSpecial(depth, indent)
 
-	if !strings.Contains(str, "\n") {
+	if !strings.Contains(str, linebreak) {
 		return indent + str
 	}
 
-	lines := strings.Split(str, "\n")
+	lines := strings.Split(str, linebreak)
 	var sb strings.Builder
 	lastIndex := len(lines) - 1
 	for i, line := range lines {
@@ -32,7 +32,7 @@ func indentMultilineSpecial(depth int, str string, indent string) string {
 			sb.WriteString(indent + line)
 		}
 		if i < lastIndex {
-			sb.WriteString("\n")
+			sb.WriteString(linebreak)
 		}
 	}
 

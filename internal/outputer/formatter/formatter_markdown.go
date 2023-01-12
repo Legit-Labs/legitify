@@ -163,7 +163,7 @@ func (mp markdownPolicyFormatter) FormatSubtitle(title string) string {
 }
 
 func (mp markdownPolicyFormatter) FormatText(depth int, format string, args ...interface{}) string {
-	return indentMultilineSpecial(depth, fmt.Sprintf(format, args...), mp.Indent(1))
+	return indentMultilineSpecial(depth, fmt.Sprintf(format, args...), mp.Indent(1), mp.Linebreak())
 }
 
 func (mp markdownPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool) string {
