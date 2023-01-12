@@ -1,8 +1,6 @@
 package formatter_test
 
 import (
-	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
@@ -26,18 +24,4 @@ func TestFormatJson(t *testing.T) {
 	require.Nilf(t, err, "Error converting struct to map: %v", err)
 
 	require.Equal(t, mapped, output)
-}
-
-func amplifyIndentSpecial(depth int, indent string) string {
-	return strings.Repeat(indent, depth)
-}
-
-func indentMultilineSpecial(depth int, str string, indent string) string {
-	indent = amplifyIndentSpecial(depth, indent)
-	lines := strings.Split(str, "\n")
-	return strings.Join(lines, "\n"+indent)
-}
-
-func TestMultilineIndent(t *testing.T) {
-	fmt.Println(indentMultilineSpecial(1, "fuck me hard\n", "> "))
 }
