@@ -162,17 +162,8 @@ func (mp markdownPolicyFormatter) FormatSubtitle(title string) string {
 	return asMarkdownSubtitle(title)
 }
 
-func (mp markdownPolicyFormatter) fixDepth(depth int) int {
-	// never use more than 1 indent - just looks bad.
-	if depth >= 1 {
-		return 1
-	} else {
-		return 0
-	}
-}
-
 func (mp markdownPolicyFormatter) FormatText(depth int, format string, args ...interface{}) string {
-	return indentMultilineSpecial(mp.fixDepth(depth), fmt.Sprintf(format, args...), mp.Indent(1))
+	return indentMultilineSpecial(depth, fmt.Sprintf(format, args...), mp.Indent(1))
 }
 
 func (mp markdownPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool) string {
@@ -202,5 +193,5 @@ func (mp markdownPolicyFormatter) Separator() string {
 }
 
 func (mp markdownPolicyFormatter) Indent(depth int) string {
-	return strings.Repeat("> ", mp.fixDepth(depth))
+	return strings.Repeat("> ", depth)
 }
