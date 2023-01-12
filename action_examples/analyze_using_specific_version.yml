@@ -17,5 +17,5 @@ jobs:
         uses: Legit-Labs/legitify@main # it is recommended to use a specific commit hash
         with:
           github_token: ${{ secrets.PAT_FOR_LEGITIFY }}
-          legitify_version: "0.1.6"
+          legitify_version: "0.2.0"
           analyze_self_only: "true"

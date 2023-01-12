@@ -1,5 +1,8 @@
 name: "Legitify Analyze"
 description: "Legitify GitHub Action"
+branding:
+  color: "purple"
+  icon: "target"
 inputs:
   github_token:
     description: "GitHub Personal Access Token"
@@ -14,7 +17,7 @@ inputs:
   legitify_base_version:
     description: "The base version of legitify to use. Non breaking changes will be auto updated."
     required: false
-    default: "0.1"
+    default: "0.2"
 runs:
   using: "node16"
   main: "index.js"
