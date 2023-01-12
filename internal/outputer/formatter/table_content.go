@@ -14,10 +14,10 @@ type tableFormatter interface {
 
 type tableContent struct {
 	tf        tableFormatter
-	colorizer Colorizer
+	colorizer colorizer
 }
 
-func NewTableContent(tf tableFormatter, colorizer Colorizer) *tableContent {
+func NewTableContent(tf tableFormatter, colorizer colorizer) *tableContent {
 	return &tableContent{
 		tf:        tf,
 		colorizer: colorizer,

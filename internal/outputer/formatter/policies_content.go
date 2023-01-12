@@ -20,12 +20,12 @@ type policiesFormatter interface {
 
 type policiesContent struct {
 	pf        policiesFormatter
-	colorizer Colorizer
+	colorizer colorizer
 	sb        strings.Builder
 	depth     int
 }
 
-func NewPoliciesContent(pf policiesFormatter, colorizer Colorizer) *policiesContent {
+func NewPoliciesContent(pf policiesFormatter, colorizer colorizer) *policiesContent {
 	return &policiesContent{
 		pf:        pf,
 		colorizer: colorizer,

@@ -17,10 +17,6 @@ const (
 	themeColorNone themeColor = iota
 )
 
-type Colorizer interface {
-	colorize(color themeColor, text interface{}) string
-}
-
 func severityToThemeColor(sev severity.Severity) themeColor {
 	switch sev {
 	case severity.Critical:

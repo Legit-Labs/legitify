@@ -76,5 +76,5 @@ func (se *GenericListEnrichment) HumanReadable(prepend string, linebreak string)
 		}
 	}
 
-	return "\n" + sb.String()
+	return linebreak + sb.String()
 }
