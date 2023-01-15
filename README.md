@@ -10,7 +10,7 @@
  
 Strengthen the security posture of your source-code management! <br/>
 Detect and remediate misconfigurations, security and compliance issues across all your GitHub and GitLab assets with ease 🔥 <br/>
- by [Legit Security](https://www.legitsecurity.com/)
+ by [Legit Security](https://www.legitsecurity.com/).
 </div>
 
 https://user-images.githubusercontent.com/107790206/210602039-2d022692-87ea-4005-b9c6-f091158de3ce.mov
@@ -78,7 +78,7 @@ You can also run legitify as a GitHub action in your workflows, see the **action
   admin:org, read:enterprise, admin:org_hook, read:org, repo, read:repo_hook
   ```
 See [Creating a Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for more information.  
-Fine-grained personal access tokens are currently not supported because they do not support GitHub's GraphQL (https://github.blog/2022-10-18-introducing-fine-grained-personal-access-tokens-for-github/)
+Fine-grained personal access tokens are currently not supported because they do not support [GitHub's GraphQL](https://github.blog/2022-10-18-introducing-fine-grained-personal-access-tokens-for-github/).
 
 ### GitHub Enterprise Server
 You can run legitify against a GitHub Enterprise Server instance if you set the endpoint URL in the environment variable ``SERVER_URL``:
@@ -96,7 +96,7 @@ LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organiz
     read_api, read_user, read_repository, read_registry
     ```
   See [Creating a Personal Access Token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) for more information.  
-To run legitify against GitLab Cloud set the scm flag to gitlab `--scm gitlab`, to run against GitLab Server you need to provide also SERVER_URL:
+To run legitify against GitLab Cloud set the scm flag to gitlab `--scm gitlab`, to run against GitLab Server you need to provide also a SERVER_URL:
 
 ```sh
 export SERVER_URL="https://gitlab.example.com/"
@@ -156,7 +156,7 @@ When outputting in a human-readable format, legitify support the conventional `-
 - Use the `--failed-only` flag to filter-out passed/skipped checks from the result.
 
 ## Scorecard Support - Only for GitHub server/cloud repositories
-[scorecard](https://github.com/ossf/scorecard) is an OSSF's open-source project:
+[Scorecard](https://github.com/ossf/scorecard) is an OSSF's open-source project:
 
 > Scorecards is an automated tool that assesses a number of important heuristics ("checks") associated with software security and assigns each check a score of 0-10. You can use these scores to understand specific areas to improve in order to strengthen the security posture of your project. You can also assess the risks that dependencies introduce, and make informed decisions about accepting these risks, evaluating alternative solutions, or working with the maintainers to make improvements.
 
