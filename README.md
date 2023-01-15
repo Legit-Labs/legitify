@@ -189,7 +189,7 @@ legitify runs the following scorecard checks:
 ## Policies
 legitify comes with a set of policies for each SCM in the `policies/` directory.
 
-These policies are documented [here](https://legitify.dev/policies.html).
+These policies are documented [here](https://legitify.dev).
 
 In addition, you can use the `--policies-path (-p)` flag to specify a custom directory for OPA policies.
 
