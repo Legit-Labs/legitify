@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Legit-Labs/legitify-github-action.git"
+    "url": "git+https://github.com/Legit-Labs/legitify.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Legit-Labs/legitify-github-action/issues"
+    "url": "https://github.com/Legit-Labs/legitify/issues"
   },
-  "homepage": "https://github.com/Legit-Labs/legitify-github-action#readme",
+  "homepage": "https://github.com/Legit-Labs/legitify#readme",
   "dependencies": {
     "@actions/artifact": "^1.1.0",
     "@actions/core": "^1.10.0",
