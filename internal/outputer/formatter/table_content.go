@@ -35,7 +35,7 @@ func (tc *tableContent) countColorize(count int, color themeColor) string {
 func (tc *tableContent) FormatSummary(output scheme.FlattenedScheme) []byte {
 	output = scheme.SortSchemeByNamespace(output, false)
 
-	tc.tf.SetTitle(tc.colorizer.colorize(themeColorBold, "Findings Summary"))
+	tc.tf.SetTitle(tc.colorizer.colorize(themeColorBold, "Legitify Findings Summary"))
 
 	headers := []string{"#", "Namespace", "Policy", "Severity", "Passed", "Failed", "Skipped"}
 	for i, h := range headers {
