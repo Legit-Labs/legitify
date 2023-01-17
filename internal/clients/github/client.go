@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Legit-Labs/legitify/internal/clients/github/transport"
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
@@ -23,7 +24,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const experimentalApiAcceptHeader = "application/vnd.github.hawkgirl-preview+json"
 const scopeHttpHeader = "X-OAuth-Scopes"
 
 type Client struct {
@@ -38,23 +38,7 @@ type Client struct {
 	serverUrl        string
 }
 
-func isBadRequest(err error) bool {
-	return err.Error() == "Bad credentials"
-}
-
-func newHttpClients(ctx context.Context, token string) (client *http.Client, graphQL *http.Client) {
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	acceptHeader := experimentalApiAcceptHeader
-	clientWithAcceptHeader := NewClientWithAcceptHeader(tc.Transport, &acceptHeader)
-
-	return tc, clientWithAcceptHeader
-}
-
-func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, fillCache bool) (*Client, error) {
+func NewClient(ctx context.Context, token string, githubEndpoint string, org []string) (*Client, error) {
 	client := &Client{
 		orgs:      org,
 		context:   ctx,
@@ -71,19 +55,7 @@ func NewClient(ctx context.Context, token string, githubEndpoint string, org []s
 	}
 	client.scopes = scopes
 
-	if fillCache {
-		if err := client.fillCache(); err != nil {
-			return nil, err
-		}
-	}
-
-	var instanceTypeMsg string
-	if client.IsGithubCloud() {
-		instanceTypeMsg = "Using Github Cloud"
-	} else {
-		instanceTypeMsg = fmt.Sprintf("Using Github Enterprise Endpoint: %s\n\n", client.serverUrl)
-	}
-	screen.Printf("%s\n", instanceTypeMsg)
+	client.printInstanceTypeMessage()
 
 	return client, nil
 }
@@ -119,7 +91,6 @@ func (c *Client) initClients(ctx context.Context, token string) error {
 			return err
 		}
 		graphQLClient = githubv4.NewEnterpriseClient(c.getGitHubGraphURL(), graphQLRawClient)
-
 	}
 
 	c.graphQLRawClient = graphQLRawClient
@@ -151,23 +122,6 @@ func (c *Client) getGitHubGraphURL() string {
 	return c.serverUrl + "/api/graphql"
 }
 
-func (c *Client) fillCache() error {
-	_, err := c.CollectOrganizations()
-	if err != nil && isBadRequest(err) {
-		return fmt.Errorf("invalid token (make sure it's not expired or revoked)")
-	}
-
-	if len(c.orgsCache) == 0 {
-		if len(c.orgs) != 0 {
-			return fmt.Errorf("token doesn't have access to the requested organizations")
-		} else {
-			return fmt.Errorf("token doesn't have access to any organization")
-		}
-	}
-
-	return nil
-}
-
 func (c *Client) Scopes() permissions.TokenScopes {
 	return c.scopes
 }
@@ -176,21 +130,25 @@ func (c *Client) Orgs() []string {
 	return c.orgs
 }
 
+func (c *Client) inRealOrgs(org string, realOrgs []string) bool {
+	for _, realOrg := range realOrgs {
+		if strings.EqualFold(org, realOrg) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (c *Client) setOrgsList(realOrgs []string) error {
 	if len(c.orgs) == 0 {
 		c.orgs = realOrgs
-	} else {
-		for _, userRequestedOrg := range c.orgs {
-			inRealOrgs := false
-			for _, realOrg := range realOrgs {
-				if strings.EqualFold(userRequestedOrg, realOrg) {
-					inRealOrgs = true
-					break
-				}
-			}
-			if !inRealOrgs {
-				return fmt.Errorf("User has no access to the requested organization: %s\n", userRequestedOrg)
-			}
+		return nil
+	}
+
+	for _, userRequestedOrg := range c.orgs {
+		if !c.inRealOrgs(userRequestedOrg, realOrgs) {
+			return fmt.Errorf("user has no access to the requested organization: %s", userRequestedOrg)
 		}
 	}
 
@@ -198,11 +156,21 @@ func (c *Client) setOrgsList(realOrgs []string) error {
 }
 
 func (c *Client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
+	// fast path: once cache is initialized, just take from the cache without blocking
 	c.cacheLock.RLock()
 	if c.orgsCache != nil {
 		return c.orgsCache, nil
 	}
 	c.cacheLock.RUnlock()
+
+	// slow path: singular request that also updates the cache
+	c.cacheLock.Lock()
+	defer c.cacheLock.Unlock()
+
+	// check again to avoid a race condition
+	if c.orgsCache != nil {
+		return c.orgsCache, nil
+	}
 
 	realOrgs, err := c.collectOrgsList()
 	if err != nil {
@@ -217,10 +185,7 @@ func (c *Client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
 		return nil, err
 	}
 
-	c.cacheLock.Lock()
 	c.orgsCache = orgs
-	c.cacheLock.Unlock()
-
 	return orgs, nil
 }
 
@@ -519,10 +484,32 @@ func (c *Client) getOrganizationsRepositories() ([]commontypes.RepositoryWithOwn
 	return repositories, nil
 }
 
+func (c *Client) printInstanceTypeMessage() {
+	var instanceTypeMsg string
+	if c.IsGithubCloud() {
+		instanceTypeMsg = "Using Github Cloud"
+	} else {
+		instanceTypeMsg = fmt.Sprintf("Using Github Enterprise Endpoint: %s", c.serverUrl)
+	}
+	screen.Printf("%s\n", instanceTypeMsg)
+}
+
 type samlError struct {
 	organization string
 }
 
 func (se *samlError) Error() string {
 	return fmt.Sprintf("Token is not SAML authorized for organization: %s.\nPlease go to https://github.com/settings/tokens and authorize.", se.organization)
+}
+
+func newHttpClients(ctx context.Context, token string) (client *http.Client, graphQL *http.Client) {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	clientWithSecondaryRateLimit := transport.NewRateLimitWaiter(tc.Transport)
+	clientWithAcceptHeader := transport.NewGraphQL(tc.Transport)
+
+	return clientWithSecondaryRateLimit, clientWithAcceptHeader
 }

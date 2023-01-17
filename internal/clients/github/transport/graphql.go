@@ -1,18 +1,22 @@
-package github
+package transport
 
-import "net/http"
+import (
+	"net/http"
+)
 
-type transport struct {
+const (
+	experimentalApiAcceptHeader = "application/vnd.github.hawkgirl-preview+json"
+)
+
+type graphQL struct {
 	Base         http.RoundTripper
-	AcceptHeader *string
+	acceptHeader string
 }
 
-func (t transport) RoundTrip(request *http.Request) (*http.Response, error) {
+func (t graphQL) RoundTrip(request *http.Request) (*http.Response, error) {
 	req2 := CloneRequest(*request)
 
-	if t.AcceptHeader != nil {
-		req2.Header.Set("Accept", *t.AcceptHeader)
-	}
+	req2.Header.Set("Accept", t.acceptHeader)
 
 	return t.Base.RoundTrip(&req2)
 }
@@ -33,9 +37,9 @@ func CloneHeader(in http.Header) http.Header {
 	return out
 }
 
-func NewClientWithAcceptHeader(base http.RoundTripper, acceptHeader *string) *http.Client {
-	return &http.Client{Transport: &transport{
-		AcceptHeader: acceptHeader,
+func NewGraphQL(base http.RoundTripper) *http.Client {
+	return &http.Client{Transport: &graphQL{
+		acceptHeader: experimentalApiAcceptHeader,
 		Base:         base,
 	}}
 }
