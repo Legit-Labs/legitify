@@ -22,7 +22,6 @@ To get an overview of the project, read the  [README](https://github.com/Legit-L
 ## Getting started
 
 Clone the repository to get started. Then you should:
-* Run `make install-deps` to set up Go dependencies.
 * Run `make build` to build from source.
 
 Once your changes are ready, run `make test` to test your changes.
