@@ -155,13 +155,17 @@ func (c *Client) setOrgsList(realOrgs []string) error {
 	return nil
 }
 
+func (c *Client) orgsFromCache() []githubcollected.ExtendedOrg {
+	c.cacheLock.RLock()
+	defer c.cacheLock.RUnlock()
+	return c.orgsCache
+}
+
 func (c *Client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
 	// fast path: once cache is initialized, just take from the cache without blocking
-	c.cacheLock.RLock()
-	if c.orgsCache != nil {
-		return c.orgsCache, nil
+	if orgs := c.orgsFromCache(); orgs != nil {
+		return orgs, nil
 	}
-	c.cacheLock.RUnlock()
 
 	// slow path: singular request that also updates the cache
 	c.cacheLock.Lock()
