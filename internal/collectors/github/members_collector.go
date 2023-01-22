@@ -2,14 +2,16 @@ package github
 
 import (
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
 	"time"
+
+	"github.com/Legit-Labs/legitify/internal/collectors"
 
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
+	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/google/go-github/v49/github"
@@ -160,26 +162,18 @@ func (c *memberCollector) enrichMembers(org *ghcollected.ExtendedOrg, members []
 }
 
 func (c *memberCollector) collectMembers(org, memberType string) []*github.User {
-	var membersByType []*github.User
+	listMemOpts := &github.ListMembersOptions{
+		Role: memberType,
+	}
 
-	_ = ghclient.PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
-		listMemOpts := &github.ListMembersOptions{
-			Role:        memberType,
-			ListOptions: *opts,
-		}
+	res := pagination.New[*github.User](c.Client.Client().Organizations.ListMembers, listMemOpts).Sync(c.Context, org)
+	if res.Err != nil {
+		// TODO permission error or real error
+		log.Printf("error collecting members of type %s for org %s: %s\n", memberType, org, res.Err)
+		return []*github.User{}
+	}
 
-		members, resp, err := c.Client.Client().Organizations.ListMembers(c.Context, org, listMemOpts)
-
-		if err != nil {
-			log.Printf("error collecting members of type %s for org %s: %s\n", memberType, org, err)
-			return nil, err
-		}
-
-		membersByType = append(membersByType, members...)
-		return resp, err
-	})
-
-	return membersByType
+	return res.Collected
 }
 
 // collectMemberLastActiveTime will search and retrieve the most recent timestamp where a member was seen active,

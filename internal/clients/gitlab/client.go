@@ -3,8 +3,11 @@ package gitlab
 import (
 	"context"
 
+	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
+	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/common/types"
+	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/patrickmn/go-cache"
 	"github.com/xanzy/go-gitlab"
 )
@@ -28,7 +31,10 @@ func (c *Client) Client() *gitlab.Client {
 func NewClient(ctx context.Context, token string, endpoint string, orgs []string) (*Client, error) {
 	var config []gitlab.ClientOptionFunc
 	if endpoint != "" {
-		config = []gitlab.ClientOptionFunc{gitlab.WithBaseURL(endpoint)}
+		config = []gitlab.ClientOptionFunc{
+			gitlab.WithBaseURL(endpoint),
+			gitlab.WithHTTPClient(transport.NewHttpClient()),
+		}
 	}
 
 	git, err := gitlab.NewClient(token, config...)
@@ -85,47 +91,31 @@ func (c *Client) Organizations() ([]types.Organization, error) {
 }
 
 func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
-	var result []types.RepositoryWithOwner
-
 	maintainerPermissions := gitlab.MaintainerPermissions
-	options := gitlab.ListProjectsOptions{MinAccessLevel: &maintainerPermissions}
-	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
-		repos, resp, err := c.Client().Projects.ListProjects(&options)
-		if err != nil {
-			return nil, err
+	opts := gitlab.ListProjectsOptions{MinAccessLevel: &maintainerPermissions}
+	mapper := func(projects []*gitlab.Project) []types.RepositoryWithOwner {
+		if projects == nil {
+			return []types.RepositoryWithOwner{}
 		}
-
-		for _, r := range repos {
-			result = append(result, types.NewRepositoryWithOwner(r.PathWithNamespace, permissions.RepoRoleAdmin))
-		}
-
-		return resp, nil
-	}, &options.ListOptions)
-
-	if err != nil {
-		return nil, err
+		return utils.MapSlice(projects, func(p *gitlab.Project) types.RepositoryWithOwner {
+			return types.NewRepositoryWithOwner(p.PathWithNamespace, permissions.RepoRoleAdmin)
+		})
 	}
-	return result, nil
+	result := pagination.NewMapper(c.Client().Projects.ListProjects, opts, mapper).Sync()
+
+	if result.Err != nil {
+		return nil, result.Err
+	}
+	return result.Collected, nil
 }
 
 func (c *Client) GroupMembers(group *gitlab.Group) ([]*gitlab.GroupMember, error) {
-	var result []*gitlab.GroupMember
-
-	options := gitlab.ListGroupMembersOptions{}
-	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
-		members, resp, err := c.Client().Groups.ListGroupMembers(group.ID, &options)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, members...)
-		return resp, nil
-	}, &options.ListOptions)
-
-	if err != nil {
-		return nil, err
+	result := pagination.New[*gitlab.GroupMember](c.Client().Groups.ListGroupMembers, nil).Sync(group.ID)
+	if result.Err != nil {
+		return nil, result.Err
 	}
 
-	return result, nil
+	return result.Collected, nil
 }
 
 func (c *Client) Groups() ([]*gitlab.Group, error) {
@@ -137,47 +127,22 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 
 	ownedGroups := true
 	for _, group := range c.orgs {
-		options := gitlab.ListGroupsOptions{Owned: &ownedGroups, Search: &group}
-
-		err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
-			groups, resp, err := c.Client().Groups.ListGroups(&options)
-			if err != nil {
-				return nil, err
-			}
-
-			result = append(result, groups...)
-
-			return resp, nil
-		}, &options.ListOptions)
-
-		if err != nil {
-			return nil, err
+		opts := &gitlab.ListGroupsOptions{Owned: &ownedGroups, Search: &group}
+		res := pagination.New[*gitlab.Group](c.Client().Groups.ListGroups, opts).Sync()
+		if res.Err != nil {
+			return nil, res.Err
 		}
+		result = append(result, res.Collected...)
 	}
 
 	return result, nil
 }
 
 func (c *Client) GroupHooks(gid int) ([]*gitlab.GroupHook, error) {
-	var result []*gitlab.GroupHook
-
-	options := &gitlab.ListGroupHooksOptions{}
-	casted := (*gitlab.ListOptions)(options)
-
-	err := PaginateResults(func(opts *gitlab.ListOptions) (*gitlab.Response, error) {
-		hooks, resp, err := c.Client().Groups.ListGroupHooks(gid, options)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, hooks...)
-
-		return resp, nil
-	}, casted)
-
-	if err != nil {
-		return nil, err
+	result := pagination.New[*gitlab.GroupHook](c.Client().Groups.ListGroupHooks, nil).Sync(gid)
+	if result.Err != nil {
+		return nil, result.Err
 	}
 
-	return result, nil
+	return result.Collected, nil
 }

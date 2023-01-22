@@ -2,7 +2,10 @@ package gitlab
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab"
+	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
@@ -10,7 +13,6 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	gitlab2 "github.com/xanzy/go-gitlab"
-	"log"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"golang.org/x/net/context"
@@ -96,70 +98,38 @@ func getRepositoryEncodedName(repo types.RepositoryWithOwner) string {
 }
 
 func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	var completeProtectedBranches []*gitlab2.ProtectedBranch
-	options := gitlab2.ListProtectedBranchesOptions{}
-
-	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectProtectedBranches, resp, err := rc.Client.Client().ProtectedBranches.ListProtectedBranches(int(project.ID()), &options)
-		if err != nil {
-			return nil, err
-		}
-		completeProtectedBranches = append(completeProtectedBranches, projectProtectedBranches...)
-
-		return resp, nil
-	}, (*gitlab2.ListOptions)(&options))
-	if err != nil {
-		log.Printf("failed to list projects %s", err)
-		return project, err
+	res := pagination.New[*gitlab2.ProtectedBranch](rc.Client.Client().ProtectedBranches.ListProtectedBranches, nil).Sync(int(project.ID()))
+	if res.Err != nil {
+		log.Printf("failed to list projects %s", res.Err)
+		return project, res.Err
 	}
 
 	extendedProject := project
-	extendedProject.ProtectedBranches = completeProtectedBranches
+	extendedProject.ProtectedBranches = res.Collected
 	return extendedProject, nil
 }
 
 func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	var completeMembersList []*gitlab2.ProjectMember
-	options := &gitlab2.ListProjectMembersOptions{}
-
-	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectMembers, resp, err := rc.Client.Client().ProjectMembers.ListAllProjectMembers(int(project.ID()), options)
-		if err != nil {
-			return nil, err
-		}
-		completeMembersList = append(completeMembersList, projectMembers...)
-		return resp, nil
-	}, &options.ListOptions)
-
-	if err != nil {
-		log.Printf("failed to list projects %s", err)
-		return project, err
+	res := pagination.New[*gitlab2.ProjectMember](rc.Client.Client().ProjectMembers.ListAllProjectMembers, nil).Sync(int(project.ID()))
+	if res.Err != nil {
+		log.Printf("failed to list projects %s", res.Err)
+		return project, res.Err
 	}
 
 	extendedProject := project
-	extendedProject.Members = completeMembersList
+	extendedProject.Members = res.Collected
 	return extendedProject, nil
 }
 
 func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	var completeProjectWebhookList []*gitlab2.ProjectHook
-	options := gitlab2.ListProjectHooksOptions{}
-
-	err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-		projectWebhooks, resp, err := rc.Client.Client().Projects.ListProjectHooks(int(project.ID()), &options)
-		if err != nil {
-			return nil, err
-		}
-		completeProjectWebhookList = append(completeProjectWebhookList, projectWebhooks...)
-		return resp, nil
-	}, (*gitlab2.ListOptions)(&options))
-	if err != nil {
-		log.Printf("failed to list project: %s webhook. error message: %s", project.Name(), err)
-		return project, err
+	res := pagination.New[*gitlab2.ProjectHook](rc.Client.Client().Projects.ListProjectHooks, nil).Sync(int(project.ID()))
+	if res.Err != nil {
+		log.Printf("failed to list project: %s webhook. error message: %s", project.Name(), res.Err)
+		return project, res.Err
 	}
 
 	extendedProject := project
-	extendedProject.Webhooks = completeProjectWebhookList
+	extendedProject.Webhooks = res.Collected
 	return extendedProject, nil
 }
 
@@ -211,7 +181,6 @@ func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project
 
 func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
-		options := gitlab2.ListProjectsOptions{}
 		organizations, err := rc.Client.Organizations()
 		if err != nil {
 			log.Printf("failed to collect list of orgniazations to get repositories  %s", err)
@@ -219,22 +188,22 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 		}
 		gw := group_waiter.New()
 		for _, org := range organizations {
-			err := gitlab.PaginateResults(func(opts *gitlab2.ListOptions) (*gitlab2.Response, error) {
-				repos, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.Name, &gitlab2.ListGroupProjectsOptions{})
-				if err != nil {
-					return nil, err
+			org := org
+			gw.Do(func() {
+				ch := pagination.New[*gitlab2.Project](rc.Client.Client().Groups.ListGroupProjects, nil).Async(org.Name)
+				for res := range ch {
+					if res.Err != nil {
+						log.Printf("failed to list projects %s", err)
+						return // TODO better handling
+					}
+					for _, completedProject := range res.Collected {
+						completedProject := completedProject
+						gw.Do(func() {
+							rc.extendedCollection(completedProject)
+						})
+					}
 				}
-				for _, completeProject := range repos {
-					k := completeProject
-					gw.Do(func() {
-						rc.extendedCollection(k)
-					})
-				}
-				return resp, nil
-			}, &options.ListOptions)
-			if err != nil {
-				log.Printf("failed to list projects %s", err)
-			}
+			})
 		}
 		gw.Wait()
 	})

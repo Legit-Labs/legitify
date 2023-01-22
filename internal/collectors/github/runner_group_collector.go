@@ -1,7 +1,11 @@
 package github
 
 import (
+	"log"
+	"sync"
+
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
+	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
@@ -9,22 +13,18 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/google/go-github/v49/github"
 	"golang.org/x/net/context"
-	"log"
-	"sync"
 )
 
 type runnersCollector struct {
 	collectors.BaseCollector
 	client  *ghclient.Client
 	context context.Context
-	cache   map[string][]*github.RunnerGroup
 }
 
 func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &runnersCollector{
 		client:  client,
 		context: ctx,
-		cache:   make(map[string][]*github.RunnerGroup),
 	}
 	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
@@ -32,6 +32,21 @@ func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collector
 
 func (c *runnersCollector) Namespace() namespace.Namespace {
 	return namespace.RunnerGroup
+}
+
+func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup, error) {
+	mapper := func(rg *github.RunnerGroups) []*github.RunnerGroup {
+		if rg == nil {
+			return []*github.RunnerGroup{}
+		}
+		return rg.RunnerGroups
+	}
+	result := pagination.NewMapper(c.client.Client().Actions.ListOrganizationRunnerGroups, nil, mapper).Sync(c.context, orgName)
+	if result.Err != nil {
+		// TODO handle properly
+		log.Printf("Error collecting runner groups for %s - %v", orgName, result.Err)
+	}
+	return result.Collected, result.Err
 }
 
 func (c *runnersCollector) CollectMetadata() collectors.Metadata {
@@ -45,29 +60,14 @@ func (c *runnersCollector) CollectMetadata() collectors.Metadata {
 	totalCount := 0
 	var mutex = &sync.RWMutex{}
 	for _, org := range orgs {
+		org := org
 		gw.Do(func() {
-			org := org
-			result := make([]*github.RunnerGroup, 0)
-			err := ghclient.PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
-				options := &github.ListOrgRunnerGroupOptions{
-					ListOptions: *opts,
-				}
-
-				runners, resp, err := c.client.Client().Actions.ListOrganizationRunnerGroups(c.context, org.Name(), options)
-
-				if err != nil {
-					return nil, err
-				}
-
-				result = append(result, runners.RunnerGroups...)
-				return resp, nil
-			})
-
+			result, err := c.collectForOrg(org.Name())
 			if err != nil {
+				// TODO handle properly
 				log.Printf("Error collecting runner groups for %s - %v", org.Name(), err)
 			} else {
 				mutex.Lock()
-				c.cache[org.Name()] = result
 				totalCount = totalCount + len(result)
 				mutex.Unlock()
 			}
@@ -90,9 +90,12 @@ func (c *runnersCollector) Collect() collectors.SubCollectorChannels {
 		}
 
 		for _, org := range orgs {
-			cached := c.cache[org.Name()]
+			groups, err := c.collectForOrg(org.Name())
+			if err != nil {
+				return
+			}
 
-			for _, rg := range cached {
+			for _, rg := range groups {
 				c.CollectionChangeByOne()
 
 				c.CollectData(org,
