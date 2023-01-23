@@ -46,12 +46,16 @@ func (e *scorecardEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, boo
 	return nil, false
 }
 
-func (e *scorecardEnricher) Name() string {
-	return Scorecard
+func (e *scorecardEnricher) Parse(data interface{}) (Enrichment, error) {
+	if val, ok := data.([]ScorecardCheck); !ok {
+		return nil, fmt.Errorf("expecting []ScorecardCheck")
+	} else {
+		return ScorecardEnrichment(val), nil
+	}
 }
 
-func createEnrichment(sc *sc.Result) (*ScorecardEnrichment, error) {
-	var result ScorecardEnrichment
+func createEnrichment(sc *sc.Result) (ScorecardEnrichment, error) {
+	var checks []ScorecardCheck
 	d, err := docs.Read()
 	if err != nil {
 		return nil, err
@@ -74,14 +78,14 @@ func createEnrichment(sc *sc.Result) (*ScorecardEnrichment, error) {
 			}
 		}
 
-		result.Checks = append(result.Checks, ScorecardCheck{
+		checks = append(checks, ScorecardCheck{
 			Reason:  checkResult.Reason,
 			DocsUrl: doc.GetDocumentationURL(sc.Result.Scorecard.CommitSHA),
 			Details: details,
 		})
 	}
 
-	return &result, nil
+	return ScorecardEnrichment(checks), nil
 }
 
 type ScorecardCheck struct {
@@ -90,27 +94,21 @@ type ScorecardCheck struct {
 	Details []string
 }
 
-type ScorecardEnrichment struct {
-	Checks []ScorecardCheck
-}
+type ScorecardEnrichment []ScorecardCheck
 
-func (se *ScorecardEnrichment) Name() string {
-	return Scorecard
-}
-
-func (se *ScorecardEnrichment) HumanReadable(prepend string, linebreak string) string {
+func (se ScorecardEnrichment) HumanReadable(prepend string, linebreak string) string {
 	sb := utils.NewPrependedStringBuilder(prepend)
 
-	for j, checkResult := range se.Checks {
-		sb.WriteString(fmt.Sprintf("%d. %s:%s", j+1, checkResult.Reason, linebreak))
-		sb.WriteString(fmt.Sprintf("docs: %s%s", checkResult.DocsUrl, linebreak))
+	for j, checkResult := range []ScorecardCheck(se) {
+		sb.WriteStringf("%d. %s:%s", j+1, checkResult.Reason, linebreak)
+		sb.WriteStringf("docs: %s%s", checkResult.DocsUrl, linebreak)
 
 		if len(checkResult.Details) > 0 {
-			sb.WriteString(fmt.Sprintln("details: "))
+			sb.WriteStringf("details: %s", linebreak)
 			for i, detail := range checkResult.Details {
 				clean := strings.Replace(detail, "\t", "", -1)
 				clean = strings.Replace(clean, "\n", " ", -1)
-				sb.WriteString(fmt.Sprintf("  %d. %s%s", i+1, clean, linebreak))
+				sb.WriteStringf("  %d. %s%s", i+1, clean, linebreak)
 			}
 		}
 	}

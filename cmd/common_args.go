@@ -20,6 +20,7 @@ type args struct {
 	OutputFormat               string
 	OutputScheme               string
 	ScorecardWhen              string
+	InputFile     string
 	FailedOnly                 bool
 	SimulateSecondaryRateLimit bool
 }
@@ -52,13 +53,16 @@ func (a *args) ApplyEnvVars() {
 		a.Endpoint = viper.GetString(EnvServerUrl)
 	}
 }
+func (a *args) addOutputOptions(flags *pflag.FlagSet) {
+	flags.StringVarP(&a.OutputFile, ArgOutputFile, "o", "", "output file, defaults to stdout")
+	flags.StringVarP(&a.ErrorFile, ArgErrorFile, "e", "error.log", "error log path")
+}
 
 func (a *args) addCommonOptions(flags *pflag.FlagSet) {
 	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github (required unless environment variable LEGITIFY_AUTH_TOKEN is set)")
 	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github/gitlab endpoint to use instead of the Cloud API (can be set via the environment variable SERVER_URL)")
-	flags.StringVarP(&a.OutputFile, ArgOutputFile, "o", "", "output file, defaults to stdout")
-	flags.StringVarP(&a.ErrorFile, ArgErrorFile, "e", "error.log", "error log path")
 	flags.StringVarP(&a.ScmType, ScmType, "", scm_type.GitHub, "server type (GitHub, GitLab), defaults to GitHub")
+	a.addOutputOptions(flags)
 }
 
 func (a *args) validateCommonOptions() error {

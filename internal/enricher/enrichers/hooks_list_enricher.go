@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"sort"
+	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/iancoleman/orderedmap"
 )
 
 const HooksList = "hooksList"
@@ -21,19 +25,24 @@ type hooksListEnricher struct {
 func (e *hooksListEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
 	result, err := createHooksListEnrichment(data.ExtraData)
 	if err != nil {
+		log.Printf("failed to enrich hooks list: %v", err)
 		return nil, false
 	}
 	return result, true
 }
 
+func (e *hooksListEnricher) Parse(data interface{}) (Enrichment, error) {
+	return NewGenericListEnrichmentFromInterface(data)
+}
+
 func createHooksListEnrichment(extraData interface{}) (Enrichment, error) {
-	casted, ok := extraData.(map[string]interface{})
+	asMap, ok := extraData.(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("invalid hookslist extra data")
 	}
-	var result []map[string]string
 
-	for k := range casted {
+	var result []orderedmap.OrderedMap
+	for k := range asMap {
 		var hooksEnrichment map[string]string
 
 		err := json.Unmarshal([]byte(k), &hooksEnrichment)
@@ -41,40 +50,15 @@ func createHooksListEnrichment(extraData interface{}) (Enrichment, error) {
 			return nil, err
 		}
 
-		result = append(result, hooksEnrichment)
+		result = append(result, *utils.ToKeySortedMap(hooksEnrichment))
 	}
 
-	return &GenericListEnrichment{
-		GenericEnrichments: result,
-	}, nil
-}
+	// order by url to maintain a determenistic order
+	sort.Slice(result, func(i, j int) bool {
+		urlI := utils.UnsafeGet[string](&result[i], "url")
+		urlJ := utils.UnsafeGet[string](&result[j], "url")
+		return strings.Compare(urlI, urlJ) < 0
+	})
 
-func (e *hooksListEnricher) Name() string {
-	return HooksList
-}
-
-type GenericListEnrichment struct {
-	GenericEnrichments []map[string]string
-}
-
-func (se *GenericListEnrichment) Name() string {
-	return HooksList
-}
-
-func (se *GenericListEnrichment) HumanReadable(prepend string, linebreak string) string {
-	sb := utils.NewPrependedStringBuilder(prepend)
-
-	for i, enrichment := range se.GenericEnrichments {
-		first := true
-		for k, v := range enrichment {
-			if first {
-				sb.WriteString(fmt.Sprintf("%d. %s: %s%s", i+1, k, v, linebreak))
-				first = false
-			} else {
-				sb.WriteString(fmt.Sprintf("   %s: %s%s", k, v, linebreak))
-			}
-		}
-	}
-
-	return linebreak + sb.String()
+	return GenericListEnrichment(result), nil
 }

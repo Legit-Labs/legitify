@@ -8,18 +8,16 @@ import (
 
 const EntityName = "entityName"
 
-func NewEntityNameEnricher(ctx context.Context) Enricher {
-	return &entityNameEnricher{}
-}
-
 type entityNameEnricher struct {
+	basicEnricher
 }
 
-func (e *entityNameEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
-	name := data.Entity.Name()
-	return NewBasicEnrichment(name, EntityName), true
+func NewEntityNameEnricher(ctx context.Context) Enricher {
+	return entityNameEnricher{
+		newBasicEnricher(enrichEntityName),
+	}
 }
 
-func (e *entityNameEnricher) Name() string {
-	return EntityName
+func enrichEntityName(data analyzers.AnalyzedData) (string, bool) {
+	return data.Entity.Name(), true
 }

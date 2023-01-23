@@ -12,6 +12,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
+	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/spf13/cobra"
 
@@ -50,7 +51,7 @@ func newAnalyzeCommand() *cobra.Command {
 	}
 
 	formats := toOptionsString(formatter.OutputFormats())
-	schemeTypes := toOptionsString(converter.SchemeTypes())
+	schemeTypes := toOptionsString(scheme.SchemeTypes())
 	colorWhens := toOptionsString(ColorOptions())
 	scorecardWhens := toOptionsString(scorecardOptions())
 
@@ -63,7 +64,7 @@ func newAnalyzeCommand() *cobra.Command {
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
 	flags.StringVarP(&analyzeArgs.OutputFormat, argOutputFormat, "f", formatter.Human, "output format "+formats)
-	flags.StringVarP(&analyzeArgs.OutputScheme, argOutputScheme, "", converter.DefaultScheme, "output scheme "+schemeTypes)
+	flags.StringVarP(&analyzeArgs.OutputScheme, argOutputScheme, "", scheme.DefaultScheme, "output scheme "+schemeTypes)
 	flags.StringVarP(&analyzeArgs.ColorWhen, argColor, "", DefaultColorOption, "when to use coloring "+colorWhens)
 	flags.StringVarP(&analyzeArgs.ScorecardWhen, argScorecard, "", DefaultScOption, "Whether to run additional scorecard checks "+scorecardWhens)
 	flags.BoolVarP(&analyzeArgs.FailedOnly, argFailedOnly, "", false, "Only show violated policied (do not show succeeded/skipped)")

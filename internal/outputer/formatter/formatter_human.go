@@ -9,7 +9,6 @@ import (
 	tw "github.com/olekukonko/tablewriter"
 
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/fatih/color"
 )
 
@@ -23,24 +22,24 @@ func newHumanFormatter() OutputFormatter {
 	}
 }
 
-func (f *HumanFormatter) formatSummaryTable(output scheme.FlattenedScheme) []byte {
+func (f *HumanFormatter) formatSummaryTable(output *scheme.Flattened) []byte {
 	tf := newHumanTableWriter()
 	tw := newTableContent(tf, f.colorizer)
 	return tw.FormatSummary(output)
 }
 
-func (f *HumanFormatter) formatFailedPolicies(output scheme.FlattenedScheme) []byte {
-	failedPolicies := scheme.OnlyFailedViolations(output)
+func (f *HumanFormatter) formatFailedPolicies(output *scheme.Flattened) []byte {
+	failedPolicies := output.OnlyFailedViolations()
 	pf := newHumanPolicyFormatter()
 	pc := newPoliciesContent(pf, f.colorizer)
 	return pc.FormatFailedPolicies(failedPolicies)
 }
 
-func (f *HumanFormatter) Format(output interface{}, failedOnly bool) ([]byte, error) {
+func (f *HumanFormatter) Format(output scheme.Scheme, failedOnly bool) ([]byte, error) {
 	var summary, failedPolicies []byte
-	var typedOutput scheme.FlattenedScheme
+	var typedOutput *scheme.Flattened
 
-	typedOutput, ok := output.(scheme.FlattenedScheme)
+	typedOutput, ok := output.(*scheme.Flattened)
 	if !ok {
 		return nil, UnsupportedScheme{output}
 	}
@@ -55,7 +54,7 @@ func (f *HumanFormatter) Format(output interface{}, failedOnly bool) ([]byte, er
 }
 
 func (f *HumanFormatter) IsSchemeSupported(schemeType string) bool {
-	return schemeType == converter.Flattened
+	return schemeType == scheme.TypeFlattened
 }
 
 // table formatting

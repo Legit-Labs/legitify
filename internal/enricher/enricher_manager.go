@@ -2,6 +2,10 @@ package enricher
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"sync"
+
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
@@ -49,15 +53,37 @@ type enricherManager struct {
 	ctx context.Context
 }
 
-type newEnricherFunc func(ctx context.Context) enrichers.Enricher
+var enricherTextToEnricher struct {
+	once    sync.Once
+	mapping map[string]enrichers.Enricher
+}
 
-var enricherTextToEnricher = map[string]newEnricherFunc{
-	enrichers.EntityId:       enrichers.NewEntityIdEnricher,
-	enrichers.EntityName:     enrichers.NewEntityNameEnricher,
-	enrichers.OrganizationId: enrichers.NewOrganizationIdEnricher,
-	enrichers.Scorecard:      enrichers.NewScorecardEnricher,
-	enrichers.MembersList:    enrichers.NewMembersListEnricher,
-	enrichers.HooksList:      enrichers.NewHooksListEnricher,
+func getEnricher(ctx context.Context, name string) (enrichers.Enricher, error) {
+	enricherTextToEnricher.once.Do(func() {
+		enricherTextToEnricher.mapping = map[string]enrichers.Enricher{
+			enrichers.EntityId:       enrichers.NewEntityIdEnricher(ctx),
+			enrichers.EntityName:     enrichers.NewEntityNameEnricher(ctx),
+			enrichers.OrganizationId: enrichers.NewOrganizationIdEnricher(ctx),
+			enrichers.Scorecard:      enrichers.NewScorecardEnricher(ctx),
+			enrichers.MembersList:    enrichers.NewMembersListEnricher(ctx),
+			enrichers.HooksList:      enrichers.NewHooksListEnricher(ctx),
+		}
+	})
+
+	if e, ok := enricherTextToEnricher.mapping[name]; ok {
+		return e, nil
+	} else {
+		return nil, fmt.Errorf("failed to find enricher %s", name)
+	}
+}
+
+func ParseEnrichment(ctx context.Context, name string, data interface{}) (enrichers.Enrichment, error) {
+	e, err := getEnricher(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return e.Parse(data)
 }
 
 func newEnrichedData(analyzed analyzers.AnalyzedData, enrichments map[string]enrichers.Enrichment) EnrichedData {
@@ -92,22 +118,20 @@ func (e *enricherManager) Enrich(analyzedDataChannel <-chan analyzers.AnalyzedDa
 
 					enrichments := make(map[string]enrichers.Enrichment)
 					for _, requiredEnricher := range requiredEnrichers {
-						createEnricher, ok := enricherTextToEnricher[requiredEnricher]
-						if !ok {
+						enricher, err := getEnricher(e.ctx, requiredEnricher)
+						if err != nil {
+							log.Printf("failed to find enricher: %v", err)
 							continue
 						}
-
-						enricher := createEnricher(e.ctx)
 
 						enrichment, ok := enricher.Enrich(analyzedData)
 						if !ok {
 							continue
 						}
 
-						enrichments[enrichment.Name()] = enrichment
+						enrichments[requiredEnricher] = enrichment
 					}
 					enrichedData := newEnrichedData(analyzedData, enrichments)
-
 					outputChannel <- enrichedData
 				})
 			}(analyzedData)

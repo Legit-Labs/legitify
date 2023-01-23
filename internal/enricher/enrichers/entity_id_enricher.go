@@ -9,18 +9,17 @@ import (
 
 const EntityId = "entityId"
 
-func NewEntityIdEnricher(ctx context.Context) Enricher {
-	return &entityIdEnricher{}
-}
-
 type entityIdEnricher struct {
+	basicEnricher
 }
 
-func (e *entityIdEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
+func NewEntityIdEnricher(ctx context.Context) Enricher {
+	return entityIdEnricher{
+		newBasicEnricher(enrichEntityId),
+	}
+}
+
+func enrichEntityId(data analyzers.AnalyzedData) (string, bool) {
 	entityID := data.Entity.ID()
-	return NewBasicEnrichment(strconv.FormatInt(entityID, 10), EntityId), true
-}
-
-func (e *entityIdEnricher) Name() string {
-	return EntityId
+	return strconv.FormatInt(entityID, 10), true
 }

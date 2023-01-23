@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
+	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
@@ -16,7 +17,7 @@ type Outputer interface {
 	Output(writer io.Writer) error
 }
 
-func NewOutputer(ctx context.Context, format formatter.FormatName, schemeType converter.SchemeType, failedOnly bool) Outputer {
+func NewOutputer(ctx context.Context, format formatter.FormatName, schemeType scheme.SchemeType, failedOnly bool) Outputer {
 	return &outputer{
 		format:     format,
 		schemeType: schemeType,
@@ -28,7 +29,7 @@ func NewOutputer(ctx context.Context, format formatter.FormatName, schemeType co
 
 type outputer struct {
 	format     formatter.FormatName
-	schemeType converter.SchemeType
+	schemeType scheme.SchemeType
 	failedOnly bool
 	output     []byte
 	err        error
@@ -51,24 +52,24 @@ func enrichedDataToViolation(enrichedData enricher.EnrichedData) scheme.Violatio
 	return scheme.Violation{
 		CanonicalLink:       enrichedData.CanonicalLink,
 		ViolationEntityType: enrichedData.Entity.ViolationEntityType(),
-		Aux:                 enrichedData.Enrichers,
+		Aux:                 utils.ToKeySortedMap(enrichedData.Enrichers),
 		Status:              enrichedData.Status,
 	}
 }
 
-func (o *outputer) receiveViolations(inputChannel <-chan enricher.EnrichedData) scheme.FlattenedScheme {
+func (o *outputer) receiveViolations(inputChannel <-chan enricher.EnrichedData) *scheme.Flattened {
 	violations := scheme.NewFlattenedScheme()
 
 	for encrichedData := range inputChannel {
 		policyName := encrichedData.FullyQualifiedPolicyName
 
-		if _, ok := violations.Get(policyName); !ok {
-			violations.Set(policyName, scheme.NewOutputData(enrichedDataToPolicyInfo(encrichedData)))
+		if _, ok := violations.AsOrderedMap().Get(policyName); !ok {
+			violations.AsOrderedMap().Set(policyName, scheme.NewOutputData(enrichedDataToPolicyInfo(encrichedData)))
 		}
 		preAppend := violations.GetPolicyData(policyName)
 
 		violation := enrichedDataToViolation(encrichedData)
-		violations.Set(policyName, scheme.AppendViolations(preAppend, violation))
+		violations.AsOrderedMap().Set(policyName, scheme.AppendViolations(preAppend, violation))
 	}
 
 	return violations
@@ -80,10 +81,10 @@ func (o *outputer) Digest(inputChannel <-chan enricher.EnrichedData) group_waite
 	gw.Do(func() {
 		o.err = nil // zero err to allow reuse of the object
 		violations := o.receiveViolations(inputChannel)
-		sorted := scheme.SortSchemeBySeverity(violations, true)
+		sorted := violations.SortedBySeverity()
 
 		if o.failedOnly {
-			sorted = scheme.OnlyFailedViolations(sorted)
+			sorted = sorted.OnlyFailedViolations()
 		}
 
 		converted, err := converter.Convert(o.schemeType, sorted)

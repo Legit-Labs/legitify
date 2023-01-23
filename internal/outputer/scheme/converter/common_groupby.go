@@ -8,13 +8,17 @@ import (
 
 type grouper interface {
 	Element(policyInfo scheme.PolicyInfo, violation scheme.Violation) string
-	NewScheme() *orderedmap.OrderedMap
+	NewScheme() groupingScheme
 }
 
-func ConvertToGroupBy(groupBy grouper, output scheme.FlattenedScheme) (interface{}, error) {
-	byElement := groupBy.NewScheme()
+type groupingScheme interface {
+	AsOrderedMap() *orderedmap.OrderedMap
+}
 
-	for _, policyName := range output.Keys() {
+func ConvertToGroupBy(groupBy grouper, output *scheme.Flattened) (*orderedmap.OrderedMap, error) {
+	byElement := groupBy.NewScheme().AsOrderedMap()
+
+	for _, policyName := range output.AsOrderedMap().Keys() {
 		outputData := output.GetPolicyData(policyName)
 		for _, violation := range outputData.Violations {
 			element := groupBy.Element(outputData.PolicyInfo, violation)
@@ -22,15 +26,15 @@ func ConvertToGroupBy(groupBy grouper, output scheme.FlattenedScheme) (interface
 			if _, ok := byElement.Get(element); !ok {
 				byElement.Set(element, scheme.NewFlattenedScheme())
 			}
-			byPolicy := utils.UnsafeGet(byElement, element).(scheme.FlattenedScheme)
+			byPolicy := utils.UnsafeGet[*scheme.Flattened](byElement, element)
 
-			if _, ok := byPolicy.Get(policyName); !ok {
-				byPolicy.Set(policyName, scheme.NewOutputData(outputData.PolicyInfo))
+			if _, ok := byPolicy.AsOrderedMap().Get(policyName); !ok {
+				byPolicy.AsOrderedMap().Set(policyName, scheme.NewOutputData(outputData.PolicyInfo))
 			}
 			preAppend := byPolicy.GetPolicyData(policyName)
 
 			postAppend := scheme.AppendViolations(preAppend, violation)
-			byPolicy.Set(policyName, postAppend)
+			byPolicy.AsOrderedMap().Set(policyName, postAppend)
 			byElement.Set(element, byPolicy)
 		}
 	}

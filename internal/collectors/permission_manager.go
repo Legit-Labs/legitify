@@ -56,7 +56,7 @@ func CollectMissingPermissions(missingPermissionChan chan MissingPermission) {
 		return aName < bName
 	}
 	for _, permission := range permMap.Keys() {
-		entity := utils.UnsafeGet(permMap, permission).(*orderedmap.OrderedMap)
+		entity := utils.UnsafeGet[*orderedmap.OrderedMap](permMap, permission)
 		entity.Sort(lessByEntityName)
 		permMap.Set(permission, entity)
 	}
@@ -64,9 +64,9 @@ func CollectMissingPermissions(missingPermissionChan chan MissingPermission) {
 	// Build missing permissions string
 	for _, permission := range permMap.Keys() {
 		errlog.PermIssueF("missing permission: \"%s\" on:\n", permission)
-		entity := utils.UnsafeGet(permMap, permission).(*orderedmap.OrderedMap)
+		entity := utils.UnsafeGet[*orderedmap.OrderedMap](permMap, permission)
 		for _, entityName := range entity.Keys() {
-			effects := utils.UnsafeGet(entity, entityName).(effectSet)
+			effects := utils.UnsafeGet[effectSet](entity, entityName)
 			filteredEffects := []string{}
 			for effect := range effects {
 				if effect == "" {
