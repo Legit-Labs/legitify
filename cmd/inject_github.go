@@ -42,5 +42,5 @@ func provideGitHubCollectors(ctx context.Context, client *github.Client, analyze
 
 func provideGitHubClient(analyzeArgs *args) (*github.Client, error) {
 	return github.NewClient(context.Background(), analyzeArgs.Token, analyzeArgs.Endpoint,
-		analyzeArgs.Organizations, false)
+		analyzeArgs.Organizations)
 }

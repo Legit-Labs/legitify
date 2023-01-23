@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"context"
+
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/patrickmn/go-cache"
@@ -24,7 +25,7 @@ func (c *Client) Client() *gitlab.Client {
 	return c.client
 }
 
-func NewClient(ctx context.Context, token string, endpoint string, orgs []string, fillCache bool) (*Client, error) {
+func NewClient(ctx context.Context, token string, endpoint string, orgs []string) (*Client, error) {
 	var config []gitlab.ClientOptionFunc
 	if endpoint != "" {
 		config = []gitlab.ClientOptionFunc{gitlab.WithBaseURL(endpoint)}
@@ -44,12 +45,6 @@ func NewClient(ctx context.Context, token string, endpoint string, orgs []string
 		client:  git,
 		cache:   cache.New(cache.NoExpiration, cache.NoExpiration),
 		orgs:    orgs,
-	}
-
-	if fillCache {
-		if err := result.fillCache(); err != nil {
-			return nil, err
-		}
 	}
 
 	return result, nil
@@ -131,21 +126,6 @@ func (c *Client) GroupMembers(group *gitlab.Group) ([]*gitlab.GroupMember, error
 	}
 
 	return result, nil
-}
-
-func (c *Client) fillCache() error {
-	if _, found := c.cache.Get(orgsCacheKeys); found {
-		return nil
-	}
-
-	orgs, err := c.Groups()
-	if err != nil {
-		return err
-	}
-
-	c.cache.Set(orgsCacheKeys, orgs, cache.NoExpiration)
-
-	return nil
 }
 
 func (c *Client) Groups() ([]*gitlab.Group, error) {
