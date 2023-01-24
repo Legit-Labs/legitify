@@ -164,7 +164,7 @@ jobs:
         run: |
           find ${{ env.GORELEASER_ARTIFACTS_DOWNLOAD_PATH }} -maxdepth 1 -type f -not -name '*darwin*' -exec cp {} ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/ \;
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@d4e8205d7e959a9107da6396278b2f1f07af0f9b
         # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
