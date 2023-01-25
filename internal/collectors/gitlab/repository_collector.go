@@ -98,10 +98,10 @@ func getRepositoryEncodedName(repo types.RepositoryWithOwner) string {
 }
 
 func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	res := pagination.New[*gitlab2.ProtectedBranch](rc.Client.Client().ProtectedBranches.ListProtectedBranches, nil).Sync(int(project.ID()))
-	if res.Err != nil {
-		log.Printf("failed to list projects %s", res.Err)
-		return project, res.Err
+	res, err := pagination.New[*gitlab2.ProtectedBranch](rc.Client.Client().ProtectedBranches.ListProtectedBranches, nil).Sync(int(project.ID()))
+	if err != nil {
+		log.Printf("failed to list projects %s", err)
+		return project, err
 	}
 
 	extendedProject := project
@@ -110,10 +110,10 @@ func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab
 }
 
 func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	res := pagination.New[*gitlab2.ProjectMember](rc.Client.Client().ProjectMembers.ListAllProjectMembers, nil).Sync(int(project.ID()))
-	if res.Err != nil {
-		log.Printf("failed to list projects %s", res.Err)
-		return project, res.Err
+	res, err := pagination.New[*gitlab2.ProjectMember](rc.Client.Client().ProjectMembers.ListAllProjectMembers, nil).Sync(int(project.ID()))
+	if err != nil {
+		log.Printf("failed to list projects %s", err)
+		return project, err
 	}
 
 	extendedProject := project
@@ -122,10 +122,10 @@ func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected
 }
 
 func (rc *repositoryCollector) extendProjectWithWebhooks(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	res := pagination.New[*gitlab2.ProjectHook](rc.Client.Client().Projects.ListProjectHooks, nil).Sync(int(project.ID()))
-	if res.Err != nil {
-		log.Printf("failed to list project: %s webhook. error message: %s", project.Name(), res.Err)
-		return project, res.Err
+	res, err := pagination.New[*gitlab2.ProjectHook](rc.Client.Client().Projects.ListProjectHooks, nil).Sync(int(project.ID()))
+	if err != nil {
+		log.Printf("failed to list project: %s webhook. error message: %s", project.Name(), err)
+		return project, err
 	}
 
 	extendedProject := project

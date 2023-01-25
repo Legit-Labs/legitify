@@ -41,12 +41,13 @@ func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup,
 		}
 		return rg.RunnerGroups
 	}
-	result := pagination.NewMapper(c.client.Client().Actions.ListOrganizationRunnerGroups, nil, mapper).Sync(c.context, orgName)
-	if result.Err != nil {
+	result, err := pagination.NewMapper(c.client.Client().Actions.ListOrganizationRunnerGroups, nil, mapper).Sync(c.context, orgName)
+	if err != nil {
 		// TODO check for permission error and leave logging for the caller
-		log.Printf("Error collecting runner groups for %s - %v", orgName, result.Err)
+		log.Printf("Error collecting runner groups for %s - %v", orgName, err)
+		return nil, err
 	}
-	return result.Collected, result.Err
+	return result.Collected, nil
 }
 
 func (c *runnersCollector) CollectMetadata() collectors.Metadata {

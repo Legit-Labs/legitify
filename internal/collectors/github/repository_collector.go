@@ -353,14 +353,14 @@ func (rc *repositoryCollector) withActionsSettings(repo ghcollected.Repository, 
 }
 
 func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
-	res := pagination.New[*github.Hook](rc.Client.Client().Repositories.ListHooks, nil).Sync(rc.Context, org, repo.Repository.Name)
-	if res.Err != nil {
+	res, err := pagination.New[*github.Hook](rc.Client.Client().Repositories.ListHooks, nil).Sync(rc.Context, org, repo.Repository.Name)
+	if err != nil {
 		if res.Resp.Response.StatusCode == http.StatusNotFound {
 			perm := collectors.NewMissingPermission(permissions.RepoHookRead, collectors.FullRepoName(org, repo.Repository.Name),
 				"Cannot read repository webhooks", namespace.Repository)
 			rc.IssueMissingPermissions(perm)
 		}
-		return repo, res.Err
+		return repo, err
 	}
 
 	repo.Hooks = res.Collected

@@ -264,9 +264,9 @@ func (c *Client) collectOrgsList() ([]string, error) {
 			return *o.Login
 		})
 	}
-	res := pagination.NewMapper(c.Client().Organizations.List, nil, mapper).Sync(c.context, "")
-	if res.Err != nil {
-		return nil, res.Err
+	res, err := pagination.NewMapper(c.Client().Organizations.List, nil, mapper).Sync(c.context, "")
+	if err != nil {
+		return nil, err
 	}
 
 	return res.Collected, nil

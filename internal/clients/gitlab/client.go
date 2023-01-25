@@ -101,18 +101,18 @@ func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
 			return types.NewRepositoryWithOwner(p.PathWithNamespace, permissions.RepoRoleAdmin)
 		})
 	}
-	result := pagination.NewMapper(c.Client().Projects.ListProjects, opts, mapper).Sync()
+	result, err := pagination.NewMapper(c.Client().Projects.ListProjects, opts, mapper).Sync()
 
-	if result.Err != nil {
-		return nil, result.Err
+	if err != nil {
+		return nil, err
 	}
 	return result.Collected, nil
 }
 
 func (c *Client) GroupMembers(group *gitlab.Group) ([]*gitlab.GroupMember, error) {
-	result := pagination.New[*gitlab.GroupMember](c.Client().Groups.ListGroupMembers, nil).Sync(group.ID)
-	if result.Err != nil {
-		return nil, result.Err
+	result, err := pagination.New[*gitlab.GroupMember](c.Client().Groups.ListGroupMembers, nil).Sync(group.ID)
+	if err != nil {
+		return nil, err
 	}
 
 	return result.Collected, nil
@@ -128,9 +128,9 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 	ownedGroups := true
 	for _, group := range c.orgs {
 		opts := &gitlab.ListGroupsOptions{Owned: &ownedGroups, Search: &group}
-		res := pagination.New[*gitlab.Group](c.Client().Groups.ListGroups, opts).Sync()
-		if res.Err != nil {
-			return nil, res.Err
+		res, err := pagination.New[*gitlab.Group](c.Client().Groups.ListGroups, opts).Sync()
+		if err != nil {
+			return nil, err
 		}
 		result = append(result, res.Collected...)
 	}
@@ -139,9 +139,9 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 }
 
 func (c *Client) GroupHooks(gid int) ([]*gitlab.GroupHook, error) {
-	result := pagination.New[*gitlab.GroupHook](c.Client().Groups.ListGroupHooks, nil).Sync(gid)
-	if result.Err != nil {
-		return nil, result.Err
+	result, err := pagination.New[*gitlab.GroupHook](c.Client().Groups.ListGroupHooks, nil).Sync(gid)
+	if err != nil {
+		return nil, err
 	}
 
 	return result.Collected, nil

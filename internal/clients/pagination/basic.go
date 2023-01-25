@@ -11,10 +11,10 @@ func New[ApiRetT any, OptsT any, RespT any](fn interface{}, opts interface{}, op
 	}
 }
 
-func (p *Basic[ApiRetT, OptsT, RespT]) Async(params ...interface{}) <-chan Result[ApiRetT, RespT] {
+func (p *Basic[ApiRetT, OptsT, RespT]) Async(params ...interface{}) <-chan AsyncResult[ApiRetT, RespT] {
 	return p.mapper.Async(params...)
 }
 
-func (p *Basic[ApiRetT, OptsT, RespT]) Sync(params ...interface{}) Result[ApiRetT, RespT] {
+func (p *Basic[ApiRetT, OptsT, RespT]) Sync(params ...interface{}) (SyncResult[ApiRetT, RespT], error) {
 	return p.mapper.Sync(params...)
 }

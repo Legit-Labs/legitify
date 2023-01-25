@@ -29,20 +29,16 @@ func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, 
 	}
 }
 
-func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface{}) <-chan Result[UserRetT, RespT] {
-	ch := make(chan Result[UserRetT, RespT], defaultChannelSize)
+func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface{}) <-chan AsyncResult[UserRetT, RespT] {
+	ch := make(chan AsyncResult[UserRetT, RespT], defaultChannelSize)
 
 	f, inputs := p.prepareFunc(params...)
 	go func() {
 		defer close(ch)
 		for {
 			result, resp, err := p.parseOutputs(f.Call(inputs))
-			ch <- Result[UserRetT, RespT]{
-				Err:       err,
-				Resp:      resp,
-				Collected: p.Mapper(result),
-			}
 
+			ch <- newAsyncResult(p.Mapper(result), resp, err)
 			if err != nil || p.optioner.Done(resp) {
 				break
 			}
@@ -54,23 +50,17 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface
 	return ch
 }
 
-func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Sync(params ...interface{}) Result[UserRetT, RespT] {
+func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Sync(params ...interface{}) (SyncResult[UserRetT, RespT], error) {
 	var results []UserRetT
 	ch := p.Async(params...)
 
 	for r := range ch {
 		if r.Err != nil {
-			return Result[UserRetT, RespT]{
-				Err:       r.Err,
-				Resp:      r.Resp,
-				Collected: results,
-			}
+			return r.SyncResult, r.Err
 		}
 		results = append(results, r.Collected...)
 	}
-	return Result[UserRetT, RespT]{
-		Collected: results,
-	}
+	return newSyncCollection[UserRetT, RespT](results), nil
 }
 
 func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...interface{}) (reflect.Value, []reflect.Value) {
