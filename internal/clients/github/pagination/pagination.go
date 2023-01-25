@@ -5,11 +5,6 @@ import (
 	"github.com/google/go-github/v49/github"
 )
 
-type Optioner interface {
-	Done(resp interface{}) bool
-	Advance(resp interface{}, opts interface{})
-}
-
 type GHOpts = *github.ListOptions
 type GHResp = *github.Response
 type ghOptioner struct {
@@ -23,6 +18,9 @@ func (gh *ghOptioner) Advance(resp interface{}, opts interface{}) {
 	r := resp.(GHResp)
 	o := opts.(GHOpts)
 	o.Page = r.NextPage
+}
+func (gh *ghOptioner) OptionsIndex(fnInputsCount int, isVariadic bool) int {
+	return fnInputsCount - 1
 }
 
 func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GHOpts, GHResp] {

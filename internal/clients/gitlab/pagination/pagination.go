@@ -5,11 +5,6 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-type Optioner interface {
-	Done(resp interface{}) bool
-	Advance(resp interface{}, opts interface{})
-}
-
 type GLOpts = *gitlab.ListOptions
 type GLResp = *gitlab.Response
 type glOptioner struct {
@@ -23,6 +18,14 @@ func (gl *glOptioner) Advance(resp interface{}, opts interface{}) {
 	r := resp.(GLResp)
 	o := opts.(GLOpts)
 	o.Page = r.NextPage
+}
+
+func (gl *glOptioner) OptionsIndex(fnInputsCount int, isVariadic bool) int {
+	index := fnInputsCount - 1
+	if isVariadic {
+		index--
+	}
+	return index
 }
 
 func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GLOpts, GLResp] {

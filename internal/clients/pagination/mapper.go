@@ -3,6 +3,8 @@ package pagination
 import (
 	"log"
 	"reflect"
+
+	"github.com/Legit-Labs/legitify/internal/common/utils"
 )
 
 const defaultChannelSize = 1000
@@ -19,7 +21,10 @@ func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, 
 		log.Panic("creating a pagination mapper requires both a function and a mapper")
 	}
 	if opts == nil {
-		opts = zeroOpts(fn)
+		opts = zeroOpts(fn, optioner)
+	}
+	if reflect.ValueOf(opts).Kind() != reflect.Ptr {
+		log.Panic("the options parameter must be of a pointer type")
 	}
 	return &MappedPager[ApiRetT, UserRetT, OptsT, RespT]{
 		Fn:       fn,
@@ -32,11 +37,11 @@ func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, 
 func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface{}) <-chan AsyncResult[UserRetT, RespT] {
 	ch := make(chan AsyncResult[UserRetT, RespT], defaultChannelSize)
 
-	f, inputs := p.prepareFunc(params...)
+	apiCall := p.prepareFunc(params...)
 	go func() {
 		defer close(ch)
 		for {
-			result, resp, err := p.parseOutputs(f.Call(inputs))
+			result, resp, err := apiCall()
 
 			ch <- newAsyncResult(p.Mapper(result), resp, err)
 			if err != nil || p.optioner.Done(resp) {
@@ -63,22 +68,33 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Sync(params ...interface{
 	return newSyncCollection[UserRetT, RespT](results), nil
 }
 
-func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...interface{}) (reflect.Value, []reflect.Value) {
-	// XXX: happens to be true for both GH & GL clients as long as we don't use the extra options field
-	// if we need to use it, fix here and in zeroOpts()
-	params = append(params, p.Opts)
-
-	if inputsCount(p.Fn) != len(params) {
-		log.Panicf("incorrect number of parameters: %d != %d", inputsCount(p.Fn), len(params))
+func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...interface{}) func() (ApiRetT, RespT, error) {
+	// params validation
+	count, isVariadic := inputsCount(p.Fn)
+	paramsCountWithOpts := len(params) + 1
+	if isVariadic && paramsCountWithOpts < count-1 {
+		log.Panicf("incorrect number of parameters: %d != %d", count, paramsCountWithOpts)
+	} else if count != paramsCountWithOpts {
+		log.Panicf("incorrect number of parameters: %d != %d", count, paramsCountWithOpts)
 	}
 
-	inputs := make([]reflect.Value, 0, len(params))
-	for _, in := range params {
-		inputs = append(inputs, reflect.ValueOf(in))
+	// add the options to the params
+	optsIndex := p.optioner.OptionsIndex(count, isVariadic)
+	paramsWithOpts := make([]interface{}, 0, len(params)+1)
+	for i, v := range params {
+		if i == optsIndex {
+			paramsWithOpts = append(params, p.Opts)
+		}
+		paramsWithOpts = append(paramsWithOpts, v)
 	}
+	if optsIndex == paramsCountWithOpts-1 { // in case the options is the last arg
+		paramsWithOpts = append(paramsWithOpts, p.Opts)
+	}
+	inputs := utils.MapSlice(paramsWithOpts, reflect.ValueOf)
 
-	f := reflect.ValueOf(p.Fn)
-	return f, inputs
+	return func() (ApiRetT, RespT, error) {
+		return p.parseOutputs(reflect.ValueOf(p.Fn).Call(inputs))
+	}
 }
 
 func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) parseOutputs(outputs []reflect.Value) (ApiRetT, RespT, error) {
@@ -106,15 +122,11 @@ func isVariadic(fn interface{}) bool {
 	return reflect.TypeOf(fn).IsVariadic()
 }
 
-func inputsCount(fn interface{}) int {
-	count := reflect.TypeOf(fn).NumIn()
-	if isVariadic(fn) {
-		count--
-	}
-	return count
+func inputsCount(fn interface{}) (count int, variadic bool) {
+	return reflect.TypeOf(fn).NumIn(), isVariadic(fn)
 }
 
-func zeroOpts(fn interface{}) interface{} {
-	optsLocation := inputsCount(fn) - 1
+func zeroOpts(fn interface{}, optioner Optioner) interface{} {
+	optsLocation := optioner.OptionsIndex(inputsCount(fn))
 	return reflect.Zero(reflect.TypeOf(fn).In(optsLocation)).Interface()
 }
