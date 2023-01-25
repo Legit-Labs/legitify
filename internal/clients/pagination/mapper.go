@@ -45,7 +45,7 @@ func (p *MappedPager[T, U, O, R]) Async(params ...interface{}) <-chan Result[U, 
 				break
 			}
 
-			p.optioner.Next(resp, p.Opts)
+			p.optioner.Advance(resp, p.Opts)
 		}
 	}()
 

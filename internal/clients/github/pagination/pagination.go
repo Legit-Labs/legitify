@@ -7,7 +7,7 @@ import (
 
 type Optioner interface {
 	Done(resp interface{}) bool
-	Next(resp interface{}, opts interface{})
+	Advance(resp interface{}, opts interface{})
 }
 
 type GHOpts = *github.ListOptions
@@ -19,7 +19,7 @@ func (gh *ghOptioner) Done(resp interface{}) bool {
 	r := resp.(GHResp)
 	return r.NextPage == 0
 }
-func (gh *ghOptioner) Next(resp interface{}, opts interface{}) {
+func (gh *ghOptioner) Advance(resp interface{}, opts interface{}) {
 	r := resp.(GHResp)
 	o := opts.(GHOpts)
 	o.Page = r.NextPage

@@ -7,7 +7,7 @@ import (
 
 type Optioner interface {
 	Done(resp interface{}) bool
-	Next(resp interface{}, opts interface{})
+	Advance(resp interface{}, opts interface{})
 }
 
 type GLOpts = *gitlab.ListOptions
@@ -19,7 +19,7 @@ func (gh *glOptioner) Done(resp interface{}) bool {
 	r := resp.(GLResp)
 	return r.CurrentPage == r.TotalPages
 }
-func (gh *glOptioner) Next(resp interface{}, opts interface{}) {
+func (gh *glOptioner) Advance(resp interface{}, opts interface{}) {
 	r := resp.(GLResp)
 	o := opts.(GLOpts)
 	o.Page = r.NextPage
