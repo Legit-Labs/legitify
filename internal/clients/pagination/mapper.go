@@ -5,6 +5,8 @@ import (
 	"reflect"
 )
 
+const defaultChannelSize = 1000
+
 type MappedPager[ApiRetT any, UserRetT any, OptsT any, RespT any] struct {
 	Opts     interface{}
 	Fn       interface{}
@@ -28,7 +30,7 @@ func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, 
 }
 
 func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface{}) <-chan Result[UserRetT, RespT] {
-	ch := make(chan Result[UserRetT, RespT])
+	ch := make(chan Result[UserRetT, RespT], defaultChannelSize)
 
 	f, inputs := p.prepareFunc(params...)
 	go func() {
