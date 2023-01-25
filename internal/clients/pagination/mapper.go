@@ -14,7 +14,7 @@ type MappedPager[ApiRetT any, UserRetT any, OptsT any, RespT any] struct {
 
 func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT, optioner Optioner) *MappedPager[ApiRetT, UserRetT, OptsT, RespT] {
 	if fn == nil || mapper == nil {
-		log.Panic("must provide a function and a mapper")
+		log.Panic("creating a pagination mapper requires both a function and a mapper")
 	}
 	if opts == nil {
 		opts = zeroOpts(fn)
