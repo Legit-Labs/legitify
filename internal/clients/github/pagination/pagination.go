@@ -25,9 +25,9 @@ func (gh *ghOptioner) Advance(resp interface{}, opts interface{}) {
 	o.Page = r.NextPage
 }
 
-func New[T any](fn interface{}, opts interface{}) *pagination.Basic[T, GHOpts, GHResp] {
-	return pagination.New[T, GHOpts, GHResp](fn, opts, &ghOptioner{})
+func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GHOpts, GHResp] {
+	return pagination.New[ApiRetT, GHOpts, GHResp](fn, opts, &ghOptioner{})
 }
-func NewMapper[T any, U any](fn interface{}, opts interface{}, mapper func(T) []U) *pagination.MappedPager[T, U, GHOpts, GHResp] {
-	return pagination.NewMapper[T, U, GHOpts, GHResp](fn, opts, mapper, &ghOptioner{})
+func NewMapper[ApiRetT any, UserRetT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT) *pagination.MappedPager[ApiRetT, UserRetT, GHOpts, GHResp] {
+	return pagination.NewMapper[ApiRetT, UserRetT, GHOpts, GHResp](fn, opts, mapper, &ghOptioner{})
 }

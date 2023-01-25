@@ -5,21 +5,21 @@ import (
 	"reflect"
 )
 
-type MappedPager[T any, U any, O any, R any] struct {
+type MappedPager[ApiRetT any, UserRetT any, OptsT any, RespT any] struct {
 	Opts     interface{}
 	Fn       interface{}
-	Mapper   func(T) []U
+	Mapper   func(ApiRetT) []UserRetT
 	optioner Optioner
 }
 
-func NewMapper[T any, U any, O any, R any](fn interface{}, opts interface{}, mapper func(T) []U, optioner Optioner) *MappedPager[T, U, O, R] {
+func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT, optioner Optioner) *MappedPager[ApiRetT, UserRetT, OptsT, RespT] {
 	if fn == nil || mapper == nil {
 		log.Panic("must provide a function and a mapper")
 	}
 	if opts == nil {
 		opts = zeroOpts(fn)
 	}
-	return &MappedPager[T, U, O, R]{
+	return &MappedPager[ApiRetT, UserRetT, OptsT, RespT]{
 		Fn:       fn,
 		Opts:     opts,
 		Mapper:   mapper,
@@ -27,15 +27,15 @@ func NewMapper[T any, U any, O any, R any](fn interface{}, opts interface{}, map
 	}
 }
 
-func (p *MappedPager[T, U, O, R]) Async(params ...interface{}) <-chan Result[U, R] {
-	ch := make(chan Result[U, R])
+func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface{}) <-chan Result[UserRetT, RespT] {
+	ch := make(chan Result[UserRetT, RespT])
 
 	f, inputs := p.prepareFunc(params...)
 	go func() {
 		defer close(ch)
 		for {
 			result, resp, err := p.parseOutputs(f.Call(inputs))
-			ch <- Result[U, R]{
+			ch <- Result[UserRetT, RespT]{
 				Err:       err,
 				Resp:      resp,
 				Collected: p.Mapper(result),
@@ -52,13 +52,13 @@ func (p *MappedPager[T, U, O, R]) Async(params ...interface{}) <-chan Result[U, 
 	return ch
 }
 
-func (p *MappedPager[T, U, O, R]) Sync(params ...interface{}) Result[U, R] {
-	var results []U
+func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Sync(params ...interface{}) Result[UserRetT, RespT] {
+	var results []UserRetT
 	ch := p.Async(params...)
 
 	for r := range ch {
 		if r.Err != nil {
-			return Result[U, R]{
+			return Result[UserRetT, RespT]{
 				Err:       r.Err,
 				Resp:      r.Resp,
 				Collected: results,
@@ -66,12 +66,12 @@ func (p *MappedPager[T, U, O, R]) Sync(params ...interface{}) Result[U, R] {
 		}
 		results = append(results, r.Collected...)
 	}
-	return Result[U, R]{
+	return Result[UserRetT, RespT]{
 		Collected: results,
 	}
 }
 
-func (p *MappedPager[T, U, O, R]) prepareFunc(params ...interface{}) (reflect.Value, []reflect.Value) {
+func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...interface{}) (reflect.Value, []reflect.Value) {
 	// XXX: happens to be true for both GH & GL clients as long as we don't use the extra options field
 	// if we need to use it, fix here and in zeroOpts()
 	params = append(params, p.Opts)
@@ -89,15 +89,15 @@ func (p *MappedPager[T, U, O, R]) prepareFunc(params ...interface{}) (reflect.Va
 	return f, inputs
 }
 
-func (p *MappedPager[T, U, O, R]) parseOutputs(outputs []reflect.Value) (T, R, error) {
+func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) parseOutputs(outputs []reflect.Value) (ApiRetT, RespT, error) {
 	if len(outputs) != 3 {
 		log.Panicf("incorrect number of return values")
 	}
-	res, ok := outputs[0].Interface().(T)
+	res, ok := outputs[0].Interface().(ApiRetT)
 	if !ok {
 		log.Panicf("unexpected result type (%T)", outputs[0].Interface())
 	}
-	resp, ok := outputs[1].Interface().(R)
+	resp, ok := outputs[1].Interface().(RespT)
 	if !ok {
 		log.Panicf("unexpected response type (%T)", resp)
 	}

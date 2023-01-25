@@ -15,19 +15,19 @@ type GLResp = *gitlab.Response
 type glOptioner struct {
 }
 
-func (gh *glOptioner) Done(resp interface{}) bool {
+func (gl *glOptioner) Done(resp interface{}) bool {
 	r := resp.(GLResp)
 	return r.CurrentPage == r.TotalPages
 }
-func (gh *glOptioner) Advance(resp interface{}, opts interface{}) {
+func (gl *glOptioner) Advance(resp interface{}, opts interface{}) {
 	r := resp.(GLResp)
 	o := opts.(GLOpts)
 	o.Page = r.NextPage
 }
 
-func New[T any](fn interface{}, opts interface{}) *pagination.Basic[T, GLOpts, GLResp] {
-	return pagination.New[T, GLOpts, GLResp](fn, opts, &glOptioner{})
+func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GLOpts, GLResp] {
+	return pagination.New[ApiRetT, GLOpts, GLResp](fn, opts, &glOptioner{})
 }
-func NewMapper[T any, U any](fn interface{}, opts interface{}, mapper func(T) []U) *pagination.MappedPager[T, U, GLOpts, GLResp] {
-	return pagination.NewMapper[T, U, GLOpts, GLResp](fn, opts, mapper, &glOptioner{})
+func NewMapper[ApiRetT any, UserRetT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT) *pagination.MappedPager[ApiRetT, UserRetT, GLOpts, GLResp] {
+	return pagination.NewMapper[ApiRetT, UserRetT, GLOpts, GLResp](fn, opts, mapper, &glOptioner{})
 }

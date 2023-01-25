@@ -1,7 +1,7 @@
 package pagination
 
-type Result[T any, R any] struct {
+type Result[ApiRetT any, RespT any] struct {
 	Err       error
-	Resp      R
-	Collected []T
+	Resp      RespT
+	Collected []ApiRetT
 }

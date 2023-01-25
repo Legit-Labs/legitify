@@ -1,20 +1,20 @@
 package pagination
 
-type Basic[T any, O any, R any] struct {
-	mapper *MappedPager[[]T, T, O, R]
+type Basic[ApiRetT any, OptsT any, RespT any] struct {
+	mapper *MappedPager[[]ApiRetT, ApiRetT, OptsT, RespT]
 }
 
-func New[T any, O any, R any](fn interface{}, opts interface{}, optioner Optioner) *Basic[T, O, R] {
-	mapper := func(t []T) []T { return t }
-	return &Basic[T, O, R]{
-		mapper: NewMapper[[]T, T, O, R](fn, opts, mapper, optioner),
+func New[ApiRetT any, OptsT any, RespT any](fn interface{}, opts interface{}, optioner Optioner) *Basic[ApiRetT, OptsT, RespT] {
+	mapper := func(t []ApiRetT) []ApiRetT { return t }
+	return &Basic[ApiRetT, OptsT, RespT]{
+		mapper: NewMapper[[]ApiRetT, ApiRetT, OptsT, RespT](fn, opts, mapper, optioner),
 	}
 }
 
-func (p *Basic[T, O, R]) Async(params ...interface{}) <-chan Result[T, R] {
+func (p *Basic[ApiRetT, OptsT, RespT]) Async(params ...interface{}) <-chan Result[ApiRetT, RespT] {
 	return p.mapper.Async(params...)
 }
 
-func (p *Basic[T, O, R]) Sync(params ...interface{}) Result[T, R] {
+func (p *Basic[ApiRetT, OptsT, RespT]) Sync(params ...interface{}) Result[ApiRetT, RespT] {
 	return p.mapper.Sync(params...)
 }
