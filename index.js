@@ -96,6 +96,13 @@ function generateAnalyzeArgs(repo, owner) {
     return args;
   }
 
+  const scorecard = core.getInput("scorecard");
+  if (scorecard === "yes" || scorecard === "verbose") {
+    args.push("--scorecard");
+    args.push(scorecard);
+    return args;
+  }
+
   args.push("--org");
   args.push(owner);
 
