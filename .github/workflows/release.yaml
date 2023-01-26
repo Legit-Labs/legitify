@@ -1,4 +1,4 @@
-name: goreleaser
+name: releaser
 on:
   push:
     tags:
@@ -6,6 +6,10 @@ on:
 permissions:
   contents: 'write'
   packages: 'write'
+env:
+  GORELEASER_ARTIFACTS_NAME: release_candidate
+  SIGNED_MACOS_ARTIFACTS_NAME: signed_macos_release
+  GORELEASER_ARTIFACTS_DOWNLOAD_PATH: /tmp/archives
 jobs:
   goreleaser:
     outputs:
@@ -29,30 +33,148 @@ jobs:
           password: '${{ secrets.GITHUB_TOKEN }}'
       - name: save keys to files
         run: echo ${{ secrets.WINDOWS_PUBLIC_KEY_B64 }} | base64 -d > /tmp/legit_signature.crt ; echo ${{ secrets.WINDOWS_PRIVATE_KEY_B64 }} | base64 -d > /tmp/legit_signature.key
-      - name: release
+      - uses: goreleaser/goreleaser-action@b953231f81b8dfd023c58e0854a721e35037f28b
         id: run-goreleaser
-        uses: 'goreleaser/goreleaser-action@b508e2e3ef3b19d4e4146d4f8fb3ba9db644a757'
         with:
-          version: 'latest'
-          args: 'release --rm-dist'
+          version: latest
+          args: "release --rm-dist"
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
+        with:
+          name: ${{ env.GORELEASER_ARTIFACTS_NAME }}
+          path: |
+            ./dist/*
       - name: provenance-inputs
         id: hash
         env:
           ARTIFACTS: "${{ steps.run-goreleaser.outputs.artifacts }}"
         run: |
           set -euo pipefail
-          hashes=$(echo $ARTIFACTS | jq --raw-output '.[] | {name, "digest": (.extra.Digest // .extra.Checksum)} | select(.digest) | {digest} + {name} | join("  ") | sub("^sha256:";"")' | base64 -w0)
+          hashes=$(echo $ARTIFACTS | jq --raw-output '.[] | {name, "digest": (.extra.Digest // .extra.Checksum)} | select(.digest) | {digest} + {name} | join("  ") | sub("^sha256:";"")' | grep -v darwin | base64 -w0)
           echo "hashes=$hashes" >> $GITHUB_OUTPUT
-
+  macos_sign:
+    needs: goreleaser
+    runs-on: macos-latest
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    env:
+      SIGNED_ARTIFACTS_PATH: /tmp/signed_path
+    steps:
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
+        with:
+          name: ${{ env.GORELEASER_ARTIFACTS_NAME }}
+          path: ${{ env.GORELEASER_ARTIFACTS_DOWNLOAD_PATH }}
+      - name: Codesign executable
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_P12_BASE64 }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.APPLE_DEVELOPER_CERTIFICATE_PASSWORD }}
+          PROD_MACOS_APPLICATION_ID_NAME: ${{ secrets.MACOS_APPLICATION_ID_NAME }}
+          PROD_MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+          PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.MACOS_NOTARIZATION_APPLE_ID }}
+          PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.MACOS_NOTARIZATION_TEAM_ID }}
+          PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
+        run: |
+          echo "extracting files to sign"
+          extracted_files=()
+          for file in $GORELEASER_ARTIFACTS_DOWNLOAD_PATH/*darwin*.tar.gz; do
+             dirname="${file%.tar.gz}"
+             mkdir "$dirname"
+             tar -xzvf "$file" -C "$dirname"
+             extracted_files+=($dirname/legitify)
+          done
+          echo "Prepare keychain to sign"
+          echo $MACOS_CERTIFICATE | base64 -d > certificate.p12
+          security create-keychain -p "$PROD_MACOS_KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$PROD_MACOS_KEYCHAIN_PASSWORD" build.keychain
+          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$PROD_MACOS_KEYCHAIN_PASSWORD" build.keychain
+          for file in "${extracted_files[@]}"; do
+            echo "Signing $file"
+            /usr/bin/codesign --force -s "$PROD_MACOS_APPLICATION_ID_NAME" --options runtime "$file" -v
+          done
+          
+          # Store the notarization credentials so that we can prevent a UI password dialog
+          # from blocking the CI
+          echo "Create keychain profile"
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "$PROD_MACOS_NOTARIZATION_APPLE_ID" --team-id "$PROD_MACOS_NOTARIZATION_TEAM_ID" --password "$PROD_MACOS_NOTARIZATION_PWD"
+          # We can't notarize an app bundle directly, but we need to compress it as an archive.
+          # Therefore, we create a zip file containing our app bundle, so that we can send it to the
+          # notarization service
+          echo "Creating temp notarization archive"
+          for file in "${extracted_files[@]}"; do
+            echo "dittoing $file"
+            ditto -c -k "$file" "notarization.zip"
+            
+            # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
+            # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
+            # characteristics.            
+            echo "Notarize app"
+            xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
+          done
+          mkdir ${{ env.SIGNED_ARTIFACTS_PATH }}
+          for file in "${extracted_files[@]}"; do
+            parent_dirname=$(basename "$(dirname "$file")")
+            currnet_archive_name=${parent_dirname}.tar.gz
+            cli_path=$(dirname $file)
+            cli_name=$(basename $file)
+            cd "$cli_path"
+            tar -czvf "$currnet_archive_name" -C "$cli_path" *
+            cp "$currnet_archive_name" ${{ env.SIGNED_ARTIFACTS_PATH }}
+          done
+      - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
+        with:
+          name: ${{ env.SIGNED_MACOS_ARTIFACTS_NAME }}
+          path: ${{ env.SIGNED_ARTIFACTS_PATH }}
+      - name: provenance-inputs
+        id: hash
+        run: |
+          set -euo pipefail
+          cd "${{ env.SIGNED_ARTIFACTS_PATH }}"
+          mac_hashes="$(shasum -a 256 *.tar.gz)"
+          release_hashes="$(echo "${{ needs.goreleaser.outputs.hashes }}" | base64 -d)" # without darwin
+          hashes="$(echo -e "${release_hashes}\n${mac_hashes}" | base64)"
+          echo "hashes=$hashes" >> $GITHUB_OUTPUT
+  release:
+    needs: macos_sign
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read # To read the workflow path.
+      id-token: write # To sign the provenance.
+      contents: write # To add assets to a release.
+    env:
+      ARTIFACTS_DOWNLOAD_PATH: /tmp/macos_archives
+    steps:
+      - uses: 'actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b'
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
+        with:
+          name: ${{ env.SIGNED_MACOS_ARTIFACTS_NAME }}
+          path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
+      - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
+        with:
+          name: ${{ env.GORELEASER_ARTIFACTS_NAME }}
+          path: ${{ env.GORELEASER_ARTIFACTS_DOWNLOAD_PATH }}
+      - name: prepare-release-files
+        run: |
+          find ${{ env.GORELEASER_ARTIFACTS_DOWNLOAD_PATH }} -maxdepth 1 -type f -not -name '*darwin*' -exec cp {} ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/ \;
+      - name: Release
+        uses: softprops/action-gh-release@d4e8205d7e959a9107da6396278b2f1f07af0f9b
+        # if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
   provenance:
-    needs: [goreleaser]
+    needs: macos_sign
     permissions:
       actions: read # To read the workflow path.
       id-token: write # To sign the provenance.
       contents: write # To add assets to a release.
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.2.2
     with:
-      base64-subjects: "${{ needs.goreleaser.outputs.hashes }}"
+      base64-subjects: "${{ needs.macos_sign.outputs.hashes }}"
       upload-assets: true # upload to a new release
