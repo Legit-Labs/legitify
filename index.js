@@ -42,10 +42,9 @@ async function executeLegitify(token, args) {
   options.silent = true
 
   try {
-    const args = ["analyze", ...args, "--output-format", "markdown"];
-    console.log(`executing legitify with: "${args.join(' ')}"`);
-
-    await exec.exec('"./legitify"', args, options);
+    const argsCopy = ["analyze", ...args, "--output-format", "markdown"];
+    console.log(`executing legitify with: ${argsCopy.join(' ')}`);
+    await exec.exec('"./legitify"', argsCopy, options);
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
   } catch (error) {
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, "legitify failed with:\n" + myError)
