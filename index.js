@@ -84,6 +84,13 @@ async function fetchLegitifyReleaseUrl(baseVersion) {
 
 function generateAnalyzeArgs(repo, owner) {
   let args = [];
+
+  const scorecard = core.getInput("scorecard");
+  if (scorecard === "yes" || scorecard === "verbose") {
+    args.push("--scorecard");
+    args.push(scorecard);
+  }
+
   if (core.getInput("analyze_self_only") === "true") {
     args.push("--repo");
     args.push(repo);
@@ -96,12 +103,7 @@ function generateAnalyzeArgs(repo, owner) {
     return args;
   }
 
-  const scorecard = core.getInput("scorecard");
-  if (scorecard === "yes" || scorecard === "verbose") {
-    args.push("--scorecard");
-    args.push(scorecard);
-    return args;
-  }
+  
 
   args.push("--org");
   args.push(owner);
