@@ -103,8 +103,6 @@ function generateAnalyzeArgs(repo, owner) {
     return args;
   }
 
-  
-
   args.push("--org");
   args.push(owner);
 
