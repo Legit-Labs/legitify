@@ -2,16 +2,19 @@ package github
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
-	"log"
 
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
+	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
@@ -350,29 +353,17 @@ func (rc *repositoryCollector) withActionsSettings(repo ghcollected.Repository, 
 }
 
 func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
-	var result []*github.Hook
-
-	err := ghclient.PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
-		hooks, resp, err := rc.Client.Client().Repositories.ListHooks(rc.Context, org, repo.Repository.Name, opts)
-		if err != nil {
-			if resp.Response.StatusCode == 404 {
-				perm := collectors.NewMissingPermission(permissions.RepoHookRead, collectors.FullRepoName(org, repo.Repository.Name),
-					"Cannot read repository webhooks", namespace.Repository)
-				rc.IssueMissingPermissions(perm)
-			}
-			return nil, err
-		}
-
-		result = append(result, hooks...)
-
-		return resp, nil
-	})
-
+	res, err := pagination.New[*github.Hook](rc.Client.Client().Repositories.ListHooks, nil).Sync(rc.Context, org, repo.Repository.Name)
 	if err != nil {
+		if res.Resp.Response.StatusCode == http.StatusNotFound {
+			perm := collectors.NewMissingPermission(permissions.RepoHookRead, collectors.FullRepoName(org, repo.Repository.Name),
+				"Cannot read repository webhooks", namespace.Repository)
+			rc.IssueMissingPermissions(perm)
+		}
 		return repo, err
 	}
 
-	repo.Hooks = result
+	repo.Hooks = res.Collected
 	return repo, nil
 }
 

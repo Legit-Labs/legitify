@@ -1,12 +1,15 @@
 package github
 
 import (
-	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
+	"net/http"
+
+	"github.com/Legit-Labs/legitify/internal/collectors"
 
 	"github.com/google/go-github/v49/github"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
+	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
@@ -101,26 +104,17 @@ func (c *organizationCollector) collectExtraData(org *ghcollected.ExtendedOrg) g
 }
 
 func (c *organizationCollector) collectOrgWebhooks(org string) ([]*github.Hook, error) {
-	var result []*github.Hook
-
-	err := ghclient.PaginateResults(func(opts *github.ListOptions) (*github.Response, error) {
-		hooks, resp, err := c.Client.Client().Organizations.ListHooks(c.Context, org, opts)
-		if err != nil {
-			if resp.Response.StatusCode == 404 {
-				perm := collectors.NewMissingPermission(permissions.OrgHookAdmin, org,
-					"Cannot read organization webhooks", namespace.Organization)
-				c.IssueMissingPermissions(perm)
-			}
-			return nil, err
-		}
-		result = append(result, hooks...)
-		return resp, nil
-	})
-
+	res, err := pagination.New[*github.Hook](c.Client.Client().Organizations.ListHooks, nil).Sync(c.Context, org)
 	if err != nil {
+		if res.Resp.Response.StatusCode == http.StatusNotFound {
+			perm := collectors.NewMissingPermission(permissions.OrgHookAdmin, org,
+				"Cannot read organization webhooks", namespace.Organization)
+			c.IssueMissingPermissions(perm)
+		}
 		return nil, err
 	}
-	return result, nil
+
+	return res.Collected, nil
 }
 
 func (c *organizationCollector) collectOrgSamlData(org string) (*bool, error) {
