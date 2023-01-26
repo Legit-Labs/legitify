@@ -168,7 +168,6 @@ func (c *memberCollector) collectMembers(org, memberType string) []*github.User 
 
 	res, err := pagination.New[*github.User](c.Client.Client().Organizations.ListMembers, listMemOpts).Sync(c.Context, org)
 	if err != nil {
-		// TODO permission error or real error
 		log.Printf("error collecting members of type %s for org %s: %s\n", memberType, org, err)
 		return []*github.User{}
 	}

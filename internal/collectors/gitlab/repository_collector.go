@@ -194,7 +194,7 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 				for res := range ch {
 					if res.Err != nil {
 						log.Printf("failed to list projects %s", err)
-						return // TODO better handling
+						return
 					}
 					for _, completedProject := range res.Collected {
 						completedProject := completedProject

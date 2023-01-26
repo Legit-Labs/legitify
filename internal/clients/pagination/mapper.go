@@ -68,6 +68,11 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Sync(params ...interface{
 	return newSyncCollection[UserRetT, RespT](results), nil
 }
 
+// prepareFunc gets the params for the API call,
+// verifies that they match the registered API call function,
+// injects the options parameter to the params at the index proided by the optioner,
+// and wraps the API call in a simple zero-args func that returns the explicit types.
+// It assumes that all API calls return (data, resp, error) as their return values.
 func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...interface{}) func() (ApiRetT, RespT, error) {
 	// params validation
 	count, isVariadic := inputsCount(p.Fn)
@@ -80,7 +85,7 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...int
 
 	// add the options to the params
 	optsIndex := p.optioner.OptionsIndex(count, isVariadic)
-	paramsWithOpts := make([]interface{}, 0, len(params)+1)
+	paramsWithOpts := make([]interface{}, 0, paramsCountWithOpts)
 	for i, v := range params {
 		if i == optsIndex {
 			paramsWithOpts = append(params, p.Opts)
@@ -98,19 +103,29 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...int
 }
 
 func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) parseOutputs(outputs []reflect.Value) (ApiRetT, RespT, error) {
-	if len(outputs) != 3 {
+	const (
+		dataIndex         = iota
+		respIndex         = iota
+		errIndex          = iota
+		totalReturnValues = iota
+	)
+
+	if len(outputs) != totalReturnValues {
 		log.Panicf("incorrect number of return values")
 	}
-	res, ok := outputs[0].Interface().(ApiRetT)
+
+	res, ok := outputs[dataIndex].Interface().(ApiRetT)
 	if !ok {
 		log.Panicf("unexpected result type (%T)", outputs[0].Interface())
 	}
-	resp, ok := outputs[1].Interface().(RespT)
+
+	resp, ok := outputs[respIndex].Interface().(RespT)
 	if !ok {
 		log.Panicf("unexpected response type (%T)", resp)
 	}
-	errVal := outputs[2].Interface()
-	err, ok := outputs[2].Interface().(error)
+
+	errVal := outputs[errIndex].Interface()
+	err, ok := outputs[errIndex].Interface().(error)
 	if errVal != nil && !ok {
 		log.Panicf("unexpected error type")
 	}

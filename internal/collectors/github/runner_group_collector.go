@@ -43,7 +43,6 @@ func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup,
 	}
 	result, err := pagination.NewMapper(c.client.Client().Actions.ListOrganizationRunnerGroups, nil, mapper).Sync(c.context, orgName)
 	if err != nil {
-		// TODO check for permission error and leave logging for the caller
 		log.Printf("Error collecting runner groups for %s - %v", orgName, err)
 		return nil, err
 	}
@@ -65,7 +64,6 @@ func (c *runnersCollector) CollectMetadata() collectors.Metadata {
 		gw.Do(func() {
 			result, err := c.collectForOrg(org.Name())
 			if err != nil {
-				// TODO check for permission error and consider failing execution for other errors
 				log.Printf("Error collecting runner groups for %s - %v", org.Name(), err)
 			} else {
 				mutex.Lock()
