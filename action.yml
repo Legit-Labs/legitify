@@ -18,6 +18,10 @@ inputs:
     description: "The base version of legitify to use. Non breaking changes will be auto updated."
     required: false
     default: "0.2"
+  scorecard:
+    description: 'Whether to run scorecard as part of the analysis (no/yes/verbose default to "no")'
+    required: false
+    default: "no"
 runs:
   using: "node16"
   main: "index.js"
