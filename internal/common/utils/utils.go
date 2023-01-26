@@ -37,3 +37,11 @@ func Retry(op func() (shouldRetry bool, err error), max_attempts int, errString 
 
 	return err
 }
+
+func MapSlice[T any, U any](slice []T, mapper func(T) U) []U {
+	result := make([]U, 0, len(slice))
+	for _, s := range slice {
+		result = append(result, mapper(s))
+	}
+	return result
+}

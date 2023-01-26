@@ -10,10 +10,13 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/github/transport"
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
+	commontransport "github.com/Legit-Labs/legitify/internal/clients/transport"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
+	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/screen"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -31,11 +34,10 @@ type Client struct {
 	orgs             []string
 	graphQLClient    *githubv4.Client
 	context          context.Context
-	orgsCache        []githubcollected.ExtendedOrg
-	cacheLock        sync.RWMutex
 	scopes           permissions.TokenScopes
 	graphQLRawClient *http.Client
 	serverUrl        string
+	once             sync.Once
 }
 
 func NewClient(ctx context.Context, token string, githubEndpoint string, org []string) (*Client, error) {
@@ -155,32 +157,15 @@ func (c *Client) setOrgsList(realOrgs []string) error {
 	return nil
 }
 
-func (c *Client) orgsFromCache() []githubcollected.ExtendedOrg {
-	c.cacheLock.RLock()
-	defer c.cacheLock.RUnlock()
-	return c.orgsCache
-}
-
 func (c *Client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
-	// fast path: once cache is initialized, just take from the cache without blocking
-	if orgs := c.orgsFromCache(); orgs != nil {
-		return orgs, nil
-	}
-
-	// slow path: singular request that also updates the cache
-	c.cacheLock.Lock()
-	defer c.cacheLock.Unlock()
-
-	// check again to avoid a race condition
-	if c.orgsCache != nil {
-		return c.orgsCache, nil
-	}
-
 	realOrgs, err := c.collectOrgsList()
 	if err != nil {
 		return nil, err
 	}
-	if err := c.setOrgsList(realOrgs); err != nil {
+	c.once.Do(func() {
+		err = c.setOrgsList(realOrgs)
+	})
+	if err != nil {
 		return nil, err
 	}
 
@@ -189,7 +174,6 @@ func (c *Client) CollectOrganizations() ([]githubcollected.ExtendedOrg, error) {
 		return nil, err
 	}
 
-	c.orgsCache = orgs
 	return orgs, nil
 }
 
@@ -272,28 +256,20 @@ func (c *Client) collectTokenScopes() (permissions.TokenScopes, error) {
 }
 
 func (c *Client) collectOrgsList() ([]string, error) {
-	var orgNames []string
-	err := PaginateResults(func(opts *gh.ListOptions) (*gh.Response, error) {
-		orgs, resp, err := c.Client().Organizations.List(c.context, "", opts)
-
-		if err != nil {
-			return nil, err
+	mapper := func(orgs []*gh.Organization) []string {
+		if orgs == nil {
+			return []string{}
 		}
-
-		for _, o := range orgs {
-			// The list-organizations API does not return all information,
-			// so we only use it to pull the names
-			orgNames = append(orgNames, *o.Login)
-		}
-
-		return resp, nil
-	})
-
+		return utils.MapSlice(orgs, func(o *gh.Organization) string {
+			return *o.Login
+		})
+	}
+	res, err := pagination.NewMapper(c.Client().Organizations.List, nil, mapper).Sync(c.context, "")
 	if err != nil {
 		return nil, err
 	}
 
-	return orgNames, nil
+	return res.Collected, nil
 }
 
 func (c *Client) collectSpecificOrganizations() ([]githubcollected.ExtendedOrg, error) {
@@ -510,10 +486,13 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-	tc := oauth2.NewClient(ctx, ts)
+	tc := &oauth2.Transport{
+		Base:   commontransport.NewCacheTransport(),
+		Source: ts,
+	}
 
-	clientWithSecondaryRateLimit := transport.NewRateLimitWaiter(tc.Transport)
-	clientWithAcceptHeader := transport.NewGraphQL(tc.Transport)
+	clientWithSecondaryRateLimit := commontransport.NewCacheTracker(transport.NewRateLimitWaiter(tc))
+	clientWithAcceptHeader := transport.NewGraphQL(tc)
 
 	return clientWithSecondaryRateLimit, clientWithAcceptHeader
 }
