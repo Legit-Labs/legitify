@@ -5,6 +5,7 @@ on:
     - cron: "0 20 * * *"
   release:
     types: [ published ]
+  pull_reqest:
 permissions:
   contents: read
 jobs:
