@@ -77,8 +77,10 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...int
 	// params validation
 	count, isVariadic := inputsCount(p.Fn)
 	paramsCountWithOpts := len(params) + 1
-	if isVariadic && paramsCountWithOpts < count-1 {
-		log.Panicf("incorrect number of parameters: %d != %d", count, paramsCountWithOpts)
+	if isVariadic {
+		if paramsCountWithOpts < count-1 {
+			log.Panicf("incorrect number of parameters: %d != %d", count, paramsCountWithOpts)
+		}
 	} else if count != paramsCountWithOpts {
 		log.Panicf("incorrect number of parameters: %d != %d", count, paramsCountWithOpts)
 	}
