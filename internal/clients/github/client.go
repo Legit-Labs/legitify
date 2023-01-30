@@ -82,7 +82,11 @@ func (c *Client) initClients(ctx context.Context, token string) error {
 	var ghClient *gh.Client
 	var graphQLClient *githubv4.Client
 
-	rawClient, graphQLRawClient := newHttpClients(ctx, token)
+	rawClient, graphQLRawClient, err := newHttpClients(ctx, token)
+	if err != nil {
+		return err
+	}
+
 	if c.IsGithubCloud() {
 		ghClient = gh.NewClient(rawClient)
 		graphQLClient = githubv4.NewClient(graphQLRawClient)
@@ -482,7 +486,7 @@ func (se *samlError) Error() string {
 	return fmt.Sprintf("Token is not SAML authorized for organization: %s.\nPlease go to https://github.com/settings/tokens and authorize.", se.organization)
 }
 
-func newHttpClients(ctx context.Context, token string) (client *http.Client, graphQL *http.Client) {
+func newHttpClients(ctx context.Context, token string) (client *http.Client, graphQL *http.Client, err error) {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
@@ -491,8 +495,13 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 		Source: ts,
 	}
 
-	clientWithSecondaryRateLimit := commontransport.NewCacheTracker(transport.NewRateLimitWaiter(tc))
+	rateLimitWaiter, err := transport.NewRateLimitWaiter(tc)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create rate limiter: %v", err)
+	}
+
+	clientWithSecondaryRateLimit := commontransport.NewCacheTracker(rateLimitWaiter)
 	clientWithAcceptHeader := transport.NewGraphQL(tc)
 
-	return clientWithSecondaryRateLimit, clientWithAcceptHeader
+	return clientWithSecondaryRateLimit, clientWithAcceptHeader, nil
 }
