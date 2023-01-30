@@ -47,17 +47,14 @@ func (c *organizationCollector) Namespace() namespace.Namespace {
 	return namespace.Organization
 }
 
-func (c *organizationCollector) CollectMetadata() collectors.Metadata {
+func (c *organizationCollector) CollectTotalEntities() int {
 	orgs, err := c.Client.CollectOrganizations()
-	res := collectors.Metadata{}
-
 	if err != nil {
 		log.Printf("failed to collect organizations %s", err)
-	} else {
-		res.TotalEntities = len(orgs)
+		return 0
 	}
 
-	return res
+	return len(orgs)
 }
 
 func (c *organizationCollector) Collect() collectors.SubCollectorChannels {

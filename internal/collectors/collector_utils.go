@@ -2,6 +2,8 @@ package collectors
 
 import (
 	"fmt"
+
+	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/collected"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -25,21 +27,20 @@ func (c *collectedDataContext) Roles() []permissions.Role {
 }
 
 type BaseCollector struct {
-	Collector
+	c               Collector
 	collectedChan   chan CollectedData
-	progressChan    chan CollectionMetric
+	progressChan    chan progressbar.ChannelType
 	missingPermChan chan MissingPermission
 }
 
 func InitBaseCollector(b *BaseCollector, c Collector) {
-	b.Collector = c
+	b.c = c
 }
 
 func (b *BaseCollector) CollectData(org githubcollected.ExtendedOrg, entity collected.Entity, canonicalLink string, viewerRoles []permissions.Role) {
-
 	b.collectedChan <- CollectedData{
 		Entity:        entity,
-		Namespace:     b.Namespace(),
+		Namespace:     b.c.Namespace(),
 		CanonicalLink: canonicalLink,
 		Context: &collectedDataContext{
 			roles:        viewerRoles,
@@ -52,17 +53,14 @@ func (b *BaseCollector) CollectDataWithContext(entity collected.Entity, canonica
 
 	b.collectedChan <- CollectedData{
 		Entity:        entity,
-		Namespace:     b.Namespace(),
+		Namespace:     b.c.Namespace(),
 		CanonicalLink: canonicalLink,
 		Context:       ctx,
 	}
 }
 
 func (b *BaseCollector) CollectionChange(change int) {
-	b.progressChan <- CollectionMetric{
-		Namespace:        b.Namespace(),
-		CollectionChange: change,
-	}
+	b.progressChan <- progressbar.NewUpdate(b.c.Namespace(), change)
 }
 
 func (b *BaseCollector) CollectionChangeByOne() {
@@ -77,7 +75,7 @@ func (b *BaseCollector) IssueMissingPermissions(missingPermissions ...MissingPer
 
 func (b *BaseCollector) makeChannels() {
 	b.collectedChan = make(chan CollectedData)
-	b.progressChan = make(chan CollectionMetric)
+	b.progressChan = make(chan progressbar.ChannelType)
 	b.missingPermChan = make(chan MissingPermission)
 }
 

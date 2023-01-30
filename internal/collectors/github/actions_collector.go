@@ -2,8 +2,9 @@ package github
 
 import (
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
+
+	"github.com/Legit-Labs/legitify/internal/collectors"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -35,17 +36,14 @@ func (c *actionCollector) Namespace() namespace.Namespace {
 	return namespace.Actions
 }
 
-func (c *actionCollector) CollectMetadata() collectors.Metadata {
+func (c *actionCollector) CollectTotalEntities() int {
 	orgs, err := c.client.CollectOrganizations()
-	res := collectors.Metadata{}
-
 	if err != nil {
 		log.Printf("failed to collect organizations %s", err)
-	} else {
-		res.TotalEntities = len(orgs)
+		return 0
 	}
 
-	return res
+	return len(orgs)
 }
 
 func (c *actionCollector) Collect() collectors.SubCollectorChannels {

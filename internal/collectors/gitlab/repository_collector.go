@@ -37,30 +37,30 @@ func (rc *repositoryCollector) Namespace() namespace.Namespace {
 	return namespace.Repository
 }
 
-func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
-	res := collectors.Metadata{}
-
+func (rc *repositoryCollector) CollectTotalEntities() int {
 	repositories, exist := context_utils.GetRepositories(rc.Context)
-
 	if exist {
-		res.TotalEntities = len(repositories)
-	} else {
-		organizations, err := rc.Client.Organizations()
-		if err != nil {
-			log.Printf("failed to collect list of orgniazations to get repositories metadata %s", err)
-			return res
-		}
-		for _, org := range organizations {
-			_, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.Name, &gitlab2.ListGroupProjectsOptions{})
+		return len(repositories)
+	}
 
-			if err != nil {
-				log.Printf("failed to collect metadata for repositories %s", err)
-			} else {
-				res.TotalEntities += resp.TotalItems
-			}
+	organizations, err := rc.Client.Organizations()
+	if err != nil {
+		log.Printf("failed to collect list of orgniazations to get repositories metadata %s", err)
+		return 0
+	}
+
+	var total int
+	for _, org := range organizations {
+		_, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.Name, &gitlab2.ListGroupProjectsOptions{})
+
+		if err != nil {
+			log.Printf("failed to collect metadata for repositories %s", err)
+		} else {
+			total += resp.TotalItems
 		}
 	}
-	return res
+
+	return total
 }
 
 func (rc *repositoryCollector) Collect() collectors.SubCollectorChannels {

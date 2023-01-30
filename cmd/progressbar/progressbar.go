@@ -3,30 +3,119 @@ package progressbar
 import (
 	"io"
 	"log"
+	"math"
 	"sync"
+	"time"
 
-	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
-	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/screen"
-	"github.com/vbauerster/mpb"
-	"github.com/vbauerster/mpb/decor"
+	"github.com/vbauerster/mpb/v8"
+	"github.com/vbauerster/mpb/v8/decor"
 )
 
-type ProgressBar struct {
-	metadata map[namespace.Namespace]collectors.Metadata
-	enabled  bool
+var pb *progressBar
+
+func init() {
+	pb = newProgressBar()
 }
 
-func NewProgressBar(md map[namespace.Namespace]collectors.Metadata) *ProgressBar {
-	return &ProgressBar{
-		metadata: md,
-		enabled:  screen.IsTty(),
+func Run() group_waiter.Waitable {
+	return pb.Run()
+}
+func Report(msg ChannelType) {
+	pb.ReportProgress(msg)
+}
+
+type progressBar struct {
+	barTotals map[string]int
+	progress  *mpb.Progress
+	bars      map[string]*mpb.Bar
+	waiter    *pbWaiter
+	inChannel chan ChannelType
+	enabled   bool
+}
+
+func newProgressBar() *progressBar {
+	enabled := screen.IsTty()
+
+	var outputFile io.Writer
+	if enabled {
+		outputFile = screen.Writer()
+	} else {
+		outputFile = io.Discard
 	}
+
+	pb := mpb.New(mpb.WithWaitGroup(&sync.WaitGroup{}),
+		mpb.WithWidth(64),
+		mpb.WithOutput(outputFile),
+	)
+
+	waiter := newPbWaiter(pb)
+
+	p := &progressBar{
+		barTotals: make(map[string]int),
+		bars:      make(map[string]*mpb.Bar),
+		progress:  pb,
+		waiter:    waiter,
+		enabled:   enabled,
+		inChannel: make(chan ChannelType),
+	}
+
+	return p
 }
 
-func createBar(progress *mpb.Progress, totalCount int, displayName string) *mpb.Bar {
-	return progress.AddBar(int64(totalCount),
+func (pb *progressBar) Run() group_waiter.Waitable {
+	if !pb.enabled {
+		screen.Printf("Progress bar is disabled because stderr is not a terminal. Starting collection...\n")
+	}
+
+	go func() {
+		for d := range pb.inChannel {
+			switch data := d.(type) {
+			case MinimalBars:
+				pb.handleMinimalBars(data)
+			case RequiredBarCreation:
+				pb.handleRequiredBarCreation(data)
+			case OptionalBarCreation:
+				pb.handleOptionalBarCreation(data)
+			case BarUpdate:
+				pb.handleBarUpdate(data)
+			case TimedBarCreation:
+				pb.handleTimedBarCreation(data)
+			default:
+				log.Panicf("unexpected progress update type: %t", d)
+			}
+		}
+	}()
+
+	return pb.waiter
+}
+
+func (pb *progressBar) ReportProgress(msg ChannelType) {
+	pb.inChannel <- msg
+}
+
+func (pb *progressBar) handleMinimalBars(data MinimalBars) {
+	pb.waiter.SetMinCount(data.count)
+}
+
+func (pb *progressBar) handleRequiredBarCreation(data RequiredBarCreation) {
+	pb.handleOptionalBarCreation(OptionalBarCreation(data))
+	pb.waiter.ReportBarCreation()
+}
+
+func (pb *progressBar) handleOptionalBarCreation(data OptionalBarCreation) {
+	if data.TotalEntities == 0 {
+		return
+	}
+
+	displayName := data.BarName
+
+	if _, exists := pb.bars[displayName]; exists {
+		log.Panicf("trying to create a bar that already exists: %s (%v)", displayName, data)
+	}
+
+	pb.bars[displayName] = pb.progress.AddBar(int64(data.TotalEntities),
 		mpb.PrependDecorators(
 			decor.Name(displayName, decor.WC{W: len(displayName) + 1, C: decor.DSyncSpaceR}),
 			decor.CountersNoUnit("%d / %d", decor.WCSyncWidth),
@@ -37,56 +126,44 @@ func createBar(progress *mpb.Progress, totalCount int, displayName string) *mpb.
 	)
 }
 
-func (pb *ProgressBar) createBars() (*mpb.Progress, map[string]*mpb.Bar) {
-	var wg sync.WaitGroup
-	var outputFile io.Writer
-	if pb.enabled {
-		outputFile = screen.Writer()
-	} else {
-		outputFile = io.Discard
+func (pb *progressBar) handleBarUpdate(data BarUpdate) {
+	displayName := data.BarName
+
+	val, exists := pb.bars[displayName]
+	if !exists {
+		log.Panicf("trying to update a bar that doesn't exist: %s (%v)", displayName, data)
 	}
 
-	bars := make(map[string]*mpb.Bar)
-	p := mpb.New(mpb.WithWaitGroup(&wg),
-		mpb.WithWidth(64),
-		mpb.WithOutput(outputFile))
-
-	for ns, md := range pb.metadata {
-		if md.TotalEntities > 0 {
-			bars[ns] = createBar(p, md.TotalEntities, ns)
-		}
+	if data.Change <= 0 {
+		return
 	}
 
-	return p, bars
+	val.IncrBy(data.Change)
+	if val.Completed() && !pb.enabled {
+		screen.Printf("Finished collecting %s\n", displayName)
+	}
 }
 
-func (pb *ProgressBar) Run(progress <-chan collectors.CollectionMetric) group_waiter.Waitable {
-	if !pb.enabled {
-		screen.Printf("Progress bar is disabled because stderr is not a terminal. Starting collection...\n")
-	}
+func (pb *progressBar) handleTimedBarCreation(data TimedBarCreation) {
+	total := int64(time.Until(data.End).Seconds())
 
-	p, bars := pb.createBars()
+	displayName := data.BarName
+	bar := pb.progress.AddBar(int64(total),
+		mpb.PrependDecorators(
+			decor.Name(displayName, decor.WC{W: len(displayName) + 1, C: decor.DSyncSpaceR}),
+			decor.CountersNoUnit("%ds / %ds", decor.WCSyncWidth),
+		),
+	)
+	bar.SetPriority(math.MaxInt)
+
 	go func() {
-		for data := range progress {
-			displayName := data.Namespace
-			val, ok := bars[displayName]
-
-			if ok {
-				if data.CollectionChange != 0 {
-					val.IncrBy(data.CollectionChange)
-				}
-
-				if data.Finished {
-					val.SetTotal(int64(pb.metadata[displayName].TotalEntities), true)
-					if !pb.enabled {
-						screen.Printf("Finished collecting %s\n", displayName)
-					}
-				}
-			} else {
-				log.Printf("Failed to find bar with name: %s (%v)", displayName, data)
-			}
+		for i := 0; i < int(total)-1; i++ {
+			time.Sleep(time.Second)
+			bar.Increment()
 		}
-	}()
 
-	return p
+		// must not complete to abort - so just do the last one manually
+		time.Sleep(time.Second)
+		bar.Abort(true)
+	}()
 }

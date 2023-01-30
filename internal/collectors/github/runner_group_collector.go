@@ -49,12 +49,12 @@ func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup,
 	return result.Collected, nil
 }
 
-func (c *runnersCollector) CollectMetadata() collectors.Metadata {
+func (c *runnersCollector) CollectTotalEntities() int {
 	gw := group_waiter.New()
 	orgs, err := c.client.CollectOrganizations()
 	if err != nil {
 		log.Printf("failed to collection organizations %s", err)
-		return collectors.Metadata{}
+		return 0
 	}
 
 	totalCount := 0
@@ -74,9 +74,7 @@ func (c *runnersCollector) CollectMetadata() collectors.Metadata {
 	}
 
 	gw.Wait()
-	return collectors.Metadata{
-		TotalEntities: totalCount,
-	}
+	return totalCount
 }
 
 func (c *runnersCollector) Collect() collectors.SubCollectorChannels {

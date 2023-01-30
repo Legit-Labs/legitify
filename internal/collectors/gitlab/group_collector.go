@@ -1,13 +1,14 @@
 package gitlab
 
 import (
+	"log"
+
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab"
 	"github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	gitlab2 "github.com/xanzy/go-gitlab"
-	"log"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"golang.org/x/net/context"
@@ -32,17 +33,14 @@ func (c *groupCollector) Namespace() namespace.Namespace {
 	return namespace.Organization
 }
 
-func (c *groupCollector) CollectMetadata() collectors.Metadata {
+func (c *groupCollector) CollectTotalEntities() int {
 	groups, err := c.Client.Groups()
-	res := collectors.Metadata{}
-
 	if err != nil {
 		log.Printf("failed to collect groups %s", err)
-	} else {
-		res.TotalEntities = len(groups)
+		return 0
 	}
 
-	return res
+	return len(groups)
 }
 
 func (c *groupCollector) Collect() collectors.SubCollectorChannels {
