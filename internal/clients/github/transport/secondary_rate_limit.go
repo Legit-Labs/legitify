@@ -20,7 +20,7 @@ const (
 func NewRateLimitWaiter(base http.RoundTripper) (*http.Client, error) {
 	sleepCB := github_ratelimit.WithLimitDetectedCallback(func(ctx *github_ratelimit.CallbackContext) {
 		log.Printf("facing secondary rate limit with request: %v. sleeping until: %v", ctx.Request.URL, *ctx.SleepUntil)
-		progressbar.Report(progressbar.NewTimedBar("Secondary rate limit", *ctx.SleepUntil))
+		progressbar.Report(progressbar.NewTimedBar("secondary rate limit", *ctx.SleepUntil))
 	})
 	limitCB := github_ratelimit.WithSingleSleepLimit(singleSleepLimit, func(ctx *github_ratelimit.CallbackContext) {
 		log.Printf("secondary rate limit sleep is too long, failing the request (%v > %v)", time.Until(*ctx.SleepUntil), singleSleepLimit)
@@ -30,8 +30,8 @@ func NewRateLimitWaiter(base http.RoundTripper) (*http.Client, error) {
 		var err error
 		base, err = github_ratelimit_test.NewRateLimitInjecter(base,
 			&github_ratelimit_test.SecondaryRateLimitInjecterOptions{
-				Every: time.Second,
-				Sleep: time.Second,
+				Every: 3 * time.Second,
+				Sleep: 5 * time.Second,
 			},
 		)
 		if err != nil {

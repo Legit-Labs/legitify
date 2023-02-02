@@ -89,7 +89,7 @@ func (c *runnersCollector) Collect() collectors.SubCollectorChannels {
 		for _, org := range orgs {
 			groups, err := c.collectForOrg(org.Name())
 			if err != nil {
-				return
+				continue
 			}
 
 			for _, rg := range groups {
