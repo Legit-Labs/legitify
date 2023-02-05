@@ -82,6 +82,8 @@ func (pb *progressBar) Run() group_waiter.Waitable {
 				pb.handleBarUpdate(data)
 			case TimedBarCreation:
 				pb.handleTimedBarCreation(data)
+			case BarClose:
+				pb.handleBarClose(data)
 			default:
 				log.Panicf("unexpected progress update type: %t", d)
 			}
@@ -166,4 +168,18 @@ func (pb *progressBar) handleTimedBarCreation(data TimedBarCreation) {
 		time.Sleep(time.Second)
 		bar.Abort(true)
 	}()
+}
+func (pb *progressBar) handleBarClose(data BarClose) {
+	displayName := data.BarName
+
+	val, exists := pb.bars[displayName]
+	if !exists {
+		log.Panicf("trying to update a bar that doesn't exist: %s (%v)", displayName, data)
+	}
+
+	if !val.Completed() {
+		log.Printf("BUG: closing bar %s although it is not completed. please report this issue to legitify repository.", displayName)
+	}
+
+	val.Abort(false)
 }

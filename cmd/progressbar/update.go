@@ -24,6 +24,10 @@ type TimedBarCreation struct {
 	End     time.Time
 }
 
+type BarClose struct {
+	BarName string
+}
+
 func NewMinimalBars(count int) MinimalBars {
 	return MinimalBars{
 		count: count,
@@ -55,5 +59,11 @@ func NewTimedBar(name string, end time.Time) TimedBarCreation {
 	return TimedBarCreation{
 		BarName: name,
 		End:     end,
+	}
+}
+
+func NewBarClose(name string) BarClose {
+	return BarClose{
+		BarName: name,
 	}
 }
