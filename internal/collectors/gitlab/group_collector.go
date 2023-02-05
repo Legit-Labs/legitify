@@ -22,7 +22,7 @@ type groupCollector struct {
 
 func NewGroupCollector(ctx context.Context, client *gitlab.Client) collectors.Collector {
 	c := &groupCollector{
-		BaseCollector: collectors.NewBaseCollector(namespace.Repository),
+		BaseCollector: collectors.NewBaseCollector(namespace.Organization),
 		Client:        client,
 		Context:       ctx,
 	}
