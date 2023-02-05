@@ -8,6 +8,7 @@ import (
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"golang.org/x/net/context"
@@ -55,26 +56,31 @@ func (c *actionCollector) Collect() collectors.SubCollectorChannels {
 			return
 		}
 
+		gw := group_waiter.New()
 		for _, org := range orgs {
-			actionsPermissions, err1 := c.client.GetActionsTokenPermissionsForOrganization(org.Name())
-			actionsData, _, err2 := c.client.Client().Organizations.GetActionsPermissions(c.context, org.Name())
+			org := org
+			gw.Do(func() {
+				actionsPermissions, err1 := c.client.GetActionsTokenPermissionsForOrganization(org.Name())
+				actionsData, _, err2 := c.client.Client().Organizations.GetActionsPermissions(c.context, org.Name())
 
-			if err1 != nil || err2 != nil {
-				entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
-				perm := collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
-				c.IssueMissingPermissions(perm)
-			}
+				if err1 != nil || err2 != nil {
+					entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
+					perm := collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
+					c.IssueMissingPermissions(perm)
+				}
 
-			c.CollectionChangeByOne()
+				c.CollectionChangeByOne()
 
-			c.CollectData(org,
-				ghcollected.OrganizationActions{
-					Organization:       org,
-					ActionsPermissions: actionsData,
-					TokenPermissions:   actionsPermissions,
-				},
-				org.CanonicalLink(),
-				[]permissions.Role{org.Role})
+				c.CollectData(org,
+					ghcollected.OrganizationActions{
+						Organization:       org,
+						ActionsPermissions: actionsData,
+						TokenPermissions:   actionsPermissions,
+					},
+					org.CanonicalLink(),
+					[]permissions.Role{org.Role})
+			})
 		}
+		gw.Wait()
 	})
 }
