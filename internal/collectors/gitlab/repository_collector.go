@@ -26,15 +26,11 @@ type repositoryCollector struct {
 
 func NewRepositoryCollector(ctx context.Context, client *gitlab.Client) collectors.Collector {
 	c := &repositoryCollector{
-		Client:  client,
-		Context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.Repository),
+		Client:        client,
+		Context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (rc *repositoryCollector) Namespace() namespace.Namespace {
-	return namespace.Repository
 }
 
 func (rc *repositoryCollector) CollectTotalEntities() int {

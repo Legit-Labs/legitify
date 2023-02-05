@@ -27,20 +27,24 @@ func (c *collectedDataContext) Roles() []permissions.Role {
 }
 
 type BaseCollector struct {
-	c               Collector
+	namespace       string
 	collectedChan   chan CollectedData
 	progressChan    chan progressbar.ChannelType
 	missingPermChan chan MissingPermission
 }
 
-func InitBaseCollector(b *BaseCollector, c Collector) {
-	b.c = c
+func NewBaseCollector(namespace string) BaseCollector {
+	return BaseCollector{namespace: namespace}
+}
+
+func (b *BaseCollector) Namespace() string {
+	return b.namespace
 }
 
 func (b *BaseCollector) CollectData(org githubcollected.ExtendedOrg, entity collected.Entity, canonicalLink string, viewerRoles []permissions.Role) {
 	b.collectedChan <- CollectedData{
 		Entity:        entity,
-		Namespace:     b.c.Namespace(),
+		Namespace:     b.namespace,
 		CanonicalLink: canonicalLink,
 		Context: &collectedDataContext{
 			roles:        viewerRoles,
@@ -53,14 +57,14 @@ func (b *BaseCollector) CollectDataWithContext(entity collected.Entity, canonica
 
 	b.collectedChan <- CollectedData{
 		Entity:        entity,
-		Namespace:     b.c.Namespace(),
+		Namespace:     b.namespace,
 		CanonicalLink: canonicalLink,
 		Context:       ctx,
 	}
 }
 
 func (b *BaseCollector) CollectionChange(change int) {
-	b.progressChan <- progressbar.NewUpdate(b.c.Namespace(), change)
+	b.progressChan <- progressbar.NewUpdate(b.namespace, change)
 }
 
 func (b *BaseCollector) CollectionChangeByOne() {
@@ -80,7 +84,7 @@ func (b *BaseCollector) makeChannels() {
 }
 
 func (b *BaseCollector) closeChannels() {
-	b.progressChan <- progressbar.NewBarClose(b.c.Namespace())
+	b.progressChan <- progressbar.NewBarClose(b.namespace)
 	close(b.collectedChan)
 	close(b.progressChan)
 	close(b.missingPermChan)

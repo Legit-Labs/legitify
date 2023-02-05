@@ -22,15 +22,11 @@ type userCollector struct {
 
 func NewUserCollector(ctx context.Context, client *gitlab.Client) collectors.Collector {
 	c := &userCollector{
-		Client:  client,
-		Context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.Member),
+		Client:        client,
+		Context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (c *userCollector) Namespace() namespace.Namespace {
-	return namespace.Member
 }
 
 func (c *userCollector) CollectTotalEntities() int {

@@ -27,15 +27,11 @@ type memberCollector struct {
 
 func NewMemberCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &memberCollector{
-		Client:  client,
-		Context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.Member),
+		Client:        client,
+		Context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (c *memberCollector) Namespace() namespace.Namespace {
-	return namespace.Member
 }
 
 type totalCountMembersQuery struct {

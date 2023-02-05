@@ -26,15 +26,11 @@ type actionCollector struct {
 
 func NewActionCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &actionCollector{
-		client:  client,
-		context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.Actions),
+		client:        client,
+		context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (c *actionCollector) Namespace() namespace.Namespace {
-	return namespace.Actions
 }
 
 func (c *actionCollector) CollectTotalEntities() int {

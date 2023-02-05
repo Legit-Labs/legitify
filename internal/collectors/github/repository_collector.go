@@ -32,16 +32,12 @@ type repositoryCollector struct {
 
 func NewRepositoryCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &repositoryCollector{
+		BaseCollector:    collectors.NewBaseCollector(namespace.Repository),
 		Client:           client,
 		Context:          ctx,
 		scorecardEnabled: context_utils.GetScorecardEnabled(ctx),
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (rc *repositoryCollector) Namespace() namespace.Namespace {
-	return namespace.Repository
 }
 
 type totalCountRepoQuery struct {

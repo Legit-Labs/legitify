@@ -36,15 +36,11 @@ var orgSamlQuery struct {
 
 func NewOrganizationCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &organizationCollector{
-		Client:  client,
-		Context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.Organization),
+		Client:        client,
+		Context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (c *organizationCollector) Namespace() namespace.Namespace {
-	return namespace.Organization
 }
 
 func (c *organizationCollector) CollectTotalEntities() int {

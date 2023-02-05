@@ -23,15 +23,11 @@ type runnersCollector struct {
 
 func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &runnersCollector{
-		client:  client,
-		context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.RunnerGroup),
+		client:        client,
+		context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (c *runnersCollector) Namespace() namespace.Namespace {
-	return namespace.RunnerGroup
 }
 
 func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup, error) {
