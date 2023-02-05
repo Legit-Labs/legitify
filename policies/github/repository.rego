@@ -4,8 +4,8 @@ import data.common.webhooks as webhookUtils
 
 # METADATA
 # scope: rule
-# title: Repository Not Maintained
-# description: There hasn't been any commits in tha last 3 months. A project which is not active might not be patched against security issues within its code and dependencies, and is therefore at higher risk of including unpatched vulnerabilities.
+# title: Repository Must Be Updated At Least Quarterly
+# description: A project which is not actively maintained may not be patched against security issues within its code and dependencies, and is therefore at higher risk of including known vulnerabilities.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
 #   severity: HIGH
@@ -14,30 +14,30 @@ import data.common.webhooks as webhookUtils
 default repository_not_maintained = false
 
 repository_not_maintained {
-    not input.repository.is_archived
-    not is_null(input.repository.pushed_at)
-    ns := time.parse_rfc3339_ns(input.repository.pushed_at)
-    now := time.now_ns()
-    diff := time.diff(now, ns)
-    monthsIndex := 1
-    inactivityMonthsThreshold := 3
-    diff[monthsIndex] >= inactivityMonthsThreshold
+	not input.repository.is_archived
+	not is_null(input.repository.pushed_at)
+	ns := time.parse_rfc3339_ns(input.repository.pushed_at)
+	now := time.now_ns()
+	diff := time.diff(now, ns)
+	monthsIndex := 1
+	inactivityMonthsThreshold := 3
+	diff[monthsIndex] >= inactivityMonthsThreshold
 }
 
 repository_not_maintained {
-    not input.repository.is_archived
-    not is_null(input.repository.pushed_at)
-    ns := time.parse_rfc3339_ns(input.repository.pushed_at)
-    now := time.now_ns()
-    diff := time.diff(now, ns)
-    yearIndex := 0
-    diff[yearIndex] > 0
+	not input.repository.is_archived
+	not is_null(input.repository.pushed_at)
+	ns := time.parse_rfc3339_ns(input.repository.pushed_at)
+	now := time.now_ns()
+	diff := time.diff(now, ns)
+	yearIndex := 0
+	diff[yearIndex] > 0
 }
 
 # METADATA
 # scope: rule
-# title: Repository Has Too Many Admins
-# description: Repository are admins highly privileged and could create great damage if being compromised, it's recommeneded to limit them to the minimum required (recommended maximum 3 admins).
+# title: Repository Should Have Fewer Than Three Admins
+# description: Repository admins are highly privileged and could create great damage if they are compromised. It is recommeneded to limit the number of Repository Admins to the minimum required (recommended maximum 3 admins).
 # custom:
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the repository settings page, Press "Collaborators and teams", Select the unwanted admin users, Select "Change Role"]
@@ -46,15 +46,16 @@ repository_not_maintained {
 #     - "A compromised user with admin permissions can initiate a supply chain attack in a plethora of ways."
 #     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past."
 default repository_has_too_many_admins = false
+
 repository_has_too_many_admins {
-    admins := [admin | admin := input.collaborators[_]; admin.permissions["admin"]]
-    count(admins) > 3
+	admins := [admin | admin := input.collaborators[_]; admin.permissions.admin]
+	count(admins) > 3
 }
 
 # METADATA
 # scope: rule
-# title: Webhook Configured Without A Secret
-# description: Webhooks are not configured with an authenticated token to validate the origin of the request and could make your software vulnerable.
+# title: Webhooks Should Be Configured With A Secret
+# description: Webhooks are not configured with a shared secret to validate the origin and content of the request. This could allow your webhook to be triggered by any bad actor with the URL.
 # custom:
 #   requiredEnrichers: [hooksList]
 #   severity: LOW
@@ -64,18 +65,18 @@ repository_has_too_many_admins {
 #     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
 #     - "This allows attackers to masquerade as your repository, potentially creating an unstable or insecure state in other systems."
 repository_webhook_no_secret[violated] = true {
-    some index
-    hook := input.hooks[index]
-    not webhookUtils.has_secret(hook)
-    violated := {
-        "name": hook.name,
-        "url": hook.url
-    }
+	some index
+	hook := input.hooks[index]
+	not webhookUtils.has_secret(hook)
+	violated := {
+		"name": hook.name,
+		"url": hook.url,
+	}
 }
 
 # METADATA
 # scope: rule
-# title: Webhook Configured Without SSL
+# title: Webhooks Should Be Configured To Use SSL
 # description: Webhooks that are not configured with SSL enabled could expose your sofware to man in the middle attacks (MITM).
 # custom:
 #   requiredEnrichers: [hooksList]
@@ -86,41 +87,42 @@ repository_webhook_no_secret[violated] = true {
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
 #     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
 repository_webhook_doesnt_require_ssl[violated] = true {
-    some index
-    hook := input.hooks[index]
-    not webhookUtils.ssl_enabled(hook)
-    violated := {
-        "name": hook.name,
-        "url": hook.url
-    }
+	some index
+	hook := input.hooks[index]
+	not webhookUtils.ssl_enabled(hook)
+	violated := {
+		"name": hook.name,
+		"url": hook.url,
+	}
 }
 
 # METADATA
 # scope: rule
-# title: Forking Allowed for This Repository
-# description: Forking a repository can lead to loss of control and potential exposure of the source code. The option to fork must be disabled by default and turned on only by admins deliberately when opting to create a fork. If you do not need forking, it is recommended to turn it off in the repository configuration.
+# title: Forking Should Not Be Allowed for This Repository
+# description: Forking a repository can lead to loss of control and potential exposure of the source code. If you do not need forking, it is recommended to turn it off in the repository configuration. If needed, forking should be turned on by admins deliberately when opting to create a fork.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "General" tab, Under "Features", Toggle off "Allow forking"]
 #   severity: LOW
 #   requiredScopes: [read:org]
 #   threat: Forked repositories cause more code and secret sprawl in the organization as forks are independent copies of the repository and need to be tracked separately, making it more difficult to keep track of sensitive assets and contain potential incidents.
 default forking_allowed_for_repository = false
+
 forking_allowed_for_repository {
-    input.repository.is_private == true
-    input.repository.allow_forking == true
+	input.repository.is_private == true
+	input.repository.allow_forking == true
 }
 
 is_null(x) {
-    x == null
+	x == null
 }
 
 has_branch_protection_info(_input) {
-    not is_null(_input.repository.default_branch) # protect against empty repos
+	not is_null(_input.repository.default_branch) # protect against empty repos
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Is Not Protected
+# title: Default Branch Should Be Protected
 # description: Branch protection is not enabled for this repository’s default branch. Protecting branches ensures new code changes must go through a controlled merge process and allows enforcement of code review as well as other security tests. This issue is raised if the default branch protection is turned off.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Add rule", Set "Branch name pattern" as the default branch name (usually "main" or "master"), Set desired protections, Click "Create" and save the rule]
@@ -129,13 +131,14 @@ has_branch_protection_info(_input) {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Any contributor with write access may push potentially dangerous code to this repository, making it easier to compromise and difficult to audit.
 default missing_default_branch_protection = false
+
 missing_default_branch_protection {
-    is_null(input.repository.default_branch.branch_protection_rule)
+	is_null(input.repository.default_branch.branch_protection_rule)
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Could Be Deleted
+# title: Default Branch Deletion Protection Should Be Enabled
 # description: The history of the default branch is not protected against deletion for this repository.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Uncheck "Allow deletions", Click "Save changes"]
@@ -144,17 +147,18 @@ missing_default_branch_protection {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
 default missing_default_branch_protection_deletion = false
+
 missing_default_branch_protection_deletion {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 missing_default_branch_protection_deletion {
-    input.repository.default_branch.branch_protection_rule.allows_deletions == true
+	input.repository.default_branch.branch_protection_rule.allows_deletions == true
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Allows Force Pushes
+# title: Default Branch Should Not Allow Force Pushes
 # description: The history of the default branch is not protected against changes for this repository. Protecting branch history ensures every change that was made to code can be retained and later examined. This issue is raised if the default branch history can be modified using force push.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Uncheck "Allow force pushes", Click "Save changes"]
@@ -163,18 +167,19 @@ missing_default_branch_protection_deletion {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
 default missing_default_branch_protection_force_push = false
+
 missing_default_branch_protection_force_push {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 missing_default_branch_protection_force_push {
-    input.repository.default_branch.branch_protection_rule.allows_force_pushes == true
+	input.repository.default_branch.branch_protection_rule.allows_force_pushes == true
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn’t Require All Checks To Pass Before Merge
-# description: Branch protection is enabled. However, the checks which validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures code is up-to-date in order to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass. This option is found in the branch protection setting for the repository.
+# title: Default Branch Should Require All Checks To Pass Before Merge
+# description: Branch protection is enabled. However, the checks which validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures code is up-to-date in order to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", "Add the required checks that must pass before merging (tests, lint, etc...)", Click "Save changes"]
 #   severity: MEDIUM
@@ -182,18 +187,19 @@ missing_default_branch_protection_force_push {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
 default requires_status_checks = false
+
 requires_status_checks {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 requires_status_checks {
-    input.repository.default_branch.branch_protection_rule.requires_status_checks == false
+	input.repository.default_branch.branch_protection_rule.requires_status_checks == false
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn’t Require Branches To Be Up To Date Before Merge
-# description: Status checks are required, but branches that are not up to date can be merged.
+# title: Default Branch Should Require Branches To Be Up To Date Before Merge
+# description: Status checks are required, but branches that are not up to date can be merged. This can result in previously remediated issues being merged in over fixes.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", Check "Require branches to be up to date before merging", Click "Save changes"]
 #   severity: MEDIUM
@@ -201,23 +207,24 @@ requires_status_checks {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Required status checks may be failing on the latest version after passing on an earlier version of the code, making it easy to commit buggy or otherwise insecure code.
 default requires_branches_up_to_date_before_merge = false
+
 requires_branches_up_to_date_before_merge {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 requires_branches_up_to_date_before_merge {
-    requires_status_checks
+	requires_status_checks
 }
 
 requires_branches_up_to_date_before_merge {
-    input.repository.default_branch.branch_protection_rule.requires_status_checks == true
-    input.repository.default_branch.branch_protection_rule.requires_strict_status_checks == false
+	input.repository.default_branch.branch_protection_rule.requires_status_checks == true
+	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks == false
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Require New Code Changes After Approval To Be Re-Approved
-# description: This security control prevents merging code that was approved but later on changed. Turning it on ensures new changes are required to be reviewed again. This setting is part of the branch protection and code-review settings, and hardens the review process. If turned off - a developer can change the code after approval, and push code that is different from the one that was previously allowed. This option is found in the branch protection setting for the repository.
+# title: Default Branch Should Require New Code Changes After Approval To Be Re-Approved
+# description: This security control prevents merging code that was approved but later on changed. Turning it on ensures any new changes must be reviewed again. This setting is part of the branch protection and code-review settings, and hardens the review process. If turned off - a developer can change the code after approval, and push code that is different from the one that was previously allowed. This option is found in the branch protection setting for the repository.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Dismiss stale pull request approvals when new commits are pushed", Click "Save changes"]
 #   severity: LOW
@@ -225,18 +232,19 @@ requires_branches_up_to_date_before_merge {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Buggy or insecure code may be committed after approval and will reach the main branch without review. Alternatively, an attacker can attempt a just-in-time attack to introduce dangerous code just before merge.
 default dismisses_stale_reviews = false
+
 dismisses_stale_reviews {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 dismisses_stale_reviews {
-    not input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
+	not input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Require Code Review
-# description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository. An even safer option is to require 2 separate reviewers, which is enforced in the Legitify policy "Default Branch Doesn't Require Code Review By At Least Two Reviewers".
+# title: Default Branch Must Require Code Review
+# description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management system's built-in enforcement. This option is found in the branch protection setting of the repository.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
 #   severity: HIGH
@@ -244,21 +252,22 @@ dismisses_stale_reviews {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Users can merge code without being reviewed, which can lead to insecure code reaching the main branch and production.
 default code_review_not_required = false
+
 code_review_not_required {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 code_review_not_required {
-    not input.repository.default_branch.branch_protection_rule.required_approving_review_count
+	not input.repository.default_branch.branch_protection_rule.required_approving_review_count
 }
 
 code_review_not_required {
-    input.repository.default_branch.branch_protection_rule.required_approving_review_count < 1
+	input.repository.default_branch.branch_protection_rule.required_approving_review_count < 1
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Require Code Review By At Least Two Reviewers
+# title: Default Branch Should Require Code Review By At Least Two Reviewers
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
@@ -269,21 +278,22 @@ code_review_not_required {
 #     - "Users can merge code without being reviewed, which can lead to insecure code reaching the main branch and production."
 #     - "Requiring code review by at least two reviewers further decreases the risk of an insider threat (as merging code requires compromising at least 2 identities with write permissions), and decreases the likelihood of human error in the review process."
 default code_review_by_two_members_not_required = false
+
 code_review_by_two_members_not_required {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 code_review_by_two_members_not_required {
-    not input.repository.default_branch.branch_protection_rule.required_approving_review_count
+	not input.repository.default_branch.branch_protection_rule.required_approving_review_count
 }
 
 code_review_by_two_members_not_required {
-    input.repository.default_branch.branch_protection_rule.required_approving_review_count < 2
+	input.repository.default_branch.branch_protection_rule.required_approving_review_count < 2
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Limit Code Review to Code-Owners
+# title: Default Branch Should Limit Code Review to Code-Owners
 # description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the repository.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require review from Code Owners", Click "Save changes"]
@@ -292,17 +302,18 @@ code_review_by_two_members_not_required {
 #   prerequisites: [has_branch_protection_permission]
 #   threat: A pull request may be approved by any contributor with write access. Specifying specific code owners can ensure review is only done by individuals with the correct expertise required for the review of the changed files, potentially preventing bugs and security risks.
 default code_review_not_limited_to_code_owners = false
+
 code_review_not_limited_to_code_owners {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 code_review_not_limited_to_code_owners {
-    input.repository.default_branch.branch_protection_rule.requires_code_owner_reviews == false
+	input.repository.default_branch.branch_protection_rule.requires_code_owner_reviews == false
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Require Linear History
+# title: Default Branch Should Require Linear History
 # description: Prevent merge commits from being pushed to protected branches.
 # custom:
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require linear history", Click "Save changes"]
@@ -311,17 +322,18 @@ code_review_not_limited_to_code_owners {
 #    prerequisites: [has_branch_protection_permission]
 #    threat: Having a non-linear history makes it harder to reverse changes, making recovery from bugs and security risks slower and more difficult.
 default non_linear_history = false
+
 non_linear_history {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 non_linear_history {
-    input.repository.default_branch.branch_protection_rule.requires_linear_history == false
+	input.repository.default_branch.branch_protection_rule.requires_linear_history == false
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Require All Conversations To Be Resolved Before Merge
+# title: Default Branch Should Require All Conversations To Be Resolved Before Merge
 # description: Require all Pull Request conversations to be resolved before merging. Check this to avoid bypassing/missing a Pull Reuqest comment.
 # custom:
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require conversation resolution before merging", Click "Save changes"]
@@ -330,17 +342,18 @@ non_linear_history {
 #    prerequisites: [has_branch_protection_permission]
 #    threat: Allowing the merging of code without resolving all conversations can promote poor and vulnerable code, as important comments may be forgotten or deliberately ignored when the code is merged.
 default no_conversation_resolution = false
+
 no_conversation_resolution {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 no_conversation_resolution {
-    input.repository.default_branch.branch_protection_rule.requires_conversation_resolution == false
+	input.repository.default_branch.branch_protection_rule.requires_conversation_resolution == false
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Require All Commits To Be Signed
+# title: Default Branch Should Require All Commits To Be Signed
 # description: Require all commits to be signed and verified
 # custom:
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require signed commits", Click "Save changes"]
@@ -349,17 +362,18 @@ no_conversation_resolution {
 #    prerequisites: [has_branch_protection_permission]
 #    threat: A commit containing malicious code may be crafted by a malicious actor that has acquired write access to the repository to initiate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
 default no_signed_commits = false
+
 no_signed_commits {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 no_signed_commits {
-    input.repository.default_branch.branch_protection_rule.requires_commit_signatures == false
+	input.repository.default_branch.branch_protection_rule.requires_commit_signatures == false
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Restrict Who Can Dismiss Reviews
+# title: Default Branch Should Restrict Who Can Dismiss Reviews
 # description: Any user with write access to the repository can dismiss pull-request reviews. Pull-request review contains essential information on the work that needs to be done and helps keep track of the changes. Dismissing it might cause a loss of this information and should be restricted to a limited number of users.
 # custom:
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can dismiss pull request reviews", Click "Save changes"]
@@ -368,18 +382,19 @@ no_signed_commits {
 #    prerequisites: [has_branch_protection_permission]
 #    threat: Allowing the dismissal of reviews can promote poor and vulnerable code, as important comments may be forgotten and ignored during the review process.
 default review_dismissal_allowed = false
+
 review_dismissal_allowed {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 review_dismissal_allowed {
-    input.repository.default_branch.branch_protection_rule.restricts_review_dismissals == false
+	input.repository.default_branch.branch_protection_rule.restricts_review_dismissals == false
 }
 
 # METADATA
 # scope: rule
-# title: Default Branch Doesn't Restrict Who Can Push
-# description: By default, commits can be pushed directly to protected branches, without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
+# title: Default Branch Should Restrict Who Can Push To It
+# description: By default, commits can be pushed directly to protected branches without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
 # custom:
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can push to matching branches", Choose who should be allowed to push, Click "Save changes"]
 #    severity: LOW
@@ -387,48 +402,51 @@ review_dismissal_allowed {
 #    prerequisites: [has_branch_protection_permission]
 #    threat: An attacker with write credentials may introduce vulnerabilities to your code without your knowledge. Alternatively, contributors may commit unsafe code that is buggy or easy to exploit that could have been caught using a review process.
 default pushes_are_not_restricted = false
+
 pushes_are_not_restricted {
-    missing_default_branch_protection
+	missing_default_branch_protection
 }
 
 pushes_are_not_restricted {
-    code_review_not_required
-    input.repository.default_branch.branch_protection_rule.restricts_pushes == false
+	code_review_not_required
+	input.repository.default_branch.branch_protection_rule.restricts_pushes == false
 }
 
 # METADATA
 # scope: rule
-# title: Vulnerability Alerts Is Not Enabled
-# description: Enable GitHub Dependabot to continuously scan for open source vulnerabilities and receive alerts
+# title: Vulnerability Alerts Should Be Enabled
+# description: Enable GitHub Dependabot to regularly scan for open source vulnerabilities.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Code security and analysis" tab, Set "Dependabot alerts" as Enabled]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   threat: An open source vulnerability may be affecting your code without your knowledge, making it vulnerable to exploitation.
 default vulnerability_alerts_not_enabled = false
+
 vulnerability_alerts_not_enabled {
-    # deliberately ignoring nil value (in case this data is unavailable)
-    input.vulnerability_alerts_enabled == false
+	# deliberately ignoring nil value (in case this data is unavailable)
+	input.vulnerability_alerts_enabled == false
 }
 
 # METADATA
 # scope: rule
-# title: GitHub Advanced Security – Dependency Review Is Disabled For A Repository
-# description: Enable GitHub Advanced Security dependency review to avoid introducing new vulnerabilities
+# title: GitHub Advanced Security – Dependency Review Should Be Enabled For A Repository
+# description: Enable GitHub Advanced Security dependency review to avoid introducing new vulnerabilities and detect newly discovered vulnerabilities in existing packages.
 # custom:
 #    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Code security and analysis" tab, Set "Dependency graph" as Enabled]
 #    severity: MEDIUM
 #    requiredScopes: [repo]
 #    threat: A contributor may add vulnerable third-party dependencies to the repository, introducing vulnerabilities to your application that will only be detected after merge.
 default ghas_dependency_review_not_enabled = false
+
 ghas_dependency_review_not_enabled {
-    input.dependency_graph_manifests.total_count == 0
+	input.dependency_graph_manifests.total_count == 0
 }
 
 # METADATA
 # scope: rule
-# title: Low Scorecard Score for Repository Indicates Poor Security Posture
-# description: Scorecard is an open-source tool from OSSF that helps to asses the security posture of repositories, Low scorecard score means your repository may be under risk.
+# title: OSSF Scorecard Score Should Be Above 7
+# description: Scorecard is an open-source tool from the OSSF that helps to asses the security posture of repositories. A low scorecard score means your repository may be at risk.
 # custom:
 #    requiredEnrichers: [scorecard]
 #    remediationSteps: [Get scorecard output by either:, "- Run legitify with --scorecard verbose", "- Run scorecard manually", Fix the failed checks]
@@ -437,15 +455,16 @@ ghas_dependency_review_not_enabled {
 #    prerequisites: [scorecard_enabled]
 #    threat: A low Scorecard score can indicate that the repository is more vulnerable to attack than others, making it a prime attack target.
 default scorecard_score_too_low = false
+
 scorecard_score_too_low {
-    not is_null(input.scorecard)
-    input.scorecard.score < 7.0
+	not is_null(input.scorecard)
+	input.scorecard.score < 7.0
 }
 
 # METADATA
 # scope: rule
-# title: Default Workflow Token Permission Is Not Read Only
-# description: Your default GitHub Action workflow token permission is set to read-write. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
+# title: Default Workflow Token Permission Should Be Set To Read Only
+# description: The default GitHub Action workflow token permission is set to read-write. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps:
@@ -459,14 +478,15 @@ scorecard_score_too_low {
 #   requiredScopes: [admin:org]
 #   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
 default token_default_permissions_is_read_write = false
+
 token_default_permissions_is_read_write {
-    input.actions_token_permissions.default_workflow_permissions != "read"
+	input.actions_token_permissions.default_workflow_permissions != "read"
 }
 
 # METADATA
 # scope: rule
-# title: Workflows Are Allowed To Approve Pull Requests
-# description: Your default GitHub Actions configuration allows for workflows to approve pull requests. This could allow users to bypass code-review restrictions.
+# title: Workflows Must Not Be Allowed To Approve Pull Requests
+# description: The default GitHub Actions configuration allows for workflows to approve pull requests. This could allow users to bypass code-review restrictions.
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps:
@@ -480,6 +500,7 @@ token_default_permissions_is_read_write {
 #   requiredScopes: [admin:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
 default actions_can_approve_pull_requests = false
+
 actions_can_approve_pull_requests {
-    input.actions_token_permissions.can_approve_pull_request_reviews
+	input.actions_token_permissions.can_approve_pull_request_reviews
 }
