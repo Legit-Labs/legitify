@@ -48,7 +48,7 @@ organization_webhook_doesnt_require_ssl[violated] = true {
 
 # METADATA
 # scope: rule
-# title: Two-Factor Authentication Must Be Enforced For The Organization
+# title: Two-Factor Authentication Should Be Enforced For The Organization
 # description: The two-factor authentication requirement is not enabled at the organization level. Regardless of whether users are managed externally by SSO, it is highly recommended to enable this option to reduce the risk of a deliberate or accidental user creation without MFA.
 # custom:
 #   severity: HIGH
@@ -80,7 +80,7 @@ non_admins_can_create_public_repositories {
 
 # METADATA
 # scope: rule
-# title: Default Member Permissions Must Be Restricted
+# title: Default Member Permissions Should Be Restricted
 # description: Default repository permissions configuration is not set in the organization, thus every new repository will be accessible by default to all users. It is strongly recommended to remove the default permissions and assign them on demand.
 # custom:
 #   severity: HIGH

@@ -2,7 +2,7 @@ package member
 
 # METADATA
 # scope: rule
-# title: Two Factor Authentication Must Be Enabled for Collaborators
+# title: Two Factor Authentication Should Be Enabled for Collaborators
 # description: A collaborator's two factor authentication is disabled. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 # custom:
 #   severity: HIGH
@@ -21,7 +21,7 @@ two_factor_authentication_is_disabled_for_a_collaborator {
 
 # METADATA
 # scope: rule
-# title: Two Factor Authentication Must Be Enabled for External Collaborators
+# title: Two Factor Authentication Should Be Enabled for External Collaborators
 # description: An external collaborator's two factor authentication is disabled. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 # custom:
 #   severity: HIGH

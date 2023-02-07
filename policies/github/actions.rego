@@ -67,7 +67,7 @@ token_default_permissions_is_read_write {
 
 # METADATA
 # scope: rule
-# title: Workflows Must Not Be Allowed To Approve Pull Requests
+# title: Workflows Should Not Be Allowed To Approve Pull Requests
 # description: The default GitHub Actions configuration allows for workflows to approve pull requests. This could allow users to bypass code-review restrictions.
 # custom:
 #   requiredEnrichers: [organizationId]

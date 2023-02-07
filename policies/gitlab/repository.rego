@@ -2,7 +2,7 @@ package repository
 
 # METADATA
 # scope: rule
-# title: Project Must Be Updated At Least Quarterly
+# title: Project Should Be Updated At Least Quarterly
 # description: A project which is not actively maintained may not be patched against security issues within its code and dependencies, and is therefore at higher risk of including known vulnerabilities.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the project]
@@ -181,7 +181,7 @@ no_signed_commits {
 
 # METADATA
 # scope: rule
-# title: Default Branch Must Require Code Review
+# title: Default Branch Should Require Code Review
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 1 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]

@@ -2,7 +2,7 @@ package organization
 
 # METADATA
 # scope: rule
-# title: Two-Factor Authentication Must Be Enforced For The Group
+# title: Two-Factor Authentication Should Be Enforced For The Group
 # description: The two-factor authentication requirement is not enabled at the group level. Regardless of whether users are managed externally by SSO, it is highly recommended to enable this option, to reduce the risk of a deliberate or accidental user creation without MFA.
 # custom:
 #   severity: HIGH
@@ -22,7 +22,7 @@ two_factor_authentication_not_required_for_group {
 
 # METADATA
 # scope: rule
-# title: Forking of Repositories to External Namespaces must be disabled.
+# title: Forking of Repositories to External Namespaces Should Be Disabled.
 # description: The ability to fork project to external namespaces is turned on. Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork. 
 # custom:
 #   severity: MEDIUM

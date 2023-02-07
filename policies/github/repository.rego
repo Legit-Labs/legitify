@@ -4,7 +4,7 @@ import data.common.webhooks as webhookUtils
 
 # METADATA
 # scope: rule
-# title: Repository Must Be Updated At Least Quarterly
+# title: Repository Should Be Updated At Least Quarterly
 # description: A project which is not actively maintained may not be patched against security issues within its code and dependencies, and is therefore at higher risk of including known vulnerabilities.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Either Delete or Archive the repository]
@@ -243,7 +243,7 @@ dismisses_stale_reviews {
 
 # METADATA
 # scope: rule
-# title: Default Branch Must Require Code Review
+# title: Default Branch Should Require Code Review
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management system's built-in enforcement. This option is found in the branch protection setting of the repository.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
@@ -485,7 +485,7 @@ token_default_permissions_is_read_write {
 
 # METADATA
 # scope: rule
-# title: Workflows Must Not Be Allowed To Approve Pull Requests
+# title: Workflows Should Not Be Allowed To Approve Pull Requests
 # description: The default GitHub Actions configuration allows for workflows to approve pull requests. This could allow users to bypass code-review restrictions.
 # custom:
 #   requiredEnrichers: [organizationId]

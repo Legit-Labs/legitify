@@ -2,7 +2,7 @@ package runner_group
 
 # METADATA
 # scope: rule
-# title: Runner Group Must Be Limited to Private Repositories
+# title: Runner Group Should Be Limited to Private Repositories
 # description: |
 #       Workflows from public repositories are allowed to run on GitHub Hosted Runners.
 #       When using GitHub Hosted Runners, it is recommended to allow only workflows from private repositories to run on these runners to avoid being vulnerable
@@ -32,7 +32,7 @@ runner_group_can_be_used_by_public_repositories {
 
 # METADATA
 # scope: rule
-# title: Runner Group Must Be Limited to Selected Repositories
+# title: Runner Group Should Be Limited to Selected Repositories
 # description: |
 #       Not limiting the runner group to selected repositories allows any user in the organization to execute workflows
 #       on the group's runners.
