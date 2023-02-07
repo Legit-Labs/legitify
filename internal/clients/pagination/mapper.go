@@ -7,7 +7,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/utils"
 )
 
-const defaultChannelSize = 1000
+const defaultChannelSize = 1024
 
 type MappedPager[ApiRetT any, UserRetT any, OptsT any, RespT any] struct {
 	Opts     interface{}

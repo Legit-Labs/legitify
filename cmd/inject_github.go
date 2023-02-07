@@ -9,6 +9,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
+	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/google/wire"
 )
 
@@ -41,6 +42,7 @@ func provideGitHubCollectors(ctx context.Context, client *github.Client, analyze
 }
 
 func provideGitHubClient(analyzeArgs *args) (*github.Client, error) {
-	return github.NewClient(context.Background(), analyzeArgs.Token, analyzeArgs.Endpoint,
+	ctx := context_utils.NewContextWithSimulatedSecondaryRateLimit(context.Background(), analyzeArgs.SimulateSecondaryRateLimit)
+	return github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Endpoint,
 		analyzeArgs.Organizations)
 }

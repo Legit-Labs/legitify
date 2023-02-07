@@ -1,20 +1,11 @@
 package collectors
 
 import (
+	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/collected"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 )
-
-type Metadata struct {
-	TotalEntities int
-}
-
-type CollectionMetric struct {
-	CollectionChange int
-	Finished         bool
-	Namespace        string
-}
 
 type CollectedDataContext interface {
 	Premium() bool
@@ -35,12 +26,12 @@ type CollectedData struct {
 
 type SubCollectorChannels struct {
 	Collected         <-chan CollectedData
-	Progress          <-chan CollectionMetric
+	Progress          <-chan progressbar.ChannelType
 	MissingPermission <-chan MissingPermission
 }
 
 type Collector interface {
 	Collect() SubCollectorChannels
 	Namespace() namespace.Namespace
-	CollectMetadata() Metadata
+	CollectTotalEntities() int
 }

@@ -27,15 +27,11 @@ type memberCollector struct {
 
 func NewMemberCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &memberCollector{
-		Client:  client,
-		Context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.Member),
+		Client:        client,
+		Context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (c *memberCollector) Namespace() namespace.Namespace {
-	return namespace.Member
 }
 
 type totalCountMembersQuery struct {
@@ -46,13 +42,12 @@ type totalCountMembersQuery struct {
 	} `graphql:"organization(login: $login)"`
 }
 
-func (c *memberCollector) CollectMetadata() collectors.Metadata {
+func (c *memberCollector) CollectTotalEntities() int {
 	gw := group_waiter.New()
 	orgs, err := c.Client.CollectOrganizations()
-
 	if err != nil {
 		log.Printf("failed to collect organization %s", err)
-		return collectors.Metadata{}
+		return 0
 	}
 
 	var totalCount int32 = 0
@@ -80,9 +75,7 @@ func (c *memberCollector) CollectMetadata() collectors.Metadata {
 	}
 	gw.Wait()
 
-	return collectors.Metadata{
-		TotalEntities: int(totalCount),
-	}
+	return int(totalCount)
 }
 
 func (c *memberCollector) Collect() collectors.SubCollectorChannels {
@@ -106,7 +99,6 @@ func (c *memberCollector) Collect() collectors.SubCollectorChannels {
 
 			for _, memberType := range []string{"member", "admin"} {
 				res := c.collectMembers(org.Name(), memberType)
-				c.CollectionChange(len(res))
 
 				if !hasLastActive {
 					for _, m := range res {
@@ -117,6 +109,7 @@ func (c *memberCollector) Collect() collectors.SubCollectorChannels {
 					enrichedMembers = append(enrichedMembers, enrichedResult...)
 				}
 
+				c.CollectionChange(len(res))
 			}
 
 			c.CollectData(org,

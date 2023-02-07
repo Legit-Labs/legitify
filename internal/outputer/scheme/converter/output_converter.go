@@ -13,7 +13,6 @@ const (
 	GroupByNamespace SchemeType = "group-by-namespace"
 	GroupByResource  SchemeType = "group-by-resource"
 	GroupBySeverity  SchemeType = "group-by-severity"
-	Object           SchemeType = "object"
 
 	DefaultScheme = Flattened
 )
@@ -21,7 +20,7 @@ const (
 func Convert(schemeType SchemeType, output scheme.FlattenedScheme) (interface{}, error) {
 	outputConverterCreator := outputConverters[schemeType]
 	if outputConverterCreator == nil {
-		return nil, fmt.Errorf("No output converter for %s", schemeType)
+		return nil, fmt.Errorf("no output converter for %s", schemeType)
 	}
 
 	outputConverter := outputConverterCreator()
@@ -45,13 +44,12 @@ var outputConverters = map[SchemeType]newConvertFunc{
 	GroupByNamespace: newByNamespaceConverter,
 	GroupByResource:  newByResourceConverter,
 	GroupBySeverity:  newBySeverityConverter,
-	Object:           nil, // TODO pending implementation of Object output
 }
 
 func ValidateOutputScheme(schemeType SchemeType) error {
 	_, ok := outputConverters[schemeType]
 	if !ok {
-		return fmt.Errorf("Unsupported output scheme type: %s", schemeType)
+		return fmt.Errorf("unsupported output scheme type: %s", schemeType)
 	}
 
 	return nil

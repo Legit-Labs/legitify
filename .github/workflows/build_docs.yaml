@@ -20,7 +20,7 @@ jobs:
           token: ${{ secrets.DOCS_TOKEN }}
       - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
       - name: build docs
         run: make docs
       - name: update docs

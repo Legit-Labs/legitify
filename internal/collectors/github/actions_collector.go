@@ -2,11 +2,13 @@ package github
 
 import (
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/collectors"
 	"log"
+
+	"github.com/Legit-Labs/legitify/internal/collectors"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"golang.org/x/net/context"
@@ -24,28 +26,21 @@ type actionCollector struct {
 
 func NewActionCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &actionCollector{
-		client:  client,
-		context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.Actions),
+		client:        client,
+		context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
 }
 
-func (c *actionCollector) Namespace() namespace.Namespace {
-	return namespace.Actions
-}
-
-func (c *actionCollector) CollectMetadata() collectors.Metadata {
+func (c *actionCollector) CollectTotalEntities() int {
 	orgs, err := c.client.CollectOrganizations()
-	res := collectors.Metadata{}
-
 	if err != nil {
 		log.Printf("failed to collect organizations %s", err)
-	} else {
-		res.TotalEntities = len(orgs)
+		return 0
 	}
 
-	return res
+	return len(orgs)
 }
 
 func (c *actionCollector) Collect() collectors.SubCollectorChannels {
@@ -57,26 +52,32 @@ func (c *actionCollector) Collect() collectors.SubCollectorChannels {
 			return
 		}
 
+		gw := group_waiter.New()
 		for _, org := range orgs {
-			actionsPermissions, err1 := c.client.GetActionsTokenPermissionsForOrganization(org.Name())
-			actionsData, _, err2 := c.client.Client().Organizations.GetActionsPermissions(c.context, org.Name())
+			org := org
+			gw.Do(func() {
+				actionsPermissions, err1 := c.client.GetActionsTokenPermissionsForOrganization(org.Name())
+				actionsData, _, err2 := c.client.Client().Organizations.GetActionsPermissions(c.context, org.Name())
 
-			if err1 != nil || err2 != nil {
-				entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
-				perm := collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
-				c.IssueMissingPermissions(perm)
-			}
+				if err1 != nil || err2 != nil {
+					entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
+					perm := collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
+					c.IssueMissingPermissions(perm)
+					return
+				}
 
-			c.CollectionChangeByOne()
+				c.CollectionChangeByOne()
 
-			c.CollectData(org,
-				ghcollected.OrganizationActions{
-					Organization:       org,
-					ActionsPermissions: actionsData,
-					TokenPermissions:   actionsPermissions,
-				},
-				org.CanonicalLink(),
-				[]permissions.Role{org.Role})
+				c.CollectData(org,
+					ghcollected.OrganizationActions{
+						Organization:       org,
+						ActionsPermissions: actionsData,
+						TokenPermissions:   actionsPermissions,
+					},
+					org.CanonicalLink(),
+					[]permissions.Role{org.Role})
+			})
 		}
+		gw.Wait()
 	})
 }

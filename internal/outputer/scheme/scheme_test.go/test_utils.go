@@ -2,6 +2,7 @@ package scheme_test
 
 import (
 	"encoding/json"
+
 	"github.com/Legit-Labs/legitify/internal/collected"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
@@ -52,7 +53,6 @@ const (
 )
 
 func arbitraryEntity() collected.Entity {
-	// TODO move to common test files with enricher
 	var entityID int64 = 666
 	var entityName = "arbitrary"
 	var link = "link1"
@@ -72,7 +72,6 @@ func arbitraryEntity() collected.Entity {
 }
 
 func arbitraryEntity2() collected.Entity {
-	// TODO move to common test files with enricher
 	var entityID int64 = 667
 	var entityName = "arbitrary2"
 	var link = "link2"
