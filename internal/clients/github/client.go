@@ -495,7 +495,7 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 		Source: ts,
 	}
 
-	rateLimitWaiter, err := transport.NewRateLimitWaiter(tc)
+	rateLimitWaiter, err := transport.NewRateLimitWaiter(ctx, tc)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create rate limiter: %v", err)
 	}
