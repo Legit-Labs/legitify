@@ -63,6 +63,7 @@ func (c *actionCollector) Collect() collectors.SubCollectorChannels {
 					entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
 					perm := collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
 					c.IssueMissingPermissions(perm)
+					return
 				}
 
 				c.CollectionChangeByOne()

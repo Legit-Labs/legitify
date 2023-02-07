@@ -4,7 +4,7 @@ import "time"
 
 type ChannelType = interface{}
 
-type MinimalBars struct {
+type MinimumRequiredBars struct {
 	count int
 }
 
@@ -28,12 +28,16 @@ type BarClose struct {
 	BarName string
 }
 
-func NewMinimalBars(count int) MinimalBars {
-	return MinimalBars{
+// NewMinimumRequiredBars creates a request to set the minimum number of bars.
+// It is used to prevent the progress bar from finishing before all bars were created.
+func NewMinimumRequiredBars(count int) MinimumRequiredBars {
+	return MinimumRequiredBars{
 		count: count,
 	}
 }
 
+// NewRequiredBar creates a request to create a new required bar.
+// It is used to create a bar and mark it for the minimum requirement count.
 func NewRequiredBar(name string, total int) RequiredBarCreation {
 	return RequiredBarCreation{
 		BarName:       name,
@@ -41,6 +45,8 @@ func NewRequiredBar(name string, total int) RequiredBarCreation {
 	}
 }
 
+// NewOptionalBar creates a request to create a new optional bar.
+// It is used to create a bar without marking it for the minimum requirement count.
 func NewOptionalBar(name string, total int) OptionalBarCreation {
 	return OptionalBarCreation{
 		BarName:       name,
@@ -48,6 +54,8 @@ func NewOptionalBar(name string, total int) OptionalBarCreation {
 	}
 }
 
+// NewUpdate creates a request to update the count for an existing bar.
+// The change must be positive.
 func NewUpdate(name string, change int) BarUpdate {
 	return BarUpdate{
 		BarName: name,
@@ -55,6 +63,8 @@ func NewUpdate(name string, change int) BarUpdate {
 	}
 }
 
+// NewTimedBar creates a request to create a time-based bar.
+// Timed bars are counted with seconds and removed when finished.
 func NewTimedBar(name string, end time.Time) TimedBarCreation {
 	return TimedBarCreation{
 		BarName: name,
@@ -62,6 +72,9 @@ func NewTimedBar(name string, end time.Time) TimedBarCreation {
 	}
 }
 
+// NewBarClose creates a request to close an existing bar.
+// It is used to prevent the program from being stuck if a progress bar is not completed (due to error).
+// In case the progress bar already completed, it is just ignored.
 func NewBarClose(name string) BarClose {
 	return BarClose{
 		BarName: name,

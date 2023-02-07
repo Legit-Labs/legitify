@@ -24,7 +24,7 @@ func (m *manager) Collect() <-chan collectors.CollectedData {
 	collectedChan := make(chan collectors.CollectedData)
 
 	// require all collection bars and the metadata bar
-	progressbar.Report(progressbar.NewMinimalBars(len(m.collectors) + 1))
+	progressbar.Report(progressbar.NewMinimumRequiredBars(len(m.collectors) + 1))
 
 	// init the metadata bar
 	const metadataBarName = "metadata"

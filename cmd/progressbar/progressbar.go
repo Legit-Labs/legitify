@@ -72,8 +72,8 @@ func (pb *progressBar) Run() group_waiter.Waitable {
 	go func() {
 		for d := range pb.inChannel {
 			switch data := d.(type) {
-			case MinimalBars:
-				pb.handleMinimalBars(data)
+			case MinimumRequiredBars:
+				pb.handleMinimumRequiredBars(data)
 			case RequiredBarCreation:
 				pb.handleRequiredBarCreation(data)
 			case OptionalBarCreation:
@@ -97,7 +97,7 @@ func (pb *progressBar) ReportProgress(msg ChannelType) {
 	pb.inChannel <- msg
 }
 
-func (pb *progressBar) handleMinimalBars(data MinimalBars) {
+func (pb *progressBar) handleMinimumRequiredBars(data MinimumRequiredBars) {
 	pb.waiter.SetMinCount(data.count)
 }
 
