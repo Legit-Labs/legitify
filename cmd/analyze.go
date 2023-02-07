@@ -68,7 +68,7 @@ func newAnalyzeCommand() *cobra.Command {
 	flags.StringVarP(&analyzeArgs.ScorecardWhen, argScorecard, "", DefaultScOption, "Whether to run additional scorecard checks "+scorecardWhens)
 	flags.BoolVarP(&analyzeArgs.FailedOnly, argFailedOnly, "", false, "Only show violated policied (do not show succeeded/skipped)")
 	flags.BoolVarP(&analyzeArgs.SimulateSecondaryRateLimit, argSimulateSecondaryRateLimit, "", false, "Simulate secondary rate limits (for testing purposes)")
-	flags.MarkHidden(argSimulateSecondaryRateLimit)
+	_ = flags.MarkHidden(argSimulateSecondaryRateLimit)
 
 	return analyzeCmd
 }
