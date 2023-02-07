@@ -32,16 +32,12 @@ type repositoryCollector struct {
 
 func NewRepositoryCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &repositoryCollector{
+		BaseCollector:    collectors.NewBaseCollector(namespace.Repository),
 		Client:           client,
 		Context:          ctx,
 		scorecardEnabled: context_utils.GetScorecardEnabled(ctx),
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (rc *repositoryCollector) Namespace() namespace.Namespace {
-	return namespace.Repository
 }
 
 type totalCountRepoQuery struct {
@@ -52,12 +48,10 @@ type totalCountRepoQuery struct {
 	} `graphql:"organization(login: $login)"`
 }
 
-func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
+func (rc *repositoryCollector) CollectTotalEntities() int {
 	repositories, exist := context_utils.GetRepositories(rc.Context)
 	if exist {
-		return collectors.Metadata{
-			TotalEntities: len(repositories),
-		}
+		return len(repositories)
 	}
 
 	gw := group_waiter.New()
@@ -65,7 +59,7 @@ func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
 
 	if err != nil {
 		log.Printf("failed to collect organization %s", err)
-		return collectors.Metadata{}
+		return 0
 	}
 
 	var totalCount int32 = 0
@@ -89,9 +83,7 @@ func (rc *repositoryCollector) CollectMetadata() collectors.Metadata {
 	}
 	gw.Wait()
 
-	return collectors.Metadata{
-		TotalEntities: int(totalCount),
-	}
+	return int(totalCount)
 }
 
 func (rc *repositoryCollector) Collect() collectors.SubCollectorChannels {

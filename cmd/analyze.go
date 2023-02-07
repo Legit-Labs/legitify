@@ -23,15 +23,16 @@ func init() {
 }
 
 const (
-	argOrg          = "org"
-	argRepository   = "repo"
-	argPoliciesPath = "policies-path"
-	argNamespace    = "namespace"
-	argOutputFormat = "output-format"
-	argOutputScheme = "output-scheme"
-	argColor        = "color"
-	argScorecard    = "scorecard"
-	argFailedOnly   = "failed-only"
+	argOrg                        = "org"
+	argRepository                 = "repo"
+	argPoliciesPath               = "policies-path"
+	argNamespace                  = "namespace"
+	argOutputFormat               = "output-format"
+	argOutputScheme               = "output-scheme"
+	argColor                      = "color"
+	argScorecard                  = "scorecard"
+	argFailedOnly                 = "failed-only"
+	argSimulateSecondaryRateLimit = "simulate-secondary-rate-limit"
 )
 
 func toOptionsString(options []string) string {
@@ -66,6 +67,8 @@ func newAnalyzeCommand() *cobra.Command {
 	flags.StringVarP(&analyzeArgs.ColorWhen, argColor, "", DefaultColorOption, "when to use coloring "+colorWhens)
 	flags.StringVarP(&analyzeArgs.ScorecardWhen, argScorecard, "", DefaultScOption, "Whether to run additional scorecard checks "+scorecardWhens)
 	flags.BoolVarP(&analyzeArgs.FailedOnly, argFailedOnly, "", false, "Only show violated policied (do not show succeeded/skipped)")
+	flags.BoolVarP(&analyzeArgs.SimulateSecondaryRateLimit, argSimulateSecondaryRateLimit, "", false, "Simulate secondary rate limits (for testing purposes)")
+	_ = flags.MarkHidden(argSimulateSecondaryRateLimit)
 
 	return analyzeCmd
 }

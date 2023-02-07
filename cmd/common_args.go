@@ -7,20 +7,21 @@ import (
 )
 
 type args struct {
-	Token         string
-	Endpoint      string
-	ScmType       scm_type.ScmType
-	Organizations []string
-	Repositories  []string
-	PoliciesPath  []string
-	Namespaces    []string
-	ColorWhen     string
-	OutputFile    string
-	ErrorFile     string
-	OutputFormat  string
-	OutputScheme  string
-	ScorecardWhen string
-	FailedOnly    bool
+	Token                      string
+	Endpoint                   string
+	ScmType                    scm_type.ScmType
+	Organizations              []string
+	Repositories               []string
+	PoliciesPath               []string
+	Namespaces                 []string
+	ColorWhen                  string
+	OutputFile                 string
+	ErrorFile                  string
+	OutputFormat               string
+	OutputScheme               string
+	ScorecardWhen              string
+	FailedOnly                 bool
+	SimulateSecondaryRateLimit bool
 }
 
 const (

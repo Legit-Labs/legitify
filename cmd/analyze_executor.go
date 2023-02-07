@@ -9,7 +9,6 @@ import (
 	"github.com/Legit-Labs/legitify/internal/enricher"
 	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/Legit-Labs/legitify/internal/outputer"
-	"github.com/Legit-Labs/legitify/internal/screen"
 )
 
 type analyzeExecutor struct {
@@ -34,21 +33,19 @@ func initializeAnalyzeExecutor(manager collectors_manager.CollectorManager,
 func (r *analyzeExecutor) Run() error {
 	defer errlog.FlushAll()
 
-	screen.Printf("Gathering collection metadata...")
-	collectionMetadata := r.manager.CollectMetadata()
-	progressBar := progressbar.NewProgressBar(collectionMetadata)
+	// let progress bar run in the background
+	pWaiter := progressbar.Run()
 
-	// TODO progressBar should run before collection starts and wait for channels to read from
-	collectionChannels := r.manager.Collect()
-	pWaiter := progressBar.Run(collectionChannels.Progress)
-	analyzedDataChan := r.analyzer.Analyze(collectionChannels.Collected)
+	// start all pipeline parts in the background
+	collectionChan := r.manager.Collect()
+	analyzedDataChan := r.analyzer.Analyze(collectionChan)
 	enrichedDataChan := r.enricherManager.Enrich(analyzedDataChan)
 	outputWaiter := r.out.Digest(enrichedDataChan)
 
-	// Wait for progress bars to finish before outputting
+	// wait for progress bars to finish before outputting
 	pWaiter.Wait()
 
-	// Wait for output to be digested
+	// wait for output to be digested
 	outputWaiter.Wait()
 
 	return r.out.Output(os.Stdout)

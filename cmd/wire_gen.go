@@ -17,6 +17,7 @@ import (
 	github2 "github.com/Legit-Labs/legitify/internal/collectors/github"
 	gitlab2 "github.com/Legit-Labs/legitify/internal/collectors/gitlab"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
+	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
 )
 
@@ -85,7 +86,8 @@ func provideGitHubCollectors(ctx context.Context, client *github.Client, analyze
 }
 
 func provideGitHubClient(analyzeArgs2 *args) (*github.Client, error) {
-	return github.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.
+	ctx := context_utils.NewContextWithSimulatedSecondaryRateLimit(context.Background(), analyzeArgs2.SimulateSecondaryRateLimit)
+	return github.NewClient(ctx, analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.
 		Organizations)
 }
 

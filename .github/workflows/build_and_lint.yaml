@@ -15,13 +15,12 @@ jobs:
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
       - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
       - name: Lint
-        uses: golangci/golangci-lint-action@07db5389c99593f11ad7b44463c2d4233066a9b1 # ratchet:golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@08e2f20817b15149a52b5b3ebe7de50aff2ba8c5 # v3.4
         with:
-          version: v1.46
+          version: v1.50.0
           args: --timeout=3m
-          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
   build_and_test:
     strategy:
       matrix:
@@ -31,7 +30,7 @@ jobs:
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
       - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
       - name: Verify dependencies
         run: go mod verify
       - name: Build

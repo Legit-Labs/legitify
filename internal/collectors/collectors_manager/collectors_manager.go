@@ -1,20 +1,13 @@
 package collectors_manager
 
 import (
+	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
-
-	"github.com/Legit-Labs/legitify/internal/common/namespace"
 )
 
-type CollectorChannels struct {
-	Collected <-chan collectors.CollectedData
-	Progress  <-chan collectors.CollectionMetric
-}
-
 type CollectorManager interface {
-	Collect() CollectorChannels
-	CollectMetadata() map[namespace.Namespace]collectors.Metadata
+	Collect() <-chan collectors.CollectedData
 }
 
 type manager struct {
@@ -27,38 +20,18 @@ func NewCollectorsManager(initiatedCollectors []collectors.Collector) CollectorM
 	}
 }
 
-func (m *manager) CollectMetadata() map[namespace.Namespace]collectors.Metadata {
-	type metaDataPair struct {
-		Namespace namespace.Namespace
-		Metadata  collectors.Metadata
-	}
-
-	gw := group_waiter.New()
-	ch := make(chan metaDataPair, len(m.collectors))
-	for _, c := range m.collectors {
-		c := c
-		gw.Do(func() {
-			ch <- metaDataPair{Namespace: c.Namespace(), Metadata: c.CollectMetadata()}
-		})
-	}
-	gw.Wait()
-	close(ch)
-
-	res := make(map[namespace.Namespace]collectors.Metadata)
-	for m := range ch {
-		res[m.Namespace] = m.Metadata
-	}
-
-	return res
-}
-
-func (m *manager) Collect() CollectorChannels {
+func (m *manager) Collect() <-chan collectors.CollectedData {
 	collectedChan := make(chan collectors.CollectedData)
-	progressChan := make(chan collectors.CollectionMetric)
+
+	// require all collection bars and the metadata bar
+	progressbar.Report(progressbar.NewMinimumRequiredBars(len(m.collectors) + 1))
+
+	// init the metadata bar
+	const metadataBarName = "metadata"
+	progressbar.Report(progressbar.NewRequiredBar(metadataBarName, len(m.collectors)))
 
 	go func() {
 		defer close(collectedChan)
-		defer close(progressChan)
 
 		missingPermissionsChannel := make(chan collectors.MissingPermission)
 		permWait := group_waiter.New()
@@ -72,6 +45,14 @@ func (m *manager) Collect() CollectorChannels {
 			collectionChannels := c.Collect()
 
 			gw.Do(func() {
+				totalEntities := c.CollectTotalEntities()
+				progressbar.Report(progressbar.NewRequiredBar(c.Namespace(), totalEntities))
+				progressbar.Report(progressbar.NewUpdate(metadataBarName, 1))
+
+				if totalEntities == 0 {
+					return
+				}
+
 				pb := collectionChannels.Progress
 				collected := collectionChannels.Collected
 				perm := collectionChannels.MissingPermission
@@ -82,7 +63,7 @@ func (m *manager) Collect() CollectorChannels {
 						if !ok {
 							pb = nil
 						} else {
-							progressChan <- x
+							progressbar.Report(x)
 						}
 					case x, ok := <-collected:
 						if !ok {
@@ -102,11 +83,6 @@ func (m *manager) Collect() CollectorChannels {
 						break
 					}
 				}
-
-				progressChan <- collectors.CollectionMetric{
-					Finished:  true,
-					Namespace: c.Namespace(),
-				}
 			})
 		}
 		gw.Wait()
@@ -114,8 +90,5 @@ func (m *manager) Collect() CollectorChannels {
 		permWait.Wait()
 	}()
 
-	return CollectorChannels{
-		Collected: collectedChan,
-		Progress:  progressChan,
-	}
+	return collectedChan
 }

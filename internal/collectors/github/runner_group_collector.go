@@ -23,15 +23,11 @@ type runnersCollector struct {
 
 func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
 	c := &runnersCollector{
-		client:  client,
-		context: ctx,
+		BaseCollector: collectors.NewBaseCollector(namespace.RunnerGroup),
+		client:        client,
+		context:       ctx,
 	}
-	collectors.InitBaseCollector(&c.BaseCollector, c)
 	return c
-}
-
-func (c *runnersCollector) Namespace() namespace.Namespace {
-	return namespace.RunnerGroup
 }
 
 func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup, error) {
@@ -49,12 +45,12 @@ func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup,
 	return result.Collected, nil
 }
 
-func (c *runnersCollector) CollectMetadata() collectors.Metadata {
+func (c *runnersCollector) CollectTotalEntities() int {
 	gw := group_waiter.New()
 	orgs, err := c.client.CollectOrganizations()
 	if err != nil {
 		log.Printf("failed to collection organizations %s", err)
-		return collectors.Metadata{}
+		return 0
 	}
 
 	totalCount := 0
@@ -74,9 +70,7 @@ func (c *runnersCollector) CollectMetadata() collectors.Metadata {
 	}
 
 	gw.Wait()
-	return collectors.Metadata{
-		TotalEntities: totalCount,
-	}
+	return totalCount
 }
 
 func (c *runnersCollector) Collect() collectors.SubCollectorChannels {
@@ -91,7 +85,7 @@ func (c *runnersCollector) Collect() collectors.SubCollectorChannels {
 		for _, org := range orgs {
 			groups, err := c.collectForOrg(org.Name())
 			if err != nil {
-				return
+				continue
 			}
 
 			for _, rg := range groups {

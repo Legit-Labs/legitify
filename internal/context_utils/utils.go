@@ -2,6 +2,7 @@ package context_utils
 
 import (
 	"context"
+
 	"github.com/Legit-Labs/legitify/internal/common/types"
 
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -10,12 +11,13 @@ import (
 type contextKey string
 
 const (
-	organizationKey     contextKey = "org"
-	repositoryKey       contextKey = "repo"
-	tokenScopesKey      contextKey = "tokenScopes"
-	scorecardEnabledKey contextKey = "scorecardEnabled"
-	scorecardVerboseKey contextKey = "scorecardVerbose"
-	isCloudKey          contextKey = "isCloud"
+	organizationKey               contextKey = "org"
+	repositoryKey                 contextKey = "repo"
+	tokenScopesKey                contextKey = "tokenScopes"
+	scorecardEnabledKey           contextKey = "scorecardEnabled"
+	scorecardVerboseKey           contextKey = "scorecardVerbose"
+	isCloudKey                    contextKey = "isCloud"
+	simulateSecondaryRateLimitKey contextKey = "simulateSecondaryRateLimit"
 )
 
 func NewContextWithRepos(repos []types.RepositoryWithOwner) context.Context {
@@ -40,6 +42,10 @@ func NewContextWithIsCloud(ctx context.Context, isCloud bool) context.Context {
 	return context.WithValue(ctx, isCloudKey, isCloud)
 }
 
+func NewContextWithSimulatedSecondaryRateLimit(ctx context.Context, simulate bool) context.Context {
+	return context.WithValue(ctx, simulateSecondaryRateLimitKey, simulate)
+}
+
 func GetTokenScopes(ctx context.Context) permissions.TokenScopes {
 	return ctx.Value(tokenScopesKey).(permissions.TokenScopes)
 }
@@ -60,5 +66,9 @@ func GetRepositories(ctx context.Context) ([]types.RepositoryWithOwner, bool) {
 }
 func GetIsCloud(ctx context.Context) bool {
 	val, ok := ctx.Value(isCloudKey).(bool)
+	return ok && val
+}
+func GetSimulateSecondaryRateLimit(ctx context.Context) bool {
+	val, ok := ctx.Value(simulateSecondaryRateLimitKey).(bool)
 	return ok && val
 }
