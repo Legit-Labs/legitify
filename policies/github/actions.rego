@@ -2,7 +2,7 @@ package actions
 
 # METADATA
 # scope: rule
-# title: GitHub Actions Is Not Restricted To Selected Repositories
+# title: GitHub Actions Should Be Restricted To Selected Repositories
 # description: By not limiting GitHub Actions to specific repositories, every user in the organization is able to run arbitrary workflows. This could enable malicious activity such as accessing organization secrets, crypto-mining, etc.
 # custom:
 #   requiredEnrichers: [organizationId]
@@ -18,14 +18,15 @@ package actions
 #     - "5. Attacker receives all organization secrets and uses them maliciously"
 #   requiredScopes: [admin:org]
 default all_repositories_can_run_github_actions = false
+
 all_repositories_can_run_github_actions {
-    input.actions_permissions.enabled_repositories == "all"
+	input.actions_permissions.enabled_repositories == "all"
 }
 
 # METADATA
 # scope: rule
-# title: GitHub Actions Runs Are Not Limited To Verified Actions
-# description: When using GitHub Actions, it is recommended to only use actions by Marketplace verified creators or explicitly trusted actions. By not restricting which actions are permitted allows your developers to use actions that were not audited and potentially malicious, thus exposing your pipeline to supply chain attacks.
+# title: GitHub Actions Should Be Limited To Verified or Explicitly Trusted Actions
+# description: It is recommended to only use GitHub Actions by Marketplace verified creators or explicitly trusted actions. By not restricting which actions are permitted, developers may use actions that were not audited and may be malicious, thus exposing your pipeline to supply chain attacks.
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps: [Make sure you have admin permissions, Go to the org's settings page, Enter "Actions - General" tab, Under "Policies", 'Select "Allow enterprise, and select non-enterprise, actions and reusable workflows"', Check "Allow actions created by GitHub" and "Allow actions by Marketplace verified creators", Set any other used trusted actions under "Allow specified actions and reusable workflows", Click "Save"]
@@ -36,15 +37,16 @@ all_repositories_can_run_github_actions {
 #     - "1. Attacker creates a repository with a tempting but malicious custom GitHub Action"
 #     - "2. An innocent developer / DevOps engineer uses this malicious action"
 #     - "3. The malicious action has access to the developer repository and could steal its secrets or modify its content"
-default all_github_actions_are_allowed  = false
+default all_github_actions_are_allowed = false
+
 all_github_actions_are_allowed {
-    input.actions_permissions.allowed_actions == "all"
+	input.actions_permissions.allowed_actions == "all"
 }
 
 # METADATA
 # scope: rule
-# title: Default Workflow Token Permission Is Not Read Only
-# description: Your default GitHub Action workflow token permission is set to read-write. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
+# title: Default Workflow Token Permission Should Be Read Only
+# description: The default GitHub Action workflow token permission is set to read-write. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps:
@@ -57,15 +59,16 @@ all_github_actions_are_allowed {
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
 #   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
-default token_default_permissions_is_read_write  = false
+default token_default_permissions_is_read_write = false
+
 token_default_permissions_is_read_write {
-    input.token_permissions.default_workflow_permissions != "read"
+	input.token_permissions.default_workflow_permissions != "read"
 }
 
 # METADATA
 # scope: rule
-# title: Workflows Are Allowed To Approve Pull Requests
-# description: Your default GitHub Actions configuration allows for workflows to approve pull requests. This could allow users to bypass code-review restrictions.
+# title: Workflows Should Not Be Allowed To Approve Pull Requests
+# description: The default GitHub Actions configuration allows for workflows to approve pull requests. This could allow users to bypass code-review restrictions.
 # custom:
 #   requiredEnrichers: [organizationId]
 #   remediationSteps:
@@ -78,7 +81,8 @@ token_default_permissions_is_read_write {
 #   severity: HIGH
 #   requiredScopes: [admin:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
-default actions_can_approve_pull_requests  = false
+default actions_can_approve_pull_requests = false
+
 actions_can_approve_pull_requests {
-    input.token_permissions.can_approve_pull_request_reviews
+	input.token_permissions.can_approve_pull_request_reviews
 }
