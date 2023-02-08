@@ -1,18 +1,18 @@
 ---
 layout: default
-title: GitHub Actions Runs Are Not Limited To Verified Actions
+title: GitHub Actions Should Be Limited To Verified or Explicitly Trusted Actions
 parent: Actions Policies
 grand_parent: GitHub Policies
 ---
 
 
-## GitHub Actions Runs Are Not Limited To Verified Actions
+## GitHub Actions Should Be Limited To Verified or Explicitly Trusted Actions
 policy name: all_github_actions_are_allowed
 
 severity: MEDIUM
 
 ### Description
-When using GitHub Actions, it is recommended to only use actions by Marketplace verified creators or explicitly trusted actions. By not restricting which actions are permitted allows your developers to use actions that were not audited and potentially malicious, thus exposing your pipeline to supply chain attacks.
+It is recommended to only use GitHub Actions by Marketplace verified creators or explicitly trusted actions. By not restricting which actions are permitted, developers may use actions that were not audited and may be malicious, thus exposing your pipeline to supply chain attacks.
 
 ### Threat Example(s)
 This misconfiguration could lead to the following attack:

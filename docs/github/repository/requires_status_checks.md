@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Default Branch Doesn’t Require All Checks To Pass Before Merge
+title: Default Branch Should Require All Checks To Pass Before Merge
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn’t Require All Checks To Pass Before Merge
+## Default Branch Should Require All Checks To Pass Before Merge
 policy name: requires_status_checks
 
 severity: MEDIUM
 
 ### Description
-Branch protection is enabled. However, the checks which validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures code is up-to-date in order to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass. This option is found in the branch protection setting for the repository.
+Branch protection is enabled. However, the checks which validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures code is up-to-date in order to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass.
 
 ### Threat Example(s)
 Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.

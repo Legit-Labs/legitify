@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Doesn't Require Code Review By At Least Two Reviewers
+title: Default Branch Should Require Code Review By At Least Two Reviewers
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn't Require Code Review By At Least Two Reviewers
+## Default Branch Should Require Code Review By At Least Two Reviewers
 policy name: code_review_by_two_members_not_required
 
 severity: MEDIUM

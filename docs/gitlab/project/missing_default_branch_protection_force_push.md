@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Allows Force Pushes
+title: Default Branch Should Not Allow Force Pushes
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Default Branch Allows Force Pushes
+## Default Branch Should Not Allow Force Pushes
 policy name: missing_default_branch_protection_force_push
 
 severity: MEDIUM

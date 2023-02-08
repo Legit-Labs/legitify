@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Runner Group Is Not Limited to Private Repositories
+title: Runner Group Should Be Limited to Private Repositories
 parent: Runner_Group Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Runner Group Is Not Limited to Private Repositories
+## Runner Group Should Be Limited to Private Repositories
 policy name: runner_group_can_be_used_by_public_repositories
 
 severity: HIGH

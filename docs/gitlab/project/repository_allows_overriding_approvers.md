@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Merge Request Authors Nay Override the Approvers List
+title: Merge Request Authors Should Not Be Able To Override the Approvers List
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Merge Request Authors Nay Override the Approvers List
+## Merge Request Authors Should Not Be Able To Override the Approvers List
 policy name: repository_allows_overriding_approvers
 
 severity: MEDIUM
 
 ### Description
-The repository allows all merge request authors to freely edit the list of required approvers. To enforce code review only by authorized personnel, the option to override the list of valid approvers for the merge request must be toggled off.
+A repository should not allow merge request authors to freely edit the list of required approvers. To enforce code review only by authorized personnel, the option to override the list of valid approvers for the merge request must be toggled off.
 
 ### Threat Example(s)
 Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production.

@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Stale Admin Detected
+title: Admininistrators Should Have Activity in the Last 6 Months
 parent: Member Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Stale Admin Detected
+## Admininistrators Should Have Activity in the Last 6 Months
 policy name: stale_admin_found
 
 severity: MEDIUM

@@ -1,12 +1,12 @@
 ---
 layout: default
-title: GitHub Actions Is Not Restricted To Selected Repositories
+title: GitHub Actions Should Be Restricted To Selected Repositories
 parent: Actions Policies
 grand_parent: GitHub Policies
 ---
 
 
-## GitHub Actions Is Not Restricted To Selected Repositories
+## GitHub Actions Should Be Restricted To Selected Repositories
 policy name: all_repositories_can_run_github_actions
 
 severity: MEDIUM

@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Webhook Configured Without SSL
+title: Webhooks Should Be Configured To Use SSL
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Webhook Configured Without SSL
+## Webhooks Should Be Configured To Use SSL
 policy name: repository_webhook_doesnt_require_ssl
 
 severity: LOW

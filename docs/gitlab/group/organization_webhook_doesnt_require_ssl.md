@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Webhook Configured Without SSL
+title: Webhooks Should Be Configured To Use SSL
 parent: Group Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Webhook Configured Without SSL
+## Webhooks Should Be Configured To Use SSL
 policy name: organization_webhook_doesnt_require_ssl
 
 severity: LOW
 
 ### Description
-Webhooks that are not configured with SSL enabled could expose your software to man in the middle attacks (MITM).
+Webhooks that are not configured with SSL enabled could expose your sofware to man in the middle attacks (MITM).
 
 ### Threat Example(s)
 If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request.

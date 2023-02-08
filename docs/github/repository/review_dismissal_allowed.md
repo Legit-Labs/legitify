@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Doesn't Restrict Who Can Dismiss Reviews
+title: Default Branch Should Restrict Who Can Dismiss Reviews
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn't Restrict Who Can Dismiss Reviews
+## Default Branch Should Restrict Who Can Dismiss Reviews
 policy name: review_dismissal_allowed
 
 severity: LOW

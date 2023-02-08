@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Unsigned Commits Are Allowed
+title: Default Branch Should Require All Commits To Be Signed
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Unsigned Commits Are Allowed
+## Default Branch Should Require All Commits To Be Signed
 policy name: no_signed_commits
 
 severity: LOW

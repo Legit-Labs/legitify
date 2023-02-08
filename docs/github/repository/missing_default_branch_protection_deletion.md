@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Could Be Deleted
+title: Default Branch Deletion Protection Should Be Enabled
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Could Be Deleted
+## Default Branch Deletion Protection Should Be Enabled
 policy name: missing_default_branch_protection_deletion
 
 severity: MEDIUM

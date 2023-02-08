@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Repository Has Too Many Admins
+title: Repository Should Have Fewer Than Three Admins
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Repository Has Too Many Admins
+## Repository Should Have Fewer Than Three Admins
 policy name: repository_has_too_many_admins
 
 severity: LOW
 
 ### Description
-Repository are admins highly privileged and could create great damage if being compromised, it's recommeneded to limit them to the minimum required (recommended maximum 3 admins).
+Repository admins are highly privileged and could create great damage if they are compromised. It is recommeneded to limit the number of Repository Admins to the minimum required (recommended maximum 3 admins).
 
 ### Threat Example(s)
 A compromised user with admin permissions can initiate a supply chain attack in a plethora of ways.

@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Is Not Protected
+title: Default Branch Should Be Protected
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Default Branch Is Not Protected
+## Default Branch Should Be Protected
 policy name: missing_default_branch_protection
 
 severity: MEDIUM

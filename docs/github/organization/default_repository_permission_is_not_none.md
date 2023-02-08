@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Permissive Default Member Permissions Exist For New Repositories
+title: Default Member Permissions Should Be Restricted
 parent: Organization Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Permissive Default Member Permissions Exist For New Repositories
+## Default Member Permissions Should Be Restricted
 policy name: default_repository_permission_is_not_none
 
 severity: HIGH

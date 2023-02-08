@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Code Review Is Not Limited to Code-Owners Only in Default Branch
+title: Default Branch Should Limit Code Review to Code-Owners
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Code Review Is Not Limited to Code-Owners Only in Default Branch
+## Default Branch Should Limit Code Review to Code-Owners
 policy name: repository_require_code_owner_reviews_policy
 
 severity: LOW

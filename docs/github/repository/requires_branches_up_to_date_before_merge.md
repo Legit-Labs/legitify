@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Default Branch Doesn’t Require Branches To Be Up To Date Before Merge
+title: Default Branch Should Require Branches To Be Up To Date Before Merge
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn’t Require Branches To Be Up To Date Before Merge
+## Default Branch Should Require Branches To Be Up To Date Before Merge
 policy name: requires_branches_up_to_date_before_merge
 
 severity: MEDIUM
 
 ### Description
-Status checks are required, but branches that are not up to date can be merged.
+Status checks are required, but branches that are not up to date can be merged. This can result in previously remediated issues being merged in over fixes.
 
 ### Threat Example(s)
 Required status checks may be failing on the latest version after passing on an earlier version of the code, making it easy to commit buggy or otherwise insecure code.

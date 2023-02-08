@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Repository Allows Committer Approvals Policy
+title: Repository Should Not Allow Committer Approvals
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Repository Allows Committer Approvals Policy
+## Repository Should Not Allow Committer Approvals
 policy name: repository_allows_committer_approvals_policy
 
 severity: LOW

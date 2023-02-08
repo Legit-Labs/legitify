@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Allows Force Pushes
+title: Default Branch Should Not Allow Force Pushes
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Allows Force Pushes
+## Default Branch Should Not Allow Force Pushes
 policy name: missing_default_branch_protection_force_push
 
 severity: MEDIUM

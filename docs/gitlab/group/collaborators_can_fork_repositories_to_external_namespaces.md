@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Collaborators Can Fork Repositories To External Namespaces
+title: Forking of Repositories to External Namespaces Should Be Disabled.
 parent: Group Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Collaborators Can Fork Repositories To External Namespaces
+## Forking of Repositories to External Namespaces Should Be Disabled.
 policy name: collaborators_can_fork_repositories_to_external_namespaces
 
 severity: MEDIUM
 
 ### Description
-The ability to fork project to external namespaces is turned on. Forking repositories poses security issues due to the loss of control over the code. It is recommended to disable this feature if it is not explicitly needed, in order to proactively prevent code leakage.
+The ability to fork project to external namespaces is turned on. Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
 
 ### Threat Example(s)
 Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.

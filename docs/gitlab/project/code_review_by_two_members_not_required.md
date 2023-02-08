@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Project Doesn't Require Code Review By At Least Two Reviewers For Default Branch
+title: Default Branch Should Require Code Review By At Least Two Reviewers
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Project Doesn't Require Code Review By At Least Two Reviewers For Default Branch
+## Default Branch Should Require Code Review By At Least Two Reviewers
 policy name: code_review_by_two_members_not_required
 
 severity: MEDIUM
 
 ### Description
-In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement
+In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement.
 
 ### Threat Example(s)
 Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production.

@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Two-Factor Authentication Is Not Enforced For The Organization
+title: Two-Factor Authentication Should Be Enforced For The Organization
 parent: Organization Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Two-Factor Authentication Is Not Enforced For The Organization
+## Two-Factor Authentication Should Be Enforced For The Organization
 policy name: two_factor_authentication_not_required_for_org
 
 severity: HIGH
 
 ### Description
-The two-factor authentication requirement is not enabled at the organization level. Regardless of whether users are managed externally by SSO, it is highly recommended to enable this option, to reduce the risk of a deliberate or accidental user creation without MFA.
+The two-factor authentication requirement is not enabled at the organization level. Regardless of whether users are managed externally by SSO, it is highly recommended to enable this option to reduce the risk of a deliberate or accidental user creation without MFA.
 
 ### Threat Example(s)
 If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.

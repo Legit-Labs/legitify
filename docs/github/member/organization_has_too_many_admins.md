@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Organization Has Too Many Owners
+title: Organization Should Have Fewer Than Three Owners
 parent: Member Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Organization Has Too Many Owners
+## Organization Should Have Fewer Than Three Owners
 policy name: organization_has_too_many_admins
 
 severity: MEDIUM
 
 ### Description
-Organization owners are highly privileged and could create great damage if being compromised, it's recommended to limit them to the minimum needed (recommended maximum 3 owners).
+Organization owners are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of Organizational Admins to the minimum needed (recommended maximum 3 owners).
 
 ### Threat Example(s)
 1. An organization has a permissive attitude and provides an owner role to all developers.

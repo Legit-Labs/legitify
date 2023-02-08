@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Doesn't Require All Conversations To Be Resolved Before Merge
+title: Default Branch Should Require All Conversations To Be Resolved Before Merge
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn't Require All Conversations To Be Resolved Before Merge
+## Default Branch Should Require All Conversations To Be Resolved Before Merge
 policy name: no_conversation_resolution
 
 severity: LOW

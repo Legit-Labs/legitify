@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Group Does Not Enforce Branch Protection by Default
+title: Group Should Enforce Branch Protection
 parent: Group Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Group Does Not Enforce Branch Protection by Default
+## Group Should Enforce Branch Protection
 policy name: group_does_not_enforce_branch_protection_by_default
 
 severity: MEDIUM
 
 ### Description
-You do not have a default full branch protection for a specific group, which means any new repository will be created without it. In fully protected level, developers cannot push new commits, and no one can force push or delete the branch. Protecting branches ensures new code changes must go through a controlled merge process and it allows enforcement of code review and other security tests.
+The default branch should be protected in each group so that any new repository will be created with a protected default branch by default. In fully protected level, developers cannot push new commits, and no one can force push or delete the branch. Protecting branches ensures new code changes must go through a controlled merge process and it allows enforcement of code review and other security tests.
 
 ### Threat Example(s)
 A developer creates a repository without any branch protection rules

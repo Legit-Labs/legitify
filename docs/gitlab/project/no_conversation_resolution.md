@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Project Doesn't Require All Conversations To Be Resolved Before Merge
+title: Project Should Require All Conversations To Be Resolved Before Merge
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Project Doesn't Require All Conversations To Be Resolved Before Merge
+## Project Should Require All Conversations To Be Resolved Before Merge
 policy name: no_conversation_resolution
 
 severity: LOW

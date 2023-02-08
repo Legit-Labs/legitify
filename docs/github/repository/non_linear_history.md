@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Doesn't Require Linear History
+title: Default Branch Should Require Linear History
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn't Require Linear History
+## Default Branch Should Require Linear History
 policy name: non_linear_history
 
 severity: MEDIUM

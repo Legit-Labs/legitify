@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Doesn't Require All Commits To Be Signed
+title: Default Branch Should Require All Commits To Be Signed
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn't Require All Commits To Be Signed
+## Default Branch Should Require All Commits To Be Signed
 policy name: no_signed_commits
 
 severity: LOW

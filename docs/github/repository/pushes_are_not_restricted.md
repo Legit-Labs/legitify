@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Default Branch Doesn't Restrict Who Can Push
+title: Default Branch Should Restrict Who Can Push To It
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn't Restrict Who Can Push
+## Default Branch Should Restrict Who Can Push To It
 policy name: pushes_are_not_restricted
 
 severity: LOW
 
 ### Description
-By default, commits can be pushed directly to protected branches, without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
+By default, commits can be pushed directly to protected branches without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
 
 ### Threat Example(s)
 An attacker with write credentials may introduce vulnerabilities to your code without your knowledge. Alternatively, contributors may commit unsafe code that is buggy or easy to exploit that could have been caught using a review process.

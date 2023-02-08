@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Two-Factor Authentication Is Not Enforced For The Group
+title: Two-Factor Authentication Should Be Enforced For The Group
 parent: Group Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Two-Factor Authentication Is Not Enforced For The Group
+## Two-Factor Authentication Should Be Enforced For The Group
 policy name: two_factor_authentication_not_required_for_group
 
 severity: HIGH

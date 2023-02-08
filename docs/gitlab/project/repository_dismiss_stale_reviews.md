@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Doesn't Require New Code Changes After Approval To Be Re-Approved
+title: Default Branch Should Require New Code Changes After Approval To Be Re-Approved
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Default Branch Doesn't Require New Code Changes After Approval To Be Re-Approved
+## Default Branch Should Require New Code Changes After Approval To Be Re-Approved
 policy name: repository_dismiss_stale_reviews
 
 severity: LOW

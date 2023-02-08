@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Project Not Maintained
+title: Project Should Be Updated At Least Quarterly
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Project Not Maintained
+## Project Should Be Updated At Least Quarterly
 policy name: project_not_maintained
 
 severity: HIGH
 
 ### Description
-The project was not active in the last 3 months. A project which is not active might not be patched against security issues within its code and dependencies, and is therefore at higher risk of including unpatched vulnerabilities.
+A project which is not actively maintained may not be patched against security issues within its code and dependencies, and is therefore at higher risk of including known vulnerabilities.
 
 ### Threat Example(s)
 As new vulnerabilities are found over time, unmaintained repositories are more likely to point to dependencies that have known vulnerabilities, exposing these repositories to 1-day attacks.

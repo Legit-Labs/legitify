@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Project Doesn’t Require All Pipelines to Succeed
+title: Project Should Require All Pipelines to Succeed
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## Project Doesn’t Require All Pipelines to Succeed
+## Project Should Require All Pipelines to Succeed
 policy name: requires_status_checks
 
 severity: MEDIUM

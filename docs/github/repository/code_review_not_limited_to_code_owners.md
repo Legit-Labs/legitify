@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Default Branch Doesn't Limit Code Review to Code-Owners
+title: Default Branch Should Limit Code Review to Code-Owners
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Default Branch Doesn't Limit Code Review to Code-Owners
+## Default Branch Should Limit Code Review to Code-Owners
 policy name: code_review_not_limited_to_code_owners
 
 severity: LOW

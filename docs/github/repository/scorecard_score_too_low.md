@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Low Scorecard Score for Repository Indicates Poor Security Posture
+title: OSSF Scorecard Score Should Be Above 7
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Low Scorecard Score for Repository Indicates Poor Security Posture
+## OSSF Scorecard Score Should Be Above 7
 policy name: scorecard_score_too_low
 
 severity: MEDIUM
 
 ### Description
-Scorecard is an open-source tool from OSSF that helps to asses the security posture of repositories, Low scorecard score means your repository may be under risk.
+Scorecard is an open-source tool from the OSSF that helps to asses the security posture of repositories. A low scorecard score means your repository may be at risk.
 
 ### Threat Example(s)
 A low Scorecard score can indicate that the repository is more vulnerable to attack than others, making it a prime attack target.

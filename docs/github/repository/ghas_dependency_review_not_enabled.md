@@ -1,18 +1,18 @@
 ---
 layout: default
-title: GitHub Advanced Security – Dependency Review Is Disabled For A Repository
+title: GitHub Advanced Security – Dependency Review Should Be Enabled For A Repository
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## GitHub Advanced Security – Dependency Review Is Disabled For A Repository
+## GitHub Advanced Security – Dependency Review Should Be Enabled For A Repository
 policy name: ghas_dependency_review_not_enabled
 
 severity: MEDIUM
 
 ### Description
-Enable GitHub Advanced Security dependency review to avoid introducing new vulnerabilities
+Enable GitHub Advanced Security dependency review to avoid introducing new vulnerabilities and detect newly discovered vulnerabilities in existing packages.
 
 ### Threat Example(s)
 A contributor may add vulnerable third-party dependencies to the repository, introducing vulnerabilities to your application that will only be detected after merge.
