@@ -49,7 +49,7 @@ project_has_too_many_admins {
 # METADATA
 # scope: rule
 # title: Forking Should Not Be Allowed
-# description: Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork. 
+# description: Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the project's settings page, Enter "General" tab, Under "Visibility, project features, permissions", Toggle off "Forks"]
 #   severity: LOW
@@ -84,16 +84,16 @@ missing_default_branch_protection {
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
-default missing_default_branch_protection_force_push = false
+default missing_default_branch_protection_force_push = true
 
-missing_default_branch_protection_force_push {
+missing_default_branch_protection_force_push = false {
 	missing_default_branch_protection
 }
 
 missing_default_branch_protection_force_push {
 	default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
 	rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
-	count(rules_allow_force_push) > 0
+	count(rules_allow_force_push) == 0
 }
 
 # METADATA
