@@ -27,6 +27,8 @@ error.log
 docs/_site
 docs/.jekyll-cache/
 docs/Gemfile
+docs/github
+docs/gitlab
 docs/Gemfile.lock
 generated-docs.yaml
 .DS_Store

@@ -20,6 +20,9 @@ build_and_install_deps: install_deps build
 
 clean:
 	rm -f "${BINARY_NAME}"
+	rm -rf docs/github
+	rm -rf docs/gitlab
+
 .PHONY: clean
 
 install:
