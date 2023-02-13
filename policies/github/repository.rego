@@ -64,7 +64,7 @@ repository_has_too_many_admins = false {
 #   threat: 
 #     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
 #     - "This allows attackers to masquerade as your repository, potentially creating an unstable or insecure state in other systems."
-default repository_webhook_no_secret[violated] = true {
+repository_webhook_no_secret[violated] = true {
 	some index
 	hook := input.hooks[index]
 	not webhookUtils.has_secret(hook)
