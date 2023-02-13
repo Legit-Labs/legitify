@@ -12,11 +12,11 @@ package member
 #     - "1. An organization has a permissive attitude and provides an owner role to all developers."
 #     - "2. One of the developers has decided to collaborate with an evil ransomware gang, and uses his high privileges to add a malicious external collaborator"
 #     - "3. The malicious collaborator, being an owner, has a wide range of destructive operations he can do (e.g. remove security settings)"
-default organization_has_too_many_admins = false
+default organization_has_too_many_admins = true
 
-organization_has_too_many_admins {
+organization_has_too_many_admins = false {
 	admins := count({member | member := input.members[_]; member.is_admin == false})
-	admins > 3
+	admins <= 3
 }
 
 # METADATA
