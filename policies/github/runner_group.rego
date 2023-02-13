@@ -24,10 +24,10 @@ package runner_group
 #     - "If the hosted runner is insecurely configured, any GitHub user could:"
 #     - "1. Create a workflow that runs on the public hosted runner"
 #     - "2. Exploit the misconfigurations to execute code inside the private network"
-default runner_group_can_be_used_by_public_repositories = false
+default runner_group_can_be_used_by_public_repositories = true
 
-runner_group_can_be_used_by_public_repositories {
-	input.runner_group.allows_public_repositories == true
+runner_group_can_be_used_by_public_repositories = false {
+	not input.runner_group.allows_public_repositories
 }
 
 # METADATA
@@ -52,8 +52,8 @@ runner_group_can_be_used_by_public_repositories {
 #     - "If the hosted runner is insecurely configured, any user in the organization could:"
 #     - "1. Create a workflow that runs on the hosted runner"
 #     - "2. Exploit the runner misconfigurations/known CVE's to execute code inside the private network"
-default runner_group_not_limited_to_selected_repositories = false
+default runner_group_not_limited_to_selected_repositories = true
 
-runner_group_not_limited_to_selected_repositories {
-	input.runner_group.visibility != "selected"
+runner_group_not_limited_to_selected_repositories = false {
+	input.runner_group.visibility == "selected"
 }
