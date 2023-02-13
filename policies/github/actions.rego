@@ -84,5 +84,5 @@ token_default_permissions_is_read_write = false {
 default actions_can_approve_pull_requests = true
 
 actions_can_approve_pull_requests = false {
-	! input.token_permissions.can_approve_pull_request_reviews
+	not input.token_permissions.can_approve_pull_request_reviews
 }
