@@ -13,10 +13,10 @@ package member
 #     - Select "Account" on the left navigation bar
 #     - Press "Enable two-factor authentication"
 #   threat: Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password.
-default two_factor_authentication_is_disabled_for_a_collaborator = false
+default two_factor_authentication_is_disabled_for_a_collaborator = true
 
-two_factor_authentication_is_disabled_for_a_collaborator {
-	input.two_factor_enabled == false
+two_factor_authentication_is_disabled_for_a_collaborator = false {
+	input.two_factor_enabled
 }
 
 # METADATA
@@ -34,11 +34,11 @@ two_factor_authentication_is_disabled_for_a_collaborator {
 #   threat: 
 #     - "Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password."
 #     - "This is doubly important for external collaborators, as these are identities that aren't likely managed by you or your organization and may be easier to compromise."
-default two_factor_authentication_is_disabled_for_an_external_collaborator = false
+default two_factor_authentication_is_disabled_for_an_external_collaborator = true
 
-two_factor_authentication_is_disabled_for_an_external_collaborator {
-	input.external == true
-	input.two_factor_enabled == false
+two_factor_authentication_is_disabled_for_an_external_collaborator = false {
+	not input.external 
+	input.two_factor_enabled
 }
 
 # METADATA
@@ -53,13 +53,13 @@ two_factor_authentication_is_disabled_for_an_external_collaborator {
 #     - Find the stale admin and either delete of block it
 #   threat:
 #     - "Stale admins are most likely not managed and monitored, increasing the possibility of being compromised."
-default stale_admin_found = false
+default stale_admin_found = true
 
-stale_admin_found {
+stale_admin_found = false {
 	input.is_admin == true
 	not is_null(input.last_sign_in_at)
 	ns := time.parse_rfc3339_ns(input.last_sign_in_at)
-	isStale(ns, 6)
+	not isStale(ns, 6)
 }
 
 isStale(target_last_active, count_months) {
