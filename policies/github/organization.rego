@@ -56,10 +56,10 @@ organization_webhook_doesnt_require_ssl[violated] = true {
 #   requiredScopes: [admin:org]
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
-default two_factor_authentication_not_required_for_org = false
+default two_factor_authentication_not_required_for_org = true
 
-two_factor_authentication_not_required_for_org {
-	input.organization.two_factor_requirement_enabled == false
+two_factor_authentication_not_required_for_org = false {
+	input.organization.two_factor_requirement_enabled
 }
 
 # METADATA
@@ -72,10 +72,10 @@ two_factor_authentication_not_required_for_org {
 #   requiredScopes: [read:org]
 #   threat:
 #     - "A member of the organization could inadvertently or maliciously make public an internal repository exposing confidential data."
-default non_admins_can_create_public_repositories = false
+default non_admins_can_create_public_repositories = true
 
-non_admins_can_create_public_repositories {
-	input.organization.members_can_create_public_repositories == true
+non_admins_can_create_public_repositories = false {
+	not input.organization.members_can_create_public_repositories
 }
 
 # METADATA
@@ -88,10 +88,10 @@ non_admins_can_create_public_repositories {
 #   requiredScopes: [read:enterprise]
 #   threat:
 #     - "Organization members can see the content of freshly created repositories, even if they should be restricted."
-default default_repository_permission_is_not_none = false
+default default_repository_permission_is_not_none = true
 
-default_repository_permission_is_not_none {
-	input.organization.default_repository_permission != "none"
+default_repository_permission_is_not_none = false {
+	input.organization.default_repository_permission == "none"
 }
 
 # METADATA
@@ -104,8 +104,8 @@ default_repository_permission_is_not_none {
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Enter "Authentication security" tab, Toggle on "Enable SAML authentication", Fill in the remaining SSO configuration as instructed on the screen, Click "Save"]
 #   requiredScopes: [admin:org]
 #   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions accross different systems, prevents the organization from defining a common password policy, and makes it challenging to audit different aspects of the user's behavior.
-default organization_not_using_single_sign_on = false
+default organization_not_using_single_sign_on = true
 
-organization_not_using_single_sign_on {
-	input.saml_enabled == false
+organization_not_using_single_sign_on = false {
+	input.saml_enabled
 }
