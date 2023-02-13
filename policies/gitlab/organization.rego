@@ -14,10 +14,10 @@ package organization
 #     - Press "Save Changes"
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
-default two_factor_authentication_not_required_for_group = false
+default two_factor_authentication_not_required_for_group = true
 
-two_factor_authentication_not_required_for_group {
-	input.require_two_factor_authentication == false
+two_factor_authentication_not_required_for_group = false {
+	input.require_two_factor_authentication
 }
 
 # METADATA
@@ -33,10 +33,10 @@ two_factor_authentication_not_required_for_group {
 #     - "Select Save changes"
 #   threat:
 #     - Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
-default collaborators_can_fork_repositories_to_external_namespaces = false
+default collaborators_can_fork_repositories_to_external_namespaces = true
 
-collaborators_can_fork_repositories_to_external_namespaces {
-	input.prevent_forking_outside_group == false
+collaborators_can_fork_repositories_to_external_namespaces = false {
+	input.prevent_forking_outside_group
 }
 
 # METADATA
@@ -76,8 +76,8 @@ organization_webhook_doesnt_require_ssl[violation] = true {
 #   threat:
 #     - A developer creates a repository without any branch protection rules
 #     - Attacker that get access to the repository can modify its main branch without any restrictions
-default group_does_not_enforce_branch_protection_by_default = false
+default group_does_not_enforce_branch_protection_by_default = true
 
-group_does_not_enforce_branch_protection_by_default {
-	input.default_branch_protection == 0
+group_does_not_enforce_branch_protection_by_default = false {
+	input.default_branch_protection > 0
 }
