@@ -3,6 +3,7 @@
 import sys
 import yaml
 import os
+import argparse
 
 def scm_to_pretty_name(scm):
     if scm == 'github': return 'GitHub'
@@ -109,11 +110,33 @@ def create_policy_docs(docs_file, output_dir):
     for scm in docs_yaml:
         create_scm_policy_docs(scm, docs_yaml[scm], output_dir)
 
-def print_usage():
-    print("python gen-gh-pages-docs.py docs_file output_directory")
+def create_monomarkdown(docs_file, output_dir):
+    docs_yaml = get_docs_yaml(docs_file)
+    result = ""
 
-if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print_usage()
-        exit(1)
-    create_policy_docs(sys.argv[1], sys.argv[2])
+    for scm in docs_yaml:
+        result += f"# {scm_to_pretty_name(scm)}\n"
+        for ns in docs_yaml[scm]:
+            result += f"## {ns}\n"
+            for policy in docs_yaml[scm][ns]:
+                policy_md = gen_policy_markdown(policy)
+                result += policy_md
+                result += "\n"
+
+    with open(os.path.join(output_dir, "monomarkdown.md"), "w") as f:
+        f.write(result)
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("docs_file", type=str, help="input file name")
+    parser.add_argument("output_dir", type=str, help="output directory")
+    parser.add_argument("--monomarkdown", action='store_true')
+
+    args = parser.parse_args()
+
+    if not args.monomarkdown:
+        create_policy_docs(args.docs_file, args.output_dir)
+    else:
+        create_monomarkdown(args.docs_file, args.output_dir)
