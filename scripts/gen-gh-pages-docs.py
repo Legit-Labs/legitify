@@ -111,19 +111,33 @@ def create_policy_docs(docs_file, output_dir):
         create_scm_policy_docs(scm, docs_yaml[scm], output_dir)
 
 def create_monomarkdown(docs_file, output_dir):
+    table_of_contents = "# Table of contents\n"
+
     docs_yaml = get_docs_yaml(docs_file)
     result = ""
 
+    i = 1
     for scm in docs_yaml:
-        result += f"# {scm_to_pretty_name(scm)}\n"
+        pretty_name = scm_to_pretty_name(scm)
+        result += f"# {pretty_name}\n"
+        table_of_contents += f"{i}. [{pretty_name}](#{scm})\n"
+        j = 1
         for ns in docs_yaml[scm]:
+            table_of_contents += f"\t{j}. [{ns}](#{ns})\n"
             result += f"## {ns}\n"
+            k = 1
             for policy in docs_yaml[scm][ns]:
+                table_of_contents += f"\t\t{k}. [{policy['title']}](#{policy['title'].lower().replace(' ', '-')})\n"
                 policy_md = gen_policy_markdown(policy)
                 result += policy_md
                 result += "\n"
+                k += 1
+            j += 1
+        i += 1
 
     with open(os.path.join(output_dir, "monomarkdown.md"), "w") as f:
+        f.write(table_of_contents)
+        f.write("\n")
         f.write(result)
 
 
