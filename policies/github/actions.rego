@@ -17,10 +17,10 @@ package actions
 #     - "4. Attacker trigger the workflow"
 #     - "5. Attacker receives all organization secrets and uses them maliciously"
 #   requiredScopes: [admin:org]
-default all_repositories_can_run_github_actions = false
+default all_repositories_can_run_github_actions = true
 
-all_repositories_can_run_github_actions {
-	input.actions_permissions.enabled_repositories == "all"
+all_repositories_can_run_github_actions = false {
+	input.actions_permissions.enabled_repositories != "all"
 }
 
 # METADATA
@@ -37,10 +37,10 @@ all_repositories_can_run_github_actions {
 #     - "1. Attacker creates a repository with a tempting but malicious custom GitHub Action"
 #     - "2. An innocent developer / DevOps engineer uses this malicious action"
 #     - "3. The malicious action has access to the developer repository and could steal its secrets or modify its content"
-default all_github_actions_are_allowed = false
+default all_github_actions_are_allowed = true
 
-all_github_actions_are_allowed {
-	input.actions_permissions.allowed_actions == "all"
+all_github_actions_are_allowed = false {
+	input.actions_permissions.allowed_actions != "all"
 }
 
 # METADATA
@@ -59,10 +59,10 @@ all_github_actions_are_allowed {
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
 #   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
-default token_default_permissions_is_read_write = false
+default token_default_permissions_is_read_write = true
 
-token_default_permissions_is_read_write {
-	input.token_permissions.default_workflow_permissions != "read"
+token_default_permissions_is_read_write = false {
+	input.token_permissions.default_workflow_permissions == "read"
 }
 
 # METADATA
@@ -81,8 +81,8 @@ token_default_permissions_is_read_write {
 #   severity: HIGH
 #   requiredScopes: [admin:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
-default actions_can_approve_pull_requests = false
+default actions_can_approve_pull_requests = true
 
-actions_can_approve_pull_requests {
-	input.token_permissions.can_approve_pull_request_reviews
+actions_can_approve_pull_requests = false {
+	! input.token_permissions.can_approve_pull_request_reviews
 }
