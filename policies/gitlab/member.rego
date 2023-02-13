@@ -37,7 +37,7 @@ two_factor_authentication_is_disabled_for_a_collaborator = false {
 default two_factor_authentication_is_disabled_for_an_external_collaborator = true
 
 two_factor_authentication_is_disabled_for_an_external_collaborator = false {
-	not input.external 
+	input.external 
 	input.two_factor_enabled
 }
 
