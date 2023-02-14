@@ -1,7 +1,6 @@
 package enrichers
 
 import (
-	"context"
 	"strconv"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
@@ -10,7 +9,7 @@ import (
 
 const OrganizationId = "organizationId"
 
-func NewOrganizationIdEnricher(ctx context.Context) Enricher {
+func NewOrganizationIdEnricher() organizationIdEnricher {
 	return organizationIdEnricher{
 		newBasicEnricher(enrichOrgId),
 	}

@@ -1,6 +1,7 @@
 package enrichers
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
@@ -12,13 +13,13 @@ func (s BasicEnrichment) HumanReadable(_ string, _ string) string {
 	return string(s)
 }
 
-func NewBasicEnrichment(val string) Enrichment {
+func NewBasicEnrichment(val string) BasicEnrichment {
 	return BasicEnrichment(val)
 }
 
-func NewBasicEnrichmentFromInterface(data interface{}) (Enrichment, error) {
+func NewBasicEnrichmentFromInterface(data interface{}) (BasicEnrichment, error) {
 	if val, ok := data.(string); !ok {
-		return nil, fmt.Errorf("expecting a string, found %t", data)
+		return "", fmt.Errorf("expecting a string, found %t", data)
 	} else {
 		return BasicEnrichment(val), nil
 	}
@@ -36,7 +37,7 @@ func newBasicEnricher(w basicEnricherMethod) basicEnricher {
 	}
 }
 
-func (e basicEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
+func (e basicEnricher) Enrich(_ context.Context, data analyzers.AnalyzedData) (Enrichment, bool) {
 	v, ok := e.EnrichWith(data)
 	if !ok {
 		return nil, false

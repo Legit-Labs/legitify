@@ -1,7 +1,6 @@
 package enrichers
 
 import (
-	"context"
 	"strconv"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
@@ -13,7 +12,7 @@ type entityIdEnricher struct {
 	basicEnricher
 }
 
-func NewEntityIdEnricher(ctx context.Context) Enricher {
+func NewEntityIdEnricher() entityIdEnricher {
 	return entityIdEnricher{
 		newBasicEnricher(enrichEntityId),
 	}

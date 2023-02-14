@@ -1,11 +1,13 @@
 package enrichers
 
 import (
+	"context"
+
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 )
 
 type Enricher interface {
-	Enrich(data analyzers.AnalyzedData) (enrichment Enrichment, ok bool)
+	Enrich(ctx context.Context, data analyzers.AnalyzedData) (enrichment Enrichment, ok bool)
 	Parse(data interface{}) (enrichment Enrichment, err error)
 }
 

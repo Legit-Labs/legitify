@@ -1,12 +1,10 @@
 package scheme
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
-	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/iancoleman/orderedmap"
 )
 
@@ -89,7 +87,6 @@ func (s *Flattened) FilterByViolation(filter ViolationFilter) *Flattened {
 
 func (s *Flattened) UnmarshalJSON(data []byte) error {
 	// enable scorecard to support jsons with scorecard
-	ctx := context_utils.NewContextWithScorecard(context.Background(), true, true)
 	asMap := s.AsOrderedMap()
 
 	err := json.Unmarshal(data, asMap)
@@ -99,7 +96,7 @@ func (s *Flattened) UnmarshalJSON(data []byte) error {
 
 	for _, policyName := range asMap.Keys() {
 		outputDataMap := utils.UnsafeGet[orderedmap.OrderedMap](asMap, policyName)
-		outputData, err := NewOutputDataFromMap(ctx, &outputDataMap)
+		outputData, err := NewOutputDataFromMap(&outputDataMap)
 		if err != nil {
 			return err
 		}

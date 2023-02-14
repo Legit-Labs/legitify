@@ -28,7 +28,7 @@ func (se GenericListEnrichment) HumanReadable(prepend string, linebreak string) 
 	return linebreak + sb.String()
 }
 
-func NewGenericListEnrichmentFromInterface(data interface{}) (Enrichment, error) {
+func NewGenericListEnrichmentFromInterface(data interface{}) (GenericListEnrichment, error) {
 	if val, ok := data.([]interface{}); !ok {
 		return nil, fmt.Errorf("expecting []map[string]string, found %T", data)
 	} else {

@@ -13,14 +13,14 @@ import (
 
 const MembersList = "violatedUsers"
 
-func NewMembersListEnricher(ctx context.Context) Enricher {
-	return &membersListEnricher{}
+func NewMembersListEnricher() membersListEnricher {
+	return membersListEnricher{}
 }
 
 type membersListEnricher struct {
 }
 
-func (e *membersListEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
+func (e membersListEnricher) Enrich(_ context.Context, data analyzers.AnalyzedData) (Enrichment, bool) {
 	result, err := createMembersListEnrichment(data.ExtraData)
 	if err != nil {
 		return nil, false

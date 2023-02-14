@@ -1,7 +1,6 @@
 package scheme
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
@@ -39,7 +38,7 @@ type Violation struct { // Must be exported for json marshal
 	Status              analyzers.PolicyStatus `json:"status"`
 }
 
-func newAuxFromMap(ctx context.Context, m *orderedmap.OrderedMap) (*orderedmap.OrderedMap, error) {
+func newAuxFromMap(m *orderedmap.OrderedMap) (*orderedmap.OrderedMap, error) {
 	newM := orderedmap.New()
 	for _, name := range m.Keys() {
 		v := utils.UnsafeGetUntyped(m, name)
@@ -47,7 +46,7 @@ func newAuxFromMap(ctx context.Context, m *orderedmap.OrderedMap) (*orderedmap.O
 			newM.Set(name, nil)
 			continue
 		}
-		enrichment, err := enricher.ParseEnrichment(ctx, name, v)
+		enrichment, err := enricher.NewEnricherManager().Parse(name, v)
 		if err != nil {
 			return nil, fmt.Errorf("failed to enrich %v: %v", name, err)
 		}
@@ -57,14 +56,14 @@ func newAuxFromMap(ctx context.Context, m *orderedmap.OrderedMap) (*orderedmap.O
 	return newM, nil
 }
 
-func NewViolationFromMap(ctx context.Context, m *orderedmap.OrderedMap) (*Violation, error) {
+func NewViolationFromMap(m *orderedmap.OrderedMap) (*Violation, error) {
 	var p Violation
 	err := utils.ShalloUnmarshalOrderedMap(m, &p)
 	if err != nil {
 		return nil, err
 	}
 
-	p.Aux, err = newAuxFromMap(ctx, p.Aux)
+	p.Aux, err = newAuxFromMap(p.Aux)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse aux for violation: %v", err)
 	}
@@ -84,7 +83,7 @@ func NewOutputData(policyInfo PolicyInfo) OutputData {
 	}
 }
 
-func NewOutputDataFromMap(ctx context.Context, m *orderedmap.OrderedMap) (*OutputData, error) {
+func NewOutputDataFromMap(m *orderedmap.OrderedMap) (*OutputData, error) {
 	_, okP := m.Get("policyInfo")
 	_, okV := m.Get("violations")
 	if !okP || !okV {
@@ -102,7 +101,7 @@ func NewOutputDataFromMap(ctx context.Context, m *orderedmap.OrderedMap) (*Outpu
 	violationMaps := utils.UnsafeGet[[]interface{}](m, "violations")
 	for _, v := range violationMaps {
 		asMap := v.(orderedmap.OrderedMap)
-		violation, err := NewViolationFromMap(ctx, &asMap)
+		violation, err := NewViolationFromMap(&asMap)
 		if err != nil {
 			return nil, err
 		}

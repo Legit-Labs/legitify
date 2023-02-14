@@ -1,7 +1,6 @@
 package enrichers
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,18 +10,19 @@ import (
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/iancoleman/orderedmap"
+	"golang.org/x/net/context"
 )
 
 const HooksList = "hooksList"
 
-func NewHooksListEnricher(_ context.Context) Enricher {
-	return &hooksListEnricher{}
+func NewHooksListEnricher() hooksListEnricher {
+	return hooksListEnricher{}
 }
 
 type hooksListEnricher struct {
 }
 
-func (e *hooksListEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
+func (e hooksListEnricher) Enrich(_ context.Context, data analyzers.AnalyzedData) (Enrichment, bool) {
 	result, err := createHooksListEnrichment(data.ExtraData)
 	if err != nil {
 		log.Printf("failed to enrich hooks list: %v", err)
@@ -31,11 +31,11 @@ func (e *hooksListEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, boo
 	return result, true
 }
 
-func (e *hooksListEnricher) Parse(data interface{}) (Enrichment, error) {
+func (e hooksListEnricher) Parse(data interface{}) (Enrichment, error) {
 	return NewGenericListEnrichmentFromInterface(data)
 }
 
-func createHooksListEnrichment(extraData interface{}) (Enrichment, error) {
+func createHooksListEnrichment(extraData interface{}) (GenericListEnrichment, error) {
 	asMap, ok := extraData.(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("invalid hookslist extra data")
@@ -60,5 +60,5 @@ func createHooksListEnrichment(extraData interface{}) (Enrichment, error) {
 		return strings.Compare(urlI, urlJ) < 0
 	})
 
-	return GenericListEnrichment(result), nil
+	return result, nil
 }

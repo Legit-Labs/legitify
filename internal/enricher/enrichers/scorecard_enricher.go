@@ -17,18 +17,15 @@ import (
 const Scorecard = "scorecard"
 const maxScore = 10
 
-func NewScorecardEnricher(ctx context.Context) Enricher {
-	return &scorecardEnricher{
-		enabled: context_utils.GetScorecardVerbose(ctx),
-	}
+func NewScorecardEnricher() Enricher {
+	return &scorecardEnricher{}
 }
 
 type scorecardEnricher struct {
-	enabled bool
 }
 
-func (e *scorecardEnricher) Enrich(data analyzers.AnalyzedData) (Enrichment, bool) {
-	if !e.enabled {
+func (e *scorecardEnricher) Enrich(ctx context.Context, data analyzers.AnalyzedData) (Enrichment, bool) {
+	if !context_utils.GetScorecardVerbose(ctx) {
 		return nil, false
 	}
 
