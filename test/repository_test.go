@@ -206,6 +206,7 @@ func TestRepositoryBranchesUpToDate(t *testing.T) {
 	testedPolicyName := "requires_branches_up_to_date_before_merge"
 	makeMockData := func(flag bool) githubcollected.Repository {
 		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
+			RequiresStatusChecks:       github.Bool(flag),
 			RequiresStrictStatusChecks: github.Bool(flag),
 		})
 	}

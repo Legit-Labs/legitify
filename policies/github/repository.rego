@@ -200,7 +200,8 @@ requires_status_checks = false {
 default requires_branches_up_to_date_before_merge = true
 
 requires_branches_up_to_date_before_merge = false {
-	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks == true
+	input.repository.default_branch.branch_protection_rule.requires_status_checks
+	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks
 }
 
 # METADATA
