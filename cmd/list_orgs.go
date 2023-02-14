@@ -27,30 +27,21 @@ func newListOrgsCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := listOrgsCmd.Flags()
-	listOrgsArgs.addCommonOptions(flags)
+	listOrgsArgs.addOutputOptions(flags)
+	listOrgsArgs.addCommonCollectionOptions(flags)
 
 	return listOrgsCmd
 }
 
-func validateListOrgsArgs() error {
-	return listOrgsArgs.validateCommonOptions()
-}
-
 func executeListOrgsCommand(cmd *cobra.Command, _args []string) error {
-	listOrgsArgs.ApplyEnvVars()
-
-	err := validateListOrgsArgs()
-	if err != nil {
+	if err := listOrgsArgs.applyCommonCollectionOptions(); err != nil {
 		return err
 	}
 
-	if _, err = setErrorFile(listOrgsArgs.ErrorFile); err != nil {
+	if preExit, err := listOrgsArgs.applyOutputOptions(); err != nil {
 		return err
-	}
-
-	err = setOutputFile(listOrgsArgs.OutputFile)
-	if err != nil {
-		return err
+	} else {
+		defer preExit()
 	}
 
 	client, err := provideGenericClient(&listOrgsArgs)

@@ -6,14 +6,9 @@ import (
 	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
-	"github.com/Legit-Labs/legitify/internal/errlog"
-	"github.com/Legit-Labs/legitify/internal/screen"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 
-	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/viper"
@@ -50,24 +45,18 @@ func newAnalyzeCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	formats := toOptionsString(formatter.OutputFormats())
-	schemeTypes := toOptionsString(scheme.SchemeTypes())
-	colorWhens := toOptionsString(ColorOptions())
 	scorecardWhens := toOptionsString(scorecardOptions())
 
 	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
-	analyzeArgs.addCommonOptions(flags)
+	analyzeArgs.addSchemeOutputOptions(flags)
+	analyzeArgs.addCommonCollectionOptions(flags)
 
 	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
-	flags.StringVarP(&analyzeArgs.OutputFormat, argOutputFormat, "f", formatter.Human, "output format "+formats)
-	flags.StringVarP(&analyzeArgs.OutputScheme, argOutputScheme, "", scheme.DefaultScheme, "output scheme "+schemeTypes)
-	flags.StringVarP(&analyzeArgs.ColorWhen, argColor, "", DefaultColorOption, "when to use coloring "+colorWhens)
 	flags.StringVarP(&analyzeArgs.ScorecardWhen, argScorecard, "", DefaultScOption, "Whether to run additional scorecard checks "+scorecardWhens)
-	flags.BoolVarP(&analyzeArgs.FailedOnly, argFailedOnly, "", false, "Only show violated policied (do not show succeeded/skipped)")
 	flags.BoolVarP(&analyzeArgs.SimulateSecondaryRateLimit, argSimulateSecondaryRateLimit, "", false, "Simulate secondary rate limits (for testing purposes)")
 	_ = flags.MarkHidden(argSimulateSecondaryRateLimit)
 
@@ -75,19 +64,7 @@ func newAnalyzeCommand() *cobra.Command {
 }
 
 func validateAnalyzeArgs() error {
-	if err := analyzeArgs.validateCommonOptions(); err != nil {
-		return err
-	}
-
 	if err := namespace.ValidateNamespaces(analyzeArgs.Namespaces); err != nil {
-		return err
-	}
-
-	if err := converter.ValidateOutputScheme(analyzeArgs.OutputScheme); err != nil {
-		return err
-	}
-
-	if err := formatter.ValidateOutputFormat(analyzeArgs.OutputFormat, analyzeArgs.OutputScheme); err != nil {
 		return err
 	}
 
@@ -115,35 +92,22 @@ func setupExecutor(analyzeArgs *args) (*analyzeExecutor, error) {
 }
 
 func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
-	analyzeArgs.ApplyEnvVars()
+	if err := analyzeArgs.applyCommonCollectionOptions(); err != nil {
+		return err
+	}
+
+	if preExit, err := analyzeArgs.applySchemeOutputOptions(); err != nil {
+		return err
+	} else {
+		defer preExit()
+	}
+
+	if err := validateAnalyzeArgs(); err != nil {
+		return err
+	}
 
 	// to make sure scorecard works
 	if err := os.Setenv("GITHUB_AUTH_TOKEN", analyzeArgs.Token); err != nil {
-		return err
-	}
-
-	err := validateAnalyzeArgs()
-	if err != nil {
-		return err
-	}
-
-	errFile, err := setErrorFile(analyzeArgs.ErrorFile)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if errlog.HadErrors() {
-			screen.Printf("Some errors raised during the execution. Check %s for more details", errFile.Name())
-		}
-	}()
-
-	err = setOutputFile(analyzeArgs.OutputFile)
-	if err != nil {
-		return err
-	}
-
-	err = InitColorPackage(analyzeArgs.ColorWhen)
-	if err != nil {
 		return err
 	}
 
