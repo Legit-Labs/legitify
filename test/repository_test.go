@@ -1,11 +1,12 @@
 package test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	gitlab2 "github.com/xanzy/go-gitlab"
-	"testing"
-	"time"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	gitlabcollected "github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
@@ -189,7 +190,7 @@ func TestRepositoryStaleReviews(t *testing.T) {
 
 func TestRepositoryStatusChecks(t *testing.T) {
 	name := "repository should require status checks"
-	testedPolicyName := "requires_status_checks"
+	testedPolicyName := "missing_requires_status_checks"
 	makeMockData := func(flag bool) githubcollected.Repository {
 		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
 			RequiresStatusChecks: github.Bool(flag),
@@ -455,7 +456,7 @@ func TestGitlabWebhookSSL(t *testing.T) {
 
 func TestGitlabPipelineStatusCheck(t *testing.T) {
 	name := "Project Does’nt Require All Pipelines to Succeed"
-	testedPolicyName := "requires_status_checks"
+	testedPolicyName := "missing_requires_status_checks"
 
 	makeMockData := func(flag bool) gitlabcollected.Repository {
 		return gitlabcollected.Repository{Project: &gitlab2.Project{OnlyAllowMergeIfPipelineSucceeds: flag}}

@@ -150,9 +150,6 @@ default missing_default_branch_protection_deletion = true
 
 missing_default_branch_protection_deletion = false {
 	not missing_default_branch_protection
-}
-
-missing_default_branch_protection_deletion = false {
 	not input.repository.default_branch.branch_protection_rule.allows_deletions
 }
 
@@ -170,9 +167,6 @@ default missing_default_branch_protection_force_push = true
 
 missing_default_branch_protection_force_push = false {
 	not missing_default_branch_protection
-}
-
-missing_default_branch_protection_force_push = false {
 	not input.repository.default_branch.branch_protection_rule.allows_force_pushes 
 }
 
@@ -186,13 +180,10 @@ missing_default_branch_protection_force_push = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
-default requires_status_checks = true
+default missing_requires_status_checks = true
 
-requires_status_checks = false {
+missing_requires_status_checks = false {
 	not missing_default_branch_protection
-}
-
-requires_status_checks = false {
 	input.repository.default_branch.branch_protection_rule.requires_status_checks
 }
 
@@ -210,14 +201,10 @@ default requires_branches_up_to_date_before_merge = true
 
 requires_branches_up_to_date_before_merge = false {
 	not missing_default_branch_protection
+	not missing_requires_status_checks
 }
 
 requires_branches_up_to_date_before_merge = false {
-	not requires_status_checks
-}
-
-requires_branches_up_to_date_before_merge = false {
-	not input.repository.default_branch.branch_protection_rule.requires_status_checks
 	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks
 }
 
@@ -235,9 +222,6 @@ default dismisses_stale_reviews = true
 
 dismisses_stale_reviews = false {
 	not missing_default_branch_protection
-}
-
-dismisses_stale_reviews = false {
 	input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
 }
 
@@ -253,17 +237,11 @@ dismisses_stale_reviews = false {
 #   threat: Users can merge code without being reviewed, which can lead to insecure code reaching the main branch and production.
 default code_review_not_required = true
 
-code_review_not_required = false{
+code_review_not_required = false {
 	not missing_default_branch_protection
-}
-
-code_review_not_required = false {
-	input.repository.default_branch.branch_protection_rule.required_approving_review_count
-}
-
-code_review_not_required = false {
 	input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 1
 }
+
 
 # METADATA
 # scope: rule
@@ -280,15 +258,8 @@ code_review_not_required = false {
 default code_review_by_two_members_not_required = true
 
 code_review_by_two_members_not_required = false {
-	not missing_default_branch_protection
-}
-
-code_review_by_two_members_not_required = false {
-	 input.repository.default_branch.branch_protection_rule.required_approving_review_count
-}
-
-code_review_by_two_members_not_required = false {
-	input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 2
+	 not missing_default_branch_protection
+	 input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 2
 }
 
 # METADATA
@@ -305,9 +276,6 @@ default code_review_not_limited_to_code_owners = true
 
 code_review_not_limited_to_code_owners = false {
 	not missing_default_branch_protection
-}
-
-code_review_not_limited_to_code_owners = false {
 	input.repository.default_branch.branch_protection_rule.requires_code_owner_reviews
 }
 
@@ -325,9 +293,6 @@ default non_linear_history = true
 
 non_linear_history = false {
 	not missing_default_branch_protection
-}
-
-non_linear_history = false {
 	input.repository.default_branch.branch_protection_rule.requires_linear_history 
 }
 
@@ -345,9 +310,6 @@ default no_conversation_resolution = true
 
 no_conversation_resolution = false {
 	not missing_default_branch_protection
-}
-
-no_conversation_resolution = false {
 	input.repository.default_branch.branch_protection_rule.requires_conversation_resolution
 }
 
@@ -365,9 +327,6 @@ default no_signed_commits = true
 
 no_signed_commits = false {
 	not missing_default_branch_protection
-}
-
-no_signed_commits = false {
 	input.repository.default_branch.branch_protection_rule.requires_commit_signatures
 }
 
@@ -385,9 +344,6 @@ default review_dismissal_allowed = true
 
 review_dismissal_allowed = false {
 	not missing_default_branch_protection
-}
-
-review_dismissal_allowed = false {
 	input.repository.default_branch.branch_protection_rule.restricts_review_dismissals 
 }
 
@@ -404,11 +360,10 @@ review_dismissal_allowed = false {
 default pushes_are_not_restricted = true
 
 pushes_are_not_restricted = false {
-	not missing_default_branch_protection
+	not code_review_not_required
 }
 
 pushes_are_not_restricted = false {
-	code_review_not_required
 	input.repository.default_branch.branch_protection_rule.restricts_pushes 
 }
 
