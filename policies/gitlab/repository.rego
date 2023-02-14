@@ -18,13 +18,6 @@ project_not_maintained = false {
 	monthsIndex := 1
 	inactivityMonthsThreshold := 3
 	diff[monthsIndex] < inactivityMonthsThreshold
-}
-
-project_not_maintained = false {
-	input.archived == false
-	ns := time.parse_rfc3339_ns(input.last_activity_at)
-	now := time.now_ns()
-	diff := time.diff(now, ns)
 	yearIndex := 0
 	diff[yearIndex] == 0
 }
@@ -107,7 +100,7 @@ default repository_require_code_owner_reviews_policy = true
 repository_require_code_owner_reviews_policy = false {
 	not missing_default_branch_protection
 	default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
-	rules_allow_force_push := [rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required == false]
+	rules_allow_force_push := [ rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required ]
 	count(rules_allow_force_push) > 0
 }
 
@@ -167,12 +160,10 @@ no_conversation_resolution = false {
 default no_signed_commits = true
 
 no_signed_commits = false {
-	not input.push_rules.reject_unsigned_commits
-}
-
-no_signed_commits = false {
+	input.push_rules.reject_unsigned_commits
 	not is_null(input.push_rules)
 }
+
 
 # METADATA
 # scope: rule
