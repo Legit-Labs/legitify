@@ -32,8 +32,8 @@ func (tc *tableContent) countColorize(count int, color themeColor) string {
 	}
 }
 
-func (tc *tableContent) FormatSummary(output scheme.FlattenedScheme) []byte {
-	output = scheme.SortSchemeByNamespace(output, false)
+func (tc *tableContent) FormatSummary(output *scheme.Flattened) []byte {
+	output = output.SortedByNamespace()
 
 	tc.tf.SetTitle(tc.colorizer.colorize(themeColorBold, "Legitify Findings Summary"))
 
@@ -43,7 +43,7 @@ func (tc *tableContent) FormatSummary(output scheme.FlattenedScheme) []byte {
 	}
 	tc.tf.SetHeaders(headers)
 
-	for i, policyName := range output.Keys() {
+	for i, policyName := range output.AsOrderedMap().Keys() {
 		rowNum := tc.colorizer.colorize(themeColorBold, i+1)
 		data := output.GetPolicyData(policyName)
 		policyInfo := data.PolicyInfo

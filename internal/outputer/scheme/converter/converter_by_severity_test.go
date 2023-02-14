@@ -3,18 +3,17 @@ package converter_test
 import (
 	"testing"
 
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme/scheme_test.go"
+	"github.com/Legit-Labs/legitify/internal/outputer/scheme/scheme_test"
 	"github.com/stretchr/testify/require"
 )
 
-func bySeverityToByPolicy(bySeverity scheme.BySeverityScheme) scheme.FlattenedScheme {
+func bySeverityToByPolicy(bySeverity *scheme.BySeverity) *scheme.Flattened {
 	result := scheme.NewFlattenedScheme()
 
-	for _, severity := range bySeverity.Keys() {
-		subscheme := utils.UnsafeGet(bySeverity, severity).(scheme.FlattenedScheme)
+	for _, severity := range bySeverity.AsOrderedMap().Keys() {
+		subscheme := bySeverity.UnsafeGet(severity)
 		result = scheme_test.CombineSchemes(result, subscheme)
 	}
 
@@ -24,13 +23,13 @@ func bySeverityToByPolicy(bySeverity scheme.BySeverityScheme) scheme.FlattenedSc
 func TestBySeverityConverter(t *testing.T) {
 	sample := scheme_test.SchemeSample()
 
-	output, err := converter.Convert(converter.GroupBySeverity, sample)
+	output, err := converter.Convert(scheme.TypeGroupBySeverity, sample)
 	require.Nilf(t, err, "Error converting: %v", err)
 
-	converted := output.(scheme.BySeverityScheme)
-	for _, severity := range converted.Keys() {
-		subscheme := utils.UnsafeGet(converted, severity).(scheme.FlattenedScheme)
-		for _, policyName := range subscheme.Keys() {
+	converted := output.(*scheme.BySeverity)
+	for _, severity := range converted.AsOrderedMap().Keys() {
+		subscheme := converted.UnsafeGet(severity)
+		for _, policyName := range subscheme.AsOrderedMap().Keys() {
 			outputData := subscheme.GetPolicyData(policyName)
 			for range outputData.Violations {
 				require.Equalf(t, severity, outputData.PolicyInfo.Severity, "Violation severity mismatch")

@@ -9,6 +9,6 @@ func newFlattenedConverter() outputConverter {
 type flattenedConverter struct {
 }
 
-func (c *flattenedConverter) Convert(output scheme.FlattenedScheme) (interface{}, error) {
+func (c *flattenedConverter) Convert(output *scheme.Flattened) (scheme.Scheme, error) {
 	return output, nil
 }

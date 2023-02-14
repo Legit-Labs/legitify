@@ -3,18 +3,17 @@ package converter_test
 import (
 	"testing"
 
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme/scheme_test.go"
+	"github.com/Legit-Labs/legitify/internal/outputer/scheme/scheme_test"
 	"github.com/stretchr/testify/require"
 )
 
-func byNamespaceToFlattened(byType scheme.ByTypeScheme) scheme.FlattenedScheme {
+func byNamespaceToFlattened(byNamespace *scheme.ByNamespace) *scheme.Flattened {
 	result := scheme.NewFlattenedScheme()
 
-	for _, resourceType := range byType.Keys() {
-		subscheme := utils.UnsafeGet(byType, resourceType).(scheme.FlattenedScheme)
+	for _, namespace := range byNamespace.AsOrderedMap().Keys() {
+		subscheme := byNamespace.UnsafeGet(namespace)
 		result = scheme_test.CombineSchemes(result, subscheme)
 	}
 
@@ -24,13 +23,13 @@ func byNamespaceToFlattened(byType scheme.ByTypeScheme) scheme.FlattenedScheme {
 func TestByNamespaceConverter(t *testing.T) {
 	sample := scheme_test.SchemeSample()
 
-	output, err := converter.Convert(converter.GroupByNamespace, sample)
+	output, err := converter.Convert(scheme.TypeGroupByNamespace, sample)
 	require.Nilf(t, err, "Error converting: %v", err)
 
-	converted := output.(scheme.ByTypeScheme)
-	for _, namespace := range converted.Keys() {
-		subscheme := utils.UnsafeGet(converted, namespace).(scheme.FlattenedScheme)
-		for _, policyName := range subscheme.Keys() {
+	converted := output.(*scheme.ByNamespace)
+	for _, namespace := range converted.AsOrderedMap().Keys() {
+		subscheme := converted.UnsafeGet(namespace)
+		for _, policyName := range subscheme.AsOrderedMap().Keys() {
 			outputData := subscheme.GetPolicyData(policyName)
 			require.Equalf(t, namespace, outputData.PolicyInfo.Namespace, "Violation namespace mismatch")
 		}

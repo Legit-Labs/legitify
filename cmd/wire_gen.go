@@ -40,9 +40,9 @@ func setupGitHub(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	}
 	skipper := skippers.NewSkipper(context)
 	analyzer := analyzers.NewAnalyzer(context, enginer, skipper)
-	enricherManager := enricher.NewEnricherManager(context)
+	enricherManager := enricher.NewEnricherManager()
 	outputer := provideOutputer(context, analyzeArgs2)
-	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer)
+	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer, context)
 	return cmdAnalyzeExecutor, nil
 }
 
@@ -65,9 +65,9 @@ func setupGitLab(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	}
 	skipper := skippers.NewSkipper(context)
 	analyzer := analyzers.NewAnalyzer(context, enginer, skipper)
-	enricherManager := enricher.NewEnricherManager(context)
+	enricherManager := enricher.NewEnricherManager()
 	outputer := provideOutputer(context, analyzeArgs2)
-	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer)
+	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer, context)
 	return cmdAnalyzeExecutor, nil
 }
 
