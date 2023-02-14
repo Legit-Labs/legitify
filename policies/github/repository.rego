@@ -205,7 +205,7 @@ requires_branches_up_to_date_before_merge = false {
 }
 
 requires_branches_up_to_date_before_merge = false {
-	requires_status_checks
+	not input.repository.default_branch.branch_protection_rule.requires_status_checks
 	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks
 }
 
