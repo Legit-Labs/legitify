@@ -1,7 +1,7 @@
 package scheme
 
 import (
-	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/iancoleman/orderedmap"
 )
 
@@ -21,5 +21,5 @@ func (s *ByResource) Keys() []string {
 	return s.AsOrderedMap().Keys()
 }
 func (s *ByResource) UnsafeGet(resourceType string) *Flattened {
-	return utils.UnsafeGet[*Flattened](s.AsOrderedMap(), resourceType)
+	return map_utils.UnsafeGet[*Flattened](s.AsOrderedMap(), resourceType)
 }

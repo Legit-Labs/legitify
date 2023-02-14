@@ -1,7 +1,7 @@
 package converter
 
 import (
-	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/iancoleman/orderedmap"
 )
@@ -26,7 +26,7 @@ func ConvertToGroupBy(groupBy grouper, output *scheme.Flattened) (*orderedmap.Or
 			if _, ok := byElement.Get(element); !ok {
 				byElement.Set(element, scheme.NewFlattenedScheme())
 			}
-			byPolicy := utils.UnsafeGet[*scheme.Flattened](byElement, element)
+			byPolicy := map_utils.UnsafeGet[*scheme.Flattened](byElement, element)
 
 			if _, ok := byPolicy.AsOrderedMap().Get(policyName); !ok {
 				byPolicy.AsOrderedMap().Set(policyName, scheme.NewOutputData(outputData.PolicyInfo))

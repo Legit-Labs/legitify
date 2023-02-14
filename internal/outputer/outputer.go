@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
@@ -52,7 +52,7 @@ func enrichedDataToViolation(enrichedData enricher.EnrichedData) scheme.Violatio
 	return scheme.Violation{
 		CanonicalLink:       enrichedData.CanonicalLink,
 		ViolationEntityType: enrichedData.Entity.ViolationEntityType(),
-		Aux:                 utils.ToKeySortedMap(enrichedData.Enrichers),
+		Aux:                 map_utils.ToKeySortedMap(enrichedData.Enrichers),
 		Status:              enrichedData.Status,
 	}
 }

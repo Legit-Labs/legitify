@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/iancoleman/orderedmap"
 	"golang.org/x/net/context"
 )
@@ -50,13 +50,13 @@ func createHooksListEnrichment(extraData interface{}) (GenericListEnrichment, er
 			return nil, err
 		}
 
-		result = append(result, *utils.ToKeySortedMap(hooksEnrichment))
+		result = append(result, *map_utils.ToKeySortedMap(hooksEnrichment))
 	}
 
 	// order by url to maintain a determenistic order
 	sort.Slice(result, func(i, j int) bool {
-		urlI := utils.UnsafeGet[string](&result[i], "url")
-		urlJ := utils.UnsafeGet[string](&result[j], "url")
+		urlI := map_utils.UnsafeGet[string](&result[i], "url")
+		urlJ := map_utils.UnsafeGet[string](&result[j], "url")
 		return strings.Compare(urlI, urlJ) < 0
 	})
 

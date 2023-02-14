@@ -1,8 +1,8 @@
 package scheme
 
 import (
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/iancoleman/orderedmap"
 )
 
@@ -22,7 +22,7 @@ func (s *ByNamespace) Keys() []string {
 	return s.AsOrderedMap().Keys()
 }
 func (s *ByNamespace) UnsafeGet(namespace string) *Flattened {
-	return utils.UnsafeGet[*Flattened](s.AsOrderedMap(), namespace)
+	return map_utils.UnsafeGet[*Flattened](s.AsOrderedMap(), namespace)
 }
 
 func policiesSortByNamespaceLess(i, j *orderedmap.Pair) bool {

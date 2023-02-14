@@ -1,4 +1,4 @@
-package utils
+package map_utils
 
 import (
 	"encoding/json"

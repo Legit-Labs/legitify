@@ -10,9 +10,9 @@ import (
 	"github.com/Legit-Labs/legitify/internal/enricher/enrichers"
 	"github.com/google/go-github/v49/github"
 
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 )
@@ -188,7 +188,7 @@ func SchemeSample() *scheme.Flattened {
 			{
 				ViolationEntityType: policy_1_entity.ViolationEntityType(),
 				CanonicalLink:       first(policy_1_entity.CanonicalLink()),
-				Aux:                 utils.ToKeySortedMap(auxSample()),
+				Aux:                 map_utils.ToKeySortedMap(auxSample()),
 				Status:              analyzers.PolicyFailed,
 			},
 			{
@@ -206,13 +206,13 @@ func SchemeSample() *scheme.Flattened {
 			{
 				ViolationEntityType: policy_2_entity.ViolationEntityType(),
 				CanonicalLink:       first(policy_2_entity.CanonicalLink()),
-				Aux:                 utils.ToKeySortedMap(auxSample2()),
+				Aux:                 map_utils.ToKeySortedMap(auxSample2()),
 				Status:              analyzers.PolicyFailed,
 			},
 			{
 				ViolationEntityType: policy_2_entity.ViolationEntityType(),
 				CanonicalLink:       second(policy_2_entity.CanonicalLink()),
-				Aux:                 utils.ToKeySortedMap(auxSample2()),
+				Aux:                 map_utils.ToKeySortedMap(auxSample2()),
 				Status:              analyzers.PolicyFailed,
 			},
 		},

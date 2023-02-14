@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/enricher/enrichers"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/iancoleman/orderedmap"
@@ -129,7 +129,7 @@ func (pc *policiesContent) auxAsList(m *orderedmap.OrderedMap) []string {
 	asList := make([]string, 0, len(m.Keys()))
 
 	for _, k := range m.Keys() {
-		v := utils.UnsafeGet[enrichers.Enrichment](m, k)
+		v := map_utils.UnsafeGet[enrichers.Enrichment](m, k)
 		key := camelCaseToTitle(k)
 		prefix := pc.pf.Indent(pc.depth)
 		vText := strings.TrimSuffix(v.HumanReadable(prefix, pc.pf.Linebreak()), pc.pf.Linebreak())

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/iancoleman/orderedmap"
 )
@@ -56,7 +56,7 @@ func CollectMissingPermissions(missingPermissionChan chan MissingPermission) {
 		return aName < bName
 	}
 	for _, permission := range permMap.Keys() {
-		entity := utils.UnsafeGet[*orderedmap.OrderedMap](permMap, permission)
+		entity := map_utils.UnsafeGet[*orderedmap.OrderedMap](permMap, permission)
 		entity.Sort(lessByEntityName)
 		permMap.Set(permission, entity)
 	}
@@ -64,9 +64,9 @@ func CollectMissingPermissions(missingPermissionChan chan MissingPermission) {
 	// Build missing permissions string
 	for _, permission := range permMap.Keys() {
 		errlog.PermIssueF("missing permission: \"%s\" on:\n", permission)
-		entity := utils.UnsafeGet[*orderedmap.OrderedMap](permMap, permission)
+		entity := map_utils.UnsafeGet[*orderedmap.OrderedMap](permMap, permission)
 		for _, entityName := range entity.Keys() {
-			effects := utils.UnsafeGet[effectSet](entity, entityName)
+			effects := map_utils.UnsafeGet[effectSet](entity, entityName)
 			filteredEffects := []string{}
 			for effect := range effects {
 				if effect == "" {

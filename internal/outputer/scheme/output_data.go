@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/enricher"
 	"github.com/iancoleman/orderedmap"
 )
@@ -32,7 +32,7 @@ type Violation struct { // Must be exported for json marshal
 func newAuxFromMap(m *orderedmap.OrderedMap) (*orderedmap.OrderedMap, error) {
 	newM := orderedmap.New()
 	for _, name := range m.Keys() {
-		v := utils.UnsafeGetUntyped(m, name)
+		v := map_utils.UnsafeGetUntyped(m, name)
 		if v == nil {
 			newM.Set(name, nil)
 			continue
@@ -49,7 +49,7 @@ func newAuxFromMap(m *orderedmap.OrderedMap) (*orderedmap.OrderedMap, error) {
 
 func newViolationFromMap(m *orderedmap.OrderedMap) (*Violation, error) {
 	var p Violation
-	err := utils.ShallowUnmarshalOrderedMap(m, &p)
+	err := map_utils.ShallowUnmarshalOrderedMap(m, &p)
 	if err != nil {
 		return nil, err
 	}
@@ -81,15 +81,15 @@ func newOutputDataFromMap(m *orderedmap.OrderedMap) (*OutputData, error) {
 		return nil, fmt.Errorf("output data missing fields")
 	}
 
-	infoMap := utils.UnsafeGet[orderedmap.OrderedMap](m, "policyInfo")
+	infoMap := map_utils.UnsafeGet[orderedmap.OrderedMap](m, "policyInfo")
 	var policyInfo PolicyInfo
-	err := utils.ShallowUnmarshalOrderedMap(&infoMap, &policyInfo)
+	err := map_utils.ShallowUnmarshalOrderedMap(&infoMap, &policyInfo)
 	if err != nil {
 		return nil, err
 	}
 
 	outputData := NewOutputData(policyInfo)
-	violationMaps := utils.UnsafeGet[[]interface{}](m, "violations")
+	violationMaps := map_utils.UnsafeGet[[]interface{}](m, "violations")
 	for _, v := range violationMaps {
 		asMap := v.(orderedmap.OrderedMap)
 		violation, err := newViolationFromMap(&asMap)

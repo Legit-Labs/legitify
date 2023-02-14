@@ -3,6 +3,8 @@ package enrichers
 import (
 	"fmt"
 
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
+	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/iancoleman/orderedmap"
 )
@@ -15,7 +17,7 @@ func (se GenericListEnrichment) HumanReadable(prepend string, linebreak string) 
 	for i, enrichment := range []orderedmap.OrderedMap(se) {
 		first := true
 		for _, k := range enrichment.Keys() {
-			v := utils.UnsafeGet[string](&enrichment, k)
+			v := map_utils.UnsafeGet[string](&enrichment, k)
 			if first {
 				sb.WriteStringf("%d. %s: %s%s", i+1, k, v, linebreak)
 				first = false
@@ -32,7 +34,7 @@ func NewGenericListEnrichmentFromInterface(data interface{}) (GenericListEnrichm
 	if val, ok := data.([]interface{}); !ok {
 		return nil, fmt.Errorf("expecting []map[string]string, found %T", data)
 	} else {
-		casted := utils.CastSliceOfInterface[orderedmap.OrderedMap](val)
+		casted := slice_utils.CastInterfaces[orderedmap.OrderedMap](val)
 		return GenericListEnrichment(casted), nil
 	}
 }

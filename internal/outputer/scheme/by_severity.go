@@ -1,8 +1,8 @@
 package scheme
 
 import (
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/iancoleman/orderedmap"
 )
 
@@ -22,7 +22,7 @@ func (s *BySeverity) Keys() []string {
 	return s.AsOrderedMap().Keys()
 }
 func (s *BySeverity) UnsafeGet(severity string) *Flattened {
-	return utils.UnsafeGet[*Flattened](s.AsOrderedMap(), severity)
+	return map_utils.UnsafeGet[*Flattened](s.AsOrderedMap(), severity)
 }
 
 func policiesSortBySeverityLess(i, j *orderedmap.Pair) bool {

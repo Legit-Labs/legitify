@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/iancoleman/orderedmap"
 )
 
@@ -20,14 +20,14 @@ func ToFlattenedScheme(m *orderedmap.OrderedMap) *Flattened {
 }
 
 func (s *Flattened) ShallowClone() *Flattened {
-	return ToFlattenedScheme(utils.ShallowCloneOrderedMap(s.AsOrderedMap()))
+	return ToFlattenedScheme(map_utils.ShallowCloneOrderedMap(s.AsOrderedMap()))
 }
 
 func (s *Flattened) AsOrderedMap() *orderedmap.OrderedMap {
 	return (*orderedmap.OrderedMap)(s)
 }
 func (s *Flattened) GetPolicyData(policyName string) OutputData {
-	return utils.UnsafeGet[OutputData](s.AsOrderedMap(), policyName)
+	return map_utils.UnsafeGet[OutputData](s.AsOrderedMap(), policyName)
 }
 
 func (s *Flattened) Sorted(lessFunc func(a *orderedmap.Pair, b *orderedmap.Pair) bool) *Flattened {
@@ -97,7 +97,7 @@ func (s *Flattened) UnmarshalJSON(data []byte) error {
 	}
 
 	for _, policyName := range asMap.Keys() {
-		outputDataMap := utils.UnsafeGet[orderedmap.OrderedMap](asMap, policyName)
+		outputDataMap := map_utils.UnsafeGet[orderedmap.OrderedMap](asMap, policyName)
 		outputData, err := newOutputDataFromMap(&outputDataMap)
 		if err != nil {
 			return err
