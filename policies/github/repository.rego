@@ -200,12 +200,6 @@ requires_status_checks = false {
 default requires_branches_up_to_date_before_merge = true
 
 requires_branches_up_to_date_before_merge = false {
-	not missing_default_branch_protection
-	not requires_status_checks
-}
-
-requires_branches_up_to_date_before_merge = false {
-	not input.repository.default_branch.branch_protection_rule.requires_status_checks
 	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks
 }
 
@@ -327,7 +321,6 @@ no_conversation_resolution = false {
 default no_signed_commits = true
 
 no_signed_commits = false {
-	not missing_default_branch_protection
 	input.repository.default_branch.branch_protection_rule.requires_commit_signatures
 }
 
@@ -344,7 +337,6 @@ no_signed_commits = false {
 default review_dismissal_allowed = true
 
 review_dismissal_allowed = false {
-	not missing_default_branch_protection
 	input.repository.default_branch.branch_protection_rule.restricts_review_dismissals 
 }
 
@@ -413,7 +405,6 @@ ghas_dependency_review_not_enabled = false {
 default scorecard_score_too_low = true
 
 scorecard_score_too_low = false {
-	not is_null(input.scorecard)
 	input.scorecard.score > 7.0
 }
 
