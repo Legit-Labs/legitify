@@ -6,8 +6,8 @@ import (
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
+	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	"github.com/Legit-Labs/legitify/internal/common/types"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/patrickmn/go-cache"
 	"github.com/xanzy/go-gitlab"
 )
@@ -97,7 +97,7 @@ func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
 		if projects == nil {
 			return []types.RepositoryWithOwner{}
 		}
-		return utils.MapSlice(projects, func(p *gitlab.Project) types.RepositoryWithOwner {
+		return slice_utils.Map(projects, func(p *gitlab.Project) types.RepositoryWithOwner {
 			return types.NewRepositoryWithOwner(p.PathWithNamespace, permissions.RepoRoleAdmin)
 		})
 	}

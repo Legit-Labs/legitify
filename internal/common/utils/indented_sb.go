@@ -1,6 +1,9 @@
 package utils
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type PrependedStringBuilder struct {
 	prepend string
@@ -11,6 +14,10 @@ func NewPrependedStringBuilder(prepend string) *PrependedStringBuilder {
 	return &PrependedStringBuilder{
 		prepend: prepend,
 	}
+}
+
+func (isb *PrependedStringBuilder) WriteStringf(format string, args ...interface{}) {
+	isb.WriteString(fmt.Sprintf(format, args...))
 }
 
 func (isb *PrependedStringBuilder) WriteString(str string) {

@@ -2,8 +2,9 @@ package enricher_test
 
 import (
 	"context"
-	"github.com/Legit-Labs/legitify/internal/collected"
 	"testing"
+
+	"github.com/Legit-Labs/legitify/internal/collected"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/enricher"
@@ -21,7 +22,7 @@ type EnricherTestRequires struct {
 func arrangeEnricher(t *testing.T) EnricherTestRequires {
 	ctx := context.Background()
 
-	enricher := enricher.NewEnricherManager(ctx)
+	enricher := enricher.NewEnricherManager()
 	require.NotNilf(t, enricher, "failed to create enricher")
 
 	return EnricherTestRequires{
@@ -50,7 +51,7 @@ func arbitraryEntity() collected.Entity {
 func TestEnricher_PolicyWithNoEnricher_DoesNotEnrich(t *testing.T) {
 	enricherData := arrangeEnricher(t)
 	data := make(chan analyzers.AnalyzedData, 3)
-	outputChannel := enricherData.e.Enrich(data)
+	outputChannel := enricherData.e.Enrich(enricherData.ctx, data)
 
 	go func() {
 
@@ -88,7 +89,7 @@ func TestEnricher_PolicyWithEnricher_EnrichData(t *testing.T) {
 		},
 		VulnerabilityAlertsEnabled: nil,
 	}
-	outputChannel := enricherData.e.Enrich(data)
+	outputChannel := enricherData.e.Enrich(enricherData.ctx, data)
 	go func() {
 		someAnalyzedData := analyzers.AnalyzedData{
 			Entity:                   entity,

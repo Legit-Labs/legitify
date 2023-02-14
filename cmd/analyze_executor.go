@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"os"
 
 	"github.com/Legit-Labs/legitify/cmd/progressbar"
@@ -16,17 +17,20 @@ type analyzeExecutor struct {
 	analyzer        analyzers.Analyzer
 	enricherManager enricher.EnricherManager
 	out             outputer.Outputer
+	ctx             context.Context
 }
 
 func initializeAnalyzeExecutor(manager collectors_manager.CollectorManager,
 	analyzer analyzers.Analyzer,
 	enricherManager enricher.EnricherManager,
-	outputer outputer.Outputer) *analyzeExecutor {
+	outputer outputer.Outputer,
+	ctx context.Context) *analyzeExecutor {
 	return &analyzeExecutor{
 		manager:         manager,
 		analyzer:        analyzer,
 		enricherManager: enricherManager,
 		out:             outputer,
+		ctx:             ctx,
 	}
 }
 
@@ -39,7 +43,7 @@ func (r *analyzeExecutor) Run() error {
 	// start all pipeline parts in the background
 	collectionChan := r.manager.Collect()
 	analyzedDataChan := r.analyzer.Analyze(collectionChan)
-	enrichedDataChan := r.enricherManager.Enrich(analyzedDataChan)
+	enrichedDataChan := r.enricherManager.Enrich(r.ctx, analyzedDataChan)
 	outputWaiter := r.out.Digest(enrichedDataChan)
 
 	// wait for progress bars to finish before outputting

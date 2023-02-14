@@ -2,8 +2,9 @@ package test
 
 import (
 	"flag"
-	"github.com/thedevsaddam/gojsonq/v2"
 	"testing"
+
+	"github.com/thedevsaddam/gojsonq/v2"
 )
 
 var reportPath = flag.String("report_path", "/tmp/out.json", "legitify report output path")
@@ -25,10 +26,12 @@ func TestGitHub(t *testing.T) {
 
 func assertTestStatus(t *testing.T, jq *gojsonq.JSONQ, testPath, entityName, expectedStatus string) {
 	jq.Reset()
-	testFormattedPath := testPath + "->violations"
-	res := jq.From(testFormattedPath).Where(pathToEntityName, "=", entityName).Where("Status", "=", expectedStatus).Count()
-	if res == 0 {
-		t.Logf("Failed on test %s Entity %s did not pass expected %s count %d", testPath, entityName, expectedStatus, res)
+	testFormattedPath := "content->" + testPath + "->violations"
+	violation := jq.From(testFormattedPath)
+	entity := violation.Where(pathToEntityName, "=", entityName)
+	count := entity.Where("status", "=", expectedStatus).Count()
+	if count == 0 {
+		t.Logf("Failed on test %s Entity %s did not pass expected %s count %d", testPath, entityName, expectedStatus, count)
 		t.Fail()
 	}
 }
