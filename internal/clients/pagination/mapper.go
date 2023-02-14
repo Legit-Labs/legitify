@@ -4,7 +4,7 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/Legit-Labs/legitify/internal/common/utils"
+	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 )
 
 const defaultChannelSize = 1024
@@ -97,7 +97,7 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...int
 	if optsIndex == paramsCountWithOpts-1 { // in case the options is the last arg
 		paramsWithOpts = append(paramsWithOpts, p.Opts)
 	}
-	inputs := utils.MapSlice(paramsWithOpts, reflect.ValueOf)
+	inputs := slice_utils.Map(paramsWithOpts, reflect.ValueOf)
 
 	return func() (ApiRetT, RespT, error) {
 		return p.parseOutputs(reflect.ValueOf(p.Fn).Call(inputs))

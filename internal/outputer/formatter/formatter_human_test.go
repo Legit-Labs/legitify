@@ -4,15 +4,17 @@ import (
 	"testing"
 
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme/scheme_test.go"
+	"github.com/Legit-Labs/legitify/internal/outputer/scheme/scheme_test"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFormatHuman(t *testing.T) {
 	sample := scheme_test.SchemeSample()
 
-	bytes, err := formatter.Format(formatter.Human, formatter.DefaultOutputIndent, sample, true)
-	require.Nilf(t, err, "Error formatting markdown: %v", err)
-	require.NotNil(t, bytes, "Error formatting markdown")
-	require.NotEmpty(t, bytes, "Error formatting markdown")
+	for _, f := range []bool{true, false} {
+		bytes, err := formatter.Format(formatter.Human, formatter.DefaultOutputIndent, sample, f)
+		require.Nilf(t, err, "Error formatting markdown: %v", err)
+		require.NotNil(t, bytes, "Error formatting markdown")
+		require.NotEmpty(t, bytes, "Error formatting markdown")
+	}
 }

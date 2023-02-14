@@ -10,6 +10,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/enricher/enrichers"
 	"github.com/google/go-github/v49/github"
 
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
 	"github.com/Legit-Labs/legitify/internal/enricher"
@@ -18,16 +19,16 @@ import (
 
 func auxSample() map[string]enrichers.Enrichment {
 	aux := map[string]enrichers.Enrichment{
-		"A": enrichers.NewBasicEnrichment("foo", "A"),
-		"B": enrichers.NewBasicEnrichment("42", "B"),
+		"A": enrichers.NewBasicEnrichment("foo"),
+		"B": enrichers.NewBasicEnrichment("42"),
 	}
 
 	return aux
 }
 func auxSample2() map[string]enrichers.Enrichment {
 	aux := map[string]enrichers.Enrichment{
-		"BAR":  enrichers.NewBasicEnrichment("xxx", "BAR"),
-		"BLUE": enrichers.NewBasicEnrichment("purple", "BLUE"),
+		"BAR":  enrichers.NewBasicEnrichment("xxx"),
+		"BLUE": enrichers.NewBasicEnrichment("purple"),
 	}
 
 	return aux
@@ -178,16 +179,16 @@ func second(x string) string {
 	return x + "b"
 }
 
-func SchemeSample() scheme.FlattenedScheme {
+func SchemeSample() *scheme.Flattened {
 	sample := scheme.NewFlattenedScheme()
 
-	sample.Set(FullyQualifiedPolicyNameSample(), scheme.OutputData{
+	sample.AsOrderedMap().Set(FullyQualifiedPolicyNameSample(), scheme.OutputData{
 		PolicyInfo: policyInfoSample(),
 		Violations: []scheme.Violation{
 			{
 				ViolationEntityType: policy_1_entity.ViolationEntityType(),
 				CanonicalLink:       first(policy_1_entity.CanonicalLink()),
-				Aux:                 auxSample(),
+				Aux:                 map_utils.ToKeySortedMap(auxSample()),
 				Status:              analyzers.PolicyFailed,
 			},
 			{
@@ -199,19 +200,19 @@ func SchemeSample() scheme.FlattenedScheme {
 		},
 	})
 
-	sample.Set(FullyQualifiedPolicyNameSample2(), scheme.OutputData{
+	sample.AsOrderedMap().Set(FullyQualifiedPolicyNameSample2(), scheme.OutputData{
 		PolicyInfo: policyInfoSample2(),
 		Violations: []scheme.Violation{
 			{
 				ViolationEntityType: policy_2_entity.ViolationEntityType(),
 				CanonicalLink:       first(policy_2_entity.CanonicalLink()),
-				Aux:                 auxSample2(),
+				Aux:                 map_utils.ToKeySortedMap(auxSample2()),
 				Status:              analyzers.PolicyFailed,
 			},
 			{
 				ViolationEntityType: policy_2_entity.ViolationEntityType(),
 				CanonicalLink:       second(policy_2_entity.CanonicalLink()),
-				Aux:                 auxSample2(),
+				Aux:                 map_utils.ToKeySortedMap(auxSample2()),
 				Status:              analyzers.PolicyFailed,
 			},
 		},
@@ -232,26 +233,29 @@ func EnrichedDataSample() []enricher.EnrichedData {
 }
 
 // convert struct to map recursively (for simple nested comparison)
-func StructToMap(obj interface{}) (newMap map[string]interface{}, err error) {
+func StructToMap(obj interface{}) (map[string]interface{}, error) {
+	var newMap map[string]interface{}
 	data, err := json.Marshal(obj)
-
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	err = json.Unmarshal(data, &newMap)
-	return
+	if err != nil {
+		return nil, err
+	}
+	return newMap, nil
 }
 
-func CombineSchemes(a, b scheme.FlattenedScheme) scheme.FlattenedScheme {
-	for _, policyName := range b.Keys() {
+func CombineSchemes(a, b *scheme.Flattened) *scheme.Flattened {
+	for _, policyName := range b.AsOrderedMap().Keys() {
 		outputData := b.GetPolicyData(policyName)
-		if _, ok := a.Get(policyName); !ok {
-			a.Set(policyName, scheme.NewOutputData(outputData.PolicyInfo))
+		if _, ok := a.AsOrderedMap().Get(policyName); !ok {
+			a.AsOrderedMap().Set(policyName, scheme.NewOutputData(outputData.PolicyInfo))
 		}
 		violation := a.GetPolicyData(policyName)
 
-		a.Set(policyName, scheme.AppendViolations(violation, outputData.Violations...))
+		a.AsOrderedMap().Set(policyName, scheme.AppendViolations(violation, outputData.Violations...))
 	}
 	return a
 }

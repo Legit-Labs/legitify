@@ -27,30 +27,21 @@ func newListReposCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := listReposCmd.Flags()
-	listReposArgs.addCommonOptions(flags)
+	listReposArgs.addOutputOptions(flags)
+	listReposArgs.addCommonCollectionOptions(flags)
 
 	return listReposCmd
 }
 
-func validateListReposArgs() error {
-	return listReposArgs.validateCommonOptions()
-}
-
 func executeListReposCommand(cmd *cobra.Command, _args []string) error {
-	listReposArgs.ApplyEnvVars()
-
-	err := validateListReposArgs()
-	if err != nil {
+	if err := listReposArgs.applyCommonCollectionOptions(); err != nil {
 		return err
 	}
 
-	if _, err = setErrorFile(listReposArgs.ErrorFile); err != nil {
+	if preExit, err := listReposArgs.applyOutputOptions(); err != nil {
 		return err
-	}
-
-	err = setOutputFile(listReposArgs.OutputFile)
-	if err != nil {
-		return err
+	} else {
+		defer preExit()
 	}
 
 	client, err := provideGenericClient(&listReposArgs)

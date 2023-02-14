@@ -15,8 +15,8 @@ import (
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	commontransport "github.com/Legit-Labs/legitify/internal/clients/transport"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
+	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/screen"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
@@ -264,7 +264,7 @@ func (c *Client) collectOrgsList() ([]string, error) {
 		if orgs == nil {
 			return []string{}
 		}
-		return utils.MapSlice(orgs, func(o *gh.Organization) string {
+		return slice_utils.Map(orgs, func(o *gh.Organization) string {
 			return *o.Login
 		})
 	}
