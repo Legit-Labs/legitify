@@ -42,7 +42,7 @@ func SchemeTypes() []SchemeType {
 	}
 }
 
-func DetectSchemeType(s interface{}) (SchemeType, error) {
+func DetectSchemeType(s Scheme) (SchemeType, error) {
 	switch t := s.(type) {
 	case *Flattened:
 		return TypeFlattened, nil

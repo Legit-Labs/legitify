@@ -12,7 +12,7 @@ import (
 func byResourceToByPolicy(byResource *scheme.ByResource) *scheme.Flattened {
 	result := scheme.NewFlattenedScheme()
 
-	for _, resourceLink := range byResource.Keys() {
+	for _, resourceLink := range byResource.AsOrderedMap().Keys() {
 		subscheme := byResource.UnsafeGet(resourceLink)
 		result = scheme_test.CombineSchemes(result, subscheme)
 	}
@@ -27,7 +27,7 @@ func TestByResourceConverter(t *testing.T) {
 	require.Nilf(t, err, "Error converting: %v", err)
 
 	converted := output.(*scheme.ByResource)
-	for _, resourceLink := range converted.Keys() {
+	for _, resourceLink := range converted.AsOrderedMap().Keys() {
 		subscheme := converted.UnsafeGet(resourceLink)
 		for _, policyName := range subscheme.AsOrderedMap().Keys() {
 			outputData := subscheme.GetPolicyData(policyName)

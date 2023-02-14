@@ -59,17 +59,18 @@ func enrichedDataToViolation(enrichedData enricher.EnrichedData) scheme.Violatio
 
 func (o *outputer) receiveViolations(inputChannel <-chan enricher.EnrichedData) *scheme.Flattened {
 	violations := scheme.NewFlattenedScheme()
+	asMap := violations.AsOrderedMap()
 
 	for encrichedData := range inputChannel {
 		policyName := encrichedData.FullyQualifiedPolicyName
 
-		if _, ok := violations.AsOrderedMap().Get(policyName); !ok {
-			violations.AsOrderedMap().Set(policyName, scheme.NewOutputData(enrichedDataToPolicyInfo(encrichedData)))
+		if _, ok := asMap.Get(policyName); !ok {
+			asMap.Set(policyName, scheme.NewOutputData(enrichedDataToPolicyInfo(encrichedData)))
 		}
 		preAppend := violations.GetPolicyData(policyName)
 
 		violation := enrichedDataToViolation(encrichedData)
-		violations.AsOrderedMap().Set(policyName, scheme.AppendViolations(preAppend, violation))
+		asMap.Set(policyName, scheme.AppendViolations(preAppend, violation))
 	}
 
 	return violations

@@ -17,9 +17,6 @@ func ToByResource(m *orderedmap.OrderedMap) *ByResource {
 func (s *ByResource) AsOrderedMap() *orderedmap.OrderedMap {
 	return (*orderedmap.OrderedMap)(s)
 }
-func (s *ByResource) Keys() []string {
-	return s.AsOrderedMap().Keys()
-}
 func (s *ByResource) UnsafeGet(resourceType string) *Flattened {
 	return map_utils.UnsafeGet[*Flattened](s.AsOrderedMap(), resourceType)
 }

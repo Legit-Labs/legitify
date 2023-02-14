@@ -12,7 +12,7 @@ import (
 func bySeverityToByPolicy(bySeverity *scheme.BySeverity) *scheme.Flattened {
 	result := scheme.NewFlattenedScheme()
 
-	for _, severity := range bySeverity.Keys() {
+	for _, severity := range bySeverity.AsOrderedMap().Keys() {
 		subscheme := bySeverity.UnsafeGet(severity)
 		result = scheme_test.CombineSchemes(result, subscheme)
 	}
@@ -27,7 +27,7 @@ func TestBySeverityConverter(t *testing.T) {
 	require.Nilf(t, err, "Error converting: %v", err)
 
 	converted := output.(*scheme.BySeverity)
-	for _, severity := range converted.Keys() {
+	for _, severity := range converted.AsOrderedMap().Keys() {
 		subscheme := converted.UnsafeGet(severity)
 		for _, policyName := range subscheme.AsOrderedMap().Keys() {
 			outputData := subscheme.GetPolicyData(policyName)

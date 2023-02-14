@@ -37,7 +37,6 @@ func (f *HumanFormatter) formatFailedPolicies(output *scheme.Flattened) []byte {
 
 func (f *HumanFormatter) Format(output scheme.Scheme, failedOnly bool) ([]byte, error) {
 	var summary, failedPolicies []byte
-	var typedOutput *scheme.Flattened
 
 	typedOutput, ok := output.(*scheme.Flattened)
 	if !ok {

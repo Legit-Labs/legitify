@@ -18,9 +18,6 @@ func ToBySeverity(m *orderedmap.OrderedMap) *BySeverity {
 func (s *BySeverity) AsOrderedMap() *orderedmap.OrderedMap {
 	return (*orderedmap.OrderedMap)(s)
 }
-func (s *BySeverity) Keys() []string {
-	return s.AsOrderedMap().Keys()
-}
 func (s *BySeverity) UnsafeGet(severity string) *Flattened {
 	return map_utils.UnsafeGet[*Flattened](s.AsOrderedMap(), severity)
 }

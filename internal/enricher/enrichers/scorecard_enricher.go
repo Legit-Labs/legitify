@@ -82,7 +82,7 @@ func createEnrichment(sc *sc.Result) (ScorecardEnrichment, error) {
 		})
 	}
 
-	return ScorecardEnrichment(checks), nil
+	return checks, nil
 }
 
 type ScorecardCheck struct {

@@ -23,6 +23,8 @@ func enrichOrgId(data analyzers.AnalyzedData) (string, bool) {
 	switch t := data.Entity.(type) {
 	case githubcollected.OrganizationActions:
 		return strconv.FormatInt(*t.Organization.ID, 10), true
+	case githubcollected.RunnerGroup:
+		return strconv.FormatInt(*t.Organization.ID, 10), true
 	}
 	return "", false
 }

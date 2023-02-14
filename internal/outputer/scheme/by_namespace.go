@@ -18,9 +18,6 @@ func ToByNamespace(m *orderedmap.OrderedMap) *ByNamespace {
 func (s *ByNamespace) AsOrderedMap() *orderedmap.OrderedMap {
 	return (*orderedmap.OrderedMap)(s)
 }
-func (s *ByNamespace) Keys() []string {
-	return s.AsOrderedMap().Keys()
-}
 func (s *ByNamespace) UnsafeGet(namespace string) *Flattened {
 	return map_utils.UnsafeGet[*Flattened](s.AsOrderedMap(), namespace)
 }

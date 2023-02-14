@@ -12,7 +12,7 @@ import (
 func byNamespaceToFlattened(byNamespace *scheme.ByNamespace) *scheme.Flattened {
 	result := scheme.NewFlattenedScheme()
 
-	for _, namespace := range byNamespace.Keys() {
+	for _, namespace := range byNamespace.AsOrderedMap().Keys() {
 		subscheme := byNamespace.UnsafeGet(namespace)
 		result = scheme_test.CombineSchemes(result, subscheme)
 	}
@@ -27,7 +27,7 @@ func TestByNamespaceConverter(t *testing.T) {
 	require.Nilf(t, err, "Error converting: %v", err)
 
 	converted := output.(*scheme.ByNamespace)
-	for _, namespace := range converted.Keys() {
+	for _, namespace := range converted.AsOrderedMap().Keys() {
 		subscheme := converted.UnsafeGet(namespace)
 		for _, policyName := range subscheme.AsOrderedMap().Keys() {
 			outputData := subscheme.GetPolicyData(policyName)
