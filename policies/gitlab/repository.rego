@@ -142,9 +142,9 @@ project_webhook_doesnt_require_ssl {
 #   severity: MEDIUM
 #   remediationSteps: [Make sure you can manage project merge requests permissions, Go to the project's settings page, Select "Merge Requests", Press on the "Pipelines must succeed", Click "Save changes"]
 #   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
-default missing_requires_status_checks = true
+default requires_status_checks = true
 
-missing_requires_status_checks = false {
+requires_status_checks = false {
 	input.only_allow_merge_if_pipeline_succeeds
 }
 

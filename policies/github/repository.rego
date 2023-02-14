@@ -180,9 +180,9 @@ missing_default_branch_protection_force_push = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
-default missing_requires_status_checks = true
+default requires_status_checks = true
 
-missing_requires_status_checks = false {
+requires_status_checks = false {
 	not missing_default_branch_protection
 	input.repository.default_branch.branch_protection_rule.requires_status_checks
 }
@@ -201,7 +201,7 @@ default requires_branches_up_to_date_before_merge = true
 
 requires_branches_up_to_date_before_merge = false {
 	not missing_default_branch_protection
-	not missing_requires_status_checks
+	not requires_status_checks
 }
 
 requires_branches_up_to_date_before_merge = false {

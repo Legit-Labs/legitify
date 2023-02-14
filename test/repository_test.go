@@ -190,7 +190,7 @@ func TestRepositoryStaleReviews(t *testing.T) {
 
 func TestRepositoryStatusChecks(t *testing.T) {
 	name := "repository should require status checks"
-	testedPolicyName := "missing_requires_status_checks"
+	testedPolicyName := "requires_status_checks"
 	makeMockData := func(flag bool) githubcollected.Repository {
 		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
 			RequiresStatusChecks: github.Bool(flag),
@@ -207,7 +207,6 @@ func TestRepositoryBranchesUpToDate(t *testing.T) {
 	makeMockData := func(flag bool) githubcollected.Repository {
 		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
 			RequiresStrictStatusChecks: github.Bool(flag),
-			RequiresStatusChecks:       github.Bool(flag),
 		})
 	}
 	for _, flag := range bools {
@@ -456,7 +455,7 @@ func TestGitlabWebhookSSL(t *testing.T) {
 
 func TestGitlabPipelineStatusCheck(t *testing.T) {
 	name := "Project Does’nt Require All Pipelines to Succeed"
-	testedPolicyName := "missing_requires_status_checks"
+	testedPolicyName := "requires_status_checks"
 
 	makeMockData := func(flag bool) gitlabcollected.Repository {
 		return gitlabcollected.Repository{Project: &gitlab2.Project{OnlyAllowMergeIfPipelineSucceeds: flag}}
