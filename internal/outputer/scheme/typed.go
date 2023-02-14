@@ -23,6 +23,7 @@ func NewTypedMarshalable(t SchemeType, content Scheme) *TypedScheme[*orderedmap.
 	return NewTyped(t, content.AsOrderedMap())
 }
 
+// Unmarshal unmarshalls a typed json and returns the underlying Flattened scheme
 func Unmarshal(data []byte) (*Flattened, error) {
 	var typedScheme TypedScheme[json.RawMessage]
 	if err := json.Unmarshal(data, &typedScheme); err != nil {

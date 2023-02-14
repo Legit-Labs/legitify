@@ -22,15 +22,6 @@ type PolicyInfo struct {
 	Namespace                namespace.Namespace `json:"namespace"`
 }
 
-func NewPolicyInfoFromMap(m map[string]interface{}) (*PolicyInfo, error) {
-	var p PolicyInfo
-	err := utils.ShalloUnmarshalMap(m, &p)
-	if err != nil {
-		return nil, err
-	}
-	return &p, nil
-}
-
 type Violation struct { // Must be exported for json marshal
 	ViolationEntityType string                 `json:"violationEntityType"`
 	CanonicalLink       string                 `json:"canonicalLink"`
@@ -56,9 +47,9 @@ func newAuxFromMap(m *orderedmap.OrderedMap) (*orderedmap.OrderedMap, error) {
 	return newM, nil
 }
 
-func NewViolationFromMap(m *orderedmap.OrderedMap) (*Violation, error) {
+func newViolationFromMap(m *orderedmap.OrderedMap) (*Violation, error) {
 	var p Violation
-	err := utils.ShalloUnmarshalOrderedMap(m, &p)
+	err := utils.ShallowUnmarshalOrderedMap(m, &p)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +74,7 @@ func NewOutputData(policyInfo PolicyInfo) OutputData {
 	}
 }
 
-func NewOutputDataFromMap(m *orderedmap.OrderedMap) (*OutputData, error) {
+func newOutputDataFromMap(m *orderedmap.OrderedMap) (*OutputData, error) {
 	_, okP := m.Get("policyInfo")
 	_, okV := m.Get("violations")
 	if !okP || !okV {
@@ -92,7 +83,7 @@ func NewOutputDataFromMap(m *orderedmap.OrderedMap) (*OutputData, error) {
 
 	infoMap := utils.UnsafeGet[orderedmap.OrderedMap](m, "policyInfo")
 	var policyInfo PolicyInfo
-	err := utils.ShalloUnmarshalOrderedMap(&infoMap, &policyInfo)
+	err := utils.ShallowUnmarshalOrderedMap(&infoMap, &policyInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +92,7 @@ func NewOutputDataFromMap(m *orderedmap.OrderedMap) (*OutputData, error) {
 	violationMaps := utils.UnsafeGet[[]interface{}](m, "violations")
 	for _, v := range violationMaps {
 		asMap := v.(orderedmap.OrderedMap)
-		violation, err := NewViolationFromMap(&asMap)
+		violation, err := newViolationFromMap(&asMap)
 		if err != nil {
 			return nil, err
 		}

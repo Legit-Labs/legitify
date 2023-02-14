@@ -85,6 +85,8 @@ func (s *Flattened) FilterByViolation(filter ViolationFilter) *Flattened {
 	return filteredScheme
 }
 
+// UnmarshalJSON implements unmarshaling for the Flattened scheme (called by json.Unmarshal)
+// by rebuilding the scheme from the ordered maps.
 func (s *Flattened) UnmarshalJSON(data []byte) error {
 	// enable scorecard to support jsons with scorecard
 	asMap := s.AsOrderedMap()
@@ -96,7 +98,7 @@ func (s *Flattened) UnmarshalJSON(data []byte) error {
 
 	for _, policyName := range asMap.Keys() {
 		outputDataMap := utils.UnsafeGet[orderedmap.OrderedMap](asMap, policyName)
-		outputData, err := NewOutputDataFromMap(&outputDataMap)
+		outputData, err := newOutputDataFromMap(&outputDataMap)
 		if err != nil {
 			return err
 		}

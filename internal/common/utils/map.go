@@ -31,10 +31,11 @@ func UnsafeGetUntyped(m *orderedmap.OrderedMap, key string) interface{} {
 }
 
 func ToOrderedMap[T any](src map[string]T, sortFunc func([]string)) *orderedmap.OrderedMap {
-	m := orderedmap.New()
 	if src == nil {
 		return nil
 	}
+
+	m := orderedmap.New()
 	for k, v := range src {
 		m.Set(k, v)
 	}
@@ -69,7 +70,7 @@ func UnorderMapTypedValues[T any](m *orderedmap.OrderedMap) map[string]T {
 	return newM
 }
 
-func ShalloUnmarshalMap(m map[string]interface{}, v any) error {
+func ShallowUnmarshalMap(m map[string]interface{}, v any) error {
 	bytes, err := json.Marshal(m)
 	if err != nil {
 		return err
@@ -77,6 +78,6 @@ func ShalloUnmarshalMap(m map[string]interface{}, v any) error {
 	return json.Unmarshal(bytes, v)
 }
 
-func ShalloUnmarshalOrderedMap(m *orderedmap.OrderedMap, v any) error {
-	return ShalloUnmarshalMap(UnorderMap(m), v)
+func ShallowUnmarshalOrderedMap(m *orderedmap.OrderedMap, v any) error {
+	return ShallowUnmarshalMap(UnorderMap(m), v)
 }
