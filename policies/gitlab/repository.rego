@@ -50,7 +50,7 @@ project_has_too_many_admins = false {
 default forking_allowed_for_repository = true
 
 forking_allowed_for_repository = false {
-	input.public
+	not input.public
 	input.forking_access_level != "enabled"
 }
 
@@ -80,7 +80,7 @@ missing_default_branch_protection = false {
 default missing_default_branch_protection_force_push = true
 
 missing_default_branch_protection_force_push = false {
-	not missing_default_branch_protection
+	
     default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
 	count(default_protected_branches) > 0
 	rules_allow_force_push := [rule_allow_force_push | rule_allow_force_push := default_protected_branches[_]; rule_allow_force_push.allow_force_push == true]
@@ -98,7 +98,7 @@ missing_default_branch_protection_force_push = false {
 default repository_require_code_owner_reviews_policy = true
 
 repository_require_code_owner_reviews_policy = false {
-	not missing_default_branch_protection
+	
 	default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
 	rules_allow_force_push := [ rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required ]
 	count(rules_allow_force_push) > 0
@@ -161,7 +161,6 @@ default no_signed_commits = true
 
 no_signed_commits = false {
 	input.push_rules.reject_unsigned_commits
-	not is_null(input.push_rules)
 }
 
 
