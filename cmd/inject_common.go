@@ -16,8 +16,10 @@ var analyzeProviderSet = wire.NewSet(
 	provideOutputer,
 	provideContext,
 	analyzers.NewAnalyzer,
+	provideGPTAnalyzer,
 	skippers.NewSkipper,
 	enricher.NewEnricherManager,
 	collectors_manager.NewCollectorsManager,
 	initializeAnalyzeExecutor,
+	initializeAnalyzeGPTExecutor,
 )

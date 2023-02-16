@@ -151,5 +151,7 @@ func executeAnalyzeCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
+	screen.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
+
 	return executor.Run()
 }

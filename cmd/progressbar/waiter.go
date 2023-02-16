@@ -14,6 +14,7 @@ type pbWaiter struct {
 	minCount   int
 	count      int
 	reachedMin chan struct{}
+	closed     bool
 }
 
 func newPbWaiter(w group_waiter.Waitable) *pbWaiter {
@@ -34,9 +35,9 @@ func (w *pbWaiter) ReportBarCreation() {
 }
 
 func (w *pbWaiter) signal() {
-	if w.count >= w.minCount && w.reachedMin != nil {
+	if w.count >= w.minCount && !w.closed {
 		close(w.reachedMin)
-		w.reachedMin = nil
+		w.closed = true
 	}
 }
 

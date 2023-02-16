@@ -8,6 +8,7 @@ import (
 
 type args struct {
 	Token                      string
+	OpenAIToken                string
 	Endpoint                   string
 	ScmType                    scm_type.ScmType
 	Organizations              []string

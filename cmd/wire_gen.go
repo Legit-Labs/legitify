@@ -28,7 +28,7 @@ func setupGitHub(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	if err != nil {
 		return nil, err
 	}
-	context, err := provideContext(client)
+	context, err := provideContext(client, analyzeArgs2)
 	if err != nil {
 		return nil, err
 	}
@@ -46,6 +46,22 @@ func setupGitHub(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	return cmdAnalyzeExecutor, nil
 }
 
+func setupGitHubGPTExecutor(analyzeArgs2 *args) (*analyzeGPTExecutor, error) {
+	client, err := provideGitHubClient(analyzeArgs2)
+	if err != nil {
+		return nil, err
+	}
+	context, err := provideContext(client, analyzeArgs2)
+	if err != nil {
+		return nil, err
+	}
+	analyzer := provideGPTAnalyzer(context, analyzeArgs2)
+	v := provideGitHubCollectors(context, client, analyzeArgs2)
+	collectorManager := collectors_manager.NewCollectorsManager(v)
+	cmdAnalyzeGPTExecutor := initializeAnalyzeGPTExecutor(analyzer, collectorManager, context)
+	return cmdAnalyzeGPTExecutor, nil
+}
+
 // Injectors from inject_gitlab.go:
 
 func setupGitLab(analyzeArgs2 *args) (*analyzeExecutor, error) {
@@ -53,7 +69,7 @@ func setupGitLab(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	if err != nil {
 		return nil, err
 	}
-	context, err := provideContext(client)
+	context, err := provideContext(client, analyzeArgs2)
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +85,22 @@ func setupGitLab(analyzeArgs2 *args) (*analyzeExecutor, error) {
 	outputer := provideOutputer(context, analyzeArgs2)
 	cmdAnalyzeExecutor := initializeAnalyzeExecutor(collectorManager, analyzer, enricherManager, outputer)
 	return cmdAnalyzeExecutor, nil
+}
+
+func setupGitLabGPTExecutor(analyzeArgs2 *args) (*analyzeGPTExecutor, error) {
+	client, err := provideGitLabClient(analyzeArgs2)
+	if err != nil {
+		return nil, err
+	}
+	context, err := provideContext(client, analyzeArgs2)
+	if err != nil {
+		return nil, err
+	}
+	analyzer := provideGPTAnalyzer(context, analyzeArgs2)
+	v := provideGitLabCollectors(context, client, analyzeArgs2)
+	collectorManager := collectors_manager.NewCollectorsManager(v)
+	cmdAnalyzeGPTExecutor := initializeAnalyzeGPTExecutor(analyzer, collectorManager, context)
+	return cmdAnalyzeGPTExecutor, nil
 }
 
 // inject_github.go:
