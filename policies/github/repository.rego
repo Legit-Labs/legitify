@@ -108,7 +108,7 @@ repository_webhook_doesnt_require_ssl[violated] = true {
 default forking_allowed_for_repository = true
 
 forking_allowed_for_repository = false {
-	input.repository.is_private == false
+	input.repository.is_private == true
 	input.repository.allow_forking == false
 }
 
