@@ -1,44 +1,16 @@
 package enrichers
 
 import (
-	"fmt"
+	"context"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
-	"github.com/Legit-Labs/legitify/internal/common/utils"
 )
+
+type Enricher interface {
+	Enrich(ctx context.Context, data analyzers.AnalyzedData) (enrichment Enrichment, ok bool)
+	Parse(data interface{}) (enrichment Enrichment, err error)
+}
 
 type Enrichment interface {
 	HumanReadable(prepend string, linebreak string) string
-	Name() string
-}
-
-type BasicEnrichment struct {
-	val  string
-	name string
-}
-
-func (s *BasicEnrichment) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, s.val)), nil
-}
-
-func (be *BasicEnrichment) HumanReadable(_ string, _ string) string {
-	sb := utils.NewPrependedStringBuilder("")
-	sb.WriteString(be.val)
-	return sb.String()
-}
-
-func (be *BasicEnrichment) Name() string {
-	return be.name
-}
-
-func NewBasicEnrichment(str string, name string) Enrichment {
-	return &BasicEnrichment{
-		val:  str,
-		name: name,
-	}
-}
-
-type Enricher interface {
-	Enrich(data analyzers.AnalyzedData) (enrichment Enrichment, ok bool)
-	Name() string
 }

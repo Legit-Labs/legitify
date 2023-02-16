@@ -6,18 +6,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 )
 
-type SchemeType = string
-
-const (
-	Flattened        SchemeType = "flattened"
-	GroupByNamespace SchemeType = "group-by-namespace"
-	GroupByResource  SchemeType = "group-by-resource"
-	GroupBySeverity  SchemeType = "group-by-severity"
-
-	DefaultScheme = Flattened
-)
-
-func Convert(schemeType SchemeType, output scheme.FlattenedScheme) (interface{}, error) {
+func Convert(schemeType scheme.SchemeType, output *scheme.Flattened) (scheme.Scheme, error) {
 	outputConverterCreator := outputConverters[schemeType]
 	if outputConverterCreator == nil {
 		return nil, fmt.Errorf("no output converter for %s", schemeType)
@@ -34,35 +23,23 @@ func Convert(schemeType SchemeType, output scheme.FlattenedScheme) (interface{},
 }
 
 type outputConverter interface {
-	Convert(output scheme.FlattenedScheme) (interface{}, error)
+	Convert(output *scheme.Flattened) (scheme.Scheme, error)
 }
 
 type newConvertFunc func() outputConverter
 
-var outputConverters = map[SchemeType]newConvertFunc{
-	Flattened:        newFlattenedConverter,
-	GroupByNamespace: newByNamespaceConverter,
-	GroupByResource:  newByResourceConverter,
-	GroupBySeverity:  newBySeverityConverter,
+var outputConverters = map[scheme.SchemeType]newConvertFunc{
+	scheme.TypeFlattened:        newFlattenedConverter,
+	scheme.TypeGroupByNamespace: newByNamespaceConverter,
+	scheme.TypeGroupByResource:  newByResourceConverter,
+	scheme.TypeGroupBySeverity:  newBySeverityConverter,
 }
 
-func ValidateOutputScheme(schemeType SchemeType) error {
+func ValidateOutputScheme(schemeType scheme.SchemeType) error {
 	_, ok := outputConverters[schemeType]
 	if !ok {
 		return fmt.Errorf("unsupported output scheme type: %s", schemeType)
 	}
 
 	return nil
-}
-
-func SchemeTypes() []SchemeType {
-	converterNames := []SchemeType{}
-	for outputFormat, formatter := range outputConverters {
-		if formatter == nil {
-			continue
-		}
-		converterNames = append(converterNames, outputFormat)
-	}
-
-	return converterNames
 }
