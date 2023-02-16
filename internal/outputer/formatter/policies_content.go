@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Legit-Labs/legitify/internal/common/map_utils"
 	"github.com/Legit-Labs/legitify/internal/enricher/enrichers"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
+	"github.com/iancoleman/orderedmap"
 )
 
 type policiesFormatter interface {
@@ -32,11 +34,11 @@ func newPoliciesContent(pf policiesFormatter, colorizer colorizer) *policiesCont
 	}
 }
 
-func (pc *policiesContent) FormatFailedPolicies(output scheme.FlattenedScheme) []byte {
+func (pc *policiesContent) FormatFailedPolicies(output *scheme.Flattened) []byte {
 	pc.sb.Reset()
 
-	lastIndex := len(output.Keys()) - 1
-	for i, policyName := range output.Keys() {
+	lastIndex := len(output.AsOrderedMap().Keys()) - 1
+	for i, policyName := range output.AsOrderedMap().Keys() {
 		data := output.GetPolicyData(policyName)
 
 		pc.writeLine(pc.pf.FormatTitle(data.PolicyInfo.Title, data.PolicyInfo.Severity))
@@ -115,18 +117,19 @@ func (pc *policiesContent) writeViolation(violation scheme.Violation) {
 	pc.writeAux(violation.Aux)
 }
 
-func (pc *policiesContent) writeAux(aux map[string]enrichers.Enrichment) {
-	if len(aux) == 0 {
+func (pc *policiesContent) writeAux(aux *orderedmap.OrderedMap) {
+	if aux == nil || len(aux.Keys()) == 0 {
 		return
 	}
 
 	pc.writeList("Auxiliary Info", pc.auxAsList(aux), false)
 }
 
-func (pc *policiesContent) auxAsList(m map[string]enrichers.Enrichment) []string {
-	asList := make([]string, 0, len(m))
+func (pc *policiesContent) auxAsList(m *orderedmap.OrderedMap) []string {
+	asList := make([]string, 0, len(m.Keys()))
 
-	for k, v := range m {
+	for _, k := range m.Keys() {
+		v := map_utils.UnsafeGet[enrichers.Enrichment](m, k)
 		key := camelCaseToTitle(k)
 		prefix := pc.pf.Indent(pc.depth)
 		vText := strings.TrimSuffix(v.HumanReadable(prefix, pc.pf.Linebreak()), pc.pf.Linebreak())

@@ -7,7 +7,6 @@ import (
 
 	"github.com/Legit-Labs/legitify/internal/common/severity"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 )
 
 type markdownFormatter struct {
@@ -20,11 +19,11 @@ func newMarkdownFormatter() OutputFormatter {
 	}
 }
 
-func (m *markdownFormatter) Format(output interface{}, failedOnly bool) ([]byte, error) {
+func (m *markdownFormatter) Format(output scheme.Scheme, failedOnly bool) ([]byte, error) {
 	var summary, failedPolicies []byte
-	var typedOutput scheme.FlattenedScheme
+	var typedOutput *scheme.Flattened
 
-	typedOutput, ok := output.(scheme.FlattenedScheme)
+	typedOutput, ok := output.(*scheme.Flattened)
 	if !ok {
 		return nil, UnsupportedScheme{output}
 	}
@@ -39,17 +38,17 @@ func (m *markdownFormatter) Format(output interface{}, failedOnly bool) ([]byte,
 }
 
 func (m *markdownFormatter) IsSchemeSupported(schemeType string) bool {
-	return schemeType == converter.Flattened
+	return schemeType == scheme.TypeFlattened
 }
 
-func (m *markdownFormatter) formatSummaryTable(output scheme.FlattenedScheme) []byte {
+func (m *markdownFormatter) formatSummaryTable(output *scheme.Flattened) []byte {
 	tf := newMarkdownTableFormatter()
 	tw := newTableContent(tf, m.colorizer)
 	return tw.FormatSummary(output)
 }
 
-func (m *markdownFormatter) formatFailedPolicies(output scheme.FlattenedScheme) []byte {
-	failedPolicies := scheme.OnlyFailedViolations(output)
+func (m *markdownFormatter) formatFailedPolicies(output *scheme.Flattened) []byte {
+	failedPolicies := output.OnlyFailedViolations()
 	pf := newMarkdownPolicyFormatter()
 	pc := newPoliciesContent(pf, m.colorizer)
 	return pc.FormatFailedPolicies(failedPolicies)

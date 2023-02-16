@@ -3,7 +3,7 @@ package formatter
 import (
 	"fmt"
 
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
+	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 )
 
 type FormatName = string
@@ -16,7 +16,7 @@ const (
 )
 
 type OutputFormatter interface {
-	Format(scheme interface{}, failedOnly bool) ([]byte, error)
+	Format(scheme scheme.Scheme, failedOnly bool) ([]byte, error)
 	IsSchemeSupported(schemeType string) bool
 }
 
@@ -29,7 +29,7 @@ var outputFormatters = map[FormatName]NewFormatFunc{
 	Sarif:    nil, // TODO pending implementation of Sarif output
 }
 
-func ValidateOutputFormat(outputFormat FormatName, schemeType converter.SchemeType) error {
+func ValidateOutputFormat(outputFormat FormatName, schemeType scheme.SchemeType) error {
 	creator, ok := outputFormatters[outputFormat]
 	if !ok {
 		return fmt.Errorf("unsupported output format: %s", outputFormat)
@@ -55,7 +55,7 @@ func OutputFormats() []FormatName {
 	return formatNames
 }
 
-func Format(outputFormat FormatName, outputIndent string, scheme interface{}, failedOnly bool) ([]byte, error) {
+func Format(outputFormat FormatName, outputIndent string, scheme scheme.Scheme, failedOnly bool) ([]byte, error) {
 	outputFormatterCreator := outputFormatters[outputFormat]
 	if outputFormatterCreator == nil {
 		return nil, fmt.Errorf("no output generator for %s", outputFormat)
