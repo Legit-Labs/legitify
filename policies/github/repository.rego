@@ -20,20 +20,11 @@ repository_not_maintained = false {
 	now := time.now_ns()
 	diff := time.diff(now, ns)
 	monthsIndex := 1
+	yearIndex := 0
+	diff[yearIndex] == 0
 	inactivityMonthsThreshold := 3
 	diff[monthsIndex] < inactivityMonthsThreshold
 }
-
-repository_not_maintained = false {
-	not input.repository.is_archived
-	not is_null(input.repository.pushed_at)
-	ns := time.parse_rfc3339_ns(input.repository.pushed_at)
-	now := time.now_ns()
-	diff := time.diff(now, ns)
-	yearIndex := 0
-	diff[yearIndex] == 0
-}
-
 # METADATA
 # scope: rule
 # title: Repository Should Have Fewer Than Three Admins
@@ -149,7 +140,7 @@ missing_default_branch_protection = false {
 default missing_default_branch_protection_deletion = true
 
 missing_default_branch_protection_deletion = false {
-	not missing_default_branch_protection
+	
 	not input.repository.default_branch.branch_protection_rule.allows_deletions
 }
 
@@ -166,7 +157,7 @@ missing_default_branch_protection_deletion = false {
 default missing_default_branch_protection_force_push = true
 
 missing_default_branch_protection_force_push = false {
-	not missing_default_branch_protection
+	
 	not input.repository.default_branch.branch_protection_rule.allows_force_pushes 
 }
 
@@ -183,7 +174,7 @@ missing_default_branch_protection_force_push = false {
 default requires_status_checks = true
 
 requires_status_checks = false {
-	not missing_default_branch_protection
+	
 	input.repository.default_branch.branch_protection_rule.requires_status_checks
 }
 
@@ -217,7 +208,7 @@ requires_branches_up_to_date_before_merge = false {
 default dismisses_stale_reviews = true
 
 dismisses_stale_reviews = false {
-	not missing_default_branch_protection
+	
 	input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
 }
 
@@ -234,7 +225,7 @@ dismisses_stale_reviews = false {
 default code_review_not_required = true
 
 code_review_not_required = false {
-	not missing_default_branch_protection
+	
 	input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 1
 }
 
@@ -254,7 +245,7 @@ code_review_not_required = false {
 default code_review_by_two_members_not_required = true
 
 code_review_by_two_members_not_required = false {
-	 not missing_default_branch_protection
+	 
 	 input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 2
 }
 
@@ -271,7 +262,7 @@ code_review_by_two_members_not_required = false {
 default code_review_not_limited_to_code_owners = true
 
 code_review_not_limited_to_code_owners = false {
-	not missing_default_branch_protection
+	
 	input.repository.default_branch.branch_protection_rule.requires_code_owner_reviews
 }
 
@@ -288,7 +279,7 @@ code_review_not_limited_to_code_owners = false {
 default non_linear_history = true
 
 non_linear_history = false {
-	not missing_default_branch_protection
+	
 	input.repository.default_branch.branch_protection_rule.requires_linear_history 
 }
 
@@ -305,7 +296,7 @@ non_linear_history = false {
 default no_conversation_resolution = true
 
 no_conversation_resolution = false {
-	not missing_default_branch_protection
+	
 	input.repository.default_branch.branch_protection_rule.requires_conversation_resolution
 }
 
