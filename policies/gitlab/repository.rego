@@ -50,6 +50,10 @@ project_has_too_many_admins = false {
 default forking_allowed_for_repository = true
 
 forking_allowed_for_repository = false {
+	input.public
+}
+
+forking_allowed_for_repository = false {
 	not input.public
 	input.forking_access_level != "enabled"
 }
