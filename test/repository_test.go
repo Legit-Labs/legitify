@@ -1,11 +1,12 @@
 package test
 
 import (
+	"testing"
+	"time"
+
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	gitlab2 "github.com/xanzy/go-gitlab"
-	"testing"
-	"time"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	gitlabcollected "github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
@@ -205,8 +206,8 @@ func TestRepositoryBranchesUpToDate(t *testing.T) {
 	testedPolicyName := "requires_branches_up_to_date_before_merge"
 	makeMockData := func(flag bool) githubcollected.Repository {
 		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
-			RequiresStrictStatusChecks: github.Bool(flag),
 			RequiresStatusChecks:       github.Bool(flag),
+			RequiresStrictStatusChecks: github.Bool(flag),
 		})
 	}
 	for _, flag := range bools {
