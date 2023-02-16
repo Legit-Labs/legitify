@@ -26,8 +26,8 @@ func newAnalyzeGptCommand() *cobra.Command {
 
 	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
-	analyzeGptArgs.addCommonOptions(flags)
 
+	analyzeArgs.addCommonCollectionOptions(flags)
 	flags.StringSliceVarP(&analyzeGptArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeGptArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringVarP(&analyzeGptArgs.OpenAIToken, "openai-token", "", "", "token to authenticate with openai API")
@@ -36,7 +36,7 @@ func newAnalyzeGptCommand() *cobra.Command {
 }
 
 func validateAnalyzeGPTArgs() error {
-	if err := analyzeGptArgs.validateCommonOptions(); err != nil {
+	if err := analyzeGptArgs.validateCommonCollectionOptions(); err != nil {
 		return err
 	}
 
@@ -74,7 +74,9 @@ func setup() (*analyzeGPTExecutor, error) {
 }
 
 func executeAnalyzeGPTCommand(cmd *cobra.Command, _args []string) error {
-	analyzeGptArgs.ApplyEnvVars()
+	if err := analyzeGptArgs.applyCommonCollectionOptions(); err != nil {
+		return err
+	}
 
 	err := validateAnalyzeGPTArgs()
 	if err != nil {
