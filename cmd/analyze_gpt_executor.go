@@ -41,7 +41,7 @@ func formatResults(results []gpt.Result) string {
 		sb.WriteString(color.MagentaString("%s\n", title))
 		sb.WriteString(color.MagentaString("%s", strings.Repeat("-", len(title))))
 		sb.WriteString("\n")
-		sb.WriteString(strings.ReplaceAll("\n\n", "\n", r.GPTResult))
+		sb.WriteString(r.GPTResult)
 		sb.WriteString("\n")
 	}
 	return sb.String()

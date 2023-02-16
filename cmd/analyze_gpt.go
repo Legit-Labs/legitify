@@ -27,7 +27,8 @@ func newAnalyzeGptCommand() *cobra.Command {
 	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
 
-	analyzeArgs.addCommonCollectionOptions(flags)
+	analyzeGptArgs.addCommonCollectionOptions(flags)
+	analyzeGptArgs.addOutputOptions(flags)
 	flags.StringSliceVarP(&analyzeGptArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeGptArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringVarP(&analyzeGptArgs.OpenAIToken, "openai-token", "", "", "token to authenticate with openai API")
@@ -57,12 +58,12 @@ func validateAnalyzeGPTArgs() error {
 
 func setup() (*analyzeGPTExecutor, error) {
 	if len(analyzeGptArgs.Repositories) != 0 {
-		analyzeGptArgs.Namespaces = []namespace.Namespace{namespace.Repository}
+		analyzeGptArgs.Namespaces = append(analyzeGptArgs.Namespaces, namespace.Repository)
 	} else if len(analyzeGptArgs.Organizations) != 0 {
-		analyzeGptArgs.Namespaces = []namespace.Namespace{namespace.Organization}
+		analyzeGptArgs.Namespaces = append(analyzeGptArgs.Namespaces, namespace.Organization)
 	}
 
-	switch analyzeArgs.ScmType {
+	switch analyzeGptArgs.ScmType {
 	case scm_type.GitHub:
 		return setupGitHubGPTExecutor(&analyzeGptArgs)
 	case scm_type.GitLab:

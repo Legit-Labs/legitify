@@ -46,6 +46,7 @@ func cleanData(entity collected.Entity) (marshalled []byte, entityType string, e
 		marshalled, err = json.Marshal(v)
 	case gitlab_collected.Organization:
 		entityType = "Gitlab Organization"
+		v.Projects = nil
 		marshalled, err = json.Marshal(v)
 	case gitlab_collected.Repository:
 		entityType = "Gitlab Repository"
@@ -128,7 +129,7 @@ func (a *Analyzer) Analyze(dataChannel <-chan collectors.CollectedData) chan Res
 					Model:       gogpt.GPT3TextDavinci003,
 					Prompt:      prompt,
 					Temperature: 1.0,
-					MaxTokens:   2000,
+					MaxTokens:   1000,
 				})
 
 				if err != nil {
