@@ -67,7 +67,7 @@ type Repository struct {
 	NoBranchProtectionPermission bool                              `json:"no_branch_protection_permission"`
 	Scorecard                    *scorecard.Result                 `json:"scorecard,omitempty"`
 	Hooks                        []*github.Hook                    `json:"hooks"`
-	Collaborators                []*github.User                    `json:"collaborators"`
+	Collaborators                []*github.User                    `json:"collaborators,omitempty"`
 	ActionsTokenPermissions      *types.TokenPermissions           `json:"actions_token_permissions"`
 	DependencyGraphManifests     *GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests"`
 }

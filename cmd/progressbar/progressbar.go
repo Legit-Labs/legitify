@@ -107,10 +107,6 @@ func (pb *progressBar) handleRequiredBarCreation(data RequiredBarCreation) {
 }
 
 func (pb *progressBar) handleOptionalBarCreation(data OptionalBarCreation) {
-	if data.TotalEntities == 0 {
-		return
-	}
-
 	displayName := data.BarName
 
 	if _, exists := pb.bars[displayName]; exists {
@@ -140,7 +136,16 @@ func (pb *progressBar) handleBarUpdate(data BarUpdate) {
 		return
 	}
 
+	if data.TotalChange > 0 {
+		val.SetTotal(val.Current()+int64(data.TotalChange), false)
+	}
+
+	if data.TriggerDone {
+		val.SetTotal(-1, true)
+	}
+
 	val.IncrBy(data.Change)
+
 	if val.Completed() && !pb.enabled {
 		screen.Printf("Finished collecting %s\n", displayName)
 	}
@@ -175,10 +180,6 @@ func (pb *progressBar) handleBarClose(data BarClose) {
 	val, exists := pb.bars[displayName]
 	if !exists {
 		log.Panicf("trying to update a bar that doesn't exist: %s (%v)", displayName, data)
-	}
-
-	if !val.Completed() {
-		log.Printf("BUG: closing bar %s although it is not completed. please report this issue to legitify repository.", displayName)
 	}
 
 	val.Abort(false)

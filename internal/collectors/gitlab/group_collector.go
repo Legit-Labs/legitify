@@ -69,7 +69,7 @@ func (c *groupCollector) Collect() collectors.SubCollectorChannels {
 					Hooks: hooks,
 				}
 
-				c.CollectDataWithContext(&entity, g.WebURL, newCollectionContext(g, []permissions.OrganizationRole{permissions.RepoRoleAdmin}))
+				c.CollectDataWithContext(entity, g.WebURL, newCollectionContext(g, []permissions.OrganizationRole{permissions.RepoRoleAdmin}))
 				c.CollectionChangeByOne()
 			})
 		}

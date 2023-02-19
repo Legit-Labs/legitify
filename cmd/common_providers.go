@@ -3,14 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
+	"github.com/Legit-Labs/legitify/internal/gpt"
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
 	"github.com/Legit-Labs/legitify/internal/outputer"
-	"github.com/Legit-Labs/legitify/internal/screen"
 )
 
 func provideGenericClient(args *args) (Client, error) {
@@ -36,13 +35,13 @@ func provideOpa(analyzeArgs *args) (opa_engine.Enginer, error) {
 	return opaEngine, nil
 }
 
-func provideContext(client Client) (context.Context, error) {
+func provideContext(client Client, args *args) (context.Context, error) {
 	ctx := context.Background()
 
-	if len(analyzeArgs.Organizations) != 0 {
-		ctx = context_utils.NewContextWithOrg(analyzeArgs.Organizations)
-	} else if len(analyzeArgs.Repositories) != 0 {
-		validated, err := validateRepositories(analyzeArgs.Repositories)
+	if len(args.Organizations) != 0 {
+		ctx = context_utils.NewContextWithOrg(args.Organizations)
+	} else if len(args.Repositories) != 0 {
+		validated, err := validateRepositories(args.Repositories)
 		if err != nil {
 			return nil, err
 		}
@@ -50,18 +49,18 @@ func provideContext(client Client) (context.Context, error) {
 			return nil, err
 		}
 		ctx = context_utils.NewContextWithRepos(validated)
-		analyzeArgs.Namespaces = []namespace.Namespace{namespace.Repository}
+		args.Namespaces = []namespace.Namespace{namespace.Repository}
 	}
 
 	ctx = context_utils.NewContextWithScorecard(ctx,
-		IsScorecardEnabled(analyzeArgs.ScorecardWhen),
-		IsScorecardVerbose(analyzeArgs.ScorecardWhen))
+		IsScorecardEnabled(args.ScorecardWhen),
+		IsScorecardVerbose(args.ScorecardWhen))
 
-	if !IsScorecardEnabled(analyzeArgs.ScorecardWhen) {
-		screen.Printf("Note: to get the OpenSSF scorecard results for the organization repositories use the --scorecard option\n\n")
-	}
-
-	ctx = context_utils.NewContextWithIsCloud(ctx, analyzeArgs.Endpoint == "")
+	ctx = context_utils.NewContextWithIsCloud(ctx, args.Endpoint == "")
 
 	return context_utils.NewContextWithTokenScopes(ctx, client.Scopes()), nil
+}
+
+func provideGPTAnalyzer(context context.Context, args *args) *gpt.Analyzer {
+	return gpt.NewAnalyzer(context, args.OpenAIToken)
 }

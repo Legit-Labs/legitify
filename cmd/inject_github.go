@@ -23,6 +23,16 @@ func setupGitHub(analyzeArgs *args) (*analyzeExecutor, error) {
 	return nil, nil
 }
 
+func setupGitHubGPTExecutor(analyzeArgs *args) (*analyzeGPTExecutor, error) {
+	wire.Build(
+		wire.Bind(new(Client), new(*github.Client)),
+		analyzeProviderSet,
+		provideGitHubClient,
+		provideGitHubCollectors,
+	)
+	return nil, nil
+}
+
 func provideGitHubCollectors(ctx context.Context, client *github.Client, analyzeArgs *args) []collectors.Collector {
 	type newCollectorFunc func(ctx context.Context, client *github.Client) collectors.Collector
 	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
