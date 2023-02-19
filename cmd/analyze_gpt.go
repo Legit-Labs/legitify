@@ -16,6 +16,8 @@ func init() {
 
 var analyzeGptArgs args
 
+const argOpenAiToken = "openai_token"
+
 func newAnalyzeGptCommand() *cobra.Command {
 	analyzeCmd := &cobra.Command{
 		Use:          "gpt-analysis",
@@ -31,12 +33,13 @@ func newAnalyzeGptCommand() *cobra.Command {
 	analyzeGptArgs.addOutputOptions(flags)
 	flags.StringSliceVarP(&analyzeGptArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeGptArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
-	flags.StringVarP(&analyzeGptArgs.OpenAIToken, "openai-token", "", "", "token to authenticate with openai API")
+	flags.StringVarP(&analyzeGptArgs.OpenAIToken, argOpenAiToken, "", "", "token to authenticate with openai API")
+	viper.AutomaticEnv()
 
 	return analyzeCmd
 }
 
-func validateAnalyzeGPTArgs() error {
+func applyAnalyzeGPTArgs() error {
 	if err := analyzeGptArgs.validateCommonCollectionOptions(); err != nil {
 		return err
 	}
@@ -50,7 +53,10 @@ func validateAnalyzeGPTArgs() error {
 	}
 
 	if analyzeGptArgs.OpenAIToken == "" {
-		return fmt.Errorf("must provide openai API token")
+		analyzeGptArgs.OpenAIToken = viper.GetString(argOpenAiToken)
+		if analyzeGptArgs.OpenAIToken == "" {
+			return fmt.Errorf("must provide openai API token")
+		}
 	}
 
 	return nil
@@ -79,7 +85,7 @@ func executeAnalyzeGPTCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	err := validateAnalyzeGPTArgs()
+	err := applyAnalyzeGPTArgs()
 	if err != nil {
 		return err
 	}
