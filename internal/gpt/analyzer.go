@@ -61,8 +61,8 @@ func cleanData(entity collected.Entity) (marshalled []byte, entityType string, e
 }
 
 func generatePrompt(toAnalyze []byte, entityType string) string {
-	prompt := fmt.Sprintf("Explain the security posture of the below %s, provide the answer as a list of recommendations, all must be relevant to the provided configuration (atleast 10),"+
-		" recommendations needs to be related to the provided data and start the text with the numbered list:\n", entityType)
+	prompt := fmt.Sprintf("Explain the security posture of the below %s, provide the answer as a list of recommendations, each recommendation needs to refernce a field in the data (atleast 10)"+
+		" and start the text with the numbered list:\n", entityType)
 	return fmt.Sprintf("%s\n%s\n", prompt, toAnalyze)
 }
 

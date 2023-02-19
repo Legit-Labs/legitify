@@ -26,7 +26,6 @@ func newAnalyzeGptCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	viper.AutomaticEnv()
 	flags := analyzeCmd.Flags()
 
 	analyzeGptArgs.addCommonCollectionOptions(flags)

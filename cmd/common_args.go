@@ -116,7 +116,7 @@ func (a *args) addSchemeOutputOptions(flags *pflag.FlagSet) {
 
 	flags.StringVarP(&a.OutputFormat, argOutputFormat, "f", formatter.Human, "output format "+formats)
 	flags.StringVarP(&a.OutputScheme, argOutputScheme, "", scheme.DefaultScheme, "output scheme "+schemeTypes)
-	flags.BoolVarP(&a.FailedOnly, argFailedOnly, "", false, "Only show violated policied (do not show succeeded/skipped)")
+	flags.BoolVarP(&a.FailedOnly, argFailedOnly, "", false, "Only show violated policies (do not show succeeded/skipped)")
 }
 
 func (a *args) applySchemeOutputOptions() (preExitHook func(), err error) {
