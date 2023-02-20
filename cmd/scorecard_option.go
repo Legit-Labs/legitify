@@ -23,7 +23,7 @@ func ValidateScorecardOption(opt string) error {
 }
 
 func IsScorecardEnabled(when string) bool {
-	return when != scNo
+	return when == scYes || when == scVerbose
 }
 
 func IsScorecardVerbose(when string) bool {

@@ -15,8 +15,10 @@ type OptionalBarCreation struct {
 }
 
 type BarUpdate struct {
-	BarName string
-	Change  int
+	BarName     string
+	TotalChange int
+	TriggerDone bool
+	Change      int
 }
 
 type TimedBarCreation struct {

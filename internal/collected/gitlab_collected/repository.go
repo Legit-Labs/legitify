@@ -7,7 +7,7 @@ import (
 
 type Repository struct {
 	*gitlab2.Project
-	Members                  []*gitlab2.ProjectMember       `json:"members"`
+	Members                  []*gitlab2.ProjectMember       `json:"members,omitempty"`
 	ProtectedBranches        []*gitlab2.ProtectedBranch     `json:"protected_branches"`
 	Webhooks                 []*gitlab2.ProjectHook         `json:"webhooks"`
 	PushRules                *gitlab2.ProjectPushRules      `json:"push_rules"`

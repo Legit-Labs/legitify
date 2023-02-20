@@ -43,7 +43,9 @@ ARCH=darwin_arm64
 ```
 
 
-## CLI Usage
+## Commands
+
+### analyze
 
 ```
 LEGITIFY_TOKEN=<your_token> legitify analyze
@@ -63,6 +65,29 @@ LEGITIFY_TOKEN=<your_token> legitify analyze --org org1,org2 --namespace organiz
 ```
 
 The above command will test organization and member policies against org1 and org2.
+
+### gpt-analysis
+
+```
+LEGITIFT_TOKEN=<your_token> OPENAI_TOKEN=<token> ./legitify gpt-analysis --repo ORG_NAME/REPO_NAME --org ORG_NAME
+```
+
+GPT-3 based analysis to the security posture of the provided repository or organization.
+
+**NOTE: The repository/organization metadata is sent to openai servers.**
+
+Flags:
+- `--org`: will limit the analysis to the specified GitHub organizations or GitLab group
+- `--repo`: will limit the analysis to the specified GitHub repositories or GitLab projects
+- `--scm`: specify the source code management platform. Possible values are: `github` or `gitlab`. Defaults to `github`.
+- `--token`: token for the SCM (or set the LEGITIFY_TOKEN environment variable)
+- `--openai-token`: token for openai API (or set OPENAI_TOKEN environment variable) 
+
+Must provide either `--org` or `--repo` or both.
+
+Generating openai token:
+1. Go to https://beta.openai.com/signup and create an openai account
+2. Under https://platform.openai.com/account/api-keys press "Create new secret key"
 
 ## GitHub Action Usage
 

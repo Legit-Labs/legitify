@@ -22,6 +22,16 @@ func setupGitLab(analyzeArgs *args) (*analyzeExecutor, error) {
 	return nil, nil
 }
 
+func setupGitLabGPTExecutor(analyzeArgs *args) (*analyzeGPTExecutor, error) {
+	wire.Build(
+		wire.Bind(new(Client), new(*glclient.Client)),
+		analyzeProviderSet,
+		provideGitLabClient,
+		provideGitLabCollectors,
+	)
+	return nil, nil
+}
+
 func provideGitLabCollectors(ctx context.Context, client *glclient.Client, analyzeArgs *args) []collectors.Collector {
 	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *glclient.Client) collectors.Collector{
 		namespace.Organization: gitlab.NewGroupCollector,
