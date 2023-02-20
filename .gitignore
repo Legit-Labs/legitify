@@ -33,3 +33,4 @@ docs/Gemfile.lock
 generated-docs.yaml
 .DS_Store
 docs/.DS_Store
+docs/monomarkdown.md

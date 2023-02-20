@@ -3,6 +3,26 @@
 import sys
 import yaml
 import os
+import argparse
+from enum import Enum
+
+
+class HeaderSize(Enum):
+    H1 = 1
+    H2 = 2
+    H3 = 3
+    H4 = 4
+    H5 = 5
+    H6 = 6
+
+def format_header(header_size: HeaderSize, text: str) -> str:
+    if not isinstance(header_size, HeaderSize):
+        raise ValueError("Invalid header size")
+
+    if not isinstance(text, str):
+        raise ValueError("Invalid text")
+
+    return f"{'#' * header_size.value} {text}"
 
 def scm_to_pretty_name(scm):
     if scm == 'github': return 'GitHub'
@@ -22,22 +42,22 @@ def gen_policy_markdown(policy):
 
     remediation_string = "".join([f"{index+1}. {line}\n" for index, line in enumerate(remediation)])
     remediation = f"""
-### Remediation
+{format_header(HeaderSize.H3, "Remediation")}
 {remediation_string}
 """
 
-    tmp = f"""## {title}
+    tmp = f"""{format_header(HeaderSize.H2, title)}
 policy name: {policy_name}
 
 severity: {severity}
 
-### Description
+{format_header(HeaderSize.H3, "Description")}
 {description}
 """
     if len(threat) > 0:
         threat_string = "".join([f"{line}\n" for index, line in enumerate(threat)])
         tmp = f"""{tmp}
-### Threat Example(s)
+{format_header(HeaderSize.H3, "Threat Example(s)")}
 {threat_string}
 """
 
@@ -109,11 +129,46 @@ def create_policy_docs(docs_file, output_dir):
     for scm in docs_yaml:
         create_scm_policy_docs(scm, docs_yaml[scm], output_dir)
 
-def print_usage():
-    print("python gen-gh-pages-docs.py docs_file output_directory")
+def create_monomarkdown(docs_file, output_dir):
+    table_of_contents = f"{format_header(HeaderSize.H1, 'Table of contents')}\n"
 
-if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print_usage()
-        exit(1)
-    create_policy_docs(sys.argv[1], sys.argv[2])
+    docs_yaml = get_docs_yaml(docs_file)
+    result = ""
+
+    i = 1
+    for scm in docs_yaml:
+        pretty_name = scm_to_pretty_name(scm)
+        result += f"{format_header(HeaderSize.H1, pretty_name)}\n"
+        table_of_contents += f"{i}. [{pretty_name}](#{scm})\n"
+        j = 1
+        for ns in docs_yaml[scm]:
+            table_of_contents += f"\t{j}. [{ns}](#{ns})\n"
+            result += f"{format_header(HeaderSize.H2, ns)}\n"
+            k = 1
+            for policy in docs_yaml[scm][ns]:
+                table_of_contents += f"\t\t{k}. [{policy['title']}](#{policy['title'].lower().replace(' ', '-')})\n"
+                policy_md = gen_policy_markdown(policy)
+                result += f"{policy_md}\n"
+                k += 1
+            j += 1
+        i += 1
+
+    with open(os.path.join(output_dir, "monomarkdown.md"), "w") as f:
+        f.write(table_of_contents)
+        f.write("\n")
+        f.write(result)
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("docs_file", type=str, help="input file name")
+    parser.add_argument("output_dir", type=str, help="output directory")
+    parser.add_argument("--monomarkdown", action='store_true')
+
+    args = parser.parse_args()
+
+    if not args.monomarkdown:
+        create_policy_docs(args.docs_file, args.output_dir)
+    else:
+        create_monomarkdown(args.docs_file, args.output_dir)

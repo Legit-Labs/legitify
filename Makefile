@@ -22,6 +22,7 @@ clean:
 	rm -f "${BINARY_NAME}"
 	rm -rf docs/github
 	rm -rf docs/gitlab
+	rm -rf docs/monomarkdown.md
 
 .PHONY: clean
 
