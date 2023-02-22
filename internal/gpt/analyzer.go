@@ -67,12 +67,12 @@ func generatePrompt(toAnalyze []byte, entityType string) string {
 }
 
 func streamResults(stream *gogpt.CompletionStream, barName string) (string, error) {
-	aggregate := strings.Builder{}
-
 	progressbar.Report(progressbar.NewOptionalBar(barName, 0, true))
-	defer stream.Close()
-	defer progressbar.Report(progressbar.NewDynamicUpdate(barName, 0, 0, true))
 
+	defer stream.Close()
+	defer progressbar.Report(progressbar.NewBarClose(barName, true))
+
+	aggregate := strings.Builder{}
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
@@ -86,7 +86,7 @@ func streamResults(stream *gogpt.CompletionStream, barName string) (string, erro
 		if len(response.Choices) > 0 {
 			aggregate.WriteString(response.Choices[0].Text)
 
-			progressbar.Report(progressbar.NewDynamicUpdate(barName, 1, 4, false))
+			progressbar.Report(progressbar.NewDynamicUpdate(barName, 1, 4))
 		}
 	}
 

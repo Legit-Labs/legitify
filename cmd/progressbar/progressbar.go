@@ -145,10 +145,6 @@ func (pb *progressBar) handleDynamicBarUpdate(data DynamicBarUpdate) {
 	if data.Change > 0 {
 		val.IncrBy(data.Change)
 	}
-
-	if data.Close {
-		val.SetTotal(-1, true)
-	}
 }
 
 func (pb *progressBar) handleBarUpdate(data BarUpdate) {
@@ -200,7 +196,7 @@ func (pb *progressBar) handleBarClose(data BarClose) {
 		log.Panicf("trying to update a bar that doesn't exist: %s (%v)", displayName, data)
 	}
 
-	if !val.Completed() {
+	if !data.AllowUncompleted && !val.Completed() {
 		log.Printf("BUG: closing bar %s although it is not completed. please report this issue to legitify repository.", displayName)
 	}
 
