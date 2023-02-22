@@ -12,13 +12,18 @@ type RequiredBarCreation OptionalBarCreation
 type OptionalBarCreation struct {
 	BarName       string
 	TotalEntities int
+	IsDynamic     bool
 }
 
 type BarUpdate struct {
-	BarName     string
-	TotalChange int
-	TriggerDone bool
-	Change      int
+	BarName string
+	Change  int
+}
+
+type DynamicBarUpdate struct {
+	BarUpdate
+	TotalChange int64
+	Close       bool
 }
 
 type TimedBarCreation struct {
@@ -49,10 +54,11 @@ func NewRequiredBar(name string, total int) RequiredBarCreation {
 
 // NewOptionalBar creates a request to create a new optional bar.
 // It is used to create a bar without marking it for the minimum requirement count.
-func NewOptionalBar(name string, total int) OptionalBarCreation {
+func NewOptionalBar(name string, total int, isDynamic bool) OptionalBarCreation {
 	return OptionalBarCreation{
 		BarName:       name,
 		TotalEntities: total,
+		IsDynamic:     isDynamic,
 	}
 }
 
@@ -62,6 +68,17 @@ func NewUpdate(name string, change int) BarUpdate {
 	return BarUpdate{
 		BarName: name,
 		Change:  change,
+	}
+}
+
+func NewDynamicUpdate(name string, change int, totalChange int64, finish bool) DynamicBarUpdate {
+	return DynamicBarUpdate{
+		BarUpdate: BarUpdate{
+			BarName: name,
+			Change:  change,
+		},
+		TotalChange: totalChange,
+		Close:       finish,
 	}
 }
 

@@ -67,44 +67,29 @@ func generatePrompt(toAnalyze []byte, entityType string) string {
 }
 
 func streamResults(stream *gogpt.CompletionStream, barName string) (string, error) {
-	progressbar.Report(progressbar.OptionalBarCreation{
-		BarName:       barName,
-		TotalEntities: 0,
-	})
-
 	aggregate := strings.Builder{}
+
+	progressbar.Report(progressbar.NewOptionalBar(barName, 0, true))
 	defer stream.Close()
+	defer progressbar.Report(progressbar.NewDynamicUpdate(barName, 0, 0, true))
 
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
-			progressbar.Report(progressbar.BarUpdate{
-				BarName:     barName,
-				TriggerDone: true,
-			})
 			break
 		}
 
 		if err != nil {
-			progressbar.Report(progressbar.BarClose{
-				BarName: barName,
-			})
 			return "", err
 		}
 
 		if len(response.Choices) > 0 {
-			progressbar.Report(progressbar.BarUpdate{
-				BarName:     barName,
-				Change:      1,
-				TotalChange: 4,
-			})
 			aggregate.WriteString(response.Choices[0].Text)
+
+			progressbar.Report(progressbar.NewDynamicUpdate(barName, 1, 4, false))
 		}
 	}
 
-	progressbar.Report(progressbar.BarClose{
-		BarName: barName,
-	})
 	return aggregate.String(), nil
 }
 
