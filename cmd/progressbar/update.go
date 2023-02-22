@@ -12,13 +12,17 @@ type RequiredBarCreation OptionalBarCreation
 type OptionalBarCreation struct {
 	BarName       string
 	TotalEntities int
+	IsDynamic     bool
 }
 
 type BarUpdate struct {
-	BarName     string
-	TotalChange int
-	TriggerDone bool
-	Change      int
+	BarName string
+	Change  int
+}
+
+type DynamicBarUpdate struct {
+	BarUpdate
+	TotalChange int64
 }
 
 type TimedBarCreation struct {
@@ -27,7 +31,8 @@ type TimedBarCreation struct {
 }
 
 type BarClose struct {
-	BarName string
+	BarName          string
+	AllowUncompleted bool
 }
 
 // NewMinimumRequiredBars creates a request to set the minimum number of bars.
@@ -49,10 +54,11 @@ func NewRequiredBar(name string, total int) RequiredBarCreation {
 
 // NewOptionalBar creates a request to create a new optional bar.
 // It is used to create a bar without marking it for the minimum requirement count.
-func NewOptionalBar(name string, total int) OptionalBarCreation {
+func NewOptionalBar(name string, total int, isDynamic bool) OptionalBarCreation {
 	return OptionalBarCreation{
 		BarName:       name,
 		TotalEntities: total,
+		IsDynamic:     isDynamic,
 	}
 }
 
@@ -62,6 +68,16 @@ func NewUpdate(name string, change int) BarUpdate {
 	return BarUpdate{
 		BarName: name,
 		Change:  change,
+	}
+}
+
+func NewDynamicUpdate(name string, change int, totalChange int64) DynamicBarUpdate {
+	return DynamicBarUpdate{
+		BarUpdate: BarUpdate{
+			BarName: name,
+			Change:  change,
+		},
+		TotalChange: totalChange,
 	}
 }
 
@@ -77,8 +93,9 @@ func NewTimedBar(name string, end time.Time) TimedBarCreation {
 // NewBarClose creates a request to close an existing bar.
 // It is used to prevent the program from being stuck if a progress bar is not completed (due to error).
 // In case the progress bar already completed, it is just ignored.
-func NewBarClose(name string) BarClose {
+func NewBarClose(name string, allowUncompleted bool) BarClose {
 	return BarClose{
-		BarName: name,
+		BarName:          name,
+		AllowUncompleted: allowUncompleted,
 	}
 }
