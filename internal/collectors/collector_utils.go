@@ -84,7 +84,7 @@ func (b *BaseCollector) makeChannels() {
 }
 
 func (b *BaseCollector) closeChannels() {
-	b.progressChan <- progressbar.NewBarClose(b.namespace, false)
+	b.progressChan <- progressbar.NewBarClose(b.namespace)
 	close(b.collectedChan)
 	close(b.progressChan)
 	close(b.missingPermChan)
