@@ -166,7 +166,7 @@ func (pb *progressBar) handleDynamicBarUpdate(data DynamicBarUpdate) {
 
 	if data.Change > 0 {
 		if currentTotal == 0 {
-			val.SetTotal(currentTotal+int64(data.Change), false)
+			val.SetTotal(int64(data.Change), false)
 		}
 
 		val.IncrBy(data.Change)
