@@ -165,6 +165,8 @@ func (pb *progressBar) handleDynamicBarUpdate(data DynamicBarUpdate) {
 	}
 
 	if data.Change > 0 {
+		// in case the bar total is set to zero, we need to increase it to show there is some progress
+		// otherwise mpb won't draw progress in this bar
 		if currentTotal == 0 {
 			val.SetTotal(int64(data.Change), false)
 		}

@@ -90,6 +90,8 @@ func NewDynamicUpdate(name string, change int) DynamicBarUpdate {
 	}
 }
 
+// NewDynamicTotalUpdate increases the bar total entities by totalChange.
+// totalChange must be positive.
 func NewDynamicTotalUpdate(name string, totalChange int64) DynamicBarUpdate {
 	return DynamicBarUpdate{
 		BarUpdate: BarUpdate{
