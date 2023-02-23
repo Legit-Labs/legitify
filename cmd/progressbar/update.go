@@ -14,9 +14,8 @@ type OptionalBarCreation struct {
 	TotalEntities int
 }
 
-type OptionalDynamicBarCreation struct {
-	BarName       string
-	TotalEntities int
+type OptionalSpinnerBarCreation struct {
+	BarName string
 }
 
 type BarUpdate struct {
@@ -24,9 +23,8 @@ type BarUpdate struct {
 	Change  int
 }
 
-type DynamicBarUpdate struct {
+type SpinnerBarUpdate struct {
 	BarUpdate
-	TotalChange int64
 }
 
 type TimedBarCreation struct {
@@ -65,10 +63,9 @@ func NewOptionalBar(name string, total int) OptionalBarCreation {
 	}
 }
 
-func NewOptionalDynamicBar(name string, total int) OptionalDynamicBarCreation {
-	return OptionalDynamicBarCreation{
-		BarName:       name,
-		TotalEntities: total,
+func NewOptionalSpinnerBar(name string) OptionalSpinnerBarCreation {
+	return OptionalSpinnerBarCreation{
+		BarName: name,
 	}
 }
 
@@ -81,23 +78,12 @@ func NewUpdate(name string, change int) BarUpdate {
 	}
 }
 
-func NewDynamicUpdate(name string, change int) DynamicBarUpdate {
-	return DynamicBarUpdate{
+func NewSpinnerBarUpdate(name string, change int) SpinnerBarUpdate {
+	return SpinnerBarUpdate{
 		BarUpdate: BarUpdate{
 			BarName: name,
 			Change:  change,
 		},
-	}
-}
-
-// NewDynamicTotalUpdate increases the bar total entities by totalChange.
-// totalChange must be positive.
-func NewDynamicTotalUpdate(name string, totalChange int64) DynamicBarUpdate {
-	return DynamicBarUpdate{
-		BarUpdate: BarUpdate{
-			BarName: name,
-		},
-		TotalChange: totalChange,
 	}
 }
 

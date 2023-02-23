@@ -78,16 +78,16 @@ func (pb *progressBar) Run() group_waiter.Waitable {
 				pb.handleRequiredBarCreation(data)
 			case OptionalBarCreation:
 				pb.handleOptionalBarCreation(data)
-			case OptionalDynamicBarCreation:
-				pb.handleOptionalDynamicBarCreation(data)
+			case OptionalSpinnerBarCreation:
+				pb.handleOptionalSpinnerBarCreation(data)
 			case BarUpdate:
 				pb.handleBarUpdate(data)
 			case TimedBarCreation:
 				pb.handleTimedBarCreation(data)
 			case BarClose:
 				pb.handleBarClose(data)
-			case DynamicBarUpdate:
-				pb.handleDynamicBarUpdate(data)
+			case SpinnerBarUpdate:
+				pb.handleSpinnerBarUpdate(data)
 			default:
 				log.Panicf("unexpected progress update type: %t", d)
 			}
@@ -110,14 +110,14 @@ func (pb *progressBar) handleRequiredBarCreation(data RequiredBarCreation) {
 	pb.waiter.ReportBarCreation()
 }
 
-func (pb *progressBar) handleOptionalDynamicBarCreation(data OptionalDynamicBarCreation) {
+func (pb *progressBar) handleOptionalSpinnerBarCreation(data OptionalSpinnerBarCreation) {
 	displayName := data.BarName
 
 	if _, exists := pb.bars[displayName]; exists {
 		log.Panicf("trying to create a dynamic bar that already exists: %s (%v)", displayName, data)
 	}
 
-	pb.bars[displayName] = pb.progress.AddBar(int64(data.TotalEntities),
+	pb.bars[displayName] = pb.progress.AddBar(0,
 		mpb.PrependDecorators(
 			decor.Name(displayName, decor.WC{W: len(displayName) + 1, C: decor.DSyncSpaceR}),
 			decor.Spinner([]string{"∙∙∙∙", "●∙∙∙", "∙●∙∙", "∙∙●∙", "∙∙∙●", "∙∙∙∙"}, decor.WCSyncSpaceR),
@@ -150,7 +150,7 @@ func (pb *progressBar) handleOptionalBarCreation(data OptionalBarCreation) {
 	)
 }
 
-func (pb *progressBar) handleDynamicBarUpdate(data DynamicBarUpdate) {
+func (pb *progressBar) handleSpinnerBarUpdate(data SpinnerBarUpdate) {
 	displayName := data.BarName
 
 	val, exists := pb.bars[displayName]
@@ -158,19 +158,9 @@ func (pb *progressBar) handleDynamicBarUpdate(data DynamicBarUpdate) {
 		log.Panicf("trying to update a bar that doesn't exist: %s (%v)", displayName, data)
 	}
 
-	currentTotal := val.Current()
-
-	if data.TotalChange > 0 {
-		val.SetTotal(currentTotal+data.TotalChange, false)
-	}
-
 	if data.Change > 0 {
-		// in case the bar total is set to zero, we need to increase it to show there is some progress
-		// otherwise mpb won't draw progress in this bar
-		if currentTotal == 0 {
-			val.SetTotal(int64(data.Change), false)
-		}
-
+		currentTotal := val.Current()
+		val.SetTotal(int64(data.Change)+currentTotal+1, false)
 		val.IncrBy(data.Change)
 	}
 }

@@ -67,7 +67,7 @@ func generatePrompt(toAnalyze []byte, entityType string) string {
 }
 
 func streamResults(stream *gogpt.CompletionStream, barName string) (string, error) {
-	progressbar.Report(progressbar.NewOptionalDynamicBar(barName, 0))
+	progressbar.Report(progressbar.NewOptionalSpinnerBar(barName))
 	defer progressbar.Report(progressbar.NewBarCloseAllowUncompleted(barName))
 
 	aggregate := strings.Builder{}
@@ -84,7 +84,7 @@ func streamResults(stream *gogpt.CompletionStream, barName string) (string, erro
 		if len(response.Choices) > 0 {
 			aggregate.WriteString(response.Choices[0].Text)
 
-			progressbar.Report(progressbar.NewDynamicUpdate(barName, 1))
+			progressbar.Report(progressbar.NewSpinnerBarUpdate(barName, 1))
 		}
 	}
 
