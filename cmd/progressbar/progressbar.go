@@ -114,7 +114,7 @@ func (pb *progressBar) handleOptionalDynamicBarCreation(data OptionalDynamicBarC
 	displayName := data.BarName
 
 	if _, exists := pb.bars[displayName]; exists {
-		log.Panicf("trying to create a bar that already exists: %s (%v)", displayName, data)
+		log.Panicf("trying to create a dynamic bar that already exists: %s (%v)", displayName, data)
 	}
 
 	pb.bars[displayName] = pb.progress.AddBar(int64(data.TotalEntities),
