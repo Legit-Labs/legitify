@@ -12,7 +12,10 @@ type RequiredBarCreation OptionalBarCreation
 type OptionalBarCreation struct {
 	BarName       string
 	TotalEntities int
-	IsDynamic     bool
+}
+
+type OptionalSpinnerBarCreation struct {
+	BarName string
 }
 
 type BarUpdate struct {
@@ -20,9 +23,8 @@ type BarUpdate struct {
 	Change  int
 }
 
-type DynamicBarUpdate struct {
+type SpinnerBarUpdate struct {
 	BarUpdate
-	TotalChange int64
 }
 
 type TimedBarCreation struct {
@@ -54,11 +56,16 @@ func NewRequiredBar(name string, total int) RequiredBarCreation {
 
 // NewOptionalBar creates a request to create a new optional bar.
 // It is used to create a bar without marking it for the minimum requirement count.
-func NewOptionalBar(name string, total int, isDynamic bool) OptionalBarCreation {
+func NewOptionalBar(name string, total int) OptionalBarCreation {
 	return OptionalBarCreation{
 		BarName:       name,
 		TotalEntities: total,
-		IsDynamic:     isDynamic,
+	}
+}
+
+func NewOptionalSpinnerBar(name string) OptionalSpinnerBarCreation {
+	return OptionalSpinnerBarCreation{
+		BarName: name,
 	}
 }
 
@@ -71,13 +78,12 @@ func NewUpdate(name string, change int) BarUpdate {
 	}
 }
 
-func NewDynamicUpdate(name string, change int, totalChange int64) DynamicBarUpdate {
-	return DynamicBarUpdate{
+func NewSpinnerBarUpdate(name string, change int) SpinnerBarUpdate {
+	return SpinnerBarUpdate{
 		BarUpdate: BarUpdate{
 			BarName: name,
 			Change:  change,
 		},
-		TotalChange: totalChange,
 	}
 }
 
@@ -93,9 +99,16 @@ func NewTimedBar(name string, end time.Time) TimedBarCreation {
 // NewBarClose creates a request to close an existing bar.
 // It is used to prevent the program from being stuck if a progress bar is not completed (due to error).
 // In case the progress bar already completed, it is just ignored.
-func NewBarClose(name string, allowUncompleted bool) BarClose {
+func NewBarClose(name string) BarClose {
 	return BarClose{
 		BarName:          name,
-		AllowUncompleted: allowUncompleted,
+		AllowUncompleted: false,
+	}
+}
+
+func NewBarCloseAllowUncompleted(name string) BarClose {
+	return BarClose{
+		BarName:          name,
+		AllowUncompleted: true,
 	}
 }

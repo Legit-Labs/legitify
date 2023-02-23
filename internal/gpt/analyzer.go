@@ -67,8 +67,8 @@ func generatePrompt(toAnalyze []byte, entityType string) string {
 }
 
 func streamResults(stream *gogpt.CompletionStream, barName string) (string, error) {
-	progressbar.Report(progressbar.NewOptionalBar(barName, 0, true))
-	defer progressbar.Report(progressbar.NewBarClose(barName, true))
+	progressbar.Report(progressbar.NewOptionalSpinnerBar(barName))
+	defer progressbar.Report(progressbar.NewBarCloseAllowUncompleted(barName))
 
 	aggregate := strings.Builder{}
 	for {
@@ -84,7 +84,7 @@ func streamResults(stream *gogpt.CompletionStream, barName string) (string, erro
 		if len(response.Choices) > 0 {
 			aggregate.WriteString(response.Choices[0].Text)
 
-			progressbar.Report(progressbar.NewDynamicUpdate(barName, 1, 4))
+			progressbar.Report(progressbar.NewSpinnerBarUpdate(barName, 1))
 		}
 	}
 
@@ -126,7 +126,7 @@ func (a *Analyzer) Analyze(dataChannel <-chan collectors.CollectedData) chan Res
 				defer stream.Close()
 
 				gptResult, err := streamResults(stream,
-					fmt.Sprintf("GPT generating tokens for %s", data.Entity.Name()))
+					fmt.Sprintf("Streaming GPT response for %s", data.Entity.Name()))
 
 				if err != nil {
 					log.Println(err)
