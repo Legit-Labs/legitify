@@ -12,7 +12,11 @@ type RequiredBarCreation OptionalBarCreation
 type OptionalBarCreation struct {
 	BarName       string
 	TotalEntities int
-	IsDynamic     bool
+}
+
+type OptionalDynamicBarCreation struct {
+	BarName       string
+	TotalEntities int
 }
 
 type BarUpdate struct {
@@ -54,11 +58,17 @@ func NewRequiredBar(name string, total int) RequiredBarCreation {
 
 // NewOptionalBar creates a request to create a new optional bar.
 // It is used to create a bar without marking it for the minimum requirement count.
-func NewOptionalBar(name string, total int, isDynamic bool) OptionalBarCreation {
+func NewOptionalBar(name string, total int) OptionalBarCreation {
 	return OptionalBarCreation{
 		BarName:       name,
 		TotalEntities: total,
-		IsDynamic:     isDynamic,
+	}
+}
+
+func NewOptionalDynamicBar(name string, total int) OptionalDynamicBarCreation {
+	return OptionalDynamicBarCreation{
+		BarName:       name,
+		TotalEntities: total,
 	}
 }
 
@@ -71,11 +81,19 @@ func NewUpdate(name string, change int) BarUpdate {
 	}
 }
 
-func NewDynamicUpdate(name string, change int, totalChange int64) DynamicBarUpdate {
+func NewDynamicUpdate(name string, change int) DynamicBarUpdate {
 	return DynamicBarUpdate{
 		BarUpdate: BarUpdate{
 			BarName: name,
 			Change:  change,
+		},
+	}
+}
+
+func NewDynamicTotalUpdate(name string, totalChange int64) DynamicBarUpdate {
+	return DynamicBarUpdate{
+		BarUpdate: BarUpdate{
+			BarName: name,
 		},
 		TotalChange: totalChange,
 	}
@@ -93,9 +111,16 @@ func NewTimedBar(name string, end time.Time) TimedBarCreation {
 // NewBarClose creates a request to close an existing bar.
 // It is used to prevent the program from being stuck if a progress bar is not completed (due to error).
 // In case the progress bar already completed, it is just ignored.
-func NewBarClose(name string, allowUncompleted bool) BarClose {
+func NewBarClose(name string) BarClose {
 	return BarClose{
 		BarName:          name,
-		AllowUncompleted: allowUncompleted,
+		AllowUncompleted: false,
+	}
+}
+
+func NewBarCloseAllowUncompleted(name string) BarClose {
+	return BarClose{
+		BarName:          name,
+		AllowUncompleted: true,
 	}
 }

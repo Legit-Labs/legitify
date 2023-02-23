@@ -78,6 +78,8 @@ func (pb *progressBar) Run() group_waiter.Waitable {
 				pb.handleRequiredBarCreation(data)
 			case OptionalBarCreation:
 				pb.handleOptionalBarCreation(data)
+			case OptionalDynamicBarCreation:
+				pb.handleOptionalDynamicBarCreation(data)
 			case BarUpdate:
 				pb.handleBarUpdate(data)
 			case TimedBarCreation:
@@ -108,8 +110,26 @@ func (pb *progressBar) handleRequiredBarCreation(data RequiredBarCreation) {
 	pb.waiter.ReportBarCreation()
 }
 
+func (pb *progressBar) handleOptionalDynamicBarCreation(data OptionalDynamicBarCreation) {
+	displayName := data.BarName
+
+	if _, exists := pb.bars[displayName]; exists {
+		log.Panicf("trying to create a bar that already exists: %s (%v)", displayName, data)
+	}
+
+	pb.bars[displayName] = pb.progress.AddBar(int64(data.TotalEntities),
+		mpb.PrependDecorators(
+			decor.Name(displayName, decor.WC{W: len(displayName) + 1, C: decor.DSyncSpaceR}),
+			decor.Spinner([]string{"∙∙∙∙", "●∙∙∙", "∙●∙∙", "∙∙●∙", "∙∙∙●", "∙∙∙∙"}, decor.WCSyncSpaceR),
+		),
+		mpb.AppendDecorators(
+			decor.Current(0, "", decor.WCSyncWidth),
+		),
+	)
+}
+
 func (pb *progressBar) handleOptionalBarCreation(data OptionalBarCreation) {
-	if !data.IsDynamic && data.TotalEntities == 0 {
+	if data.TotalEntities == 0 {
 		return
 	}
 
@@ -138,11 +158,17 @@ func (pb *progressBar) handleDynamicBarUpdate(data DynamicBarUpdate) {
 		log.Panicf("trying to update a bar that doesn't exist: %s (%v)", displayName, data)
 	}
 
+	currentTotal := val.Current()
+
 	if data.TotalChange > 0 {
-		val.SetTotal(val.Current()+data.TotalChange, false)
+		val.SetTotal(currentTotal+data.TotalChange, false)
 	}
 
 	if data.Change > 0 {
+		if currentTotal == 0 {
+			val.SetTotal(currentTotal+int64(data.Change), false)
+		}
+
 		val.IncrBy(data.Change)
 	}
 }
