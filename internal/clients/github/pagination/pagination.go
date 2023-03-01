@@ -23,9 +23,9 @@ func (gh *ghOptioner) OptionsIndex(fnInputsCount int, isVariadic bool) int {
 	return fnInputsCount - 1
 }
 
-func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GHOpts, GHResp] {
-	return pagination.New[ApiRetT, GHOpts, GHResp](fn, opts, &ghOptioner{})
+func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GHResp] {
+	return pagination.New[ApiRetT, GHResp](fn, opts, &ghOptioner{})
 }
-func NewMapper[ApiRetT any, UserRetT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT) *pagination.MappedPager[ApiRetT, UserRetT, GHOpts, GHResp] {
-	return pagination.NewMapper[ApiRetT, UserRetT, GHOpts, GHResp](fn, opts, mapper, &ghOptioner{})
+func NewMapper[ApiRetT any, UserRetT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT) *pagination.MappedPager[ApiRetT, UserRetT, GHResp] {
+	return pagination.NewMapper[ApiRetT, UserRetT, GHResp](fn, opts, mapper, &ghOptioner{})
 }

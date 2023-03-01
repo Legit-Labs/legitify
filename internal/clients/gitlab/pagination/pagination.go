@@ -28,9 +28,9 @@ func (gl *glOptioner) OptionsIndex(fnInputsCount int, isVariadic bool) int {
 	return index
 }
 
-func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GLOpts, GLResp] {
-	return pagination.New[ApiRetT, GLOpts, GLResp](fn, opts, &glOptioner{})
+func New[ApiRetT any](fn interface{}, opts interface{}) *pagination.Basic[ApiRetT, GLResp] {
+	return pagination.New[ApiRetT, GLResp](fn, opts, &glOptioner{})
 }
-func NewMapper[ApiRetT any, UserRetT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT) *pagination.MappedPager[ApiRetT, UserRetT, GLOpts, GLResp] {
-	return pagination.NewMapper[ApiRetT, UserRetT, GLOpts, GLResp](fn, opts, mapper, &glOptioner{})
+func NewMapper[ApiRetT any, UserRetT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT) *pagination.MappedPager[ApiRetT, UserRetT, GLResp] {
+	return pagination.NewMapper[ApiRetT, UserRetT, GLResp](fn, opts, mapper, &glOptioner{})
 }
