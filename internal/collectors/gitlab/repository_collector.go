@@ -73,9 +73,9 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 	return rc.WrappedCollection(func() {
 		gw := group_waiter.New()
 		for _, r := range repositories {
-			repo := r
+			r := r
 			gw.Do(func() {
-				project, _, err := rc.Client.Client().Projects.GetProject(getRepositoryEncodedName(repo), &gitlab2.GetProjectOptions{})
+				project, _, err := rc.Client.Client().Projects.GetProject(getRepositoryEncodedName(r), &gitlab2.GetProjectOptions{})
 				if err != nil {
 					log.Println(err.Error())
 					return
@@ -189,7 +189,7 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 				ch := pagination.New[*gitlab2.Project](rc.Client.Client().Groups.ListGroupProjects, nil).Async(org.Name)
 				for res := range ch {
 					if res.Err != nil {
-						log.Printf("failed to list projects %v", res.Err)
+						log.Printf("failed to list projects for group %s: %v", org.Name, res.Err)
 						return
 					}
 					for _, completedProject := range res.Collected {
