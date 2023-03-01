@@ -125,7 +125,7 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 
 	var result []*gitlab.Group
 
-	ownedGroups := true
+	ownedGroups := false
 	for _, group := range c.orgs {
 		opts := &gitlab.ListGroupsOptions{Owned: &ownedGroups, Search: &group}
 		res, err := pagination.New[*gitlab.Group](c.Client().Groups.ListGroups, opts).Sync()

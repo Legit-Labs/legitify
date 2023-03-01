@@ -1,6 +1,8 @@
 package pagination
 
 import (
+	"reflect"
+
 	"github.com/Legit-Labs/legitify/internal/clients/pagination"
 	"github.com/xanzy/go-gitlab"
 )
@@ -16,8 +18,8 @@ func (gl *glOptioner) Done(resp interface{}) bool {
 }
 func (gl *glOptioner) Advance(resp interface{}, opts interface{}) {
 	r := resp.(GLResp)
-	o := opts.(GLOpts)
-	o.Page = r.NextPage
+	p := reflect.ValueOf(opts).Elem()
+	p.FieldByName("Page").SetInt(int64(r.NextPage))
 }
 
 func (gl *glOptioner) OptionsIndex(fnInputsCount int, isVariadic bool) int {

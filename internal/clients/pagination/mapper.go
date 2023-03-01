@@ -145,5 +145,10 @@ func inputsCount(fn interface{}) (count int, variadic bool) {
 
 func zeroOpts(fn interface{}, optioner Optioner) interface{} {
 	optsLocation := optioner.OptionsIndex(inputsCount(fn))
-	return reflect.Zero(reflect.TypeOf(fn).In(optsLocation)).Interface()
+	opts := reflect.TypeOf(fn).In(optsLocation)
+	if opts.Kind() == reflect.Ptr {
+		return reflect.New(opts.Elem()).Interface()
+	} else {
+		return reflect.Zero(opts).Interface()
+	}
 }
