@@ -80,6 +80,7 @@ func (c *Client) Organizations() ([]types.Organization, error) {
 		result = append(result, types.Organization{
 			Name: g.Name,
 			Role: permissions.OrgRoleOwner,
+			ID:   g.ID,
 		})
 	}
 
@@ -91,8 +92,7 @@ func (c *Client) Organizations() ([]types.Organization, error) {
 }
 
 func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
-	maintainerPermissions := gitlab.MaintainerPermissions
-	opts := gitlab.ListProjectsOptions{MinAccessLevel: &maintainerPermissions}
+	opts := &gitlab.ListProjectsOptions{MinAccessLevel: gitlab.AccessLevel(gitlab.MaintainerPermissions)}
 	mapper := func(projects []*gitlab.Project) []types.RepositoryWithOwner {
 		if projects == nil {
 			return []types.RepositoryWithOwner{}
@@ -118,6 +118,15 @@ func (c *Client) GroupMembers(group *gitlab.Group) ([]*gitlab.GroupMember, error
 	return result.Collected, nil
 }
 
+func (c *Client) IsSiteAdmin() bool {
+	res, _, err := c.Client().Users.CurrentUser()
+	if err != nil {
+		return false // assume false on error
+	}
+
+	return res.IsAdmin
+}
+
 func (c *Client) Groups() ([]*gitlab.Group, error) {
 	if groups, found := c.cache.Get(orgsCacheKeys); found {
 		return groups.([]*gitlab.Group), nil
@@ -125,9 +134,12 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 
 	var result []*gitlab.Group
 
-	ownedGroups := true
+	ownedGroups := !c.IsSiteAdmin() // list all groups as site admin
 	for _, group := range c.orgs {
-		opts := &gitlab.ListGroupsOptions{Owned: &ownedGroups, Search: &group}
+		opts := &gitlab.ListGroupsOptions{
+			Owned:  &ownedGroups,
+			Search: &group,
+		}
 		res, err := pagination.New[*gitlab.Group](c.Client().Groups.ListGroups, opts).Sync()
 		if err != nil {
 			return nil, err

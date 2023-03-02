@@ -2,8 +2,9 @@ package types
 
 import (
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"strings"
+
+	"github.com/Legit-Labs/legitify/internal/common/permissions"
 )
 
 type RepositoryWithOwner struct {
@@ -29,4 +30,5 @@ func (r RepositoryWithOwner) String() string {
 type Organization struct {
 	Name string
 	Role permissions.OrganizationRole
+	ID   int
 }
