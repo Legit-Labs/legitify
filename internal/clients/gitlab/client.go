@@ -94,7 +94,10 @@ func (c *Client) Organizations() ([]types.Organization, error) {
 }
 
 func (c *Client) Repositories() ([]types.RepositoryWithOwner, error) {
-	opts := &gitlab.ListProjectsOptions{MinAccessLevel: gitlab.AccessLevel(gitlab.MaintainerPermissions)}
+	opts := &gitlab.ListProjectsOptions{}
+	if !c.IsAdmin() {
+		opts.MinAccessLevel = gitlab.AccessLevel(gitlab.MaintainerPermissions)
+	}
 	mapper := func(projects []*gitlab.Project) []types.RepositoryWithOwner {
 		if projects == nil {
 			return []types.RepositoryWithOwner{}
