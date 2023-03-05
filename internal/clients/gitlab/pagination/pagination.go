@@ -7,7 +7,6 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-type GLOpts = *gitlab.ListOptions
 type GLResp = *gitlab.Response
 type glOptioner struct {
 }
