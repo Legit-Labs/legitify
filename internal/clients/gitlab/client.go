@@ -22,6 +22,7 @@ type Client struct {
 	client  *gitlab.Client
 	cache   *cache.Cache
 	orgs    []string
+	isAdmin bool
 }
 
 func (c *Client) Client() *gitlab.Client {
@@ -51,6 +52,7 @@ func NewClient(ctx context.Context, token string, endpoint string, orgs []string
 		client:  git,
 		cache:   cache.New(cache.NoExpiration, cache.NoExpiration),
 		orgs:    orgs,
+		isAdmin: IsAdmin(git),
 	}
 
 	return result, nil
@@ -118,12 +120,15 @@ func (c *Client) GroupMembers(group *gitlab.Group) ([]*gitlab.GroupMember, error
 	return result.Collected, nil
 }
 
-func (c *Client) IsSiteAdmin() bool {
-	res, _, err := c.Client().Users.CurrentUser()
+func (c *Client) IsAdmin() bool {
+	return c.isAdmin
+}
+
+func IsAdmin(client *gitlab.Client) bool {
+	res, _, err := client.Users.CurrentUser()
 	if err != nil {
 		return false // assume false on error
 	}
-
 	return res.IsAdmin
 }
 
@@ -134,7 +139,7 @@ func (c *Client) Groups() ([]*gitlab.Group, error) {
 
 	var result []*gitlab.Group
 
-	ownedGroups := !c.IsSiteAdmin() // list all groups as site admin
+	ownedGroups := !c.IsAdmin() // list all groups as site admin
 	for _, group := range c.orgs {
 		opts := &gitlab.ListGroupsOptions{
 			Owned:  &ownedGroups,
