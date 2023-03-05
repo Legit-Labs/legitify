@@ -192,6 +192,7 @@ func (c *Client) Organizations() ([]commontypes.Organization, error) {
 		result = append(result, commontypes.Organization{
 			Name: o.Name(),
 			Role: o.Role,
+			ID:   int(*o.ID),
 		})
 	}
 

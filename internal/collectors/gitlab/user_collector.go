@@ -84,8 +84,8 @@ func (c *userCollector) collectGroupUsers(group *gitlab2.Group) {
 		return
 	}
 
-	for _, member := range members {
-		m := member
+	for _, m := range members {
+		m := m
 		gw.Do(func() {
 			u, _, err := c.Client.Client().Users.GetUser(m.ID, gitlab2.GetUsersOptions{})
 			if err != nil {

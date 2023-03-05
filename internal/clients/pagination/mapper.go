@@ -9,14 +9,14 @@ import (
 
 const defaultChannelSize = 1024
 
-type MappedPager[ApiRetT any, UserRetT any, OptsT any, RespT any] struct {
+type MappedPager[ApiRetT any, UserRetT any, RespT any] struct {
 	Opts     interface{}
 	Fn       interface{}
 	Mapper   func(ApiRetT) []UserRetT
 	optioner Optioner
 }
 
-func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT, optioner Optioner) *MappedPager[ApiRetT, UserRetT, OptsT, RespT] {
+func NewMapper[ApiRetT any, UserRetT any, RespT any](fn interface{}, opts interface{}, mapper func(ApiRetT) []UserRetT, optioner Optioner) *MappedPager[ApiRetT, UserRetT, RespT] {
 	if fn == nil || mapper == nil {
 		log.Panic("creating a pagination mapper requires both a function and a mapper")
 	}
@@ -26,7 +26,7 @@ func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, 
 	if reflect.ValueOf(opts).Kind() != reflect.Ptr {
 		log.Panic("the options parameter must be of a pointer type")
 	}
-	return &MappedPager[ApiRetT, UserRetT, OptsT, RespT]{
+	return &MappedPager[ApiRetT, UserRetT, RespT]{
 		Fn:       fn,
 		Opts:     opts,
 		Mapper:   mapper,
@@ -34,7 +34,7 @@ func NewMapper[ApiRetT any, UserRetT any, OptsT any, RespT any](fn interface{}, 
 	}
 }
 
-func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface{}) <-chan AsyncResult[UserRetT, RespT] {
+func (p *MappedPager[ApiRetT, UserRetT, RespT]) Async(params ...interface{}) <-chan AsyncResult[UserRetT, RespT] {
 	ch := make(chan AsyncResult[UserRetT, RespT], defaultChannelSize)
 
 	apiCall := p.prepareFunc(params...)
@@ -55,7 +55,7 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Async(params ...interface
 	return ch
 }
 
-func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Sync(params ...interface{}) (SyncResult[UserRetT, RespT], error) {
+func (p *MappedPager[ApiRetT, UserRetT, RespT]) Sync(params ...interface{}) (SyncResult[UserRetT, RespT], error) {
 	var results []UserRetT
 	ch := p.Async(params...)
 
@@ -73,7 +73,7 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) Sync(params ...interface{
 // injects the options parameter to the params at the index proided by the optioner,
 // and wraps the API call in a simple zero-args func that returns the explicit types.
 // It assumes that all API calls return (data, resp, error) as their return values.
-func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...interface{}) func() (ApiRetT, RespT, error) {
+func (p *MappedPager[ApiRetT, UserRetT, RespT]) prepareFunc(params ...interface{}) func() (ApiRetT, RespT, error) {
 	// params validation
 	count, isVariadic := inputsCount(p.Fn)
 	paramsCountWithOpts := len(params) + 1
@@ -104,7 +104,7 @@ func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) prepareFunc(params ...int
 	}
 }
 
-func (p *MappedPager[ApiRetT, UserRetT, OptsT, RespT]) parseOutputs(outputs []reflect.Value) (ApiRetT, RespT, error) {
+func (p *MappedPager[ApiRetT, UserRetT, RespT]) parseOutputs(outputs []reflect.Value) (ApiRetT, RespT, error) {
 	const (
 		dataIndex         = iota
 		respIndex         = iota
@@ -145,5 +145,10 @@ func inputsCount(fn interface{}) (count int, variadic bool) {
 
 func zeroOpts(fn interface{}, optioner Optioner) interface{} {
 	optsLocation := optioner.OptionsIndex(inputsCount(fn))
-	return reflect.Zero(reflect.TypeOf(fn).In(optsLocation)).Interface()
+	opts := reflect.TypeOf(fn).In(optsLocation)
+	if opts.Kind() == reflect.Ptr {
+		return reflect.New(opts.Elem()).Interface()
+	} else {
+		return reflect.Zero(opts).Interface()
+	}
 }

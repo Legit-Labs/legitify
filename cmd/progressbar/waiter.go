@@ -45,7 +45,7 @@ func (w *pbWaiter) Wait() {
 	var timeoutVerifier atomic.Bool
 	go func() {
 		// prevent the program from getting stucked if the progress bar does not reach expected number of bars
-		const timeout = 1 * time.Minute
+		const timeout = 3 * time.Minute
 		time.Sleep(timeout)
 		if !timeoutVerifier.Load() {
 			log.Panicf("progress bar was not initialized within %v, quitting.", timeout)

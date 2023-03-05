@@ -1,8 +1,8 @@
 package gitlab
 
 import (
-	"fmt"
 	"log"
+	"sync/atomic"
 
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
@@ -45,18 +45,22 @@ func (rc *repositoryCollector) CollectTotalEntities() int {
 		return 0
 	}
 
-	var total int
+	var total atomic.Int64
+	gw := group_waiter.New()
 	for _, org := range organizations {
-		_, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.Name, &gitlab2.ListGroupProjectsOptions{})
-
-		if err != nil {
-			log.Printf("failed to collect metadata for repositories %s", err)
-		} else {
-			total += resp.TotalItems
-		}
+		org := org
+		gw.Do(func() {
+			_, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.ID, &gitlab2.ListGroupProjectsOptions{})
+			if err != nil {
+				log.Printf("failed to collect metadata for repositories of group %s (%d): %s", org.Name, org.ID, err)
+			} else {
+				total.Add(int64(resp.TotalItems))
+			}
+		})
 	}
+	gw.Wait()
 
-	return total
+	return int(total.Load())
 }
 
 func (rc *repositoryCollector) Collect() collectors.SubCollectorChannels {
@@ -73,9 +77,9 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 	return rc.WrappedCollection(func() {
 		gw := group_waiter.New()
 		for _, r := range repositories {
-			repo := r
+			r := r
 			gw.Do(func() {
-				project, _, err := rc.Client.Client().Projects.GetProject(getRepositoryEncodedName(repo), &gitlab2.GetProjectOptions{})
+				project, _, err := rc.Client.Client().Projects.GetProject(getRepositoryEncodedName(r), &gitlab2.GetProjectOptions{})
 				if err != nil {
 					log.Println(err.Error())
 					return
@@ -96,7 +100,7 @@ func getRepositoryEncodedName(repo types.RepositoryWithOwner) string {
 func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	res, err := pagination.New[*gitlab2.ProtectedBranch](rc.Client.Client().ProtectedBranches.ListProtectedBranches, nil).Sync(int(project.ID()))
 	if err != nil {
-		log.Printf("failed to list projects %s", err)
+		log.Printf("failed to list projects %v", err)
 		return project, err
 	}
 
@@ -108,7 +112,7 @@ func (rc *repositoryCollector) extendProjectWithProtectedBranches(project gitlab
 func (rc *repositoryCollector) extendProjectWithMembers(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
 	res, err := pagination.New[*gitlab2.ProjectMember](rc.Client.Client().ProjectMembers.ListAllProjectMembers, nil).Sync(int(project.ID()))
 	if err != nil {
-		log.Printf("failed to list projects %s", err)
+		log.Printf("failed to list projects %v", err)
 		return project, err
 	}
 
@@ -186,10 +190,10 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 		for _, org := range organizations {
 			org := org
 			gw.Do(func() {
-				ch := pagination.New[*gitlab2.Project](rc.Client.Client().Groups.ListGroupProjects, nil).Async(org.Name)
+				ch := pagination.New[*gitlab2.Project](rc.Client.Client().Groups.ListGroupProjects, nil).Async(org.ID)
 				for res := range ch {
 					if res.Err != nil {
-						log.Printf("failed to list projects %s", err)
+						log.Printf("failed to list projects for group %s (%d): %v", org.Name, org.ID, res.Err)
 						return
 					}
 					for _, completedProject := range res.Collected {
@@ -222,7 +226,7 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 	for _, f := range extensionFunctions {
 		proj, err = f(proj)
 		if err != nil {
-			fmt.Printf("Project '%s' collection failed with error:%s", proj.Name(), err)
+			log.Printf("project '%s' collection failed with error: %v", proj.Name(), err)
 			break
 		}
 	}
