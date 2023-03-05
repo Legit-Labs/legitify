@@ -1,11 +1,12 @@
 package pagination
 
 import (
+	"reflect"
+
 	"github.com/Legit-Labs/legitify/internal/clients/pagination"
 	"github.com/google/go-github/v49/github"
 )
 
-type GHOpts = *github.ListOptions
 type GHResp = *github.Response
 type ghOptioner struct {
 }
@@ -16,8 +17,8 @@ func (gh *ghOptioner) Done(resp interface{}) bool {
 }
 func (gh *ghOptioner) Advance(resp interface{}, opts interface{}) {
 	r := resp.(GHResp)
-	o := opts.(GHOpts)
-	o.Page = r.NextPage
+	p := reflect.ValueOf(opts).Elem()
+	p.FieldByName("Page").SetInt(int64(r.NextPage))
 }
 func (gh *ghOptioner) OptionsIndex(fnInputsCount int, isVariadic bool) int {
 	return fnInputsCount - 1
