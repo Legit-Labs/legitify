@@ -278,16 +278,21 @@ func (c *Client) collectOrgsList() ([]string, error) {
 }
 
 func (c *Client) collectSpecificOrganizations() ([]githubcollected.ExtendedOrg, error) {
-	res := make([]githubcollected.ExtendedOrg, 0)
+	res := make([]githubcollected.ExtendedOrg, 0, len(c.orgs))
 
 	for _, o := range c.orgs {
 		org, err := c.Organization(o)
 
 		if err != nil {
-			return nil, err
+			log.Printf("failed to list org %v: %v", o, err)
+			continue
 		}
 
 		res = append(res, *org)
+	}
+
+	if len(res) == 0 {
+		return nil, fmt.Errorf("could not list any organization")
 	}
 
 	return res, nil
