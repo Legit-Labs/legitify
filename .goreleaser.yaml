@@ -64,8 +64,7 @@ changelog:
       - '^docs:'
       - '^test:'
 brews:
-  -
-    name: legitify
+  - name: legitify
     homepage: "https://github.com/Legit-Labs/legitify"
     tap:
       owner: legit-labs
