@@ -69,6 +69,4 @@ brews:
     tap:
       owner: legit-labs
       name: homebrew-legit-labs
-    commit_author:
-      name: legit-labs
-      email: research@legitsecurity.com
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}""
