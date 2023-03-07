@@ -69,4 +69,4 @@ brews:
     tap:
       owner: legit-labs
       name: homebrew-legit-labs
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}""
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
