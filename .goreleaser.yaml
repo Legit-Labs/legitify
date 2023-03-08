@@ -63,10 +63,3 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
-brews:
-  - name: legitify
-    homepage: "https://github.com/Legit-Labs/legitify"
-    tap:
-      owner: legit-labs
-      name: homebrew-legit-labs
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"

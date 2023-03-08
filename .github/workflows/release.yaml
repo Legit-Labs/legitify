@@ -40,7 +40,6 @@ jobs:
           args: "release --rm-dist"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
       - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
         with:
           name: ${{ env.GORELEASER_ARTIFACTS_NAME }}
@@ -143,6 +142,8 @@ jobs:
   release:
     needs: macos_sign
     runs-on: ubuntu-latest
+    outputs:
+      brew_release_file: ${{ steps.artifact_name.outputs.brew_release_file }}
     permissions:
       actions: read # To read the workflow path.
       id-token: write # To sign the provenance.
@@ -169,6 +170,13 @@ jobs:
         # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
+      - name: brew-inputs
+        id: artifact_name
+        run: |
+          set -euo pipefail
+          cd "${{ env.ARTIFACTS_DOWNLOAD_PATH }}"
+          file_name=$(find . -maxdepth 1 -type f -name "*darwin_amd64*" -exec basename {} \;)
+          echo "brew_release_file=$file_name" >> $GITHUB_OUTPUT
   provenance:
     needs: macos_sign
     permissions:
@@ -179,3 +187,29 @@ jobs:
     with:
       base64-subjects: "${{ needs.macos_sign.outputs.hashes }}"
       upload-assets: true # upload to a new release
+  bump:   
+    needs: release
+    runs-on: macos-latest
+    steps:
+    - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
+        with:
+          name: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
+          path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
+    - name: Get version
+      id: get_version
+      run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+    - name: Set SHA
+      id: shasum
+      run: |
+        cd ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
+        echo ::set-output name=sha::"$(shasum -a 256 ${{ needs.release.outputs.brew_release_file }} | awk '{printf $1}')"
+    - name: Bump Brew
+      env: 
+        HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+      run: |
+        brew tap legit-labs/legit-labs
+        brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
+        --sha256=${{ steps.shasum.outputs.sha }} \
+        --url="https://github.com/legit-labs/legitify/releases/download/${{ steps.get_version.outputs.version }}/${{ needs.release.outputs.brew_release_file }}" \
+        --version=${{ steps.get_version.outputs.version }} \
+        legit-labs/legit-labs/legitify
