@@ -192,17 +192,17 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
-        with:
+      with:
           name: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
           path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
     - name: Get version
       id: get_version
-      run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+      run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
     - name: Set SHA
       id: shasum
       run: |
         cd ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
-        echo ::set-output name=sha::"$(shasum -a 256 ${{ needs.release.outputs.brew_release_file }} | awk '{printf $1}')"
+        echo "sha=$(shasum -a 256 ${{ needs.release.outputs.brew_release_file }} | awk '{printf $1}')" >> $GITHUB_OUTPUT
     - name: Bump Brew
       env: 
         HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
