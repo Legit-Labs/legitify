@@ -10,6 +10,7 @@ env:
   GORELEASER_ARTIFACTS_NAME: release_candidate
   SIGNED_MACOS_ARTIFACTS_NAME: signed_macos_release
   GORELEASER_ARTIFACTS_DOWNLOAD_PATH: /tmp/archives
+  BREW_RELEASE_FILES_ASSET_NAME: brew_release_assets
 jobs:
   goreleaser:
     outputs:
@@ -173,8 +174,8 @@ jobs:
       - name: upload-brew-artifacts
         uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
         with:
-          name: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
-          path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
+          name: ${{ env.BREW_RELEASE_FILES_ASSET_NAME }}
+          path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
       - name: brew-inputs
         id: artifact_name
         run: |
@@ -198,7 +199,7 @@ jobs:
     steps:
     - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
       with:
-          name: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
+          name: ${{ env.BREW_RELEASE_FILES_ASSET_NAME }}
           path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
     - name: Get version
       id: get_version
