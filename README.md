@@ -17,12 +17,20 @@ https://user-images.githubusercontent.com/107790206/210602039-2d022692-87ea-4005
 
 ## Installation
 
-1. You can download the latest legitify release from https://github.com/Legit-Labs/legitify/releases, each archive contains:
+Installation is possible in several ways:
 
-- Legitify binary for the desired platform
-- Built-in policies provided by Legit Security
+- For macOS (or linux) using homebrew:
+```
+brew tap legit-labs/legit-labs
+brew install legitify
+```
 
-2. From source with the following steps:
+- You can download the latest legitify release from https://github.com/Legit-Labs/legitify/releases, each archive contains:
+
+  - Legitify binary for the desired platform
+  - Built-in policies provided by Legit Security
+
+- From source with the following steps:
 
 ```
 git clone git@github.com:Legit-Labs/legitify.git
