@@ -10,7 +10,6 @@ env:
   GORELEASER_ARTIFACTS_NAME: release_candidate
   SIGNED_MACOS_ARTIFACTS_NAME: signed_macos_release
   GORELEASER_ARTIFACTS_DOWNLOAD_PATH: /tmp/archives
-  BREW_RELEASE_FILES_ASSET_NAME: brew_release_assets
 jobs:
   goreleaser:
     outputs:
@@ -171,17 +170,14 @@ jobs:
         # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
-      - name: upload-brew-artifacts
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
-        with:
-          name: ${{ env.BREW_RELEASE_FILES_ASSET_NAME }}
-          path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
       - name: brew-inputs
         id: artifact_name
         run: |
           set -euo pipefail
           cd "${{ env.ARTIFACTS_DOWNLOAD_PATH }}"
           file_name=$(find . -maxdepth 1 -type f -name "*darwin_amd64*" -exec basename {} \;)
+          sha="$(shasum -a 256 $file_name | awk '{printf $1}')"
+          echo "brew_files_sha=$sha" >> $GITHUB_OUTPUT
           echo "brew_release_file=$file_name" >> $GITHUB_OUTPUT
   provenance:
     needs: macos_sign
@@ -197,18 +193,9 @@ jobs:
     needs: release
     runs-on: macos-latest
     steps:
-    - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
-      with:
-          name: ${{ env.BREW_RELEASE_FILES_ASSET_NAME }}
-          path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
     - name: Get version
       id: get_version
       run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-    - name: Set SHA
-      id: shasum
-      run: |
-        cd ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
-        echo "sha=$(shasum -a 256 ${{ needs.release.outputs.brew_release_file }} | awk '{printf $1}')" >> $GITHUB_OUTPUT
     - name: Bump Brew
       env: 
         # Required token to create a pull request in the tap repository 
@@ -216,7 +203,6 @@ jobs:
       run: |
         brew tap legit-labs/legit-labs
         brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
-        --sha256=${{ steps.shasum.outputs.sha }} \
+        --sha256=${{ needs.release.outputs.brew_files_sha }} \
         --url="https://github.com/legit-labs/legitify/releases/download/${{ steps.get_version.outputs.version }}/${{ needs.release.outputs.brew_release_file }}" \
-        --version=${{ steps.get_version.outputs.version }} \
         legit-labs/legit-labs/legitify
