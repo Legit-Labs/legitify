@@ -191,6 +191,7 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 	}
 
 	gw := group_waiter.New()
+	defer gw.Wait()
 	for {
 		query := repoQuery{}
 		err := rc.Client.GraphQLClient().Query(rc.Context, &query, variables)
@@ -219,7 +220,6 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 
 		variables["repositoryCursor"] = query.Organization.Repositories.PageInfo.EndCursor
 	}
-	gw.Wait()
 
 	return nil
 }
