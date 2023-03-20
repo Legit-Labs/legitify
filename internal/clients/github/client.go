@@ -507,7 +507,7 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 	}
 
 	clientWithSecondaryRateLimit := commontransport.NewCacheTracker(rateLimitWaiter)
-	clientWithAcceptHeader := transport.NewGraphQL(tc)
+	clientWithAcceptHeader := transport.NewGraphQL(rateLimitWaiter.Transport)
 
 	return clientWithSecondaryRateLimit, clientWithAcceptHeader, nil
 }
