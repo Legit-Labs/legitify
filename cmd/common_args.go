@@ -34,7 +34,7 @@ type args struct {
 const (
 	ArgErrorFile  = "error-file"
 	ArgOutputFile = "output-file"
-	ArgToken      = "github-token"
+	ArgToken      = "token"
 	ArgServerUrl  = "server-url"
 	ScmType       = "scm"
 )
@@ -74,7 +74,7 @@ func (a *args) applyOutputOptions() (preExitHook func(), err error) {
 }
 
 func (a *args) addCommonCollectionOptions(flags *pflag.FlagSet) {
-	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github (required unless environment variable LEGITIFY_AUTH_TOKEN is set)")
+	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github/gitlab (required unless environment variable LEGITIFY_AUTH_TOKEN is set)")
 	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github/gitlab endpoint to use instead of the Cloud API (can be set via the environment variable SERVER_URL)")
 	flags.StringVarP(&a.ScmType, ScmType, "", scm_type.GitHub, "server type (GitHub, GitLab), defaults to GitHub")
 }

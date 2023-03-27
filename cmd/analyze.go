@@ -38,7 +38,7 @@ var analyzeArgs args
 func newAnalyzeCommand() *cobra.Command {
 	analyzeCmd := &cobra.Command{
 		Use:          "analyze",
-		Short:        `Analyze GitHub organizations associated with a PAT to find security issues`,
+		Short:        `Analyze GitHub/GitLab organizations associated with a PAT to find security issues`,
 		RunE:         executeAnalyzeCommand,
 		SilenceUsage: true,
 	}
