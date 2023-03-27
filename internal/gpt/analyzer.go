@@ -53,7 +53,7 @@ func cleanData(entity collected.Entity) (marshalled []byte, entityType string, e
 		v.Members = nil
 		marshalled, err = json.Marshal(v)
 	default:
-		err = fmt.Errorf("unknow type %T!\n", v)
+		err = fmt.Errorf("unknow type %T", v)
 		return
 	}
 
