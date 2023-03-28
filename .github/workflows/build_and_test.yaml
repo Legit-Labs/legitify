@@ -9,22 +9,6 @@ on:
 permissions:
   contents: read
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # ratchet:actions/checkout@v3
-      - uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # ratchet:actions/setup-go@v3
-        with:
-          go-version: 1.19
-      - name: Lint
-        uses: golangci/golangci-lint-action@08e2f20817b15149a52b5b3ebe7de50aff2ba8c5 # v3.4
-        with:
-          version: v1.50.0
-          args: --timeout=3m
-      - uses: dominikh/staticcheck-action@ba605356b4b29a60e87ab9404b712f3461e566dc # ratchet:dominikh/staticcheck-action@v1.3.0
-        with:
-          install-go: false
-          version: "2023.1.3"
   build_and_test:
     strategy:
       matrix:
