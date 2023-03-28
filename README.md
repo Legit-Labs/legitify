@@ -37,6 +37,13 @@ git clone git@github.com:Legit-Labs/legitify.git
 go run main.go analyze ...
 ```
 
+- As a GitHub CLI extension (check out https://github.com/Legit-Labs/gh-legitify for more information)
+```
+gh extension install legit-labs/gh-legitify
+gh legitify
+```
+
+
 ## Provenance
 
 To enhance the software supply chain security of legitify's users, as of v0.1.6, every legitify release contains a [SLSA Level 3 Provenance](https://github.com/slsa-framework/slsa-github-generator/blob/main/internal/builders/generic/README.md) document.  
