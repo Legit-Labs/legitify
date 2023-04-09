@@ -65,7 +65,8 @@ two_factor_authentication_not_required_for_org = false {
 # METADATA
 # scope: rule
 # title: Only Admins Should Be Able To Create Public Repositories
-# description: The organization should be configured to prevent non-admin members creating public repositories. Creating a public repository may expose sensitive organization code, which, once exposed, may be copied, cached or stored by external parties. Therefore, it is highly recommended to restrict the option to create public repositories to admins only and reduce the risk of unintentional code exposure.
+# description: >-
+#   The organization should be configured to prevent non-admin members creating public repositories. Creating a public repository may expose sensitive organization code, which, once exposed, may be copied, cached or stored by external parties. Therefore, it is highly recommended to restrict the option to create public repositories to admins only and reduce the risk of unintentional code exposure. NOTE: You should also verify that repositories owners can't change existing repositories visibility to be public. If allowed, a malicious user could create a private repo and change it to public. See: https://docs.github.com/en/enterprise-cloud@latest/organizations/managing-organization-settings/restricting-repository-visibility-changes-in-your-organization for further information
 # custom:
 #   severity: MEDIUM
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Enter "Member privileges" tab, Under "Repository creation", Toggle off "Public", Click "Save"]
