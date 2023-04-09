@@ -24,7 +24,7 @@ require (
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2
 	github.com/vbauerster/mpb/v8 v8.1.4
 	github.com/xanzy/go-gitlab v0.76.0
-	golang.org/x/net v0.4.0
+	golang.org/x/net v0.8.0
 	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -93,8 +93,8 @@ require (
 	gocloud.dev v0.25.0 // indirect
 	golang.org/x/crypto v0.2.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/api v0.84.0 // indirect
