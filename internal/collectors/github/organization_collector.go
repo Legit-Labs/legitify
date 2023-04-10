@@ -1,6 +1,8 @@
 package github
 
 import (
+	"errors"
+	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"log"
 	"net/http"
 
@@ -32,6 +34,14 @@ var orgSamlQuery struct {
 			} `graphql:"externalIdentities(first: 1)"`
 		}
 	} `graphql:"organization(login: $login)"`
+}
+
+var enterpriseVisibilityChangePolicyQuery struct {
+	Enterprise struct {
+		OwnerInfo struct {
+			MembersCanChangeRepositoryVisibilitySetting string
+		}
+	} `graphql:"enterprise(slug: $slug)"`
 }
 
 func NewOrganizationCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
@@ -89,10 +99,16 @@ func (c *organizationCollector) collectExtraData(org *ghcollected.ExtendedOrg) g
 		log.Printf("failed to collect webhooks data for %s, %s", org.Name(), err)
 	}
 
+	enterpriseVisibilityChangePolicyDisabled, err := c.collectEnterpriseVisibilityChangePolicyDisabled()
+	if err != nil {
+		enterpriseVisibilityChangePolicyDisabled = nil
+		log.Printf("failed to collect enterprise visibility change policy data for %s, %s", org.Name(), err)
+	}
 	return ghcollected.Organization{
-		Organization: org,
-		SamlEnabled:  samlEnabled,
-		Hooks:        hooks,
+		Organization:                             org,
+		SamlEnabled:                              samlEnabled,
+		Hooks:                                    hooks,
+		EnterpriseVisibilityChangePolicyDisabled: enterpriseVisibilityChangePolicyDisabled,
 	}
 }
 
@@ -125,4 +141,26 @@ func (c *organizationCollector) collectOrgSamlData(org string) (*bool, error) {
 
 	return &samlEnabled, nil
 
+}
+
+func (c *organizationCollector) collectEnterpriseVisibilityChangePolicyDisabled() (*bool, error) {
+	enterpriseName, enterpriseExist := context_utils.GetEnterprise(c.Context)
+	visibilityChangeEnabled := false
+	if enterpriseExist {
+		if len(enterpriseName) == 0 {
+			return &visibilityChangeEnabled, errors.New("cannot fetch info for empty enterprise")
+		}
+	}
+	variables := map[string]interface{}{
+		"slug": githubv4.String(enterpriseName),
+	}
+
+	err := c.Client.GraphQLClient().Query(c.Context, &enterpriseVisibilityChangePolicyQuery, variables)
+
+	if err != nil {
+		return nil, err
+	}
+	visibilityChangeEnabled = enterpriseVisibilityChangePolicyQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting == "DISABLED"
+
+	return &visibilityChangeEnabled, nil
 }

@@ -41,10 +41,11 @@ func (e ExtendedOrg) IsFree() bool {
 }
 
 type Organization struct {
-	Organization *ExtendedOrg   `json:"organization"`
-	SamlEnabled  *bool          `json:"saml_enabled,omitempty"`
-	Hooks        []*github.Hook `json:"hooks"`
-	UserRole     permissions.OrganizationRole
+	Organization                             *ExtendedOrg   `json:"organization"`
+	SamlEnabled                              *bool          `json:"saml_enabled,omitempty"`
+	Hooks                                    []*github.Hook `json:"hooks"`
+	UserRole                                 permissions.OrganizationRole
+	EnterpriseVisibilityChangePolicyDisabled *bool `json:"visibility_change_disabled,omitempty"`
 }
 
 func (o Organization) ViolationEntityType() string {

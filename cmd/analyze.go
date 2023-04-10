@@ -18,6 +18,7 @@ func init() {
 
 const (
 	argOrg                        = "org"
+	argEnterprise                 = "enterprise"
 	argRepository                 = "repo"
 	argPoliciesPath               = "policies-path"
 	argNamespace                  = "namespace"
@@ -51,6 +52,7 @@ func newAnalyzeCommand() *cobra.Command {
 	analyzeArgs.addCommonCollectionOptions(flags)
 
 	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
+	flags.StringVarP(&analyzeArgs.Enterprise, argEnterprise, "", "", "organization's enterprise slug")
 	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
@@ -72,6 +74,10 @@ func validateAnalyzeArgs() error {
 
 	if len(analyzeArgs.Organizations) != 0 && len(analyzeArgs.Repositories) != 0 {
 		return fmt.Errorf("cannot use --org & --repo options together")
+	}
+
+	if len(analyzeArgs.Organizations) == 0 && len(analyzeArgs.Enterprise) != 0 {
+		return fmt.Errorf("cannot use --enterprise without the organization option")
 	}
 
 	return nil

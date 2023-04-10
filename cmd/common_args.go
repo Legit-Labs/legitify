@@ -29,6 +29,7 @@ type args struct {
 	InputFile                  string
 	FailedOnly                 bool
 	SimulateSecondaryRateLimit bool
+	Enterprise                 string
 }
 
 const (

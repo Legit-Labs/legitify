@@ -12,6 +12,7 @@ type contextKey string
 
 const (
 	organizationKey               contextKey = "org"
+	enterpriseKey                 contextKey = "enterprise"
 	repositoryKey                 contextKey = "repo"
 	tokenScopesKey                contextKey = "tokenScopes"
 	scorecardEnabledKey           contextKey = "scorecardEnabled"
@@ -28,6 +29,10 @@ func NewContextWithRepos(repos []types.RepositoryWithOwner) context.Context {
 func NewContextWithOrg(org []string) context.Context {
 	ctx := context.Background()
 	return context.WithValue(ctx, organizationKey, org)
+}
+
+func NewContextWithEnterprise(ctx context.Context, enterprise string) context.Context {
+	return context.WithValue(ctx, enterpriseKey, enterprise)
 }
 
 func NewContextWithScorecard(ctx context.Context, scorecardEnabled bool, scorecardVerbose bool) context.Context {
@@ -71,4 +76,8 @@ func GetIsCloud(ctx context.Context) bool {
 func GetSimulateSecondaryRateLimit(ctx context.Context) bool {
 	val, ok := ctx.Value(simulateSecondaryRateLimitKey).(bool)
 	return ok && val
+}
+func GetEnterprise(ctx context.Context) (string, bool) {
+	val, ok := ctx.Value(enterpriseKey).(string)
+	return val, ok
 }

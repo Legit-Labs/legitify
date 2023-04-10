@@ -18,6 +18,7 @@ type organizationMockConfiguration struct {
 
 func newOrganizationMock(config organizationMockConfiguration) githubcollected.Organization {
 	samlEnabledMockResult := false
+	visibilityChangePolicyMockResult := false
 	if config.ssoEnabled != nil {
 		samlEnabledMockResult = *config.ssoEnabled
 	}
@@ -32,9 +33,10 @@ func newOrganizationMock(config organizationMockConfiguration) githubcollected.O
 	}
 
 	return githubcollected.Organization{
-		Organization: nil,
-		SamlEnabled:  &samlEnabledMockResult,
-		Hooks:        hooks,
+		Organization:                             nil,
+		SamlEnabled:                              &samlEnabledMockResult,
+		Hooks:                                    hooks,
+		EnterpriseVisibilityChangePolicyDisabled: &visibilityChangePolicyMockResult,
 	}
 }
 
