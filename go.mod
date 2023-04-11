@@ -14,7 +14,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/open-policy-agent/opa v0.43.1
 	github.com/ossf/scorecard/v4 v4.4.0
-	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sashabaranov/go-gpt3 v1.1.0
 	github.com/shurcooL/githubv4 v0.0.0-20220520033151-0b4e3294ff00
 	github.com/spf13/cobra v1.5.0
