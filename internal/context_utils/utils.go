@@ -12,7 +12,7 @@ type contextKey string
 
 const (
 	organizationKey               contextKey = "org"
-	enterpriseKey                 contextKey = "enterprise"
+	enterpriseKey                 contextKey = "enterprise-slug"
 	repositoryKey                 contextKey = "repo"
 	tokenScopesKey                contextKey = "tokenScopes"
 	scorecardEnabledKey           contextKey = "scorecardEnabled"
@@ -79,5 +79,10 @@ func GetSimulateSecondaryRateLimit(ctx context.Context) bool {
 }
 func GetEnterprise(ctx context.Context) (string, bool) {
 	val, ok := ctx.Value(enterpriseKey).(string)
+	if ok {
+		if val == "" {
+			return "", false
+		}
+	}
 	return val, ok
 }

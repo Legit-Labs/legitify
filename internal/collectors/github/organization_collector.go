@@ -1,7 +1,7 @@
 package github
 
 import (
-	"errors"
+	"fmt"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"log"
 	"net/http"
@@ -41,6 +41,14 @@ var enterpriseVisibilityChangePolicyQuery struct {
 		OwnerInfo struct {
 			MembersCanChangeRepositoryVisibilitySetting string
 		}
+		Organizations struct {
+			Edges []struct {
+				Node struct {
+					Name *githubv4.String
+					Id   *githubv4.ID
+				}
+			}
+		} `graphql:"organizations(query: $org_name, first:1)"`
 	} `graphql:"enterprise(slug: $slug)"`
 }
 
@@ -99,7 +107,7 @@ func (c *organizationCollector) collectExtraData(org *ghcollected.ExtendedOrg) g
 		log.Printf("failed to collect webhooks data for %s, %s", org.Name(), err)
 	}
 
-	enterpriseVisibilityChangePolicyDisabled, err := c.collectEnterpriseVisibilityChangePolicyDisabled()
+	enterpriseVisibilityChangePolicyDisabled, err := c.collectEnterpriseVisibilityChangePolicyDisabled(org.Name())
 	if err != nil {
 		enterpriseVisibilityChangePolicyDisabled = nil
 		log.Printf("failed to collect enterprise visibility change policy data for %s, %s", org.Name(), err)
@@ -143,22 +151,28 @@ func (c *organizationCollector) collectOrgSamlData(org string) (*bool, error) {
 
 }
 
-func (c *organizationCollector) collectEnterpriseVisibilityChangePolicyDisabled() (*bool, error) {
+func (c *organizationCollector) collectEnterpriseVisibilityChangePolicyDisabled(org string) (*bool, error) {
 	enterpriseName, enterpriseExist := context_utils.GetEnterprise(c.Context)
 	visibilityChangeEnabled := false
-	if enterpriseExist {
-		if len(enterpriseName) == 0 {
-			return &visibilityChangeEnabled, errors.New("cannot fetch info for empty enterprise")
-		}
+	if !enterpriseExist {
+		return nil, nil
 	}
+
 	variables := map[string]interface{}{
-		"slug": githubv4.String(enterpriseName),
+		"slug":     githubv4.String(enterpriseName),
+		"org_name": githubv4.String(org),
 	}
 
 	err := c.Client.GraphQLClient().Query(c.Context, &enterpriseVisibilityChangePolicyQuery, variables)
 
 	if err != nil {
 		return nil, err
+	}
+	if len(enterpriseVisibilityChangePolicyQuery.Enterprise.Organizations.Edges) == 0 {
+		return nil, fmt.Errorf("organization: %s was not found in selected enterprise: %s", org, enterpriseName)
+	}
+	if githubv4.String(org) != *enterpriseVisibilityChangePolicyQuery.Enterprise.Organizations.Edges[0].Node.Name {
+		return nil, fmt.Errorf("organization: %s was not found in selected enterprise: %s", org, enterpriseName)
 	}
 	visibilityChangeEnabled = enterpriseVisibilityChangePolicyQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting == "DISABLED"
 

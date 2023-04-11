@@ -39,6 +39,10 @@ func NewSkipper(ctx context.Context) Skipper {
 			"enterprise": func(_ collectors.CollectedData) bool {
 				return !context_utils.GetIsCloud(ctx)
 			},
+			"enterprise_slug": func(_ collectors.CollectedData) bool {
+				_, ok := context_utils.GetEnterprise(ctx)
+				return ok
+			},
 		},
 	}
 }

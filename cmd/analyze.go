@@ -18,7 +18,7 @@ func init() {
 
 const (
 	argOrg                        = "org"
-	argEnterprise                 = "enterprise"
+	argEnterprise                 = "enterprise-slug"
 	argRepository                 = "repo"
 	argPoliciesPath               = "policies-path"
 	argNamespace                  = "namespace"
@@ -76,7 +76,7 @@ func validateAnalyzeArgs() error {
 		return fmt.Errorf("cannot use --org & --repo options together")
 	}
 
-	if len(analyzeArgs.Organizations) == 0 && len(analyzeArgs.Enterprise) != 0 {
+	if len(analyzeArgs.Organizations) == 0 && analyzeArgs.Enterprise != "" {
 		return fmt.Errorf("cannot use --enterprise without the organization option")
 	}
 
