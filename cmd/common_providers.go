@@ -40,7 +40,7 @@ func provideContext(client Client, args *args) (context.Context, error) {
 
 	if len(args.Organizations) != 0 {
 		ctx = context_utils.NewContextWithOrg(args.Organizations)
-		if len(args.Enterprise) != 0 {
+		if args.Enterprise != "" {
 			ctx = context_utils.NewContextWithEnterprise(ctx, args.Enterprise)
 		}
 	} else if len(args.Repositories) != 0 {
