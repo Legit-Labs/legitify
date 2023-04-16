@@ -8,19 +8,16 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	"github.com/Legit-Labs/legitify/internal/common/types"
-	"github.com/patrickmn/go-cache"
 	"github.com/xanzy/go-gitlab"
 )
 
 const (
-	orgsCacheKeys   = "orgs"
 	allGroupsFilter = ""
 )
 
 type Client struct {
 	context context.Context
 	client  *gitlab.Client
-	cache   *cache.Cache
 	orgs    []string
 	isAdmin bool
 }
@@ -50,7 +47,6 @@ func NewClient(ctx context.Context, token string, endpoint string, orgs []string
 	result := &Client{
 		context: ctx,
 		client:  git,
-		cache:   cache.New(cache.NoExpiration, cache.NoExpiration),
 		orgs:    orgs,
 		isAdmin: IsAdmin(git),
 	}
@@ -136,10 +132,6 @@ func IsAdmin(client *gitlab.Client) bool {
 }
 
 func (c *Client) Groups() ([]*gitlab.Group, error) {
-	if groups, found := c.cache.Get(orgsCacheKeys); found {
-		return groups.([]*gitlab.Group), nil
-	}
-
 	var result []*gitlab.Group
 
 	ownedGroups := !c.IsAdmin() // list all groups as site admin
