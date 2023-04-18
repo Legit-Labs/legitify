@@ -48,10 +48,10 @@ func (c *enterpriseCollector) Collect() collectors.SubCollectorChannels {
 
 		gw := group_waiter.New()
 		for _, enterprise := range enterprises {
-			enterprise = enterprise
+			localEnterprise := enterprise
 			gw.Do(func() {
 				c.CollectionChangeByOne()
-				c.CollectDataWithContext(enterprise, enterprise.Url, newEnterpriseContext([]permissions.Role{permissions.EnterpriseAdmin}))
+				c.CollectDataWithContext(localEnterprise, localEnterprise.Url, newEnterpriseContext([]permissions.Role{permissions.EnterpriseAdmin}))
 			})
 		}
 		gw.Wait()
