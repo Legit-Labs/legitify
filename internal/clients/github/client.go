@@ -38,13 +38,15 @@ type Client struct {
 	graphQLRawClient *http.Client
 	serverUrl        string
 	once             sync.Once
+	enterprises      []string
 }
 
-func NewClient(ctx context.Context, token string, githubEndpoint string, org []string) (*Client, error) {
+func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, enterprises []string) (*Client, error) {
 	client := &Client{
-		orgs:      org,
-		context:   ctx,
-		serverUrl: strings.TrimRight(githubEndpoint, "/"),
+		orgs:        org,
+		context:     ctx,
+		serverUrl:   strings.TrimRight(githubEndpoint, "/"),
+		enterprises: enterprises,
 	}
 
 	if err := client.initClients(ctx, token); err != nil {
@@ -510,4 +512,53 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 	clientWithAcceptHeader := transport.NewGraphQL(rateLimitWaiter.Transport)
 
 	return clientWithSecondaryRateLimit, clientWithAcceptHeader, nil
+}
+
+var enterpriseQuery struct {
+	Enterprise struct {
+		OwnerInfo struct {
+			MembersCanChangeRepositoryVisibilitySetting string
+		}
+		Name       string
+		Url        string
+		Id         string
+		DatabaseId int64
+	} `graphql:"enterprise(slug: $slug)"`
+}
+
+func (c *Client) CollectEnterprises() ([]githubcollected.Enterprise, error) {
+	if len(c.enterprises) == 0 {
+		return nil, nil
+	}
+	enterprises, err := c.collectSpecificEnterprises()
+	if err != nil {
+		return nil, err
+	}
+
+	return enterprises, nil
+}
+
+func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, error) {
+	res := make([]githubcollected.Enterprise, 0, len(c.enterprises))
+
+	for _, enterprise := range c.enterprises {
+
+		variables := map[string]interface{}{
+			"slug": githubv4.String(githubv4.String(enterprise)),
+		}
+
+		err := c.GraphQLClient().Query(c.context, &enterpriseQuery, variables)
+		if err != nil {
+			return nil, err
+		}
+		newEnter := githubcollected.NewEnterprise(
+			enterpriseQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting,
+			enterpriseQuery.Enterprise.Name,
+			enterpriseQuery.Enterprise.Url,
+			enterpriseQuery.Enterprise.DatabaseId)
+		res = append(res, newEnter)
+
+	}
+
+	return res, nil
 }

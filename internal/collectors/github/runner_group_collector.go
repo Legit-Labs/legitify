@@ -49,7 +49,7 @@ func (c *runnersCollector) CollectTotalEntities() int {
 	gw := group_waiter.New()
 	orgs, err := c.client.CollectOrganizations()
 	if err != nil {
-		log.Printf("failed to collection organizations %s", err)
+		log.Printf("failed to collect organizations %s", err)
 		return 0
 	}
 

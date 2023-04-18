@@ -107,7 +107,7 @@ func setupGitLabGPTExecutor(analyzeArgs2 *args) (*analyzeGPTExecutor, error) {
 
 func provideGitHubCollectors(ctx context.Context, client *github.Client, analyzeArgs2 *args) []collectors.Collector {
 	type newCollectorFunc func(ctx context.Context, client *github.Client) collectors.Collector
-	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{namespace.Repository: github2.NewRepositoryCollector, namespace.Organization: github2.NewOrganizationCollector, namespace.Member: github2.NewMemberCollector, namespace.Actions: github2.NewActionCollector, namespace.RunnerGroup: github2.NewRunnersCollector}
+	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{namespace.Repository: github2.NewRepositoryCollector, namespace.Organization: github2.NewOrganizationCollector, namespace.Enterprise: github2.NewEnterpriseCollector, namespace.Member: github2.NewMemberCollector, namespace.Actions: github2.NewActionCollector, namespace.RunnerGroup: github2.NewRunnersCollector}
 
 	var result []collectors.Collector
 	for _, ns := range analyzeArgs2.Namespaces {
@@ -120,7 +120,7 @@ func provideGitHubCollectors(ctx context.Context, client *github.Client, analyze
 func provideGitHubClient(analyzeArgs2 *args) (*github.Client, error) {
 	ctx := context_utils.NewContextWithSimulatedSecondaryRateLimit(context.Background(), analyzeArgs2.SimulateSecondaryRateLimit)
 	return github.NewClient(ctx, analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.
-		Organizations)
+		Organizations, analyzeArgs2.Enterprises)
 }
 
 // inject_gitlab.go:
