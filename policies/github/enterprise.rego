@@ -14,5 +14,5 @@ package enterprise
 default enterprise_not_using_visibility_change_disable_policy = true
 
 enterprise_not_using_visibility_change_disable_policy = false {
-	input.visibility_change_disabled
+	input.visibility_change_disabled == "DISABLED"
 }

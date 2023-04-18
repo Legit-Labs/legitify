@@ -519,10 +519,11 @@ var enterpriseQuery struct {
 		OwnerInfo struct {
 			MembersCanChangeRepositoryVisibilitySetting string
 		}
-		Name       string
-		Url        string
-		Id         string
-		DatabaseId int64
+		Name          string
+		Url           string
+		Id            string
+		DatabaseId    int64
+		ViewerIsAdmin bool
 	} `graphql:"enterprise(slug: $slug)"`
 }
 
@@ -555,7 +556,8 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting,
 			enterpriseQuery.Enterprise.Name,
 			enterpriseQuery.Enterprise.Url,
-			enterpriseQuery.Enterprise.DatabaseId)
+			enterpriseQuery.Enterprise.DatabaseId,
+			enterpriseQuery.Enterprise.ViewerIsAdmin)
 		res = append(res, newEnter)
 
 	}

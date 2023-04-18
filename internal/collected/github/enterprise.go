@@ -6,18 +6,23 @@ import (
 )
 
 type Enterprise struct {
-	MembersCanChangeRepositoryVisibilitySetting string
-	EnterpriseName                              string
-	Url                                         string
-	Id                                          int64
-	UserRole                                    permissions.OrganizationRole
+	MembersCanChangeRepositoryVisibilitySetting string `json:"visibility_change_disabled"`
+	EnterpriseName                              string `json:"name"`
+	Url                                         string `json:"url"`
+	Id                                          int64  `json:"id"`
+	UserRole                                    string
 }
 
-func NewEnterprise(MembersCanChangeRepositoryVisibilitySetting string, Name string, Url string, Id int64) Enterprise {
+func NewEnterprise(MembersCanChangeRepositoryVisibilitySetting string, Name string, Url string, Id int64, admin bool) Enterprise {
+	UserRole := ""
+	if admin {
+		UserRole = permissions.EnterpriseAdmin
+	}
 	return Enterprise{MembersCanChangeRepositoryVisibilitySetting: MembersCanChangeRepositoryVisibilitySetting,
 		EnterpriseName: Name,
 		Url:            Url,
 		Id:             Id,
+		UserRole:       UserRole,
 	}
 }
 
