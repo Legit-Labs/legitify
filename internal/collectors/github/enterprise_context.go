@@ -3,10 +3,8 @@ package github
 import "github.com/Legit-Labs/legitify/internal/common/permissions"
 
 type enterpriseContext struct {
-	roles                         []permissions.Role
-	isEnterprise                  bool
-	isBranchProtectionSupported   bool
-	hasBranchProtectionPermission bool
+	roles        []permissions.Role
+	isEnterprise bool
 }
 
 func (ec *enterpriseContext) Premium() bool {
