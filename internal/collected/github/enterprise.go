@@ -6,7 +6,7 @@ import (
 )
 
 type Enterprise struct {
-	MembersCanChangeRepositoryVisibilitySetting string `json:"visibility_change_disabled"`
+	MembersCanChangeRepositoryVisibilitySetting string `json:"members_can_change_repository_visibility"`
 	EnterpriseName                              string `json:"name"`
 	Url                                         string `json:"url"`
 	Id                                          int64  `json:"id"`
