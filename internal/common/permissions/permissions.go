@@ -38,8 +38,9 @@ func IsRepositoryRole(role Role) bool {
 type EnterpriseRole = string
 
 const (
-	EnterpriseAdminRole    EnterpriseRole = "ENTERPRISE-ADMIN"
-	EnterpriseNonAdminRole                = "NON-ENTERPRISE-ADMIN"
+	EnterpriseAdminRole EnterpriseRole = "ENTERPRISE-ADMIN"
+
+	EnterpriseNonAdminRole = "NON-ENTERPRISE-ADMIN"
 )
 
 func IsEnterpriseRole(role Role) bool {
