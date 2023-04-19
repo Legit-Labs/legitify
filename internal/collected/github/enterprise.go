@@ -13,10 +13,10 @@ type Enterprise struct {
 	UserRole                                    string
 }
 
-func NewEnterprise(MembersCanChangeRepositoryVisibilitySetting string, Name string, Url string, Id int64, admin bool) Enterprise {
-	UserRole := ""
-	if admin {
-		UserRole = permissions.EnterpriseAdmin
+func NewEnterprise(MembersCanChangeRepositoryVisibilitySetting string, Name string, Url string, Id int64, isAdmin bool) Enterprise {
+	UserRole := permissions.EnterpriseNonAdminRole
+	if isAdmin {
+		UserRole = permissions.EnterpriseAdminRole
 	}
 	return Enterprise{MembersCanChangeRepositoryVisibilitySetting: MembersCanChangeRepositoryVisibilitySetting,
 		EnterpriseName: Name,

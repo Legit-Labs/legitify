@@ -545,7 +545,7 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 	for _, enterprise := range c.enterprises {
 
 		variables := map[string]interface{}{
-			"slug": githubv4.String(githubv4.String(enterprise)),
+			"slug": githubv4.String(enterprise),
 		}
 
 		err := c.GraphQLClient().Query(c.context, &enterpriseQuery, variables)
