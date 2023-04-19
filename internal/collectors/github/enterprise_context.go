@@ -3,12 +3,11 @@ package github
 import "github.com/Legit-Labs/legitify/internal/common/permissions"
 
 type enterpriseContext struct {
-	roles        []permissions.Role
-	isEnterprise bool
+	roles []permissions.Role
 }
 
 func (ec *enterpriseContext) Premium() bool {
-	return ec.isEnterprise
+	return true
 }
 
 func (ec *enterpriseContext) Roles() []permissions.Role {
@@ -16,7 +15,6 @@ func (ec *enterpriseContext) Roles() []permissions.Role {
 }
 func newEnterpriseContext(roles []permissions.Role) *enterpriseContext {
 	return &enterpriseContext{
-		roles:        roles,
-		isEnterprise: true,
+		roles: roles,
 	}
 }
