@@ -550,7 +550,8 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 
 		err := c.GraphQLClient().Query(c.context, &enterpriseQuery, variables)
 		if err != nil {
-			return nil, err
+			log.Printf("failed to get enterprise %v: %v", enterprise, err)
+			continue
 		}
 		newEnter := githubcollected.NewEnterprise(
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting,
