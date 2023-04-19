@@ -523,11 +523,22 @@ var enterpriseAdminValidScopes = map[TokenScope]bool{
 	EnterpriseRead:          false,
 }
 
+var enterpriseNonAdminValidScopes = map[TokenScope]bool{
+	EnterpriseAdmin:         false,
+	EnterpriseManageRunners: true,
+	EnterpriseManageBilling: true,
+	EnterpriseRead:          true,
+}
+
 func HasEnterpriseScope(toCheck TokenScope, scopes TokenScopes, enterpriseRole EnterpriseRole) bool {
 	var mapping map[string]bool
 	switch enterpriseRole {
 	case EnterpriseAdminRole:
 		mapping = enterpriseAdminValidScopes
+	case EnterpriseNonAdminRole:
+		if allowed, ok := enterpriseNonAdminValidScopes[toCheck]; ok && allowed {
+			return scopes[toCheck]
+		}
 	}
 
 	allowed, ok := mapping[toCheck]
