@@ -19,6 +19,7 @@ func init() {
 const (
 	argOrg                        = "org"
 	argRepository                 = "repo"
+	argEnterprises                = "enterprise"
 	argPoliciesPath               = "policies-path"
 	argNamespace                  = "namespace"
 	argOutputFormat               = "output-format"
@@ -52,6 +53,7 @@ func newAnalyzeCommand() *cobra.Command {
 
 	flags.StringSliceVarP(&analyzeArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
+	flags.StringSliceVarP(&analyzeArgs.Enterprises, argEnterprises, "", nil, "specific enterprises to collect (--enterprise your_enterprise_slug) this flag must be provided with a value")
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
 	flags.StringVarP(&analyzeArgs.ScorecardWhen, argScorecard, "", DefaultScOption, "Whether to run additional scorecard checks "+scorecardWhens)

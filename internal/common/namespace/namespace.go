@@ -5,6 +5,7 @@ import "fmt"
 type Namespace = string
 
 const (
+	Enterprise   Namespace = "enterprise"
 	Organization Namespace = "organization"
 	Repository   Namespace = "repository"
 	Member       Namespace = "member"
@@ -14,6 +15,7 @@ const (
 
 var All = []Namespace{
 	Organization,
+	Enterprise,
 	Repository,
 	Member,
 	Actions,

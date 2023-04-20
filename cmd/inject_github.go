@@ -38,6 +38,7 @@ func provideGitHubCollectors(ctx context.Context, client *github.Client, analyze
 	var collectorsMapping = map[namespace.Namespace]newCollectorFunc{
 		namespace.Repository:   github2.NewRepositoryCollector,
 		namespace.Organization: github2.NewOrganizationCollector,
+		namespace.Enterprise:   github2.NewEnterpriseCollector,
 		namespace.Member:       github2.NewMemberCollector,
 		namespace.Actions:      github2.NewActionCollector,
 		namespace.RunnerGroup:  github2.NewRunnersCollector,
@@ -54,5 +55,5 @@ func provideGitHubCollectors(ctx context.Context, client *github.Client, analyze
 func provideGitHubClient(analyzeArgs *args) (*github.Client, error) {
 	ctx := context_utils.NewContextWithSimulatedSecondaryRateLimit(context.Background(), analyzeArgs.SimulateSecondaryRateLimit)
 	return github.NewClient(ctx, analyzeArgs.Token, analyzeArgs.Endpoint,
-		analyzeArgs.Organizations)
+		analyzeArgs.Organizations, analyzeArgs.Enterprises)
 }

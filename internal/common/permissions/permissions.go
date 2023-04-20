@@ -35,6 +35,18 @@ func IsRepositoryRole(role Role) bool {
 		role == RepoRoleRead
 }
 
+type EnterpriseRole = string
+
+const (
+	EnterpriseAdminRole EnterpriseRole = "ENTERPRISE-ADMIN"
+
+	EnterpriseNonAdminRole = "NON-ENTERPRISE-ADMIN"
+)
+
+func IsEnterpriseRole(role Role) bool {
+	return role == EnterpriseAdminRole || role == EnterpriseNonAdminRole
+}
+
 func HasScope(requiredScope string, availableScopes TokenScopes, roles []Role) bool {
 	hasPermission := false
 
@@ -44,8 +56,9 @@ func HasScope(requiredScope string, availableScopes TokenScopes, roles []Role) b
 			hasPermission = HasOrgScope(requiredScope, availableScopes, role)
 		case IsRepositoryRole(role):
 			hasPermission = HasRepoScope(requiredScope, availableScopes, role)
+		case IsEnterpriseRole(role):
+			hasPermission = HasEnterpriseScope(requiredScope, availableScopes, role)
 		}
-
 		if hasPermission {
 			return true
 		}
@@ -500,6 +513,35 @@ func HasRepoScope(toCheck TokenScope, scopes TokenScopes, repoRole RepositoryRol
 	case RepoRoleRead:
 		mapping = repoReadValidScopes
 	}
+	allowed, ok := mapping[toCheck]
+	return ok && allowed && scopes[toCheck]
+}
+
+var enterpriseAdminValidScopes = map[TokenScope]bool{
+	EnterpriseAdmin:         true,
+	EnterpriseManageRunners: false,
+	EnterpriseManageBilling: false,
+	EnterpriseRead:          false,
+}
+
+var enterpriseNonAdminValidScopes = map[TokenScope]bool{
+	EnterpriseAdmin:         false,
+	EnterpriseManageRunners: true,
+	EnterpriseManageBilling: true,
+	EnterpriseRead:          true,
+}
+
+func HasEnterpriseScope(toCheck TokenScope, scopes TokenScopes, enterpriseRole EnterpriseRole) bool {
+	var mapping map[string]bool
+	switch enterpriseRole {
+	case EnterpriseAdminRole:
+		mapping = enterpriseAdminValidScopes
+	case EnterpriseNonAdminRole:
+		if allowed, ok := enterpriseNonAdminValidScopes[toCheck]; ok && allowed {
+			return scopes[toCheck]
+		}
+	}
+
 	allowed, ok := mapping[toCheck]
 	return ok && allowed && scopes[toCheck]
 }

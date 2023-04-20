@@ -18,6 +18,7 @@ type args struct {
 	ScmType                    scm_type.ScmType
 	Organizations              []string
 	Repositories               []string
+	Enterprises                []string
 	PoliciesPath               []string
 	Namespaces                 []string
 	ColorWhen                  string
