@@ -79,9 +79,9 @@ enterprise_enforce_two_factor_authentication = false {
 # title: Enterprise Should Use Single-Sign-On
 # description: It is recommended to enable access to an enterprise via SAML single sign-on (SSO) by authenticating through an identity provider (IdP). This allows for central account control and for timely access revocations.
 # custom:
-#   remediationSteps: [Make sure you are an enterprise owner, Go to the Settings page, than, go to the Authentication security tab. Toggle on "Enable SAML authentication", Fill in the remaining SSO configuration as instructed on the screen, Click "Save"]
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the Settings page, Go to the Authentication security tab, Toggle on "Enable SAML authentication", Fill in the remaining SSO configuration as instructed on the screen, Click "Save"]
 #   requiredScopes: [admin:enterprise]
-#   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions accross different systems, prevents the organization from enterprise a common password policy, and makes it challenging to audit different aspects of the user's behavior.
+#   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions across different systems, prevents common password policy throughout the enterprise, and makes it challenging to audit different aspects of the user's behavior.
 default enterprise_not_using_single_sign_on = true
 
 enterprise_not_using_single_sign_on = false {
