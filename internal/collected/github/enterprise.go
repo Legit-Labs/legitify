@@ -7,22 +7,31 @@ import (
 
 type Enterprise struct {
 	MembersCanChangeRepositoryVisibilitySetting string `json:"members_can_change_repository_visibility"`
+	RepositoriesForkingPolicy                   string `json:"repositories_forking_policy"`
+	ExternalCollaboratorsInvitePolicy           string `json:"external_collaborators_invite_policy"`
+	TwoFactorRequiredSetting                    string `json:"two_factor_required_setting"`
+	SamlEnabled                                 bool   `json:"saml_enabled"`
 	EnterpriseName                              string `json:"name"`
 	Url                                         string `json:"url"`
 	Id                                          int64  `json:"id"`
 	UserRole                                    string
 }
 
-func NewEnterprise(MembersCanChangeRepositoryVisibilitySetting string, Name string, Url string, Id int64, isAdmin bool) Enterprise {
+func NewEnterprise(membersCanChangeRepositoryVisibilitySetting string, name string, Url string, Id int64, isAdmin bool, repositoriesForkingPolicy string, externalCollaboratorsInvitePolicy string, twoFactorRequiredSetting string, samlEnabled bool) Enterprise {
 	UserRole := permissions.EnterpriseNonAdminRole
 	if isAdmin {
 		UserRole = permissions.EnterpriseAdminRole
 	}
-	return Enterprise{MembersCanChangeRepositoryVisibilitySetting: MembersCanChangeRepositoryVisibilitySetting,
-		EnterpriseName: Name,
-		Url:            Url,
-		Id:             Id,
-		UserRole:       UserRole,
+	return Enterprise{
+		MembersCanChangeRepositoryVisibilitySetting: membersCanChangeRepositoryVisibilitySetting,
+		RepositoriesForkingPolicy:                   repositoriesForkingPolicy,
+		TwoFactorRequiredSetting:                    twoFactorRequiredSetting,
+		ExternalCollaboratorsInvitePolicy:           externalCollaboratorsInvitePolicy,
+		EnterpriseName:                              name,
+		SamlEnabled:                                 samlEnabled,
+		Url:                                         Url,
+		Id:                                          Id,
+		UserRole:                                    UserRole,
 	}
 }
 

@@ -518,6 +518,14 @@ var enterpriseQuery struct {
 	Enterprise struct {
 		OwnerInfo struct {
 			MembersCanChangeRepositoryVisibilitySetting string
+			AllowPrivateRepositoryForkingSetting        string
+			MembersCanInviteCollaboratorsSetting        string
+			TwoFactorRequiredSetting                    string
+			SamlIdentityProvider                        struct {
+				ExternalIdentities struct {
+					TotalCount int
+				} `graphql:"externalIdentities(first: 1)"`
+			}
 		}
 		Name          string
 		Url           string
@@ -553,12 +561,17 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 			log.Printf("failed to get enterprise %v: %v", enterprise, err)
 			continue
 		}
+		samlEnabled := enterpriseQuery.Enterprise.OwnerInfo.SamlIdentityProvider.ExternalIdentities.TotalCount > 0
 		newEnter := githubcollected.NewEnterprise(
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting,
 			enterpriseQuery.Enterprise.Name,
 			enterpriseQuery.Enterprise.Url,
 			enterpriseQuery.Enterprise.DatabaseId,
-			enterpriseQuery.Enterprise.ViewerIsAdmin)
+			enterpriseQuery.Enterprise.ViewerIsAdmin,
+			enterpriseQuery.Enterprise.OwnerInfo.AllowPrivateRepositoryForkingSetting,
+			enterpriseQuery.Enterprise.OwnerInfo.MembersCanInviteCollaboratorsSetting,
+			enterpriseQuery.Enterprise.OwnerInfo.TwoFactorRequiredSetting,
+			samlEnabled)
 		res = append(res, newEnter)
 
 	}
