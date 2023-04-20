@@ -25,7 +25,7 @@ enterprise_not_using_visibility_change_disable_policy = false {
 # title: Enterprise Should Not Allow Members To Fork Internal And Private Repositories
 # description: The enterprise's repository forking policy should be set to DISABLED. Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
 # custom:
-#   remediationSteps: [Make sure you are an enterprise owner, Go to the policies page, Under the "Repository Forking" section, choose the "Disabled" option]
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the policies page, Under the "Repository Forking" section, Choose the "Disabled" option]
 #   requiredScopes: [admin:enterprise]
 #   threat:
 #     - Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
