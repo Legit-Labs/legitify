@@ -50,7 +50,7 @@ enterprise_allows_forking_repos = false {
 default enterprise_allows_inviting_externals_collaborators = true
 
 enterprise_allows_inviting_externals_collaborators = false {
-	input.repositories_forking_policy == "DISABLED"
+	input.external_collaborators_invite_policy == "DISABLED"
 }
 
 # METADATA
