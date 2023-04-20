@@ -41,12 +41,12 @@ enterprise_allows_forking_repos = false {
 # custom:
 #   severity: MEDIUM
 # title: Enterprise Should Not Allow Members To Invite Outside Collaborators
-# description: The enterprise's external colaborators invite policy should be set to enterprise/organizations owners only. Allowing member to invite external collaborators might result in un-authorised access to the internal projects.
+# description: The enterprise's external collaborators invite policy should be set to enterprise/organization owners only. Allowing members to invite external collaborators might result in unauthorized access to the internal projects.
 # custom:
-#   remediationSteps: [Make sure you are an enterprise owner, Go to the policies page, Under the "Repository outside collaborators" section, choose the "Enterprise Owners Only" or the "Organization Owners Only" option]
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the policies page, Under the "Repository outside collaborators" section - choose the "Enterprise Owners Only" or the "Organization Owners Only" option]
 #   requiredScopes: [admin:enterprise]
 #   threat:
-#     - Inviting external collborators could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
+#     - Inviting external collaborators could result in a loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
 default enterprise_allows_inviting_externals_collaborators = true
 
 enterprise_allows_inviting_externals_collaborators = false {
