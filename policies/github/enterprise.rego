@@ -60,7 +60,7 @@ enterprise_allows_inviting_externals_collaborators = false {
 # title: Two-Factor Authentication Should Be Enforced For The Enterprise
 # description: The two-factor authentication requirement should be enforced at the enterprise level. Regardless of whether users are managed externally by SSO, it is highly recommended to enable this option to reduce the risk of a deliberate or accidental user creation without MFA.
 # custom:
-#   remediationSteps: [Make sure you are an enterprise owner, Go to the Settings page, than, go to the Authentication security tab. Check the "Require two-factor authentication for all organizations in the enterprise" checkbox]
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the Settings page, Go to the Authentication security tab, Check the "Require two-factor authentication for all organizations in the enterprise" checkbox]
 #   requiredScopes: [admin:enterprise]
 #   threat:
 #     - If an attacker gets the valid credentials for one of the enterprise’s users they can authenticate to your GitHub enterprise.
