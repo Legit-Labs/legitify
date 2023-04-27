@@ -561,6 +561,10 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 			log.Printf("failed to get enterprise %v: %v", enterprise, err)
 			continue
 		}
+		if enterpriseQuery.Enterprise.DatabaseId == 0 {
+			log.Printf("Failed to get enterprise %v . User is not a member of this enterprise", enterprise)
+			continue
+		}
 		samlEnabled := enterpriseQuery.Enterprise.OwnerInfo.SamlIdentityProvider.ExternalIdentities.TotalCount > 0
 		newEnter := githubcollected.NewEnterprise(
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting,
