@@ -40,6 +40,25 @@ enterprise_allows_forking_repos = false {
 # scope: rule
 # custom:
 #   severity: MEDIUM
+# title: Enterprise Should Not Allow Members To Create public Repositories
+# description: The enterprise's repository creation policy should be set to private/internal repositories only. This will prevents non-admin users from creating public repositories and potentially exposing source code.
+# custom:
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the policies page, Under the "Repository creation" section, Choose the "Members can create repositories" option and uncheck 'Public']
+#   requiredScopes: [admin:enterprise]
+#   threat:
+#     - Users can accidentaly create public repositories and expose source code.
+default enterprise_allows_creating_public_repos = true
+
+enterprise_allows_forking_repos = false {
+	input.members_can_create_public_repositories_setting == false
+}
+##########################################
+
+
+# METADATA
+# scope: rule
+# custom:
+#   severity: MEDIUM
 # title: Enterprise Should Not Allow Members To Invite Outside Collaborators
 # description: The enterprise's external collaborators invite policy should be set to enterprise/organization owners only. Allowing members to invite external collaborators might result in unauthorized access to the internal projects.
 # custom:
