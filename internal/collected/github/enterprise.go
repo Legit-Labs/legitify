@@ -15,7 +15,7 @@ type Enterprise struct {
 	Url                                         string `json:"url"`
 	Id                                          int64  `json:"id"`
 	UserRole                                    string
-	MembersCanCreatePublicRepositoriesSetting   bool `json:"members_can_create_public_repositories_setting"`
+	MembersCanCreatePublicRepositoriesSetting   bool `json:"members_can_create_public_repositories"`
 }
 
 func NewEnterprise(membersCanChangeRepositoryVisibilitySetting string, name string, Url string, Id int64, isAdmin bool, repositoriesForkingPolicy string,
