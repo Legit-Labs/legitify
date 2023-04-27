@@ -15,9 +15,11 @@ type Enterprise struct {
 	Url                                         string `json:"url"`
 	Id                                          int64  `json:"id"`
 	UserRole                                    string
+	MembersCanCreatePublicRepositoriesSetting   bool `json:"members_can_create_public_repositories"`
 }
 
-func NewEnterprise(membersCanChangeRepositoryVisibilitySetting string, name string, Url string, Id int64, isAdmin bool, repositoriesForkingPolicy string, externalCollaboratorsInvitePolicy string, twoFactorRequiredSetting string, samlEnabled bool) Enterprise {
+func NewEnterprise(membersCanChangeRepositoryVisibilitySetting string, name string, Url string, Id int64, isAdmin bool, repositoriesForkingPolicy string,
+	externalCollaboratorsInvitePolicy string, membersCanCreatePublicRepositoriesSetting bool, twoFactorRequiredSetting string, samlEnabled bool) Enterprise {
 	UserRole := permissions.EnterpriseNonAdminRole
 	if isAdmin {
 		UserRole = permissions.EnterpriseAdminRole
@@ -32,6 +34,7 @@ func NewEnterprise(membersCanChangeRepositoryVisibilitySetting string, name stri
 		Url:                                         Url,
 		Id:                                          Id,
 		UserRole:                                    UserRole,
+		MembersCanCreatePublicRepositoriesSetting: membersCanCreatePublicRepositoriesSetting,
 	}
 }
 
