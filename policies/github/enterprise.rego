@@ -49,10 +49,9 @@ enterprise_allows_forking_repos = false {
 #     - Users can accidentaly create public repositories and expose source code.
 default enterprise_allows_creating_public_repos = true
 
-enterprise_allows_forking_repos = false {
-	input.members_can_create_public_repositories_setting == false
+enterprise_allows_creating_public_repos = false {
+	input.members_can_create_public_repositories == false
 }
-##########################################
 
 
 # METADATA
@@ -88,7 +87,6 @@ default enterprise_enforce_two_factor_authentication = true
 enterprise_enforce_two_factor_authentication = false {
 	input.two_factor_required_setting == "ENABLED"
 }
-
 
 
 # METADATA
