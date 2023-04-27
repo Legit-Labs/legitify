@@ -521,6 +521,7 @@ var enterpriseQuery struct {
 			AllowPrivateRepositoryForkingSetting        string
 			MembersCanInviteCollaboratorsSetting        string
 			TwoFactorRequiredSetting                    string
+			MembersCanCreatePublicRepositoriesSetting   bool
 			SamlIdentityProvider                        struct {
 				ExternalIdentities struct {
 					TotalCount int
@@ -570,6 +571,7 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 			enterpriseQuery.Enterprise.ViewerIsAdmin,
 			enterpriseQuery.Enterprise.OwnerInfo.AllowPrivateRepositoryForkingSetting,
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanInviteCollaboratorsSetting,
+			enterpriseQuery.Enterprise.OwnerInfo.MembersCanCreatePublicRepositoriesSetting,
 			enterpriseQuery.Enterprise.OwnerInfo.TwoFactorRequiredSetting,
 			samlEnabled)
 		res = append(res, newEnter)
