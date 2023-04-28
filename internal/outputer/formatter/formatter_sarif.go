@@ -2,10 +2,11 @@ package formatter
 
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/owenrumney/go-sarif/v2/sarif"
+	
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
+	"github.com/Legit-Labs/legitify/internal/common/severity"
 )
 
 type SarifFormatter struct {
@@ -44,7 +45,7 @@ func (f *SarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 		for _, violation := range data.Violations {
 			run.AddDistinctArtifact(violation.ViolationEntityType)
 			run.CreateResultForRule(policyInfo.FullyQualifiedPolicyName).
-				WithLevel(strings.ToLower(policyInfo.Severity)).
+				WithLevel(sarifSeverity(policyInfo.Severity)).
 				WithMessage(sarif.NewTextMessage(policyInfo.Description)).
 				AddLocation(
 					sarif.NewLocationWithPhysicalLocation(
@@ -63,6 +64,21 @@ func (f *SarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 		return nil, err
 	}
 	return bytes, nil
+}
+
+func sarifSeverity(s severity.Severity) string {
+	switch s {
+	case severity.Critical:
+		return "error"
+	case severity.High:
+		return "error"
+	case severity.Medium:
+		return "warning"
+	case severity.Low:
+		return "note"
+	default:
+		return "none"
+	}
 }
 
 func getMarkdownPolicySummary(output *scheme.Flattened, policyName string) string {
