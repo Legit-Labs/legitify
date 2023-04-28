@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestFormatMarkdown(t *testing.T) {
+func TestFormatSarif(t *testing.T) {
 	sample := scheme_test.SchemeSample()
 
 	for _, f := range []bool{true, false} {
