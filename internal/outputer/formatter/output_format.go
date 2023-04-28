@@ -26,7 +26,7 @@ var outputFormatters = map[FormatName]NewFormatFunc{
 	Human:    newHumanFormatter,
 	Json:     NewJsonFormatter,
 	Markdown: newMarkdownFormatter,
-	Sarif:    nil, // TODO pending implementation of Sarif output
+	Sarif:    newSarifFormatter,
 }
 
 func ValidateOutputFormat(outputFormat FormatName, schemeType scheme.SchemeType) error {
