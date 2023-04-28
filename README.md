@@ -169,6 +169,7 @@ Using the `--output-format (-f)` flag, legitify supports outputting the results 
 
 1. `human-readable` - Human-readable text (default).
 2. `json` - Standard JSON.
+3. `sarif` - SARIF format ([info](https://sarifweb.azurewebsites.net/)).
 
 ### Output Schemes
 
