@@ -34,6 +34,24 @@ func newPoliciesContent(pf policiesFormatter, colorizer colorizer) *policiesCont
 	}
 }
 
+func (pc *policiesContent) FormatPolicy(output *scheme.Flattened, policyName string) []byte {
+	pc.sb.Reset()
+
+	if _, ok := output.AsOrderedMap().Get(policyName); ok {
+		data := output.GetPolicyData(policyName)
+
+		pc.writeLine(pc.pf.FormatTitle(data.PolicyInfo.Title, data.PolicyInfo.Severity))
+
+		pc.depth++
+		pc.writePolicyInfo(policyName, data.PolicyInfo)
+		pc.writeLineBreak()
+		pc.writeViolations(data.Violations)
+		pc.depth--
+	}
+
+	return []byte(pc.sb.String())
+}
+
 func (pc *policiesContent) FormatFailedPolicies(output *scheme.Flattened) []byte {
 	pc.sb.Reset()
 
