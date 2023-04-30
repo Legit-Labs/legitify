@@ -14,9 +14,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/open-policy-agent/opa v0.43.1
 	github.com/ossf/scorecard/v4 v4.4.0
-	github.com/owenrumney/go-sarif/v2 v2.1.3
-	github.com/qri-io/jsonschema v0.2.1
-	github.com/sashabaranov/go-gpt3 v1.1.0
+	github.com/sashabaranov/go-openai v1.9.0
 	github.com/shurcooL/githubv4 v0.0.0-20220520033151-0b4e3294ff00
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
@@ -75,7 +73,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/qri-io/jsonpointer v0.1.1 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/rhysd/actionlint v1.6.13 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect

@@ -11,7 +11,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
-	gogpt "github.com/sashabaranov/go-gpt3"
+	gogpt "github.com/sashabaranov/go-openai"
 	"io"
 	"log"
 	"strings"
