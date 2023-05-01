@@ -31,6 +31,10 @@ func TestOutputFormats(t *testing.T) {
 			// json has dedicated tests
 			continue
 
+		case formatter.Sarif:
+			// sarif has dedicated tests
+			continue
+
 		default:
 			t.Fatalf("unexpected format: %s", name)
 		}
