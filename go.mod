@@ -14,6 +14,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/open-policy-agent/opa v0.43.1
 	github.com/ossf/scorecard/v4 v4.4.0
+	github.com/owenrumney/go-sarif/v2 v2.1.3
 	github.com/sashabaranov/go-gpt3 v1.1.0
 	github.com/shurcooL/githubv4 v0.0.0-20220520033151-0b4e3294ff00
 	github.com/spf13/cobra v1.5.0
@@ -69,7 +70,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/moby/buildkit v0.11.4 // indirect
-	github.com/owenrumney/go-sarif/v2 v2.1.3 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.0-beta.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

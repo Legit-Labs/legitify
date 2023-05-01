@@ -1040,7 +1040,6 @@ github.com/opencontainers/selinux v1.10.1/go.mod h1:2i0OySw99QjzBBQByd1Gr9gSjvuh
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/ossf/scorecard/v4 v4.4.0 h1:hQxfA3rfZhENVWBipBz0ED1aIoPiMyGJtwSCXOuMwoc=
 github.com/ossf/scorecard/v4 v4.4.0/go.mod h1:ZdUMc/E6gz1GYGEUqdXj0qudvaeT1z1d78Py/zX2FZo=
-github.com/owenrumney/go-sarif v1.1.1 h1:QNObu6YX1igyFKhdzd7vgzmw7XsWN3/6NMGuDzBgXmE=
 github.com/owenrumney/go-sarif v1.1.1/go.mod h1:dNDiPlF04ESR/6fHlPyq7gHKmrM0sHUvAGjsoh8ZH0U=
 github.com/owenrumney/go-sarif/v2 v2.1.3 h1:1guchw824yg1CwjredY8pnzcE0SG+sfNzFY5CUYWgE4=
 github.com/owenrumney/go-sarif/v2 v2.1.3/go.mod h1:MSqMMx9WqlBSY7pXoOZWgEsVB4FDNfhcaXDA1j6Sr+w=
