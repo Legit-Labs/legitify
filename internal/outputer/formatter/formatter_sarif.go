@@ -2,13 +2,13 @@ package formatter
 
 import (
 	"encoding/json"
-	"strings"
 	"fmt"
+	"strings"
 
 	"github.com/owenrumney/go-sarif/v2/sarif"
 
-	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/Legit-Labs/legitify/internal/common/severity"
+	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 )
 
 type sarifFormatter struct {
@@ -24,7 +24,7 @@ func newSarifFormatter() OutputFormatter {
 func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error) {
 	report, err := sarif.New(sarif.Version210)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	typedOutput, ok := s.(*scheme.Flattened)
@@ -34,7 +34,7 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 
 	run := sarif.NewRunWithInformationURI("legitify", "https://legitify.dev/")
 
-	for _, policyName := range s.AsOrderedMap().Keys() { 
+	for _, policyName := range s.AsOrderedMap().Keys() {
 		data := typedOutput.GetPolicyData(policyName)
 		policyInfo := data.PolicyInfo
 
@@ -49,17 +49,23 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 			WithDescription(policyInfo.Description).
 			WithShortDescription(sarif.NewMultiformatMessageString(policyInfo.Title)).
 			WithProperties(pb.Properties).
-			WithTextHelp(getPlaintextPolicySummary(s.(*scheme.Flattened), policyName)).
-			WithMarkdownHelp(getMarkdownPolicySummary(s.(*scheme.Flattened), policyName))
+			WithTextHelp(getPlaintextPolicySummary(typedOutput, policyName)).
+			WithMarkdownHelp(getMarkdownPolicySummary(typedOutput, policyName))
 
-		// Tools like legitify don't fit perfectly into the SARIF model, so we're going to follow the 
+		// Tools like legitify don't fit perfectly into the SARIF model, so we're going to follow the
 		// lead of OpenSSF's scorecard output as a starting point.
 		// https://github.com/ossf/scorecard/blob/273dccda33590b7b46e98e19a9154f9da5400521/pkg/testdata/check6.sarif
 
 		for _, violation := range data.Violations {
 
-			entityId, ok := violation.Aux.Get("entityId")
-			if !ok {
+			var entityId interface{}
+			var ok bool
+
+			if violation.Aux != nil {
+				entityId, ok = violation.Aux.Get("entityId")
+			}
+
+			if !ok || violation.Aux == nil {
 				entityId = "unknown"
 			}
 
@@ -71,13 +77,13 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 				AddLocation(
 					sarif.NewLocationWithPhysicalLocation(
 						sarif.NewPhysicalLocation().
-						WithArtifactLocation(
-							sarif.NewArtifactLocation().
-							WithUri(fmt.Sprintf("%v", entityId)).
-							WithUriBaseId("legitify"),
-						),
-				),
-			)
+							WithArtifactLocation(
+								sarif.NewArtifactLocation().
+									WithUri(fmt.Sprintf("%v", entityId)).
+									WithUriBaseId("legitify"),
+							),
+					),
+				)
 		}
 	}
 
@@ -160,7 +166,7 @@ type sarifColorizer struct {
 }
 
 func (sc sarifColorizer) colorize(tColor themeColor, text interface{}) string {
-	return fmt.Sprintf("%v", text)
+	return text.(string)
 }
 
 // plaintext policy formatting
@@ -176,11 +182,11 @@ func (sp sarifPolicyFormatter) FormatTitle(title string, severity severity.Sever
 	color := severityToThemeColor(severity)
 	title = sp.colorizer.colorize(color, title)
 
-	return fmt.Sprintf("%s", title)
+	return title
 }
 
 func (sp sarifPolicyFormatter) FormatSubtitle(title string) string {
-	return fmt.Sprintf("%s", title)
+	return title
 }
 
 func (sp sarifPolicyFormatter) FormatText(depth int, format string, args ...interface{}) string {

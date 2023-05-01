@@ -35,19 +35,13 @@ func newPoliciesContent(pf policiesFormatter, colorizer colorizer) *policiesCont
 }
 
 func (pc *policiesContent) FormatPolicy(output *scheme.Flattened, policyName string) []byte {
+	if _, ok := output.AsOrderedMap().Get(policyName); !ok {
+		return nil
+	}
+
 	pc.sb.Reset()
 
-	if _, ok := output.AsOrderedMap().Get(policyName); ok {
-		data := output.GetPolicyData(policyName)
-
-		pc.writeLine(pc.pf.FormatTitle(data.PolicyInfo.Title, data.PolicyInfo.Severity))
-
-		pc.depth++
-		pc.writePolicyInfo(policyName, data.PolicyInfo)
-		pc.writeLineBreak()
-		pc.writeViolations(data.Violations)
-		pc.depth--
-	}
+	pc.formatPolicyInfo(policyName, output)
 
 	return []byte(pc.sb.String())
 }
@@ -57,15 +51,7 @@ func (pc *policiesContent) FormatFailedPolicies(output *scheme.Flattened) []byte
 
 	lastIndex := len(output.AsOrderedMap().Keys()) - 1
 	for i, policyName := range output.AsOrderedMap().Keys() {
-		data := output.GetPolicyData(policyName)
-
-		pc.writeLine(pc.pf.FormatTitle(data.PolicyInfo.Title, data.PolicyInfo.Severity))
-
-		pc.depth++
-		pc.writePolicyInfo(policyName, data.PolicyInfo)
-		pc.writeLineBreak()
-		pc.writeViolations(data.Violations)
-		pc.depth--
+		pc.formatPolicyInfo(policyName, output)
 
 		if i < lastIndex {
 			pc.writeLineBreak()
@@ -73,6 +59,18 @@ func (pc *policiesContent) FormatFailedPolicies(output *scheme.Flattened) []byte
 	}
 
 	return []byte(pc.sb.String())
+}
+
+func (pc *policiesContent) formatPolicyInfo(policyName string, output *scheme.Flattened) {
+	policyData := output.GetPolicyData(policyName)
+
+	pc.writeLine(pc.pf.FormatTitle(policyData.PolicyInfo.Title, policyData.PolicyInfo.Severity))
+
+	pc.depth++
+	pc.writePolicyInfo(policyName, policyData.PolicyInfo)
+	pc.writeLineBreak()
+	pc.writeViolations(policyData.Violations)
+	pc.depth--
 }
 
 func (pc *policiesContent) write(format string, args ...interface{}) {
