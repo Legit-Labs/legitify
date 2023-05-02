@@ -27,8 +27,8 @@ inputs:
     required: false
     default: "true"
 runs:
-  using: "node16"	  using: "composite"
-  main: "index.js"	  steps:
+  using: "composite"
+  steps:
     - name: Set Up NodeJS
       uses: actions/setup-node@v3
       with:
