@@ -1,10 +1,10 @@
 package formatter_test
 
 import (
-	"os"
-	"fmt"
 	"context"
 	"encoding/json"
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
@@ -25,23 +25,18 @@ func TestFormatSarif(t *testing.T) {
 		ctx := context.Background()
 
 		schemaData, err := os.ReadFile("formatter_test/sarif_v2.1.0_schema.json")
-		if err != nil {
-			panic(err)
-		}
+		require.Nil(t, err)
 
-		// QRI + JSON schema draft-07 compatibility 
+		// QRI + JSON schema draft-07 compatibility
 		// See https://github.com/qri-io/jsonschema/issues/114#issuecomment-1102010496
 		jsonschema.RegisterKeyword("definitions", jsonschema.NewDefs)
 
 		rs := &jsonschema.Schema{}
-		if err := json.Unmarshal(schemaData, rs); err != nil {
-			panic("unmarshal schema: " + err.Error())
-		}
+		err = json.Unmarshal(schemaData, rs)
+		require.Nilf(t, err, "unmarshal schema: %v", err)
 
 		errs, err := rs.ValidateBytes(ctx, bytes)
-		if err != nil {
-			panic(err)
-		}
+		require.Nil(t, err)
 
 		if len(errs) > 0 {
 			fmt.Println(errs[0].Error())

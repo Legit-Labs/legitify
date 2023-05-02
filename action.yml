@@ -22,6 +22,43 @@ inputs:
     description: 'Whether to run scorecard as part of the analysis (no/yes/verbose default to "no")'
     required: false
     default: "no"
+  upload_code_scanning:
+    description: 'Whether to upload the results to GitHub Code Scanning'
+    required: false
+    default: "true"
 runs:
-  using: "node16"
-  main: "index.js"
+  using: "composite"
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+          node-version: '16'
+    - id: analyze
+      shell: bash
+      env:
+        github_token: ${{ inputs.github_token }}
+        analyze_self_only: ${{ inputs.analyze_self_only }}
+        repositories: ${{ inputs.repositories }}
+        legitify_base_version: ${{ inputs.legitify_base_version }}
+        scorecard: ${{ inputs.scorecard }}
+        upload_code_scanning: ${{ inputs.upload_code_scanning }}
+      run: |
+        (
+          cd "$GITHUB_ACTION_PATH"
+          node index.js
+          ls -l
+        )
+        ls -l
+        cp "$GITHUB_ACTION_PATH"/legitify-output.* .
+        ls -l
+    - name: "Upload SARIF as Code Scanning Results"
+      if: ${{ inputs.upload_code_scanning == 'true' }}
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: legitify-output.sarif
+        category: "legitify-report"
+    - name: "Upload outputs as Workflow Artifacts"
+      if: ${{ steps.analyze.outputs.is_private != 'true' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: legitify-report
+        path: legitify-output.*

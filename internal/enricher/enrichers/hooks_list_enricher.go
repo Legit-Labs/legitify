@@ -41,7 +41,7 @@ func createHooksListEnrichment(extraData interface{}) (GenericListEnrichment, er
 		return nil, fmt.Errorf("invalid hookslist extra data")
 	}
 
-	var result []orderedmap.OrderedMap
+	result := []orderedmap.OrderedMap{}
 	for k := range asMap {
 		var hooksEnrichment map[string]string
 
