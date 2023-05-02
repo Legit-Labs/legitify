@@ -25,15 +25,12 @@ async function uploadErrorLog() {
   }
 }
 
-async function executeLegitify(token, args) {
+async function executeLegitify(token, args, uploadCodeScanning) {
   let myOutput = "";
   let myError = "";
 
   const options = {};
   options.listeners = {
-    stdout: (data) => {
-      myOutput += data.toString();
-    },
     stderr: (data) => {
       myError += data.toString();
     },
@@ -42,8 +39,29 @@ async function executeLegitify(token, args) {
   options.silent = true
 
   try {
-    await exec.exec('"./legitify"', ["analyze", ...args, "--output-format", "markdown"], options);
+    // generate the output as json
+    const jsonFile = "legitify-output.json"
+    await exec.exec('"./legitify"',
+      ["analyze", ...args, "--output-format", "json", "--outupt-file", jsonFile],
+      options);
+
+    // generate a sarif version for the code scanning
+    if (uploadCodeScanning) {
+      const sarifFile = "legitify-output.sarif"
+      await exec.exec('"./legitify"',
+        ["convert", "--input-file", jsonFile, "--output-format", "sarif", "--outupt-file", sarifFile],
+        options);
+    }
+
+    // generate a markdown version for the action output
+    options.listeners.stdout = (data) => {
+      myOutput += data.toString();
+    },
+    await exec.exec('"./legitify"',
+      ["convert", "--input-file", jsonFile, "--output-format", "markdown"],
+      options);
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
+
   } catch (error) {
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, "legitify failed with:\n" + myError)
     core.setFailed(error);
@@ -150,12 +168,13 @@ async function run() {
     const legitifyBaseVersion = core.getInput("legitify_base_version");
     const fileUrl = await fetchLegitifyReleaseUrl(legitifyBaseVersion);
     const filePath = path.join(__dirname, "legitify.tar.gz");
+    const uploadCodeScanning = (core.getInput("upload_code_scanning") === "true");
 
     const args = generateAnalyzeArgs(repo, owner);
 
     await downloadAndExtract(fileUrl, filePath);
 
-    await executeLegitify(token, args);
+    await executeLegitify(token, args, uploadCodeScanning);
   } catch (error) {
     core.setFailed(error.message);
     exit(1);
