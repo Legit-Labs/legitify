@@ -34,7 +34,7 @@ runs:
       with:
           node-version: '16'
     - uses: actions/checkout@v2
-    - shell: bash 
+    - shell: bash
       run: node index.js
     - name: "Upload SARIF as Code Scanning Results"
       if: inputs.sarif == "true"
