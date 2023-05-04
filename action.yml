@@ -33,6 +33,13 @@ runs:
       with:
           node-version: '16'
     - shell: bash
+      with:
+        github_token: ${{ inputs.github_token }}
+        analyze_self_only: ${{ inputs.analyze_self_only }}
+        repositories: ${{ inputs.repositories }}
+        legitify_base_version: ${{ inputs.legitify_base_version }}
+        scorecard: ${{ inputs.scorecard }}
+        upload_code_scanning: ${{ inputs.upload_code_scanning }}
       run: |
         cd "$GITHUB_ACTION_PATH"
         node index.js
