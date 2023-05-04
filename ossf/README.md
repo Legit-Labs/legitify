@@ -8,7 +8,7 @@ For recommendations only applicable to GitHub or GitLab visit one of the followi
 - [GitHub Recommendations](github/README.md)
 - [GitLab Recommendations](gitlab/README.md)
     
-    ### Continuous Integration / Continuous Deployment 
+### Continuous Integration / Continuous Deployment 
 - Workflows Should Not Be Allowed To Approve Pull Requests [<img src="https://user-images.githubusercontent.com/287526/230375178-2f1f8844-5609-4ef3-b9ac-141c20c43406.svg" alt="GitHub" height="20" width="20">](github/actions/actions_can_approve_pull_requests.md)
 - GitHub Actions Should Be Restricted To Selected Repositories [<img src="https://user-images.githubusercontent.com/287526/230375178-2f1f8844-5609-4ef3-b9ac-141c20c43406.svg" alt="GitHub" height="20" width="20">](github/actions/all_repositories_can_run_github_actions.md)
 - GitHub Actions Should Be Limited To Verified or Explicitly Trusted Actions [<img src="https://user-images.githubusercontent.com/287526/230375178-2f1f8844-5609-4ef3-b9ac-141c20c43406.svg" alt="GitHub" height="20" width="20">](github/actions/all_github_actions_are_allowed.md)
