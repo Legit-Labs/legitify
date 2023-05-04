@@ -111,10 +111,10 @@ def create_scm_policy_docs(scm, docs_yaml, output_dir):
     table_of_contents = ''
     for ns in docs_yaml:
         k = 1
-        table_of_contents += f"\t{j}. [{rephrase_ns_name(ns)}](#{ns})\n"
+        table_of_contents += f"{format_header(HeaderSize.H3, rephrase_ns_name(ns))}\n"
         for policy in docs_yaml[ns]:
             policy_path = os.path.join(ns, f"{policy['policy_name']}.md")
-            table_of_contents += f"\t\t{k}. [{policy['title']}]({policy_path})\n"
+            table_of_contents += f"{k}. [{policy['title']}]({policy_path})\n"
             k += 1
         j += 1
 
