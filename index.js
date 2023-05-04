@@ -103,21 +103,21 @@ async function fetchLegitifyReleaseUrl(baseVersion) {
 function generateAnalyzeArgs(repo, owner) {
   let args = [];
 
-  const scorecard = process.env("scorecard");
+  const scorecard = process.env["scorecard"];
   if (scorecard === "yes" || scorecard === "verbose") {
     args.push("--scorecard");
     args.push(scorecard);
   }
 
-  if (process.env("analyze_self_only") === "true") {
+  if (process.env["analyze_self_only"] === "true") {
     args.push("--repo");
     args.push(repo);
     return args;
   }
 
-  if (process.env("repositories") !== "") {
+  if (process.env["repositories"] !== "") {
     args.push("--repo");
-    args.push(process.env("repositories"));
+    args.push(process.env["repositories"]);
     return args;
   }
 
@@ -157,7 +157,7 @@ function downloadAndExtract(fileUrl, filePath) {
 
 async function run() {
   try {
-    const token = process.env("github_token");
+    const token = process.env["github_token"];
     if (!token) {
       core.setFailed("No GitHub token provided");
       exit(1);
@@ -165,10 +165,10 @@ async function run() {
 
     const owner = process.env["GITHUB_REPOSITORY_OWNER"];
     const repo = process.env["GITHUB_REPOSITORY"];
-    const legitifyBaseVersion = process.env("legitify_base_version");
+    const legitifyBaseVersion = process.env["legitify_base_version"];
     const fileUrl = await fetchLegitifyReleaseUrl(legitifyBaseVersion);
     const filePath = path.join(__dirname, "legitify.tar.gz");
-    const uploadCodeScanning = (process.env("upload_code_scanning") === "true");
+    const uploadCodeScanning = (process.env["upload_code_scanning"] === "true");
 
     const args = generateAnalyzeArgs(repo, owner);
 
