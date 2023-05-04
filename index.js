@@ -47,6 +47,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
 
     // generate a sarif version for the code scanning
     if (uploadCodeScanning) {
+      myError = ""
       const sarifFile = "legitify-output.sarif"
       await exec.exec('"./legitify"',
         ["convert", "--input-file", jsonFile, "--output-format", "sarif", "--outupt-file", sarifFile],
@@ -54,6 +55,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     }
 
     // generate a markdown version for the action output
+    myError = ""
     options.listeners.stdout = (data) => {
       myOutput += data.toString();
     },
@@ -63,6 +65,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
 
   } catch (error) {
+    console.log("legitify failed: " + error.toString())
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, "legitify failed with:\n" + myError)
     core.setFailed(error);
     exit(1);
