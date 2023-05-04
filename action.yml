@@ -33,7 +33,7 @@ runs:
       with:
           node-version: '16'
     - shell: bash
-      with:
+      env:
         github_token: ${{ inputs.github_token }}
         analyze_self_only: ${{ inputs.analyze_self_only }}
         repositories: ${{ inputs.repositories }}
