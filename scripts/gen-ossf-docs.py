@@ -171,23 +171,23 @@ def create_root_doc(docs_file, output_dir):
     docs_yaml = get_docs_yaml(docs_file)
     processed = process_root_doc(docs_yaml)
     result = f"""
-    ## Recommendations
+## Recommendations
 
-    Each specific recommendation below is noted to be applicable to either GitHub or GitLab by use of an appropriate icon, which is linked to the detailed best practice definition: <img src="https://user-images.githubusercontent.com/287526/230375178-2f1f8844-5609-4ef3-b9ac-141c20c43406.svg" alt="GitHub" height="20" width="20"> <img src="https://user-images.githubusercontent.com/287526/230376963-ae9b8a47-4a74-4746-bc83-5b34cc520d40.svg" alt="GitLab" height="20" width="20">
-    
-    For recommendations only applicable to GitHub or GitLab visit one of the following pages:
-    
-    - [GitHub Recommendations](github/README.md)
-    - [GitLab Recommendations](gitlab/README.md)
+Each specific recommendation below is noted to be applicable to either GitHub or GitLab by use of an appropriate icon, which is linked to the detailed best practice definition: <img src="https://user-images.githubusercontent.com/287526/230375178-2f1f8844-5609-4ef3-b9ac-141c20c43406.svg" alt="GitHub" height="20" width="20"> <img src="https://user-images.githubusercontent.com/287526/230376963-ae9b8a47-4a74-4746-bc83-5b34cc520d40.svg" alt="GitLab" height="20" width="20">
+
+For recommendations only applicable to GitHub or GitLab visit one of the following pages:
+
+- [GitHub Recommendations](github/README.md)
+- [GitLab Recommendations](gitlab/README.md)
     
     """
 
     for category, policies in processed.items():
         result += f"{format_header(header_size=HeaderSize.H3, text=category)} \n"
         for policy, links in policies.items():
-            result += f"    - {policy}"
+            result += f"- {policy}"
             for link in links:
-                result += f"[{link['icon']}]({link['link']})"
+                result += f" [{link['icon']}]({link['link']})"
             result += "\n"
         result += "\n"
 
