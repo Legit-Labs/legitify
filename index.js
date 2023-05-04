@@ -65,7 +65,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
 
   } catch (error) {
-    console.log("legitify failed: " + error.toString())
+    console.log(error.toString() + " | stderr: " + myError.toString())
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, "legitify failed with:\n" + myError)
     core.setFailed(error);
     exit(1);
