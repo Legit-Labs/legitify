@@ -36,7 +36,7 @@ runs:
     - shell: bash
       run: node index.js
     - name: "Upload SARIF as Code Scanning Results"
-      if: inputs.sarif == "true"
+      if: ${{ inputs.sarif == "true" }}
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: legitify-output.sarif
