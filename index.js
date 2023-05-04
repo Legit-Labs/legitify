@@ -50,7 +50,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
       myError = ""
       const sarifFile = "legitify-output.sarif"
       await exec.exec('"./legitify"',
-        ["convert", "--input-file", jsonFile, "--output-format", "sarif", "--outupt-file", sarifFile],
+        ["convert", "--input-file", jsonFile, "--output-format", "sarif", "--output-file", sarifFile],
         options);
     }
 
