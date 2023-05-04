@@ -42,7 +42,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     // generate the output as json
     const jsonFile = "legitify-output.json"
     await exec.exec('"./legitify"',
-      ["analyze", ...args, "--output-format", "json", "--outupt-file", jsonFile],
+      ["analyze", ...args, "--output-format", "json", "--output-file", jsonFile],
       options);
 
     // generate a sarif version for the code scanning
