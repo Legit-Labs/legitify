@@ -58,8 +58,13 @@ async function executeLegitify(token, args, uploadCodeScanning) {
   options.silent = true
   const isPrivate = await isPrivateRepo(token)
   core.setOutput("is_private", isPrivate)
+  if (!isPrivate) {
+    console.log("running in a public repository - only uploading results to Code Scanning (Security Center)")
+  }
 
   try {
+    const sarifFile = "legitify-output.sarif"
+
     // generate the output as json
     const jsonFile = "legitify-output.json"
     const analyzeArgs = ["analyze", ...args, "--output-format", "json", "--output-file", jsonFile]
@@ -69,7 +74,6 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     // generate a sarif version for the code scanning
     if (uploadCodeScanning) {
       myError = ""
-      const sarifFile = "legitify-output.sarif"
       const convertSarifArgs = ["convert", "--input-file", jsonFile, "--output-format", "sarif", "--output-file", sarifFile]
       console.log("execute legitify convert sarif:", convertSarifArgs)
       await exec.exec("./legitify", convertSarifArgs, options);
@@ -86,7 +90,9 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     if (isPrivate) {
       fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
     } else {
-      fs.unlinkSync("error.log")
+      fs.unlinkSync(jsonFile);
+      fs.unlinkSync(sarifFile);
+      fs.unlinkSync("error.log");
     }
   } catch (error) {
     console.log(error.toString() + " | stderr: " + myError.toString())
