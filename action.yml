@@ -57,6 +57,7 @@ runs:
       with:
         sarif_file: legitify-output.sarif
         category: "legitify-report"
+        ref: "legitify-report"
     - name: "Upload outputs as Workflow Artifacts"
       if: ${{ steps.analyze.outputs.is_private == 'true' }}
       uses: actions/upload-artifact@v3
