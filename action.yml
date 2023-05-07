@@ -45,11 +45,11 @@ runs:
         (
           cd "$GITHUB_ACTION_PATH"
           node index.js
-          ls -l
         )
-        ls -l
-        cp "$GITHUB_ACTION_PATH"/legitify-output.* .
-        ls -l
+    - id: reports
+      if: ${{ steps.analyze.outputs.is_private != 'true' }}
+      shell: bash
+      run: cp "$GITHUB_ACTION_PATH"/legitify-output.* .
     - name: "Upload SARIF as Code Scanning Results"
       if: ${{ inputs.upload_code_scanning == 'true' }}
       uses: github/codeql-action/upload-sarif@v2
