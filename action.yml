@@ -47,9 +47,9 @@ runs:
           node index.js
         )
     - id: reports
-      if: ${{ steps.analyze.outputs.is_private == 'true' }}
       shell: bash
-      run: cp "$GITHUB_ACTION_PATH"/legitify-output.* .
+      run: |
+        cp "$GITHUB_ACTION_PATH"/legitify-output.* . || echo 'no files to copy'
     - name: "Upload SARIF as Code Scanning Results"
       if: ${{ inputs.upload_code_scanning == 'true' }}
       uses: github/codeql-action/upload-sarif@v2
