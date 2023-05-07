@@ -91,7 +91,6 @@ async function executeLegitify(token, args, uploadCodeScanning) {
       fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
     } else {
       fs.unlinkSync(jsonFile);
-      fs.unlinkSync(sarifFile);
       fs.unlinkSync("error.log");
     }
   } catch (error) {
