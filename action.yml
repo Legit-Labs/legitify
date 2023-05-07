@@ -47,7 +47,7 @@ runs:
           node index.js
         )
     - id: reports
-      if: ${{ steps.analyze.outputs.is_private != 'true' }}
+      if: ${{ steps.analyze.outputs.is_private == 'true' }}
       shell: bash
       run: cp "$GITHUB_ACTION_PATH"/legitify-output.* .
     - name: "Upload SARIF as Code Scanning Results"
@@ -57,7 +57,7 @@ runs:
         sarif_file: legitify-output.sarif
         category: "legitify-report"
     - name: "Upload outputs as Workflow Artifacts"
-      if: ${{ steps.analyze.outputs.is_private != 'true' }}
+      if: ${{ steps.analyze.outputs.is_private == 'true' }}
       uses: actions/upload-artifact@v3
       with:
         name: legitify-report
