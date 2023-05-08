@@ -197,19 +197,18 @@ async function run() {
 
     const owner = process.env["GITHUB_REPOSITORY_OWNER"];
     const repo = process.env["GITHUB_REPOSITORY"];
-    const legitifyBaseVersion = process.env["legitify_base_version"];
-    const fileUrl = await fetchLegitifyReleaseUrl(legitifyBaseVersion);
-    const filePath = path.join(__dirname, "legitify.tar.gz");
-    const uploadCodeScanning = (process.env["upload-code-scanning"] === "true");
+    const uploadCodeScanning = (process.env["upload_code_scanning"] === "true");
 
-    const args = generateAnalyzeArgs(repo, owner);
-
-    if (process.env["compile-legitify"] == "true") {
+    if (process.env["compile_legitify"] == "true") {
       console.log("using the compiled legitify version.");
     } else {
+      const legitifyBaseVersion = process.env["legitify_base_version"];
+      const fileUrl = await fetchLegitifyReleaseUrl(legitifyBaseVersion);
+      const filePath = path.join(__dirname, "legitify.tar.gz");
       await downloadAndExtract(fileUrl, filePath);
     }
 
+    const args = generateAnalyzeArgs(repo, owner);
     await executeLegitify(token, args, uploadCodeScanning);
   } catch (error) {
     core.setFailed(error.message);
