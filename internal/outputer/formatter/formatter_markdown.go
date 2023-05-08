@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/common/severity"
+	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 )
 
@@ -119,6 +120,14 @@ func (mc markdownColorizer) withEmoji(emoji string, text interface{}) string {
 	return fmt.Sprintf("%v %s", text, emoji)
 }
 
+func (mc markdownColorizer) asBold(text interface{}) string {
+	asString := strings.TrimSpace(fmt.Sprintf("%v", text))
+	bolded := slice_utils.Map(strings.Split(asString, "\n"), func(line string) string {
+		return fmt.Sprintf("**%s**", line)
+	})
+	return strings.Join(bolded, "\n")
+}
+
 func (mc markdownColorizer) colorize(tColor themeColor, text interface{}) string {
 	switch tColor {
 	case themeColorFailure:
@@ -132,7 +141,7 @@ func (mc markdownColorizer) colorize(tColor themeColor, text interface{}) string
 	case themeColorWarning:
 		return mc.withEmoji(markdownEyesEmoji, text)
 	case themeColorBold:
-		return fmt.Sprintf("**%v**", text)
+		return mc.asBold(text)
 
 	case themeColorNeutral:
 		fallthrough
