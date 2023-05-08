@@ -34,8 +34,7 @@ runner_group_can_be_used_by_public_repositories = false {
 # scope: rule
 # title: Runner Group Should Be Limited to Selected Repositories
 # description: |
-#       Not limiting the runner group to selected repositories allows any user in the organization to execute workflows
-#       on the group's runners.
+#       Not limiting the runner group to selected repositories allows any user in the organization to execute workflows on the group's runners.
 #       In case of inadequate security measures implemented on the hosted runner,
 #       malicious insider could create a repository with a workflow that exploits the runner's vulnerabilities to move laterally inside your network.
 # custom:
