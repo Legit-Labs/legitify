@@ -61,6 +61,7 @@ runs:
         legitify_base_version: ${{ inputs.legitify_base_version }}
         scorecard: ${{ inputs.scorecard }}
         upload_code_scanning: ${{ inputs.upload_code_scanning }}
+        compile_legitify: ${{ inputs.compile_legitify }}
       run: |
         cd "$GITHUB_ACTION_PATH"
         node index.js
