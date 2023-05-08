@@ -200,11 +200,15 @@ async function run() {
     const legitifyBaseVersion = process.env["legitify_base_version"];
     const fileUrl = await fetchLegitifyReleaseUrl(legitifyBaseVersion);
     const filePath = path.join(__dirname, "legitify.tar.gz");
-    const uploadCodeScanning = (process.env["upload_code_scanning"] === "true");
+    const uploadCodeScanning = (process.env["upload-code-scanning"] === "true");
 
     const args = generateAnalyzeArgs(repo, owner);
 
-    await downloadAndExtract(fileUrl, filePath);
+    if (process.env["compile-legitify"] == "true") {
+      console.log("using the compiled legitify version.");
+    } else {
+      await downloadAndExtract(fileUrl, filePath);
+    }
 
     await executeLegitify(token, args, uploadCodeScanning);
   } catch (error) {
