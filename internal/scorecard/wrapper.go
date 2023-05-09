@@ -2,13 +2,14 @@ package scorecard
 
 import (
 	"context"
+	"log"
+	"os"
+
 	"github.com/ossf/scorecard/v4/checker"
 	docs "github.com/ossf/scorecard/v4/docs/checks"
 	sclog "github.com/ossf/scorecard/v4/log"
 	"github.com/ossf/scorecard/v4/pkg"
 	"github.com/ossf/scorecard/v4/policy"
-	"log"
-	"os"
 )
 
 func init() {
@@ -76,10 +77,14 @@ func Calculate(ctx context.Context, repoUrl string, isPrivate bool) (*Result, er
 		return nil, err
 	}
 
-	repoResult, err := pkg.RunScorecards(
+	// 30 was the default for scorecard before this param was introduced.
+	commitDepth := 30
+
+	repoResult, err := pkg.RunScorecard(
 		ctx,
 		repo,
 		"HEAD",
+		commitDepth,
 		enabledChecks,
 		repoClient,
 		fuzzClient,
