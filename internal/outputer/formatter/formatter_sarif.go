@@ -76,7 +76,7 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 			run.AddDistinctArtifact(violation.ViolationEntityType)
 			run.CreateResultForRule(policyInfo.FullyQualifiedPolicyName).
 				WithLevel(sarifSeverity(policyInfo.Severity)).
-				WithMessage(sarif.NewTextMessage(policyInfo.Description + "\n  " + markdownFormatter.Form)).
+				WithMessage(sarif.NewTextMessage(getViolationMessage(&violation, &policyInfo))).
 				WithHostedViewerUri(violation.CanonicalLink).
 				AddLocation(
 					sarif.NewLocationWithPhysicalLocation(
