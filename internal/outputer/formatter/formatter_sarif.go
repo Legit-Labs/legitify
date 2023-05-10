@@ -104,7 +104,7 @@ func (f *sarifFormatter) IsSchemeSupported(schemeType string) bool {
 }
 
 func getViolationMessage(violation *scheme.Violation, policyInfo *scheme.PolicyInfo) string {
-	pc := getMarkdownContent()
+	pc := getSarifContent()
 	return pc.pf.FormatText(0, policyInfo.Description) +
 		pc.pf.Linebreak() +
 		string(pc.FormatViolation(violation))
@@ -185,7 +185,7 @@ type sarifColorizer struct {
 }
 
 func (sc sarifColorizer) colorize(tColor themeColor, text interface{}) string {
-	return text.(string)
+	return fmt.Sprintf("%v", text)
 }
 
 // plaintext policy formatting
@@ -235,7 +235,7 @@ func (sp sarifPolicyFormatter) Linebreak() string {
 }
 
 func (sp sarifPolicyFormatter) Separator() string {
-	return "---"
+	return "--"
 }
 
 func (sp sarifPolicyFormatter) Indent(depth int) string {
