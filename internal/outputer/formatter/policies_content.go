@@ -41,8 +41,14 @@ func (pc *policiesContent) FormatPolicy(output *scheme.Flattened, policyName str
 
 	pc.sb.Reset()
 
-	pc.formatPolicyInfo(policyName, output)
+	pc.formatPolicyInfo(policyName, output, false)
 
+	return []byte(pc.sb.String())
+}
+
+func (pc *policiesContent) FormatViolation(vioaltion *scheme.Violation) []byte {
+	pc.sb.Reset()
+	pc.writeViolation(vioaltion)
 	return []byte(pc.sb.String())
 }
 
@@ -51,7 +57,7 @@ func (pc *policiesContent) FormatFailedPolicies(output *scheme.Flattened) []byte
 
 	lastIndex := len(output.AsOrderedMap().Keys()) - 1
 	for i, policyName := range output.AsOrderedMap().Keys() {
-		pc.formatPolicyInfo(policyName, output)
+		pc.formatPolicyInfo(policyName, output, true)
 
 		if i < lastIndex {
 			pc.writeLineBreak()
@@ -61,7 +67,7 @@ func (pc *policiesContent) FormatFailedPolicies(output *scheme.Flattened) []byte
 	return []byte(pc.sb.String())
 }
 
-func (pc *policiesContent) formatPolicyInfo(policyName string, output *scheme.Flattened) {
+func (pc *policiesContent) formatPolicyInfo(policyName string, output *scheme.Flattened, withViolations bool) {
 	policyData := output.GetPolicyData(policyName)
 
 	pc.writeLine(pc.pf.FormatTitle(policyData.PolicyInfo.Title, policyData.PolicyInfo.Severity))
@@ -69,7 +75,9 @@ func (pc *policiesContent) formatPolicyInfo(policyName string, output *scheme.Fl
 	pc.depth++
 	pc.writePolicyInfo(policyName, policyData.PolicyInfo)
 	pc.writeLineBreak()
-	pc.writeViolations(policyData.Violations)
+	if withViolations {
+		pc.writeViolations(policyData.Violations)
+	}
 	pc.depth--
 }
 
@@ -121,14 +129,14 @@ func (pc *policiesContent) writeViolations(violations []scheme.Violation) {
 
 	lastIndex := len(violations) - 1
 	for i, violation := range violations {
-		pc.writeViolation(violation)
+		pc.writeViolation(&violation)
 		if i < lastIndex {
 			pc.writeLine(pc.pf.Separator())
 		}
 	}
 }
 
-func (pc *policiesContent) writeViolation(violation scheme.Violation) {
+func (pc *policiesContent) writeViolation(violation *scheme.Violation) {
 	pc.writeKeyval(fmt.Sprintf("Link to %s", violation.ViolationEntityType), violation.CanonicalLink)
 	pc.writeAux(violation.Aux)
 }
