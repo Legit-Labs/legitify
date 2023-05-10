@@ -105,7 +105,7 @@ func (f *sarifFormatter) IsSchemeSupported(schemeType string) bool {
 
 func getViolationMessage(violation *scheme.Violation, policyInfo *scheme.PolicyInfo) string {
 	pc := getSarifContent()
-	return pc.pf.FormatText(0, policyInfo.Description) +
+	return strings.TrimSpace(pc.pf.FormatText(0, policyInfo.Description)) +
 		pc.pf.Linebreak() +
 		string(pc.FormatViolation(violation))
 }
