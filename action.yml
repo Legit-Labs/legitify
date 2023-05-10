@@ -33,25 +33,30 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v3
-      with:
-          node-version: '16'
-
     - id: setup-go
       if: ${{ inputs.compile_legitify == 'true' }}
       uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568 # ratchet:actions/setup-go@v3
       with:
         go-version: 1.19
+    - id: checkout_legitify
+      if: ${{ inputs.compile_legitify == 'true' }}
+      uses: 'actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b'
+      with:
+        repository: Legit-Labs/legitify
+        ref: ${{ inputs.legitify_base_version }}
+        path: legitify-build 
+
     - id: compile_legitify
       if: ${{ inputs.compile_legitify == 'true' }}
       shell: bash
-      env:
-        ref: "${{ inputs.legitify_base_version }}"
       run: |
-        git clone https://github.com/Legit-Labs/legitify.git legitify-build
         cd legitify-build
-        git checkout "${ref}"
         go build -o "${GITHUB_ACTION_PATH}/legitify"
+
+    - uses: actions/setup-node@v3
+      with:
+          node-version: '16'
+
     - id: analyze
       shell: bash
       env:
