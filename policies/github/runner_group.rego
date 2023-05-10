@@ -6,7 +6,7 @@ package runner_group
 # description: |
 #       Workflows from public repositories are allowed to run on GitHub Hosted Runners.
 #       When using GitHub Hosted Runners,
-#		it is recommended to allow only workflows from private repositories to run on these runners.
+#       it is recommended to allow only workflows from private repositories to run on these runners.
 #		to avoid being vulnerable to malicious actors using workflows from public repositories to break into your private network.
 #       In case of inadequate security measures implemented on the hosted runner,
 #       malicious actors could fork your repository and then create a pwn-request (a pull-request from a forked repository to the base repository with malicious intentions)
