@@ -21,6 +21,21 @@ func newSarifFormatter() OutputFormatter {
 	}
 }
 
+func (f *sarifFormatter) URIFromLink(link string) (base, uri string) {
+	const (
+		httpsPrefix = "https://"
+		httpPrefix  = "http://"
+	)
+
+	if strings.HasPrefix(link, httpsPrefix) {
+		return httpsPrefix, link[len(httpsPrefix):]
+	} else if strings.HasPrefix(link, httpPrefix) {
+		return httpPrefix, link[len(httpPrefix):]
+	} else {
+		return "", link
+	}
+}
+
 func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error) {
 	report, err := sarif.New(sarif.Version210)
 	if err != nil {
@@ -57,6 +72,7 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 		// https://github.com/ossf/scorecard/blob/273dccda33590b7b46e98e19a9154f9da5400521/pkg/testdata/check6.sarif
 
 		for _, violation := range data.Violations {
+			base, uri := f.URIFromLink(violation.CanonicalLink)
 			run.AddDistinctArtifact(violation.ViolationEntityType)
 			run.CreateResultForRule(policyInfo.FullyQualifiedPolicyName).
 				WithLevel(sarifSeverity(policyInfo.Severity)).
@@ -67,8 +83,7 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 						sarif.NewPhysicalLocation().
 							WithArtifactLocation(
 								sarif.NewArtifactLocation().
-									WithUri(violation.CanonicalLink).
-									WithUriBaseId("legitify"),
+									WithUri(uri).WithUriBaseId(base),
 							),
 					),
 				)
