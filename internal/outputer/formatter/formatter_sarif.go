@@ -218,7 +218,7 @@ func (sp sarifPolicyFormatter) FormatList(depth int, title string, list []string
 	}
 
 	var sb strings.Builder
-	bullet := "*"
+	bullet := "-"
 	sb.WriteString(sp.FormatText(depth, "%s%s", title, sp.Linebreak()))
 	for i, step := range list {
 		if ordered {
