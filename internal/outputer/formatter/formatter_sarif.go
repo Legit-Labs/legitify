@@ -76,7 +76,7 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 			run.AddDistinctArtifact(violation.ViolationEntityType)
 			run.CreateResultForRule(policyInfo.FullyQualifiedPolicyName).
 				WithLevel(sarifSeverity(policyInfo.Severity)).
-				WithMessage(sarif.NewTextMessage(getViolationMessage(&violation, &policyInfo))).
+				WithMessage(sarif.NewMarkdownMessage(getViolationMessage(&violation, &policyInfo))).
 				WithHostedViewerUri(violation.CanonicalLink).
 				AddLocation(
 					sarif.NewLocationWithPhysicalLocation(
@@ -104,9 +104,10 @@ func (f *sarifFormatter) IsSchemeSupported(schemeType string) bool {
 }
 
 func getViolationMessage(violation *scheme.Violation, policyInfo *scheme.PolicyInfo) string {
-	return policyInfo.Description +
-		"\n" +
-		string(getSarifContent().FormatViolation(violation))
+	pc := getMarkdownContent()
+	return pc.pf.FormatText(0, policyInfo.Description) +
+		pc.pf.Linebreak() +
+		string(pc.FormatViolation(violation))
 }
 
 // See https://github.com/github/docs/issues/21221
@@ -163,15 +164,20 @@ func getSarifContent() *policiesContent {
 	return pc
 }
 
+func getMarkdownContent() *policiesContent {
+	sFormatter := newMarkdownFormatter()
+	typedFormatter := sFormatter.(*markdownFormatter)
+	pf := newMarkdownPolicyFormatter()
+	pc := newPoliciesContent(pf, typedFormatter.colorizer)
+	return pc
+}
+
 func getPlaintextPolicySummary(output *scheme.Flattened, policyName string) string {
 	return string(getSarifContent().FormatPolicy(output, policyName))
 }
 
 func getMarkdownPolicySummary(output *scheme.Flattened, policyName string) string {
-	mdFormatter := newMarkdownFormatter()
-	typedFormatter := mdFormatter.(*markdownFormatter)
-	pf := newMarkdownPolicyFormatter()
-	pc := newPoliciesContent(pf, typedFormatter.colorizer)
+	pc := getMarkdownContent()
 	return string(pc.FormatPolicy(output, policyName))
 }
 
