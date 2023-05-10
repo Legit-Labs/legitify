@@ -235,7 +235,7 @@ func (sp sarifPolicyFormatter) Linebreak() string {
 }
 
 func (sp sarifPolicyFormatter) Separator() string {
-	return "--"
+	return "---"
 }
 
 func (sp sarifPolicyFormatter) Indent(depth int) string {
