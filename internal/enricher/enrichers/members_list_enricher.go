@@ -8,6 +8,7 @@ import (
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
 )
 
@@ -29,10 +30,11 @@ func (e membersListEnricher) Enrich(_ context.Context, data analyzers.AnalyzedDa
 }
 
 func (se membersListEnricher) Parse(data interface{}) (Enrichment, error) {
-	if val, ok := data.([]githubcollected.OrganizationMember); !ok {
+	if val, ok := data.([]interface{}); !ok {
 		return nil, fmt.Errorf("expecting []githubcollected.OrganizationMember, found %T", data)
 	} else {
-		return MembersListEnrichment(val), nil
+		casted := slice_utils.CastInterfaces[githubcollected.OrganizationMember](val)
+		return MembersListEnrichment(casted), nil
 	}
 }
 
@@ -42,7 +44,7 @@ func createMembersListEnrichment(extraData interface{}) (Enrichment, error) {
 		return nil, fmt.Errorf("invalid membersList extra data")
 	}
 
-	var result []githubcollected.OrganizationMember
+	result := []githubcollected.OrganizationMember{}
 	for k := range casted {
 		var member githubcollected.OrganizationMember
 		err := json.Unmarshal([]byte(k), &member)

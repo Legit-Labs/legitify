@@ -21,6 +21,21 @@ func newSarifFormatter() OutputFormatter {
 	}
 }
 
+func (f *sarifFormatter) URIFromLink(link string) (base, uri string) {
+	const (
+		httpsPrefix = "https://"
+		httpPrefix  = "http://"
+	)
+
+	if strings.HasPrefix(link, httpsPrefix) {
+		return httpsPrefix, link[len(httpsPrefix):]
+	} else if strings.HasPrefix(link, httpPrefix) {
+		return httpPrefix, link[len(httpPrefix):]
+	} else {
+		return "", link
+	}
+}
+
 func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error) {
 	report, err := sarif.New(sarif.Version210)
 	if err != nil {
@@ -57,30 +72,18 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 		// https://github.com/ossf/scorecard/blob/273dccda33590b7b46e98e19a9154f9da5400521/pkg/testdata/check6.sarif
 
 		for _, violation := range data.Violations {
-
-			var entityId interface{}
-			var ok bool
-
-			if violation.Aux != nil {
-				entityId, ok = violation.Aux.Get("entityId")
-			}
-
-			if !ok || violation.Aux == nil {
-				entityId = "unknown"
-			}
-
+			base, uri := f.URIFromLink(violation.CanonicalLink)
 			run.AddDistinctArtifact(violation.ViolationEntityType)
 			run.CreateResultForRule(policyInfo.FullyQualifiedPolicyName).
 				WithLevel(sarifSeverity(policyInfo.Severity)).
-				WithMessage(sarif.NewTextMessage(policyInfo.Description)).
+				WithMessage(sarif.NewTextMessage(getViolationMessage(&violation, &policyInfo))).
 				WithHostedViewerUri(violation.CanonicalLink).
 				AddLocation(
 					sarif.NewLocationWithPhysicalLocation(
 						sarif.NewPhysicalLocation().
 							WithArtifactLocation(
 								sarif.NewArtifactLocation().
-									WithUri(fmt.Sprintf("%v", entityId)).
-									WithUriBaseId("legitify"),
+									WithUri(uri).WithUriBaseId(base),
 							),
 					),
 				)
@@ -98,6 +101,13 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 
 func (f *sarifFormatter) IsSchemeSupported(schemeType string) bool {
 	return true
+}
+
+func getViolationMessage(violation *scheme.Violation, policyInfo *scheme.PolicyInfo) string {
+	pc := getSarifContent()
+	return strings.TrimSpace(pc.pf.FormatText(0, policyInfo.Description)) +
+		pc.pf.Linebreak() +
+		string(pc.FormatViolation(violation))
 }
 
 // See https://github.com/github/docs/issues/21221
@@ -146,19 +156,28 @@ func sarifSecuritySeverity(s severity.Severity) string {
 	}
 }
 
-func getPlaintextPolicySummary(output *scheme.Flattened, policyName string) string {
+func getSarifContent() *policiesContent {
 	sFormatter := newSarifFormatter()
 	typedFormatter := sFormatter.(*sarifFormatter)
 	pf := newSarifPolicyFormatter()
 	pc := newPoliciesContent(pf, typedFormatter.colorizer)
-	return string(pc.FormatPolicy(output, policyName))
+	return pc
+}
+
+func getMarkdownContent() *policiesContent {
+	sFormatter := newMarkdownFormatter()
+	typedFormatter := sFormatter.(*markdownFormatter)
+	pf := newMarkdownPolicyFormatter()
+	pc := newPoliciesContent(pf, typedFormatter.colorizer)
+	return pc
+}
+
+func getPlaintextPolicySummary(output *scheme.Flattened, policyName string) string {
+	return string(getSarifContent().FormatPolicy(output, policyName))
 }
 
 func getMarkdownPolicySummary(output *scheme.Flattened, policyName string) string {
-	mdFormatter := newMarkdownFormatter()
-	typedFormatter := mdFormatter.(*markdownFormatter)
-	pf := newMarkdownPolicyFormatter()
-	pc := newPoliciesContent(pf, typedFormatter.colorizer)
+	pc := getMarkdownContent()
 	return string(pc.FormatPolicy(output, policyName))
 }
 
@@ -166,7 +185,7 @@ type sarifColorizer struct {
 }
 
 func (sc sarifColorizer) colorize(tColor themeColor, text interface{}) string {
-	return text.(string)
+	return fmt.Sprintf("%v", text)
 }
 
 // plaintext policy formatting
@@ -199,13 +218,9 @@ func (sp sarifPolicyFormatter) FormatList(depth int, title string, list []string
 	}
 
 	var sb strings.Builder
-	bullet := "*"
-	sb.WriteString(sp.FormatText(depth, "%s\n", title))
-	for i, step := range list {
-		if ordered {
-			bullet = fmt.Sprintf("%d.", i+1)
-		}
-		sb.WriteString(sp.FormatText(depth, "%s %s\n", bullet, step))
+	sb.WriteString(sp.FormatText(depth, "%s%s", title, sp.Linebreak()))
+	for _, step := range list {
+		sb.WriteString(sp.FormatText(depth, "%s%s", step, sp.Linebreak()))
 	}
 
 	return sb.String()

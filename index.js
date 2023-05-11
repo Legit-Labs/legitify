@@ -6,7 +6,7 @@ const tar = require("tar-fs");
 const path = require("path");
 const fetch = require("node-fetch");
 const exec = require("@actions/exec");
-const { context } = require("@actions/github");
+const { context, getOctokit } = require("@actions/github");
 const artifact = require("@actions/artifact");
 const { exit } = require("process");
 
@@ -25,26 +25,76 @@ async function uploadErrorLog() {
   }
 }
 
-async function executeLegitify(token, args) {
+async function isPrivateRepo(token) {
+  const repoName = process.env.GITHUB_REPOSITORY;
+  if (!repoName) {
+    core.setFailed("No repository detected.");
+    return;
+  }
+  const parts = repoName.split("/");
+  const owner = parts[0];
+  const repo = parts[1];
+
+  const octokit = getOctokit(token);
+  const repoResp = await octokit.rest.repos.get({
+    owner,
+    repo,
+  });
+
+  return repoResp.data.private;
+}
+
+async function executeLegitify(token, args, uploadCodeScanning) {
   let myOutput = "";
   let myError = "";
 
   const options = {};
   options.listeners = {
-    stdout: (data) => {
-      myOutput += data.toString();
-    },
     stderr: (data) => {
       myError += data.toString();
     },
   };
   options.env = { GITHUB_TOKEN: token };
   options.silent = true
+  const isPrivate = await isPrivateRepo(token)
+  core.setOutput("is_private", isPrivate)
+  if (!isPrivate) {
+    console.log("running in a public repository - only uploading results to Code Scanning (Security Center)")
+  }
 
   try {
-    await exec.exec('"./legitify"', ["analyze", ...args, "--output-format", "markdown"], options);
-    fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
+    const sarifFile = "legitify-output.sarif"
+
+    // generate the output as json
+    const jsonFile = "legitify-output.json"
+    const analyzeArgs = ["analyze", ...args, "--output-format", "json", "--output-file", jsonFile]
+    console.log("execute legitify analyze:", analyzeArgs)
+    await exec.exec("./legitify", analyzeArgs, options)
+
+    // generate a sarif version for the code scanning
+    if (uploadCodeScanning) {
+      myError = ""
+      const convertSarifArgs = ["convert", "--input-file", jsonFile, "--output-format", "sarif", "--output-file", sarifFile]
+      console.log("execute legitify convert sarif:", convertSarifArgs)
+      await exec.exec("./legitify", convertSarifArgs, options);
+    }
+
+    // generate a markdown version for the action output
+    myError = ""
+    options.listeners.stdout = (data) => {
+      myOutput += data.toString();
+    }
+    const convertMarkdownArgs = ["convert", "--input-file", jsonFile, "--output-format", "markdown"]
+    console.log("execute legitify convert markdown:", convertMarkdownArgs)
+    await exec.exec('"./legitify"', convertMarkdownArgs, options)
+    if (isPrivate) {
+      fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
+    } else {
+      fs.unlinkSync(jsonFile);
+      fs.unlinkSync("error.log");
+    }
   } catch (error) {
+    console.log(error.toString() + " | stderr: " + myError.toString())
     fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, "legitify failed with:\n" + myError)
     core.setFailed(error);
     exit(1);
@@ -85,21 +135,21 @@ async function fetchLegitifyReleaseUrl(baseVersion) {
 function generateAnalyzeArgs(repo, owner) {
   let args = [];
 
-  const scorecard = core.getInput("scorecard");
+  const scorecard = process.env["scorecard"];
   if (scorecard === "yes" || scorecard === "verbose") {
     args.push("--scorecard");
     args.push(scorecard);
   }
 
-  if (core.getInput("analyze_self_only") === "true") {
+  if (process.env["analyze_self_only"] === "true") {
     args.push("--repo");
     args.push(repo);
     return args;
   }
 
-  if (core.getInput("repositories") !== "") {
+  if (process.env["repositories"] !== "") {
     args.push("--repo");
-    args.push(core.getInput("repositories"));
+    args.push(process.env["repositories"]);
     return args;
   }
 
@@ -139,7 +189,7 @@ function downloadAndExtract(fileUrl, filePath) {
 
 async function run() {
   try {
-    const token = core.getInput("github_token");
+    const token = process.env["github_token"];
     if (!token) {
       core.setFailed("No GitHub token provided");
       exit(1);
@@ -147,15 +197,19 @@ async function run() {
 
     const owner = process.env["GITHUB_REPOSITORY_OWNER"];
     const repo = process.env["GITHUB_REPOSITORY"];
-    const legitifyBaseVersion = core.getInput("legitify_base_version");
-    const fileUrl = await fetchLegitifyReleaseUrl(legitifyBaseVersion);
-    const filePath = path.join(__dirname, "legitify.tar.gz");
+    const uploadCodeScanning = (process.env["upload_code_scanning"] === "true");
+
+    if (process.env["compile_legitify"] == "true") {
+      console.log("using the compiled legitify version.");
+    } else {
+      const legitifyBaseVersion = process.env["legitify_base_version"];
+      const fileUrl = await fetchLegitifyReleaseUrl(legitifyBaseVersion);
+      const filePath = path.join(__dirname, "legitify.tar.gz");
+      await downloadAndExtract(fileUrl, filePath);
+    }
 
     const args = generateAnalyzeArgs(repo, owner);
-
-    await downloadAndExtract(fileUrl, filePath);
-
-    await executeLegitify(token, args);
+    await executeLegitify(token, args, uploadCodeScanning);
   } catch (error) {
     core.setFailed(error.message);
     exit(1);

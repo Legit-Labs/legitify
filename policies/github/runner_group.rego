@@ -5,8 +5,9 @@ package runner_group
 # title: Runner Group Should Be Limited to Private Repositories
 # description: |
 #       Workflows from public repositories are allowed to run on GitHub Hosted Runners.
-#       When using GitHub Hosted Runners, it is recommended to allow only workflows from private repositories to run on these runners to avoid being vulnerable
-#       to malicious actors using workflows from public repositories to break into your private network.
+#       When using GitHub Hosted Runners,
+#       it is recommended to allow only workflows from private repositories to run on these runners.
+#       to avoid being vulnerable to malicious actors using workflows from public repositories to break into your private network.
 #       In case of inadequate security measures implemented on the hosted runner,
 #       malicious actors could fork your repository and then create a pwn-request (a pull-request from a forked repository to the base repository with malicious intentions)
 #       that create a workflow that exploits these vulnerabilities and move laterally inside your network.
@@ -34,8 +35,7 @@ runner_group_can_be_used_by_public_repositories = false {
 # scope: rule
 # title: Runner Group Should Be Limited to Selected Repositories
 # description: |
-#       Not limiting the runner group to selected repositories allows any user in the organization to execute workflows
-#       on the group's runners.
+#       Not limiting the runner group to selected repositories allows any user in the organization to execute workflows on the group's runners.
 #       In case of inadequate security measures implemented on the hosted runner,
 #       malicious insider could create a repository with a workflow that exploits the runner's vulnerabilities to move laterally inside your network.
 # custom:
