@@ -145,7 +145,7 @@ func (rc *repositoryCollector) extendProjectWithPushRules(project gitlab_collect
 }
 
 func (rc *repositoryCollector) extendProjectWithMergeRequestApprovalRules(project gitlab_collected.Repository) (gitlab_collected.Repository, error) {
-	rules, _, err := rc.Client.Client().Projects.GetProjectApprovalRules(int(project.ID()))
+	rules, _, err := rc.Client.Client().Projects.GetProjectApprovalRules(int(project.ID()), nil)
 	if err != nil {
 		log.Printf("failed to get project merge request approval rules %s", err)
 		return project, err
