@@ -59,14 +59,14 @@ func (c *actionCollector) Collect() collectors.SubCollectorChannels {
 				actionsPermissions, err1 := c.client.GetActionsTokenPermissionsForOrganization(org.Name())
 				actionsData, _, err2 := c.client.Client().Organizations.GetActionsPermissions(c.context, org.Name())
 
+				c.CollectionChangeByOne()
+
 				if err1 != nil || err2 != nil {
 					entityName := fmt.Sprintf("%s/%s", namespace.Organization, org.Name())
 					perm := collectors.NewMissingPermission(permissions.OrgAdmin, entityName, orgActionPermEffect, namespace.Organization)
 					c.IssueMissingPermissions(perm)
 					return
 				}
-
-				c.CollectionChangeByOne()
 
 				c.CollectData(org,
 					ghcollected.OrganizationActions{
