@@ -1,21 +1,21 @@
 name: Build Docs
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    path:
+      branches:
+        - 'main'
+      paths:
+        - '**.rego'
+
 permissions:
   contents: 'write'
 jobs:
   update_docs:
+    environment: github-pages
     runs-on: ubuntu-latest
     steps:
-      - name: checkout if from pull request event
+      - name: check out the main branch
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
-        if : ${{github.event_name == 'pull_request'}}
-      - name: checkout if from a push event
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # ratchet:actions/checkout@v3
-        if : ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         with:
           token: ${{ secrets.DOCS_TOKEN }}
       - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # ratchet:actions/setup-go@v3
@@ -24,7 +24,6 @@ jobs:
       - name: build docs
         run: make docs
       - name: update docs
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
           mv ./docs ..
           git fetch origin gh-docs
