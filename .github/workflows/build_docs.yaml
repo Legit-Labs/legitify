@@ -1,11 +1,17 @@
 name: Build Docs
-on: workflow_dispatch
+on:
+  push:
+    path:
+      branches:
+        - 'main'
+      paths:
+        - '**.rego'
 
 permissions:
   contents: 'write'
 jobs:
   update_docs:
-    if : ${{github.ref == 'refs/heads/main'}}
+    environment: github-pages
     runs-on: ubuntu-latest
     steps:
       - name: check out the main branch
