@@ -1,11 +1,10 @@
 name: Build Docs
 on:
   push:
-    path:
-      branches:
-        - 'main'
-      paths:
-        - '**.rego'
+    branches:
+      - 'main'
+    paths:
+      - '**.rego'
 
 permissions:
   contents: 'write'
