@@ -195,7 +195,11 @@ jobs:
     steps:
     - name: Get version
       id: get_version
-      run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+      run: |
+        echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
+        IFS="_" read -r -a parts <<< "${{ needs.release.outputs.brew_release_file }}"
+        echo "os=${parts[2]}" >> $GITHUB_OUTPUT
+        echo "arch=${parts[3]%%.*}" >> $GITHUB_OUTPUT
     - name: Bump Brew
       env: 
         # Required token to create a pull request in the tap repository 
@@ -204,5 +208,5 @@ jobs:
         brew tap legit-labs/legit-labs
         brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
         --sha256=${{ needs.release.outputs.brew_files_sha }} \
-        --url="https://github.com/legit-labs/legitify/releases/download/${{ steps.get_version.outputs.version }}/${{ needs.release.outputs.brew_release_file }}" \
+        --url="https://legitify.legitsecurity.com/${{ steps.get_version.outputs.version }}/${{ steps.get_version.os }}/${{ steps.get_version.arch }}" \
         legit-labs/legit-labs/legitify
