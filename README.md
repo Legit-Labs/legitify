@@ -53,9 +53,9 @@ You can use [SLSA framework's official verifier](https://github.com/slsa-framewo
 Example of usage for the darwin_arm64 architecture for the v0.1.6 release:
 
 ```
-VERSION=0.1.6
+VERSION=0.2.7
 ARCH=darwin_arm64
-./slsa-verifier verify-artifact --source-branch main --builder-id 'https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.2.2' --source-uri "git+https://github.com/Legit-Labs/legitify" --provenance-path multiple.intoto.jsonl ./legitify_${VERSION}_${ARCH}.tar.gz
+./slsa-verifier verify-artifact --source-branch main --builder-id 'https://github.com/slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@refs/tags/v1.6.0' --source-uri "git+https://github.com/Legit-Labs/legitify" --provenance-path multiple.intoto.jsonl ./legitify_${VERSION}_${ARCH}.tar.gz
 ```
 
 
