@@ -227,13 +227,11 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 		proj, err = f(proj)
 		if err != nil {
 			log.Printf("project '%s' collection failed with error: %v", proj.Name(), err)
-			break
 		}
 	}
 
-	if err == nil {
-		newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
-		rc.CollectDataWithContext(proj, proj.Links.Self, &newContext)
-	}
+	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
+	rc.CollectDataWithContext(proj, proj.Links.Self, &newContext)
+
 	rc.CollectionChangeByOne()
 }
