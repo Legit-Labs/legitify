@@ -74,7 +74,7 @@ You can control which resources will be analyzed with command-line flags namespa
 - `--org`: will limit the analysis to the specified GitHub organizations or GitLab group
 - `--repo`: will limit the analysis to the specified GitHub repositories or GitLab projects
 - `--scm`: specify the source code management platform. Possible values are: `github` or `gitlab`. Defaults to `github`. Please note: when running on GitLab, `--scm gitlab` is required.
-- `--enterprise`: will specifiy which enterprises should be analyzed. Please note: in order to analyze an enterprise, an enterprise slug must be provided. 
+- `--enterprise`: will specify which enterprises should be analyzed. Please note: in order to analyze an enterprise, an enterprise slug must be provided. 
 
 
 ```
@@ -86,10 +86,10 @@ The above command will test organization and member policies against org1 and or
 ### gpt-analysis
 
 ```
-LEGITIFT_TOKEN=<your_token> OPENAI_TOKEN=<token> ./legitify gpt-analysis --repo ORG_NAME/REPO_NAME --org ORG_NAME
+LEGITIFY_TOKEN=<your_token> OPENAI_TOKEN=<token> ./legitify gpt-analysis --repo org1/repo1 --org org1
 ```
 
-GPT-3 based analysis to the security posture of the provided repository or organization.
+GPT-3 based analysis of the security posture of the provided repository or organization.
 
 **NOTE: The repository/organization metadata is sent to openai servers.**
 
