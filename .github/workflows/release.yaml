@@ -208,5 +208,5 @@ jobs:
         brew tap legit-labs/legit-labs
         brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
         --sha256=${{ needs.release.outputs.brew_files_sha }} \
-        --url="https://legitify.legitsecurity.com/${{ steps.get_version.outputs.version }}/${{ steps.get_version.os }}/${{ steps.get_version.arch }}" \
+        --url="https://legitify.legitsecurity.com/${{ steps.get_version.outputs.version }}/${{ steps.get_version.os }}/${{ steps.get_version.arch }}.tar.gz" \
         legit-labs/legit-labs/legitify
