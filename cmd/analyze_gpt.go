@@ -2,10 +2,9 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
-	"github.com/Legit-Labs/legitify/internal/errlog"
-	"github.com/Legit-Labs/legitify/internal/screen"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -89,20 +88,11 @@ func executeAnalyzeGPTCommand(cmd *cobra.Command, _args []string) error {
 		return err
 	}
 
-	errFile, err := setErrorFile(analyzeGptArgs.ErrorFile)
+	preExitHook, err := analyzeGptArgs.applyOutputOptions()
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if errlog.HadErrors() {
-			screen.Printf("Some errors raised during the execution. Check %s for more details", errFile.Name())
-		}
-	}()
-
-	err = setOutputFile(analyzeGptArgs.OutputFile)
-	if err != nil {
-		return err
-	}
+	defer preExitHook()
 
 	executor, err := setup()
 	if err != nil {
