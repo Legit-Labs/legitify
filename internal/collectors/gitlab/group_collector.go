@@ -58,6 +58,8 @@ func (c *groupCollector) Collect() collectors.SubCollectorChannels {
 					return
 				}
 
+				isPremium := c.Client.IsGroupPremium(g)
+
 				hooks, err := c.Client.GroupHooks(fullGroup.ID)
 
 				if err != nil {
@@ -69,7 +71,8 @@ func (c *groupCollector) Collect() collectors.SubCollectorChannels {
 					Hooks: hooks,
 				}
 
-				c.CollectDataWithContext(entity, g.WebURL, newCollectionContext(g, []permissions.OrganizationRole{permissions.RepoRoleAdmin}))
+				c.CollectDataWithContext(entity, g.WebURL,
+					newCollectionContext(g, []permissions.OrganizationRole{permissions.RepoRoleAdmin}, isPremium))
 				c.CollectionChangeByOne()
 			})
 		}

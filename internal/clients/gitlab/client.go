@@ -2,7 +2,7 @@ package gitlab
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -131,6 +131,27 @@ func IsAdmin(client *gitlab.Client) bool {
 	return res.IsAdmin
 }
 
+func (c *Client) Group(name string) (*gitlab.Group, error) {
+	ownedGroups := !c.IsAdmin() // list all groups as site admin
+	opts := &gitlab.ListGroupsOptions{
+		Owned:  &ownedGroups,
+		Search: &name,
+	}
+
+	res, err := pagination.New[*gitlab.Group](c.Client().Groups.ListGroups, opts).Sync()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, g := range res.Collected {
+		if g.Path == name {
+			return g, nil
+		}
+	}
+
+	return nil, fmt.Errorf("couldn't find group %s", name)
+}
+
 func (c *Client) Groups() ([]*gitlab.Group, error) {
 	var result []*gitlab.Group
 
@@ -157,4 +178,28 @@ func (c *Client) GroupHooks(gid int) ([]*gitlab.GroupHook, error) {
 	}
 
 	return result.Collected, nil
+}
+
+func (c *Client) GroupPlan(group *gitlab.Group) (string, error) {
+	nss, _, err := c.Client().Namespaces.SearchNamespace(group.FullName)
+	if err != nil {
+		return "", err
+	}
+
+	for _, n := range nss {
+		if n.Path == group.Path {
+			return n.Plan, nil
+		}
+	}
+
+	return "", fmt.Errorf("didn't find namespace for %s", group.Path)
+}
+
+func (c *Client) IsGroupPremium(group *gitlab.Group) bool {
+	plan, err := c.GroupPlan(group)
+	if err != nil {
+		return false
+	}
+
+	return plan != "free"
 }

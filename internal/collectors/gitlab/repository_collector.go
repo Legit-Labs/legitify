@@ -85,7 +85,15 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 					return
 				}
 
-				rc.extendedCollection(project)
+				isPremium := false
+				group, err := rc.Client.Group(r.Owner)
+				if err != nil {
+					log.Printf(err.Error())
+				} else {
+					isPremium = rc.Client.IsGroupPremium(group)
+				}
+
+				rc.extendedCollection(project, isPremium)
 			})
 
 		}
@@ -181,25 +189,25 @@ func (rc *repositoryCollector) extendProjectWithMinimumRequiredApprovals(project
 
 func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
-		organizations, err := rc.Client.Organizations()
+		groups, err := rc.Client.Groups()
 		if err != nil {
 			log.Printf("failed to collect list of orgniazations to get repositories  %s", err)
 			return
 		}
 		gw := group_waiter.New()
-		for _, org := range organizations {
-			org := org
+		for _, group := range groups {
+			g := group
 			gw.Do(func() {
-				ch := pagination.New[*gitlab2.Project](rc.Client.Client().Groups.ListGroupProjects, nil).Async(org.ID)
+				ch := pagination.New[*gitlab2.Project](rc.Client.Client().Groups.ListGroupProjects, nil).Async(g.ID)
 				for res := range ch {
 					if res.Err != nil {
-						log.Printf("failed to list projects for group %s (%d): %v", org.Name, org.ID, res.Err)
+						log.Printf("failed to list projects for group %s (%d): %v", g.Name, g.ID, res.Err)
 						return
 					}
 					for _, completedProject := range res.Collected {
 						completedProject := completedProject
 						gw.Do(func() {
-							rc.extendedCollection(completedProject)
+							rc.extendedCollection(completedProject, rc.Client.IsGroupPremium(g))
 						})
 					}
 				}
@@ -209,7 +217,7 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	})
 }
 
-func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.Project) {
+func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.Project, isPremium bool) {
 	proj := gitlab_collected.Repository{
 		Project: completeProjectsList,
 	}
@@ -227,13 +235,11 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 		proj, err = f(proj)
 		if err != nil {
 			log.Printf("project '%s' collection failed with error: %v", proj.Name(), err)
-			break
 		}
 	}
 
-	if err == nil {
-		newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner})
-		rc.CollectDataWithContext(proj, proj.Links.Self, &newContext)
-	}
+	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner},
+		isPremium)
+	rc.CollectDataWithContext(proj, proj.Links.Self, &newContext)
 	rc.CollectionChangeByOne()
 }
