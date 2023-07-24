@@ -72,7 +72,7 @@ func (c *groupCollector) Collect() collectors.SubCollectorChannels {
 				}
 
 				c.CollectDataWithContext(entity, g.WebURL,
-					newCollectionContext(g, []permissions.OrganizationRole{permissions.RepoRoleAdmin}, isPremium))
+					newCollectionContext(g, []permissions.RepositoryRole{permissions.RepoRoleAdmin}, isPremium))
 				c.CollectionChangeByOne()
 			})
 		}

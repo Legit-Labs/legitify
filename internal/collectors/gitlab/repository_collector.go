@@ -39,20 +39,20 @@ func (rc *repositoryCollector) CollectTotalEntities() int {
 		return len(repositories)
 	}
 
-	organizations, err := rc.Client.Organizations()
+	groups, err := rc.Client.Groups()
 	if err != nil {
-		log.Printf("failed to collect list of orgniazations to get repositories metadata %s", err)
+		log.Printf("failed to collect list of groups to get repositories metadata %s", err)
 		return 0
 	}
 
 	var total atomic.Int64
 	gw := group_waiter.New()
-	for _, org := range organizations {
-		org := org
+	for _, group := range groups {
+		group := group
 		gw.Do(func() {
-			_, resp, err := rc.Client.Client().Groups.ListGroupProjects(org.ID, &gitlab2.ListGroupProjectsOptions{})
+			_, resp, err := rc.Client.Client().Groups.ListGroupProjects(group.ID, &gitlab2.ListGroupProjectsOptions{})
 			if err != nil {
-				log.Printf("failed to collect metadata for repositories of group %s (%d): %s", org.Name, org.ID, err)
+				log.Printf("failed to collect metadata for repositories of group %s (%d): %s", group.Name, group.ID, err)
 			} else {
 				total.Add(int64(resp.TotalItems))
 			}
@@ -191,7 +191,7 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 	return rc.WrappedCollection(func() {
 		groups, err := rc.Client.Groups()
 		if err != nil {
-			log.Printf("failed to collect list of orgniazations to get repositories  %s", err)
+			log.Printf("failed to collect list of groups to get repositories  %s", err)
 			return
 		}
 		gw := group_waiter.New()
@@ -238,7 +238,7 @@ func (rc *repositoryCollector) extendedCollection(completeProjectsList *gitlab2.
 		}
 	}
 
-	newContext := newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner},
+	newContext := newCollectionContext(nil, []permissions.Role{permissions.GroupRoleOwner},
 		isPremium)
 	rc.CollectDataWithContext(proj, proj.Links.Self, &newContext)
 	rc.CollectionChangeByOne()
