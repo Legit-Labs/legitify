@@ -88,7 +88,7 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 				isPremium := false
 				group, err := rc.Client.Group(r.Owner)
 				if err != nil {
-					log.Printf(err.Error())
+					log.Println(err.Error())
 				} else {
 					isPremium = rc.Client.IsGroupPremium(group)
 				}
