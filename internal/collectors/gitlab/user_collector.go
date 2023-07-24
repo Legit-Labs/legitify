@@ -96,7 +96,8 @@ func (c *userCollector) collectGroupUsers(group *gitlab2.Group) {
 				User: u,
 			}
 			c.CollectDataWithContext(&entity, entity.CanonicalLink(),
-				newCollectionContext(nil, []permissions.OrganizationRole{permissions.OrgRoleOwner}))
+				newCollectionContext(nil, []permissions.Role{permissions.GroupRoleOwner},
+					c.Client.IsGroupPremium(group)))
 			c.CollectionChangeByOne()
 		})
 	}

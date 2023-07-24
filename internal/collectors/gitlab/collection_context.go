@@ -6,20 +6,21 @@ import (
 )
 
 type collectionContext struct {
-	group *gitlab.Group
-	roles []permissions.Role
+	group     *gitlab.Group
+	roles     []permissions.Role
+	isPremium bool
 }
 
-func newCollectionContext(group *gitlab.Group, roles []permissions.Role) collectionContext {
+func newCollectionContext(group *gitlab.Group, roles []permissions.Role, isPremium bool) collectionContext {
 	return collectionContext{
-		group: group,
-		roles: roles,
+		group:     group,
+		roles:     roles,
+		isPremium: isPremium,
 	}
 }
 
 func (c collectionContext) Premium() bool {
-	// TODO: currently we don't know about GitLab policies that required premium account, need to update this once we do.
-	return true
+	return c.isPremium
 }
 
 func (c collectionContext) Roles() []permissions.Role {

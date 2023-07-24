@@ -9,6 +9,13 @@ const (
 	OrgRoleMember = "MEMBER"
 )
 
+const (
+	GroupRoleNone Role = OrgRoleNone
+
+	GroupRoleOwner  = OrgRoleOwner
+	GroupRoleMember = OrgRoleMember
+)
+
 type RepositoryRole = string
 
 const (

@@ -145,6 +145,9 @@ export SERVER_URL="https://gitlab.example.com/"
 LEGITIFY_TOKEN=<your_token> legitify analyze --namespace organization --scm gitlab
 ```
 
+> **_NOTE:_**  For non-premium GitLab accounts some policies (such as branch protection policies) will be skipped
+
+
 ## Namespaces
 
 Namespaces in legitify are resources that are collected and run against the policies.

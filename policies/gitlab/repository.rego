@@ -65,6 +65,7 @@ forking_allowed_for_repository = false {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
+#   prerequisites: [premium]
 #   threat: Any contributor with write access may push potentially dangerous code to this repository, making it easier to compromise and difficult to audit.
 default missing_default_branch_protection = true
 
@@ -80,6 +81,7 @@ missing_default_branch_protection = false {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Set the allowed to merge to "maintainers" and the allowed to push to "No one"]
 #   severity: MEDIUM
+#   prerequisites: [premium]
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
 default missing_default_branch_protection_force_push = true
 
@@ -98,6 +100,7 @@ missing_default_branch_protection_force_push = false {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Protected branches" tab, select the default branch. Check the "Code owner approval"]
 #   severity: LOW
+#   prerequisites: [premium]
 #   threat: A pull request may be approved by any contributor with write access. Specifying specific code owners can ensure review is only done by individuals with the correct expertise required for the review of the changed files, potentially preventing bugs and security risks.
 default repository_require_code_owner_reviews_policy = true
 
@@ -160,6 +163,7 @@ no_conversation_resolution = false {
 # custom:
 #   remediationSteps: [Make sure you have owner permissions, Go to the projects's settings -> Repository page, Enter "Push Rules" tab. Set the "Reject unsigned commits" checkbox ]
 #   severity: LOW
+#   prerequisites: [premium]
 #   threat: A commit containing malicious code may be crafted by a malicious actor that has acquired write access to the repository to initiate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
 default no_signed_commits = true
 
@@ -175,6 +179,7 @@ no_signed_commits = false {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 1 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]
 #   severity: HIGH
+#   prerequisites: [premium]
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_not_required = true
@@ -190,6 +195,7 @@ code_review_not_required = false {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Merge request approvals", Click "Add approval rule" on the default branch rule, Select "Approvals required" and enter at least 2 approvers", Select "Add approvers" and select the desired members, Click "Add approval rule"]
 #   severity: MEDIUM
+#   prerequisites: [premium]
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default code_review_by_two_members_not_required = true
@@ -220,6 +226,7 @@ repository_allows_review_requester_to_approve_their_own_request = false {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Prevent editing approval rules in merge requests", Click "Save Changes"]
 #   severity: MEDIUM
+#   prerequisites: [premium]
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_overriding_approvers = true
@@ -235,6 +242,7 @@ repository_allows_overriding_approvers = false {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Prevent approvals by users who add commits", Click "Save Changes"]
 #   severity: LOW
+#   prerequisites: [premium]
 #   threat:
 #    - "Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production."
 default repository_allows_committer_approvals_policy = true
@@ -250,6 +258,7 @@ repository_allows_committer_approvals_policy = false {
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Merge Requests" tab, Under "Approval settings", Check "Remove all approvals", Click "Save Changes"]
 #   severity: LOW
+#   prerequisites: [premium]
 #   threat: Buggy or insecure code may be committed after approval and will reach the main branch without review. Alternatively, an attacker can attempt a just-in-time attack to introduce dangerous code just before merge.
 default repository_dismiss_stale_reviews = true
 
