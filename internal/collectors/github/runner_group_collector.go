@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"log"
 	"sync"
 
@@ -11,8 +12,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
-	"github.com/google/go-github/v49/github"
-	"golang.org/x/net/context"
+	"github.com/google/go-github/v53/github"
 )
 
 type runnersCollector struct {

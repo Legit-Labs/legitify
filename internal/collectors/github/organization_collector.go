@@ -1,12 +1,13 @@
 package github
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	"github.com/Legit-Labs/legitify/internal/collectors"
 
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
@@ -15,7 +16,6 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/shurcooL/githubv4"
-	"golang.org/x/net/context"
 )
 
 type organizationCollector struct {

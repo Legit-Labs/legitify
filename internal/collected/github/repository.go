@@ -4,7 +4,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/shurcooL/githubv4"
 )
 

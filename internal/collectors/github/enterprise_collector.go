@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"log"
 
@@ -9,7 +10,6 @@ import (
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"golang.org/x/net/context"
 )
 
 type enterpriseCollector struct {

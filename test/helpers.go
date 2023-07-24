@@ -13,7 +13,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 )
 
 var defaultOrg = githubcollected.NewExtendedOrg(&github.Organization{}, permissions.OrgRoleNone)
