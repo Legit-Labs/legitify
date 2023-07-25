@@ -388,6 +388,10 @@ func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository
 }
 
 func (rc *repositoryCollector) withRulesSet(repository ghcollected.Repository, org string) (ghcollected.Repository, error) {
+	if repository.Repository.DefaultBranchRef == nil {
+		return repository, nil // no branches
+	}
+
 	rules, err := rc.Client.GetRulesForBranch(org, repository.Name(),
 		*repository.Repository.DefaultBranchRef.Name)
 
