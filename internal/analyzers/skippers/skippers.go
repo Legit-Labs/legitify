@@ -2,15 +2,13 @@ package skippers
 
 import (
 	"context"
-	"log"
-	"strings"
-
 	"github.com/Legit-Labs/legitify/internal/analyzers/parsing_utils"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
+	"log"
 )
 
 type Skipper interface {
@@ -78,7 +76,7 @@ func (sm *skipper) ShouldSkip(data collectors.CollectedData, violation opa_engin
 
 func (sm *skipper) ignoredPolicy(policy opa_engine.QueryResult) bool {
 	for _, ignored := range sm.ignoredPolicies {
-		if strings.Contains(policy.FullyQualifiedPolicyName, ignored) {
+		if policy.PolicyName == ignored {
 			return true
 		}
 	}

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
@@ -10,6 +11,9 @@ import (
 	"github.com/Legit-Labs/legitify/internal/opa"
 	"github.com/Legit-Labs/legitify/internal/opa/opa_engine"
 	"github.com/Legit-Labs/legitify/internal/outputer"
+	"log"
+	"os"
+	"strings"
 )
 
 func provideGenericClient(args *args) (Client, error) {
@@ -35,6 +39,31 @@ func provideOpa(analyzeArgs *args) (opa_engine.Enginer, error) {
 	return opaEngine, nil
 }
 
+func getIgnoredPolicies(args *args) []string {
+	var result []string
+	path := args.IgnoredPolicies
+	if path == "" {
+		return result
+	}
+
+	readFile, err := os.Open(path)
+	if err != nil {
+		log.Println(err)
+		return result
+	}
+	defer readFile.Close()
+	fileScanner := bufio.NewScanner(readFile)
+	fileScanner.Split(bufio.ScanLines)
+
+	for fileScanner.Scan() {
+		line := fileScanner.Text()
+		line = strings.TrimSpace(line)
+		result = append(result, line)
+	}
+
+	return result
+}
+
 func provideContext(client Client, args *args) (context.Context, error) {
 	ctx := context.Background()
 
@@ -57,7 +86,7 @@ func provideContext(client Client, args *args) (context.Context, error) {
 		IsScorecardVerbose(args.ScorecardWhen))
 
 	ctx = context_utils.NewContextWithIsCloud(ctx, args.Endpoint == "")
-	ctx = context_utils.NewContextWithIgnoredPolicies(ctx, args.IgnoredPolicies)
+	ctx = context_utils.NewContextWithIgnoredPolicies(ctx, getIgnoredPolicies(args))
 
 	return context_utils.NewContextWithTokenScopes(ctx, client.Scopes()), nil
 }

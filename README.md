@@ -200,11 +200,12 @@ When outputting in a human-readable format, legitify support the conventional `-
 ### Misc
 
 - Use the `--failed-only` flag to filter-out passed/skipped checks from the result.
-- Use the `--ignore-policies POLICY_NAME1, PN2` to ignore specific policies, e.g. 
-
-    `--ignore-policies no_conversation_resolution,requires_status_checks`
-
-  (Ignored Policies will be shown as skipped in the output)
+- Use the `--ignore-policies-path $PATH` and provide a file with the policies you want to ignore to skip specific policies.
+One policy per line, e.g. 
+    ```
+  no_conversation_resolution
+  requires_status_checks                                                     ─╯
+    ```
 
 ## Scorecard Support - Only for GitHub server/cloud repositories
 [Scorecard](https://github.com/ossf/scorecard) is an OSSF's open-source project:
