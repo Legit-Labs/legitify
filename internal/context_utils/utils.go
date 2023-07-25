@@ -81,5 +81,11 @@ func GetSimulateSecondaryRateLimit(ctx context.Context) bool {
 }
 
 func GetIgnoredPolicies(ctx context.Context) []string {
-	return ctx.Value(ignoredPoliciesKey).([]string)
+	val, ok := ctx.Value(ignoredPoliciesKey).([]string)
+
+	if !ok {
+		return []string{}
+	}
+
+	return val
 }
