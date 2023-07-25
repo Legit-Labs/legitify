@@ -584,3 +584,18 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 
 	return res, nil
 }
+
+func (c *Client) GetRulesForBranch(organization, repository, branch string) ([]*types.RepositoryRule, error) {
+	url := fmt.Sprintf("repos/%v/%v/rules/branches/%v", organization, repository, branch)
+	req, err := c.client.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var p []*types.RepositoryRule
+	_, err = c.client.Do(c.context, req, &p)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}

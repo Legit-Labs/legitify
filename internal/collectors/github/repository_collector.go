@@ -274,6 +274,10 @@ func (rc *repositoryCollector) collectExtraData(login string,
 			// If we can't get branch protection info, rego will ignore it (as nil)
 			log.Printf("error getting branch protection info for %s: %s", repository.Name, err)
 		}
+		repo, err = rc.withRulesSet(repo, login)
+		if err != nil {
+			log.Printf("error getting rules set for %s: %s", repository.Name, err)
+		}
 	} else {
 		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(login, repo.Repository.Name), orgIsFreeEffect, namespace.Repository)
 		rc.IssueMissingPermissions(perm)
@@ -381,6 +385,18 @@ func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository
 	repo.Collaborators = users
 
 	return repo, nil
+}
+
+func (rc *repositoryCollector) withRulesSet(repository ghcollected.Repository, org string) (ghcollected.Repository, error) {
+	rules, err := rc.Client.GetRulesForBranch(org, repository.Name(),
+		*repository.Repository.DefaultBranchRef.Name)
+
+	if err != nil {
+		return repository, err
+	}
+
+	repository.RulesSet = rules
+	return repository, nil
 }
 
 // fixBranchProtectionInfo fixes the branch protection info for the repository,
