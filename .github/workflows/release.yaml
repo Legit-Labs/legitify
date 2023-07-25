@@ -174,11 +174,21 @@ jobs:
         id: artifact_name
         run: |
           set -euo pipefail
+          echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
           cd "${{ env.ARTIFACTS_DOWNLOAD_PATH }}"
-          file_name=$(find . -maxdepth 1 -type f -name "*darwin_amd64*" -exec basename {} \;)
-          sha="$(shasum -a 256 $file_name | awk '{printf $1}')"
-          echo "brew_files_sha=$sha" >> $GITHUB_OUTPUT
-          echo "brew_release_file=$file_name" >> $GITHUB_OUTPUT
+          darwin_intel_file_name=$(find . -maxdepth 1 -type f -name "*darwin_amd64*" -exec basename {} \;)
+          darwin_intel_sha="$(shasum -a 256 $darwin_intel_file_name | awk '{printf $1}')"
+          echo "brew_intel_files_sha=$darwin_intel_sha" >> $GITHUB_OUTPUT
+          darwin_arm_file_name=$(find . -maxdepth 1 -type f -name "*darwin_arm64*" -exec basename {} \;)
+          darwin_arm_sha="$(shasum -a 256 $darwin_arm_file_name | awk '{printf $1}')"
+          echo "brew_arm_files_sha=$darwin_arm_file_name" >> $GITHUB_OUTPUT
+      - name: update brew formula
+        env: 
+          # Required token to create a pull request in the tap repository 
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          GITHUB_USER: ${{ secrets.HOMEBREW_TAP_GITHUB_USER }}
+        run: |
+          python3 scripts/gen-brew-multi-arch.py ${{ steps.artifact_name.outputs.version }} ${{ steps.artifact_name.outputs.brew_intel_files_sha }} ${{ steps.artifact_name.outputs.brew_arm_files_sha }}
   provenance:
     needs: macos_sign
     permissions:
@@ -189,24 +199,3 @@ jobs:
     with:
       base64-subjects: "${{ needs.macos_sign.outputs.hashes }}"
       upload-assets: true # upload to a new release
-  bump:   
-    needs: release
-    runs-on: macos-latest
-    steps:
-    - name: Get version
-      id: get_version
-      run: |
-        echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
-        IFS="_" read -r -a parts <<< "${{ needs.release.outputs.brew_release_file }}"
-        echo "os=${parts[2]}" >> $GITHUB_OUTPUT
-        echo "arch=${parts[3]%%.*}" >> $GITHUB_OUTPUT
-    - name: Bump Brew
-      env: 
-        # Required token to create a pull request in the tap repository 
-        HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-      run: |
-        brew tap legit-labs/legit-labs
-        brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
-        --sha256=${{ needs.release.outputs.brew_files_sha }} \
-        --url="https://legitify.legitsecurity.com/${{ steps.get_version.outputs.version }}/${{ steps.get_version.os }}/${{ steps.get_version.arch }}.tar.gz" \
-        legit-labs/legit-labs/legitify
