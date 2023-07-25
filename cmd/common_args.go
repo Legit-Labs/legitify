@@ -21,6 +21,7 @@ type args struct {
 	Enterprises                []string
 	PoliciesPath               []string
 	Namespaces                 []string
+	IgnoredPolicies            []string
 	ColorWhen                  string
 	OutputFile                 string
 	ErrorFile                  string

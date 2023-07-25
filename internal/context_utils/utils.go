@@ -18,6 +18,7 @@ const (
 	scorecardVerboseKey           contextKey = "scorecardVerbose"
 	isCloudKey                    contextKey = "isCloud"
 	simulateSecondaryRateLimitKey contextKey = "simulateSecondaryRateLimit"
+	ignoredPoliciesKey            contextKey = "ignoredPolicies"
 )
 
 func NewContextWithRepos(repos []types.RepositoryWithOwner) context.Context {
@@ -46,6 +47,10 @@ func NewContextWithSimulatedSecondaryRateLimit(ctx context.Context, simulate boo
 	return context.WithValue(ctx, simulateSecondaryRateLimitKey, simulate)
 }
 
+func NewContextWithIgnoredPolicies(ctx context.Context, ignoredPolicies []string) context.Context {
+	return context.WithValue(ctx, ignoredPoliciesKey, ignoredPolicies)
+}
+
 func GetTokenScopes(ctx context.Context) permissions.TokenScopes {
 	return ctx.Value(tokenScopesKey).(permissions.TokenScopes)
 }
@@ -64,11 +69,17 @@ func GetRepositories(ctx context.Context) ([]types.RepositoryWithOwner, bool) {
 	val, ok := ctx.Value(repositoryKey).([]types.RepositoryWithOwner)
 	return val, ok
 }
+
 func GetIsCloud(ctx context.Context) bool {
 	val, ok := ctx.Value(isCloudKey).(bool)
 	return ok && val
 }
+
 func GetSimulateSecondaryRateLimit(ctx context.Context) bool {
 	val, ok := ctx.Value(simulateSecondaryRateLimitKey).(bool)
 	return ok && val
+}
+
+func GetIgnoredPolicies(ctx context.Context) []string {
+	return ctx.Value(ignoredPoliciesKey).([]string)
 }

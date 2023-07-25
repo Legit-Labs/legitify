@@ -28,6 +28,7 @@ const (
 	argScorecard                  = "scorecard"
 	argFailedOnly                 = "failed-only"
 	argSimulateSecondaryRateLimit = "simulate-secondary-rate-limit"
+	argIgnorePolicies             = "ignore-policies"
 )
 
 func toOptionsString(options []string) string {
@@ -56,6 +57,7 @@ func newAnalyzeCommand() *cobra.Command {
 	flags.StringSliceVarP(&analyzeArgs.Enterprises, argEnterprises, "", nil, "specific enterprises to collect (--enterprise your_enterprise_slug) this flag must be provided with a value")
 	flags.StringSliceVarP(&analyzeArgs.PoliciesPath, argPoliciesPath, "p", []string{}, "directory containing opa policies")
 	flags.StringSliceVarP(&analyzeArgs.Namespaces, argNamespace, "n", namespace.All, "which namespace to run")
+	flags.StringSliceVarP(&analyzeArgs.IgnoredPolicies, argIgnorePolicies, "", []string{}, "policies to ignore")
 	flags.StringVarP(&analyzeArgs.ScorecardWhen, argScorecard, "", DefaultScOption, "Whether to run additional scorecard checks "+scorecardWhens)
 	flags.BoolVarP(&analyzeArgs.SimulateSecondaryRateLimit, argSimulateSecondaryRateLimit, "", false, "Simulate secondary rate limits (for testing purposes)")
 	_ = flags.MarkHidden(argSimulateSecondaryRateLimit)

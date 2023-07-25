@@ -57,6 +57,7 @@ func provideContext(client Client, args *args) (context.Context, error) {
 		IsScorecardVerbose(args.ScorecardWhen))
 
 	ctx = context_utils.NewContextWithIsCloud(ctx, args.Endpoint == "")
+	ctx = context_utils.NewContextWithIgnoredPolicies(ctx, args.IgnoredPolicies)
 
 	return context_utils.NewContextWithTokenScopes(ctx, client.Scopes()), nil
 }

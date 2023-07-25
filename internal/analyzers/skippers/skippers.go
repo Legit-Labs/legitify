@@ -3,6 +3,7 @@ package skippers
 import (
 	"context"
 	"log"
+	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/analyzers/parsing_utils"
 	"github.com/Legit-Labs/legitify/internal/collectors"
@@ -20,7 +21,8 @@ type IsPrerequisitesSatisfied func(data collectors.CollectedData) bool
 
 func NewSkipper(ctx context.Context) Skipper {
 	return &skipper{
-		ctx: ctx,
+		ctx:             ctx,
+		ignoredPolicies: context_utils.GetIgnoredPolicies(ctx),
 		prerequisitesCheckers: map[string]IsPrerequisitesSatisfied{
 			"premium": func(data collectors.CollectedData) bool {
 				return data.Context.Premium()
@@ -46,9 +48,14 @@ func NewSkipper(ctx context.Context) Skipper {
 type skipper struct {
 	ctx                   context.Context
 	prerequisitesCheckers map[string]IsPrerequisitesSatisfied
+	ignoredPolicies       []string
 }
 
 func (sm *skipper) ShouldSkip(data collectors.CollectedData, violation opa_engine.QueryResult) bool {
+	if sm.ignoredPolicy(violation) {
+		return true
+	}
+
 	prerequisites := parsing_utils.ResolveAnnotation(violation.Annotations.Custom["prerequisites"])
 
 	sufficient, missingPrerequisite := sm.arePrerequisitesSatisfied(prerequisites, data)
@@ -64,6 +71,16 @@ func (sm *skipper) ShouldSkip(data collectors.CollectedData, violation opa_engin
 	if !sufficient {
 		errlog.PrereqIssueF("Skipping policy: %s, missing scope: %s\n", violation.PolicyName, missingScope)
 		return true
+	}
+
+	return false
+}
+
+func (sm *skipper) ignoredPolicy(policy opa_engine.QueryResult) bool {
+	for _, ignored := range sm.ignoredPolicies {
+		if strings.Contains(policy.FullyQualifiedPolicyName, ignored) {
+			return true
+		}
 	}
 
 	return false
