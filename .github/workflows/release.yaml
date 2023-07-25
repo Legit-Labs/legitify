@@ -185,7 +185,7 @@ jobs:
       - name: update brew formula
         env: 
           # Required token to create a pull request in the tap repository 
-          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
           GITHUB_USER: ${{ secrets.HOMEBREW_TAP_GITHUB_USER }}
         run: |
           python3 scripts/gen-brew-multi-arch.py ${{ steps.artifact_name.outputs.version }} ${{ steps.artifact_name.outputs.brew_intel_files_sha }} ${{ steps.artifact_name.outputs.brew_arm_files_sha }}
