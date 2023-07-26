@@ -23,7 +23,8 @@ func NewRateLimitWaiter(ctx context.Context, base http.RoundTripper) (*http.Clie
 		progressbar.Report(progressbar.NewTimedBar("secondary rate limit", *ctx.SleepUntil))
 	})
 	limitCB := github_ratelimit.WithSingleSleepLimit(singleSleepLimit, func(ctx *github_ratelimit.CallbackContext) {
-		log.Printf("secondary rate limit sleep is too long, failing the request (%v > %v)", time.Until(*ctx.SleepUntil), singleSleepLimit)
+		log.Printf("secondary rate limit sleep is too long with request: %v, failing the request (%v > %v)",
+			ctx.Request.URL, time.Until(*ctx.SleepUntil), singleSleepLimit)
 	})
 
 	if context_utils.GetSimulateSecondaryRateLimit(ctx) {

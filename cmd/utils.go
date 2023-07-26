@@ -16,6 +16,16 @@ func setErrorFile(path string) (*os.File, error) {
 	return file, err
 }
 
+func setPermissionsOutputFile(path string) (*os.File, error) {
+	file, err := openForWrite(path)
+	if err != nil {
+		return nil, err
+	}
+
+	errlog.SetPermissionsOutput(file)
+	return file, err
+}
+
 func openForWrite(path string) (*os.File, error) {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
