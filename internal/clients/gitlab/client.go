@@ -27,12 +27,12 @@ func (c *Client) Client() *gitlab.Client {
 	return c.client
 }
 
-func NewClient(ctx context.Context, token string, endpoint string, orgs []string, ignoreInvalidCertificate bool) (*Client, error) {
+func NewClient(ctx context.Context, token string, endpoint string, orgs []string) (*Client, error) {
 	var config []gitlab.ClientOptionFunc
 	if endpoint != "" {
 		config = []gitlab.ClientOptionFunc{
 			gitlab.WithBaseURL(endpoint),
-			gitlab.WithHTTPClient(transport.NewHttpClient(ignoreInvalidCertificate)),
+			gitlab.WithHTTPClient(transport.NewHttpClient()),
 		}
 	}
 

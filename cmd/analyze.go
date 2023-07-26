@@ -30,7 +30,6 @@ const (
 	argFailedOnly                 = "failed-only"
 	argSimulateSecondaryRateLimit = "simulate-secondary-rate-limit"
 	argIgnorePolicies             = "ignore-policies-file"
-	argIgnoreInvalidCertificate   = "ignore-invalide-certificate"
 )
 
 func toOptionsString(options []string) string {
@@ -62,7 +61,6 @@ func newAnalyzeCommand() *cobra.Command {
 	flags.StringVarP(&analyzeArgs.IgnoredPolicies, argIgnorePolicies, "", "", "path to a file that contain \n separated list of policies to ignore")
 	flags.StringVarP(&analyzeArgs.ScorecardWhen, argScorecard, "", DefaultScOption, "Whether to run additional scorecard checks "+scorecardWhens)
 	flags.BoolVarP(&analyzeArgs.SimulateSecondaryRateLimit, argSimulateSecondaryRateLimit, "", false, "Simulate secondary rate limits (for testing purposes)")
-	flags.BoolVarP(&analyzeArgs.IgnoreInvalidCertificate, argIgnoreInvalidCertificate, "", false, "Ignore invalid server certificate")
 	_ = flags.MarkHidden(argSimulateSecondaryRateLimit)
 
 	return analyzeCmd
