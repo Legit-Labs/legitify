@@ -38,21 +38,35 @@ func assertTestStatus(t *testing.T, jq *gojsonq.JSONQ, testPath, entityName, exp
 	}
 }
 
+type testPair struct {
+	Got, Want string
+}
+
 func assertionLoop(t *testing.T, tests []testCase) {
 	jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
 	for _, test := range tests {
 		t.Logf("Testing: %s", test.path)
 
-		if test.passedEntity != "" {
-			assertTestStatus(t, jq, test.path, test.passedEntity, "PASSED")
+		pairs := []testPair{
+			{
+				Got:  test.passedEntity,
+				Want: "PASSED",
+			},
+			{
+				Got:  test.failedEntity,
+				Want: "FAILED",
+			},
+			{
+				Got:  test.skippedEntity,
+				Want: "SKIPPED",
+			},
 		}
 
-		if test.failedEntity != "" {
-			assertTestStatus(t, jq, test.path, test.failedEntity, "FAILED")
-		}
-
-		if test.skippedEntity != "" {
-			assertTestStatus(t, jq, test.path, test.skippedEntity, "SKIPPED")
+		for _, pair := range pairs {
+			if pair.Got == "" {
+				continue
+			}
+			assertTestStatus(t, jq, test.path, pair.Got, pair.Want)
 		}
 	}
 }
@@ -68,7 +82,6 @@ func TestCLI(t *testing.T) {
 	}
 
 	for _, cliTestCases := range tests {
-
 		cliTestLoop(t, cliTestCases)
 	}
 }

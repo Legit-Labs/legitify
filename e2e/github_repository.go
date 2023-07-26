@@ -72,7 +72,7 @@ var testCasesGitHubRepository = []testCase{
 		passedEntity: "good_branch_protection",
 	},
 	{
-		path:         "data.repository.allow_forking_enabled",
+		path:         "data.repository.forking_allowed_for_repository",
 		failedEntity: "bad_repo",
 		passedEntity: "good_repo",
 	},
