@@ -49,15 +49,12 @@ func (c *runnersCollector) collectForOrg(orgName string) []*github.RunnerGroup {
 		}
 		return rg.RunnerGroups
 	}
-	log.Printf("collect runner groups for org %s", orgName)
 	result, err := pagination.NewMapper(c.client.Client().Actions.ListOrganizationRunnerGroups, nil, mapper).Sync(c.context, orgName)
 	if err != nil {
 		perm := collectors.NewMissingPermission(permissions.OrgAdmin, orgName,
 			"Cannot read organization runner groups", namespace.Organization)
-		log.Printf("issue missing perms (%v)...", perm)
 		c.IssueMissingPermissions(perm)
 	}
-	log.Printf("collect runner groups for org %s completed: %d", orgName, len(result.Collected))
 	c.groupsByOrg[orgName] = result.Collected
 
 	return c.groupsByOrg[orgName]
