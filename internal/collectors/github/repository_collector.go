@@ -242,26 +242,10 @@ func (rc *repositoryCollector) collectExtraData(login string,
 		Repository: repository,
 	}
 
-	repo, err = rc.withVulnerabilityAlerts(repo, login)
-	if err != nil {
-		// If we can't get vulnerability alerts, rego will ignore it (as nil)
-		log.Printf("error getting vulnerability alerts for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
-	}
-
-	repo, err = rc.withRepositoryHooks(repo, login)
-	if err != nil {
-		log.Printf("error getting repository hooks for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
-	}
-
-	repo, err = rc.withRepoCollaborators(repo, login)
-	if err != nil {
-		log.Printf("error getting repository collaborators for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
-	}
-
-	repo, err = rc.withActionsSettings(repo, login)
-	if err != nil {
-		log.Printf("error getting repository actions settings for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
-	}
+	repo = rc.withVulnerabilityAlerts(repo, login)
+	repo = rc.withRepositoryHooks(repo, login)
+	repo = rc.withRepoCollaborators(repo, login)
+	repo = rc.withActionsSettings(repo, login)
 
 	repo, err = rc.withDependencyGraphManifestsCount(repo, login)
 	if err != nil {
@@ -323,7 +307,6 @@ func (rc *repositoryCollector) withDependencyGraphManifestsCount(repo ghcollecte
 	}
 
 	err := rc.Client.GraphQLClient().Query(rc.Context, &dependencyGraphQuery, variables)
-
 	if err != nil {
 		return repo, err
 	}
@@ -332,19 +315,19 @@ func (rc *repositoryCollector) withDependencyGraphManifestsCount(repo ghcollecte
 	return repo, nil
 }
 
-func (rc *repositoryCollector) withActionsSettings(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withActionsSettings(repo ghcollected.Repository, org string) ghcollected.Repository {
 	settings, err := rc.Client.GetActionsTokenPermissionsForRepository(org, repo.Name())
 	if err != nil {
 		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(org, repo.Repository.Name),
 			"Cannot read repository actions settings", namespace.Repository)
 		rc.IssueMissingPermissions(perm)
-		return repo, err
+		return repo
 	}
 	repo.ActionsTokenPermissions = settings
-	return repo, nil
+	return repo
 }
 
-func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, org string) ghcollected.Repository {
 	res, err := pagination.New[*github.Hook](rc.Client.Client().Repositories.ListHooks, nil).Sync(rc.Context, org, repo.Repository.Name)
 	if err != nil {
 		if res.Resp.Response.StatusCode == http.StatusNotFound {
@@ -352,35 +335,37 @@ func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, 
 				"Cannot read repository webhooks", namespace.Repository)
 			rc.IssueMissingPermissions(perm)
 		}
-		return repo, err
+		return repo
 	}
 
 	repo.Hooks = res.Collected
-	return repo, nil
+	return repo
 }
 
-func (rc *repositoryCollector) withVulnerabilityAlerts(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withVulnerabilityAlerts(repo ghcollected.Repository, org string) ghcollected.Repository {
 	enabled, _, err := rc.Client.Client().Repositories.GetVulnerabilityAlerts(rc.Context, org, repo.Repository.Name)
-
 	if err != nil {
-		return repo, err
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(org, repo.Repository.Name),
+			"Cannot read repository vulnerability alerts", namespace.Repository)
+		rc.IssueMissingPermissions(perm)
+		return repo
 	}
 
 	repo.VulnerabilityAlertsEnabled = &enabled
-
-	return repo, nil
+	return repo
 }
 
-func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository, org string) ghcollected.Repository {
 	users, _, err := rc.Client.Client().Repositories.ListCollaborators(rc.Context, org, repo.Repository.Name, &github.ListCollaboratorsOptions{})
-
 	if err != nil {
-		return repo, err
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(org, repo.Repository.Name),
+			"Cannot read repository collaborators", namespace.Repository)
+		rc.IssueMissingPermissions(perm)
+		return repo
 	}
 
 	repo.Collaborators = users
-
-	return repo, nil
+	return repo
 }
 
 // fixBranchProtectionInfo fixes the branch protection info for the repository,

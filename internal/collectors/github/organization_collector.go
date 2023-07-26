@@ -86,7 +86,9 @@ func (c *organizationCollector) collectExtraData(org *ghcollected.ExtendedOrg) g
 	hooks, err := c.collectOrgWebhooks(org.Name())
 	if err != nil {
 		hooks = nil
-		log.Printf("failed to collect webhooks data for %s, %s", org.Name(), err)
+		perm := collectors.NewMissingPermission(permissions.OrgHookAdmin, org.Name(),
+			"Cannot collect webhook for organization", namespace.Organization)
+		c.IssueMissingPermissions(perm)
 	}
 
 	return ghcollected.Organization{

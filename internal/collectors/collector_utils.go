@@ -78,9 +78,10 @@ func (b *BaseCollector) IssueMissingPermissions(missingPermissions ...MissingPer
 }
 
 func (b *BaseCollector) makeChannels() {
-	b.collectedChan = make(chan CollectedData)
-	b.progressChan = make(chan progressbar.ChannelType)
-	b.missingPermChan = make(chan MissingPermission)
+	const depthToUnblockTotalEntitiesCollection = 128
+	b.collectedChan = make(chan CollectedData, depthToUnblockTotalEntitiesCollection)
+	b.progressChan = make(chan progressbar.ChannelType, depthToUnblockTotalEntitiesCollection)
+	b.missingPermChan = make(chan MissingPermission, depthToUnblockTotalEntitiesCollection)
 }
 
 func (b *BaseCollector) closeChannels() {
