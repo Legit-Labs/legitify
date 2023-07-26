@@ -56,4 +56,24 @@ var testCasesGitHubRepository = []testCase{
 		failedEntity: "bad_branch_protection",
 		passedEntity: "good_branch_protection",
 	},
+	{
+		path:         "data.repository.no_signed_commits",
+		failedEntity: "bad_branch_protection",
+		passedEntity: "good_branch_protection",
+	},
+	{
+		path:         "data.repository.no_conversation_resolution",
+		failedEntity: "bad_branch_protection",
+		passedEntity: "good_branch_protection",
+	},
+	{
+		path:         "data.repository.review_dismissal_allowed",
+		failedEntity: "bad_branch_protection",
+		passedEntity: "good_branch_protection",
+	},
+	{
+		path:         "data.repository.allow_forking_enabled",
+		failedEntity: "bad_repo",
+		passedEntity: "good_repo",
+	},
 }
