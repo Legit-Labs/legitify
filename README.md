@@ -144,8 +144,9 @@ To run legitify against GitLab Cloud set the scm flag to gitlab `--scm gitlab`, 
 export SERVER_URL="https://gitlab.example.com/"
 LEGITIFY_TOKEN=<your_token> legitify analyze --namespace organization --scm gitlab
 ```
+> **_NOTE 1:_**  To ignore invalid server certificate, please pass the `ignore-invalide-certificate` flag
 
-> **_NOTE:_**  For non-premium GitLab accounts some policies (such as branch protection policies) will be skipped
+> **_NOTE 2:_**  For non-premium GitLab accounts some policies (such as branch protection policies) will be skipped
 
 
 ## Namespaces
