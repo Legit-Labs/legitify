@@ -1,7 +1,8 @@
 import argparse
 import os
+import json
 import subprocess
-import requests
+import urllib.request
 
 GITHUB_ORG = "Legit-Labs"
 GITHUB_REPO = "homebrew-legit-labs"
@@ -72,7 +73,7 @@ def commit_and_push():
         print(f"Error occoured while adding files to commit: {stderr.decode()}")
         exit(1)
 
-    process = subprocess.Popen(['git', 'user.name=Nadav', '-c', 'user.email=nadav@legitsecurity.com', 'commit', '-m', 'Bump brew formula'],
+    process = subprocess.Popen(['git', 'commit', '-m', 'Bump brew formula'],
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     _, stderr = process.communicate()
     
@@ -122,13 +123,29 @@ def create_pull_request(bump_version, head_branch, repo_path=GITHB_ORG_AND_REPO)
         "base": "main",
     }
 
-    response = requests.post(url, headers=headers, json=data)
+    # Convert data to bytes and set the Content-Type header
+    data_bytes = json.dumps(data).encode('utf-8')
+    headers['Content-Type'] = 'application/json'
+    headers['Content-Length'] = len(data_bytes)
 
-    if response.status_code == 201:
-        print("Pull request created successfully!")
-    else:
-        print(f"Failed to create pull request. Status code: {response.status_code}")
-        print(response.text)
+    # Create a Request object with the headers and data
+    request = urllib.request.Request(url, headers=headers, data=data_bytes)
+
+    try:
+        # Perform the HTTP POST request
+        with urllib.request.urlopen(request) as response:
+            if response.getcode() == 201:
+                print("Pull request created successfully!")
+            else:
+                print(f"Failed to create pull request. Status code: {response.getcode()}")
+                print(response.read().decode('utf-8'))
+                exit(1)
+    except urllib.error.HTTPError as e:
+        print(f"HTTP Error: {e.code} - {e.reason}")
+        print(e.read().decode('utf-8'))
+        exit(1)
+    except urllib.error.URLError as e:
+        print(f"URL Error: {e.reason}")
         exit(1)
 
 if __name__ == "__main__":
