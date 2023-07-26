@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 )
 
 type OrganizationActions struct {

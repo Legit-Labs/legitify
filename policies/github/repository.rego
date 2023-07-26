@@ -107,10 +107,6 @@ is_null(x) {
 	x == null
 }
 
-has_branch_protection_info(_input) {
-	not is_null(_input.repository.default_branch) # protect against empty repos
-}
-
 # METADATA
 # scope: rule
 # title: Default Branch Should Be Protected
@@ -127,21 +123,38 @@ missing_default_branch_protection = false {
 	not is_null(input.repository.default_branch.branch_protection_rule)
 }
 
+missing_default_branch_protection = false {
+    some index
+    rule := input.rules_set[index]
+    rule.type == "pull_request"
+}
+
 # METADATA
 # scope: rule
 # title: Default Branch Deletion Protection Should Be Enabled
 # description: The history of the default branch is not protected against deletion for this repository.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Uncheck "Allow deletions", Click "Save changes"]
+#   remediationSteps:
+#     - Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page
+#     - Make sure you have admin permissions
+#     - Go to the repo's settings page
+#     - Enter "Branches" tab
+#     - Under "Branch protection rules"
+#     - Click "Edit" on the default branch rule
+#     - Uncheck "Allow deletions", Click "Save changes"
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
 default missing_default_branch_protection_deletion = true
+missing_default_branch_protection_deletion = false {
+	not input.repository.default_branch.branch_protection_rule.allows_deletions
+}
 
 missing_default_branch_protection_deletion = false {
-	
-	not input.repository.default_branch.branch_protection_rule.allows_deletions
+    some index
+    rule := input.rules_set[index]
+    rule.type == "deletions"
 }
 
 # METADATA
@@ -149,7 +162,7 @@ missing_default_branch_protection_deletion = false {
 # title: Default Branch Should Not Allow Force Pushes
 # description: The history of the default branch is not protected against changes for this repository. Protecting branch history ensures every change that was made to code can be retained and later examined. This issue is raised if the default branch history can be modified using force push.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Uncheck "Allow force pushes", Click "Save changes"]
+#   remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Uncheck "Allow force pushes", Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -157,8 +170,13 @@ missing_default_branch_protection_deletion = false {
 default missing_default_branch_protection_force_push = true
 
 missing_default_branch_protection_force_push = false {
-	
-	not input.repository.default_branch.branch_protection_rule.allows_force_pushes 
+	not input.repository.default_branch.branch_protection_rule.allows_force_pushes
+}
+
+missing_default_branch_protection_force_push = false {
+    some index
+    rule := input.rules_set[index]
+    rule.type == "non_fast_forward"
 }
 
 # METADATA
@@ -166,7 +184,7 @@ missing_default_branch_protection_force_push = false {
 # title: Default Branch Should Require All Checks To Pass Before Merge
 # description: Branch protection is enabled. However, the checks which validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures code is up-to-date in order to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", "Add the required checks that must pass before merging (tests, lint, etc...)", Click "Save changes"]
+#   remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", "Add the required checks that must pass before merging (tests, lint, etc...)", Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -174,8 +192,14 @@ missing_default_branch_protection_force_push = false {
 default requires_status_checks = true
 
 requires_status_checks = false {
-	
 	input.repository.default_branch.branch_protection_rule.requires_status_checks
+}
+
+requires_status_checks = false {
+    some index
+    rule := input.rules_set[index]
+    rule.type == "required_status_checks"
+    count(rule.parameters.required_status_checks) > 0
 }
 
 # METADATA
@@ -183,7 +207,7 @@ requires_status_checks = false {
 # title: Default Branch Should Require Branches To Be Up To Date Before Merge
 # description: Status checks are required, but branches that are not up to date can be merged. This can result in previously remediated issues being merged in over fixes.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", Check "Require branches to be up to date before merging", Click "Save changes"]
+#   remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require status checks to pass before merging", Check "Require branches to be up to date before merging", Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -195,12 +219,20 @@ requires_branches_up_to_date_before_merge = false {
 	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks
 }
 
+requires_branches_up_to_date_before_merge = false {
+    some index
+    rule := input.rules_set[index]
+    rule.type == "required_status_checks"
+    count(rule.parameters.required_status_checks) > 0
+    rule.parameters.strict_required_status_checks_policy
+}
+
 # METADATA
 # scope: rule
 # title: Default Branch Should Require New Code Changes After Approval To Be Re-Approved
 # description: This security control prevents merging code that was approved but later on changed. Turning it on ensures any new changes must be reviewed again. This setting is part of the branch protection and code-review settings, and hardens the review process. If turned off - a developer can change the code after approval, and push code that is different from the one that was previously allowed. This option is found in the branch protection setting for the repository.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Dismiss stale pull request approvals when new commits are pushed", Click "Save changes"]
+#   remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Dismiss stale pull request approvals when new commits are pushed", Click "Save changes"]
 #   severity: LOW
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -208,8 +240,14 @@ requires_branches_up_to_date_before_merge = false {
 default dismisses_stale_reviews = true
 
 dismisses_stale_reviews = false {
-	
 	input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
+}
+
+dismisses_stale_reviews = false {
+    some index
+	rule := input.rules_set[index]
+	rule.type == "pull_request"
+	rule.parameters.dismiss_stale_reviews_on_push
 }
 
 # METADATA
@@ -217,7 +255,7 @@ dismisses_stale_reviews = false {
 # title: Default Branch Should Require Code Review
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management system's built-in enforcement. This option is found in the branch protection setting of the repository.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
+#   remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
 #   severity: HIGH
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -225,8 +263,14 @@ dismisses_stale_reviews = false {
 default code_review_not_required = true
 
 code_review_not_required = false {
-	
 	input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 1
+}
+
+code_review_not_required = false {
+    some index
+	rule := input.rules_set[index]
+	rule.type == "pull_request"
+	rule.parameters.required_approving_review_count >= 1
 }
 
 
@@ -235,7 +279,7 @@ code_review_not_required = false {
 # title: Default Branch Should Require Code Review By At Least Two Reviewers
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
+#   remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require approvals", Set "Required number of approvals before merging" to 1 or more, Click "Save changes"]
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -245,8 +289,14 @@ code_review_not_required = false {
 default code_review_by_two_members_not_required = true
 
 code_review_by_two_members_not_required = false {
-	 
 	 input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 2
+}
+
+code_review_by_two_members_not_required = false {
+    some index
+	rule := input.rules_set[index]
+	rule.type == "pull_request"
+	rule.parameters.required_approving_review_count >= 2
 }
 
 # METADATA
@@ -254,7 +304,7 @@ code_review_by_two_members_not_required = false {
 # title: Default Branch Should Limit Code Review to Code-Owners
 # description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the repository.
 # custom:
-#   remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require review from Code Owners", Click "Save changes"]
+#   remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require a pull request before merging", Check "Require review from Code Owners", Click "Save changes"]
 #   severity: LOW
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -262,8 +312,14 @@ code_review_by_two_members_not_required = false {
 default code_review_not_limited_to_code_owners = true
 
 code_review_not_limited_to_code_owners = false {
-	
 	input.repository.default_branch.branch_protection_rule.requires_code_owner_reviews
+}
+
+code_review_not_limited_to_code_owners = false {
+    some index
+	rule := input.rules_set[index]
+	rule.type == "pull_request"
+	rule.parameters.require_code_owner_review
 }
 
 # METADATA
@@ -271,7 +327,7 @@ code_review_not_limited_to_code_owners = false {
 # title: Default Branch Should Require Linear History
 # description: Prevent merge commits from being pushed to protected branches.
 # custom:
-#    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require linear history", Click "Save changes"]
+#    remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require linear history", Click "Save changes"]
 #    severity: MEDIUM
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -279,8 +335,13 @@ code_review_not_limited_to_code_owners = false {
 default non_linear_history = true
 
 non_linear_history = false {
-	
-	input.repository.default_branch.branch_protection_rule.requires_linear_history 
+	input.repository.default_branch.branch_protection_rule.requires_linear_history
+}
+
+non_linear_history = false {
+    some index
+	rule := input.rules_set[index]
+	rule.type == "required_linear_history"
 }
 
 # METADATA
@@ -288,7 +349,7 @@ non_linear_history = false {
 # title: Default Branch Should Require All Conversations To Be Resolved Before Merge
 # description: Require all Pull Request conversations to be resolved before merging. Check this to avoid bypassing/missing a Pull Reuqest comment.
 # custom:
-#    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require conversation resolution before merging", Click "Save changes"]
+#    remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require conversation resolution before merging", Click "Save changes"]
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -296,8 +357,14 @@ non_linear_history = false {
 default no_conversation_resolution = true
 
 no_conversation_resolution = false {
-	
 	input.repository.default_branch.branch_protection_rule.requires_conversation_resolution
+}
+
+no_conversation_resolution = false {
+    some index
+	rule := input.rules_set[index]
+	rule.type == "pull_request"
+	rule.parameters.required_review_thread_resolution
 }
 
 # METADATA
@@ -305,7 +372,7 @@ no_conversation_resolution = false {
 # title: Default Branch Should Require All Commits To Be Signed
 # description: Require all commits to be signed and verified
 # custom:
-#    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require signed commits", Click "Save changes"]
+#    remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Require signed commits", Click "Save changes"]
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -314,6 +381,12 @@ default no_signed_commits = true
 
 no_signed_commits = false {
 	input.repository.default_branch.branch_protection_rule.requires_commit_signatures
+}
+
+no_signed_commits = false {
+    some index
+	rule := input.rules_set[index]
+	rule.type == "required_signatures"
 }
 
 # METADATA
@@ -337,7 +410,7 @@ review_dismissal_allowed = false {
 # title: Default Branch Should Restrict Who Can Push To It
 # description: By default, commits can be pushed directly to protected branches without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
 # custom:
-#    remediationSteps: [Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can push to matching branches", Choose who should be allowed to push, Click "Save changes"]
+#    remediationSteps: ["Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page", Make sure you have admin permissions, Go to the repo's settings page, Enter "Branches" tab, Under "Branch protection rules", Click "Edit" on the default branch rule, Check "Restrict who can push to matching branches", Choose who should be allowed to push, Click "Save changes"]
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
