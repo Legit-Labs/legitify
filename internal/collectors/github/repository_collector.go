@@ -242,12 +242,7 @@ func (rc *repositoryCollector) collectExtraData(login string,
 		Repository: repository,
 	}
 
-	repo, err = rc.withVulnerabilityAlerts(repo, login)
-	if err != nil {
-		// If we can't get vulnerability alerts, rego will ignore it (as nil)
-		log.Printf("error getting vulnerability alerts for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
-	}
-
+	repo = rc.withVulnerabilityAlerts(repo, login)
 	repo = rc.withRepositoryHooks(repo, login)
 	repo = rc.withRepoCollaborators(repo, login)
 	repo = rc.withActionsSettings(repo, login)
@@ -347,16 +342,17 @@ func (rc *repositoryCollector) withRepositoryHooks(repo ghcollected.Repository, 
 	return repo
 }
 
-func (rc *repositoryCollector) withVulnerabilityAlerts(repo ghcollected.Repository, org string) (ghcollected.Repository, error) {
+func (rc *repositoryCollector) withVulnerabilityAlerts(repo ghcollected.Repository, org string) ghcollected.Repository {
 	enabled, _, err := rc.Client.Client().Repositories.GetVulnerabilityAlerts(rc.Context, org, repo.Repository.Name)
-
 	if err != nil {
-		return repo, err
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(org, repo.Repository.Name),
+			"Cannot read repository vulnerability alerts", namespace.Repository)
+		rc.IssueMissingPermissions(perm)
+		return repo
 	}
 
 	repo.VulnerabilityAlertsEnabled = &enabled
-
-	return repo, nil
+	return repo
 }
 
 func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository, org string) ghcollected.Repository {
