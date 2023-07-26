@@ -51,6 +51,20 @@ def checkout_new_branch(bump_version):
 
 
 def commit_and_push():
+    ## Add git name and mail to config
+    process = subprocess.Popen(['git', 'config', '--global', 'user.email', 'releaser@legitsecurity.com'],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    _, stderr = process.communicate()
+    if process.returncode != 0:
+        print(f"Error occoured while adding email to global git config: {stderr.decode()}")
+        exit(1)
+    process = subprocess.Popen(['git', 'config', '--global', 'user.name', 'legitify-releaser'],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    _, stderr = process.communicate()
+    if process.returncode != 0:
+        print(f"Error occoured while adding name to global git config: {stderr.decode()}")
+        exit(1)
+    
     process = subprocess.Popen(['git', 'add', FORMULA_FILE_PATH],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     _, stderr = process.communicate()
@@ -58,7 +72,7 @@ def commit_and_push():
         print(f"Error occoured while adding files to commit: {stderr.decode()}")
         exit(1)
 
-    process = subprocess.Popen(['git', 'commit', '-m', 'Bump brew formula'],
+    process = subprocess.Popen(['git', 'user.name=Nadav', '-c', 'user.email=nadav@legitsecurity.com', 'commit', '-m', 'Bump brew formula'],
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     _, stderr = process.communicate()
     
