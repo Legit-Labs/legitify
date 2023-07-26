@@ -1,0 +1,17 @@
+name: test_releaser
+on:
+  pull_request:
+permissions:
+  contents: 'write'
+  packages: 'write'
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: update brew formula
+        env: 
+          # Required token to create a pull request in the tap repository 
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          GITHUB_USER: ${{ secrets.HOMEBREW_TAP_GITHUB_USER }}
+        run: |
+          python3 scripts/gen-brew-multi-arch.py v0.0.0 sharm shaintel
