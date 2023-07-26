@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,9 +19,8 @@ import (
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/shurcooL/githubv4"
-	"golang.org/x/net/context"
 )
 
 type repositoryCollector struct {
@@ -258,6 +258,10 @@ func (rc *repositoryCollector) collectExtraData(login string,
 			// If we can't get branch protection info, rego will ignore it (as nil)
 			log.Printf("error getting branch protection info for %s: %s", repository.Name, err)
 		}
+		repo, err = rc.withRulesSet(repo, login)
+		if err != nil {
+			log.Printf("error getting rules set for %s: %s", repository.Name, err)
+		}
 	} else {
 		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(login, repo.Repository.Name), orgIsFreeEffect, namespace.Repository)
 		rc.IssueMissingPermissions(perm)
@@ -366,6 +370,22 @@ func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository
 
 	repo.Collaborators = users
 	return repo
+}
+
+func (rc *repositoryCollector) withRulesSet(repository ghcollected.Repository, org string) (ghcollected.Repository, error) {
+	if repository.Repository.DefaultBranchRef == nil {
+		return repository, nil // no branches
+	}
+
+	rules, err := rc.Client.GetRulesForBranch(org, repository.Name(),
+		*repository.Repository.DefaultBranchRef.Name)
+
+	if err != nil {
+		return repository, err
+	}
+
+	repository.RulesSet = rules
+	return repository, nil
 }
 
 // fixBranchProtectionInfo fixes the branch protection info for the repository,

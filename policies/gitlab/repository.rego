@@ -105,7 +105,6 @@ missing_default_branch_protection_force_push = false {
 default repository_require_code_owner_reviews_policy = true
 
 repository_require_code_owner_reviews_policy = false {
-	
 	default_protected_branches := [protected_branch | protected_branch := input.protected_branches[_]; protected_branch.name == input.default_branch]
 	rules_allow_force_push := [ rule_require_code_owner_review | rule_require_code_owner_review := default_protected_branches[_]; rule_require_code_owner_review.code_owner_approval_required ]
 	count(rules_allow_force_push) > 0

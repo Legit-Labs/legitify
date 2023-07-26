@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/Legit-Labs/legitify/internal/clients/pagination"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 )
 
 type GHResp = *github.Response
