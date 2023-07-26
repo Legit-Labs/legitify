@@ -3,6 +3,7 @@ package gitlab
 import (
 	"context"
 	"fmt"
+
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -26,12 +27,12 @@ func (c *Client) Client() *gitlab.Client {
 	return c.client
 }
 
-func NewClient(ctx context.Context, token string, endpoint string, orgs []string) (*Client, error) {
+func NewClient(ctx context.Context, token string, endpoint string, orgs []string, ignoreInvalidCertificate bool) (*Client, error) {
 	var config []gitlab.ClientOptionFunc
 	if endpoint != "" {
 		config = []gitlab.ClientOptionFunc{
 			gitlab.WithBaseURL(endpoint),
-			gitlab.WithHTTPClient(transport.NewHttpClient()),
+			gitlab.WithHTTPClient(transport.NewHttpClient(ignoreInvalidCertificate)),
 		}
 	}
 

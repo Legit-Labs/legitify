@@ -31,6 +31,7 @@ type args struct {
 	InputFile                  string
 	FailedOnly                 bool
 	SimulateSecondaryRateLimit bool
+	IgnoreInvalidCertificate   bool
 }
 
 const (

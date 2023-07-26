@@ -120,7 +120,7 @@ func provideGitHubCollectors(ctx context.Context, client *github.Client, analyze
 func provideGitHubClient(analyzeArgs2 *args) (*github.Client, error) {
 	ctx := context_utils.NewContextWithSimulatedSecondaryRateLimit(context.Background(), analyzeArgs2.SimulateSecondaryRateLimit)
 	return github.NewClient(ctx, analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.
-		Organizations, analyzeArgs2.Enterprises)
+		Organizations, analyzeArgs2.Enterprises, analyzeArgs2.IgnoreInvalidCertificate)
 }
 
 // inject_gitlab.go:
@@ -139,5 +139,5 @@ func provideGitLabCollectors(ctx context.Context, client *gitlab.Client, analyze
 }
 
 func provideGitLabClient(analyzeArgs2 *args) (*gitlab.Client, error) {
-	return gitlab.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.Organizations)
+	return gitlab.NewClient(context.Background(), analyzeArgs2.Token, analyzeArgs2.Endpoint, analyzeArgs2.Organizations, analyzeArgs2.IgnoreInvalidCertificate)
 }

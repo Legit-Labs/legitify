@@ -3,6 +3,7 @@ package github
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,7 +42,11 @@ type Client struct {
 	enterprises      []string
 }
 
-func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, enterprises []string) (*Client, error) {
+func NewClient(ctx context.Context, token string, githubEndpoint string, org []string, enterprises []string, ignoreInvalidCertificate bool) (*Client, error) {
+	if ignoreInvalidCertificate {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+
 	client := &Client{
 		orgs:        org,
 		context:     ctx,
