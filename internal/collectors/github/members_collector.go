@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -14,9 +15,8 @@ import (
 	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	ghcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/shurcooL/githubv4"
-	"golang.org/x/net/context"
 )
 
 type memberCollector struct {

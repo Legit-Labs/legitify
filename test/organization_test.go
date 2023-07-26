@@ -2,7 +2,7 @@ package test
 
 import (
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 	"testing"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"

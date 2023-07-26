@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab"
@@ -11,7 +12,6 @@ import (
 	gitlab2 "github.com/xanzy/go-gitlab"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"golang.org/x/net/context"
 )
 
 type groupCollector struct {

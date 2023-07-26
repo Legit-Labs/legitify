@@ -1,11 +1,10 @@
 package errlog
 
 import (
-	"fmt"
+	"encoding/json"
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 type forwarder struct{}
@@ -18,14 +17,18 @@ func (f *forwarder) Write(p []byte) (n int, err error) {
 type errlog struct {
 	log         *log.Logger
 	everWritten bool
-	permLogs    strings.Builder
-	prereqLogs  strings.Builder
+	permIssues  bool
+	skiplog     *SkipLog
+	permLog     *PermLog
+	permWriter  io.Writer
 }
 
 var singletone errlog
 
 func init() {
 	singletone.log = log.New(os.Stderr, "", log.LstdFlags)
+	singletone.skiplog = NewSkipLog()
+	singletone.permLog = NewPermLog()
 	log.SetOutput(&forwarder{})
 }
 
@@ -33,31 +36,52 @@ func SetOutput(writer io.Writer) {
 	singletone.log.SetOutput(writer)
 }
 
+func SetPermissionsOutput(writer io.Writer) {
+	singletone.permWriter = writer
+}
+
 func Printf(format string, args ...interface{}) {
 	singletone.everWritten = true
 	singletone.log.Printf(format, args...)
 }
 
-func PermIssueF(format string, args ...interface{}) {
-	singletone.permLogs.WriteString(fmt.Sprintf(format, args...))
+func AddPermIssue(issue PermIssue) {
+	singletone.permLog.Add(issue)
 }
 
-func PrereqIssueF(format string, args ...interface{}) {
-	singletone.prereqLogs.WriteString(fmt.Sprintf(format, args...))
+func AddSkipIssue(policyName string, entityName string, skipReason SkipReason) {
+	singletone.skiplog.Add(policyName, entityName, skipReason)
+}
+
+type PermissionsOutput struct {
+	Permissions     interface{} `json:"missing_permissions"`
+	SkippedPolicies interface{} `json:"skipped_policies"`
 }
 
 func FlushAll() {
-	if singletone.permLogs.Len() > 0 {
-		singletone.log.Printf("%s\n%s", "Missing permissions errors:", singletone.permLogs.String())
-		singletone.permLogs.Reset()
+	if singletone.permLog.Empty() && singletone.skiplog.Empty() {
+		return
+	}
+	singletone.permIssues = true
+
+	issuesOutput := PermissionsOutput{
+		Permissions:     singletone.permLog,
+		SkippedPolicies: singletone.skiplog,
 	}
 
-	if singletone.prereqLogs.Len() > 0 {
-		singletone.log.Printf("%s\n%s", "Unmet Prerequisites errors", singletone.prereqLogs.String())
-		singletone.prereqLogs.Reset()
+	permIssues, err := json.MarshalIndent(issuesOutput, "", "  ")
+	if err != nil {
+		singletone.log.Printf("Failed to marshal permission issues: %s", err)
+	} else {
+		if _, err := singletone.permWriter.Write(permIssues); err != nil {
+			singletone.log.Printf("Failed to dump permission issues: %s", err)
+		}
 	}
 }
 
 func HadErrors() bool {
 	return singletone.everWritten
+}
+func HadPermIssues() bool {
+	return singletone.permIssues
 }

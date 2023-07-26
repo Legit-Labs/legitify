@@ -11,7 +11,7 @@ import (
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	gitlabcollected "github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 )
 
 func repositoryTestTemplate(t *testing.T, name string, mockData interface{}, testedPolicyName string, expectFailure bool, scmType scm_type.ScmType) {

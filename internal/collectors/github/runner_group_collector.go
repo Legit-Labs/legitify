@@ -1,8 +1,10 @@
 package github
 
 import (
+	"context"
 	"log"
 	"sync"
+	"sync/atomic"
 
 	ghclient "github.com/Legit-Labs/legitify/internal/clients/github"
 	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
@@ -11,14 +13,15 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
-	"github.com/google/go-github/v49/github"
-	"golang.org/x/net/context"
+	"github.com/google/go-github/v53/github"
 )
 
 type runnersCollector struct {
 	collectors.BaseCollector
-	client  *ghclient.Client
-	context context.Context
+	client      *ghclient.Client
+	context     context.Context
+	orgLock     sync.Mutex
+	groupsByOrg map[string][]*github.RunnerGroup
 }
 
 func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collectors.Collector {
@@ -26,11 +29,20 @@ func NewRunnersCollector(ctx context.Context, client *ghclient.Client) collector
 		BaseCollector: collectors.NewBaseCollector(namespace.RunnerGroup),
 		client:        client,
 		context:       ctx,
+		groupsByOrg:   make(map[string][]*github.RunnerGroup),
 	}
 	return c
 }
 
-func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup, error) {
+func (c *runnersCollector) collectForOrg(orgName string) []*github.RunnerGroup {
+	c.orgLock.Lock()
+	defer c.orgLock.Unlock()
+
+	if groups, ok := c.groupsByOrg[orgName]; ok {
+		return groups
+	}
+
+	c.groupsByOrg[orgName] = nil
 	mapper := func(rg *github.RunnerGroups) []*github.RunnerGroup {
 		if rg == nil {
 			return []*github.RunnerGroup{}
@@ -39,10 +51,13 @@ func (c *runnersCollector) collectForOrg(orgName string) ([]*github.RunnerGroup,
 	}
 	result, err := pagination.NewMapper(c.client.Client().Actions.ListOrganizationRunnerGroups, nil, mapper).Sync(c.context, orgName)
 	if err != nil {
-		log.Printf("Error collecting runner groups for %s - %v", orgName, err)
-		return nil, err
+		perm := collectors.NewMissingPermission(permissions.OrgAdmin, orgName,
+			"Cannot read organization runner groups", namespace.Organization)
+		c.IssueMissingPermissions(perm)
 	}
-	return result.Collected, nil
+	c.groupsByOrg[orgName] = result.Collected
+
+	return c.groupsByOrg[orgName]
 }
 
 func (c *runnersCollector) CollectTotalEntities() int {
@@ -53,24 +68,17 @@ func (c *runnersCollector) CollectTotalEntities() int {
 		return 0
 	}
 
-	totalCount := 0
-	var mutex = &sync.RWMutex{}
+	var totalCount atomic.Int64
 	for _, org := range orgs {
 		org := org
 		gw.Do(func() {
-			result, err := c.collectForOrg(org.Name())
-			if err != nil {
-				log.Printf("Error collecting runner groups for %s - %v", org.Name(), err)
-			} else {
-				mutex.Lock()
-				totalCount = totalCount + len(result)
-				mutex.Unlock()
-			}
+			groups := c.collectForOrg(org.Name())
+			totalCount.Add(int64(len(groups)))
 		})
 	}
-
 	gw.Wait()
-	return totalCount
+
+	return int(totalCount.Load())
 }
 
 func (c *runnersCollector) Collect() collectors.SubCollectorChannels {
@@ -83,11 +91,7 @@ func (c *runnersCollector) Collect() collectors.SubCollectorChannels {
 		}
 
 		for _, org := range orgs {
-			groups, err := c.collectForOrg(org.Name())
-			if err != nil {
-				continue
-			}
-
+			groups := c.collectForOrg(org.Name())
 			for _, rg := range groups {
 				c.CollectionChangeByOne()
 

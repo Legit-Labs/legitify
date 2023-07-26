@@ -1,6 +1,8 @@
 package collectors_manager
 
 import (
+	"log"
+
 	"github.com/Legit-Labs/legitify/cmd/progressbar"
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
@@ -46,6 +48,7 @@ func (m *manager) Collect() <-chan collectors.CollectedData {
 
 			gw.Do(func() {
 				totalEntities := c.CollectTotalEntities()
+				log.Printf("total entities for namespace %s: %d", c.Namespace(), totalEntities)
 				progressbar.Report(progressbar.NewRequiredBar(c.Namespace(), totalEntities))
 				progressbar.Report(progressbar.NewUpdate(metadataBarName, 1))
 

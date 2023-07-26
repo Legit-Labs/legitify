@@ -4,7 +4,7 @@ import (
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/shurcooL/githubv4"
 )
 
@@ -70,6 +70,7 @@ type Repository struct {
 	Collaborators                []*github.User                    `json:"collaborators,omitempty"`
 	ActionsTokenPermissions      *types.TokenPermissions           `json:"actions_token_permissions"`
 	DependencyGraphManifests     *GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests"`
+	RulesSet                     []*types.RepositoryRule           `json:"rules_set"`
 }
 
 func (r Repository) ViolationEntityType() string {
