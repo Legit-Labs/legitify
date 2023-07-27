@@ -22,7 +22,7 @@ var analyzeFlagTests = []cliTestCase{
 	{
 		legitifyCommand: "--repo Legitify-E2E/bad_branch_protection",
 		field:           "canonicalLink",
-		op:              "notIn",
+		op:              "!=",
 		value:           "https://github.com/Legitify-E2E/bad_branch_protection",
 	},
 }
