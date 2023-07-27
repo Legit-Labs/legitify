@@ -59,7 +59,7 @@ jobs:
         env:
           LEGITIFY_TOKEN: ${{ secrets[matrix.scm_token] }}
       - name: Run output verification
-        run: go test ./e2e/... -run ${{ matrix.test_plan }} --report_path=${{ matrix.report_file_path }} --execution_args ${{ matrix.extra }}
+        run: go test ./e2e/... -run ${{ matrix.test_plan }} --report_path=${{ matrix.report_file_path }} --execution_args '${{ matrix.extra }}'
 
       - name: Upload error log
         if: always()
