@@ -9,7 +9,7 @@ var analyzeFlagTests = []cliTestCase{
 	},
 	{
 		legitifyCommand: "--namespace repository",
-		field:           "namespace",
+		field:           "violationEntityType",
 		op:              "!=",
 		value:           "repository",
 	},
