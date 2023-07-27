@@ -98,7 +98,7 @@ func cliTestLoop(t *testing.T, cliTests []cliTestCase) {
 		failedTest := content.Where(cliTest.field, cliTest.op, cliTest.value)
 		count := failedTest.Count()
 		if count != 0 {
-			t.Logf("Failed on test %s, failed line is %#v", cliTest.legitifyCommand, failedTest)
+			t.Logf("Failed on test %s", cliTest.legitifyCommand)
 			t.Fail()
 		}
 	}
