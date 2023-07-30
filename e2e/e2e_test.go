@@ -86,7 +86,11 @@ func TestCLI(t *testing.T) {
 	}
 }
 
-func mapViolations(t *testing.T, testField string, testValue string) int {
+func mapViolations(t *testing.T, testCase cliTestCase) int {
+	testField := testCase.field
+	testValue := testCase.value
+	op := testCase.op
+
 	jq := gojsonq.New().File(*reportPath)
 	content := jq.From("content")
 	mappedContent := content.Get()
@@ -96,9 +100,17 @@ func mapViolations(t *testing.T, testField string, testValue string) int {
 		violations := (mappedPolicyValue["violations"]).([]interface{})
 		for _, violationEntity := range violations {
 			violationEntity := violationEntity.(map[string]interface{})
-			if violationEntity[testField] != testValue {
-				count++
+
+			if op == "startsWith" {
+				if strings.Contains(violationEntity[testField].(string), testValue) {
+					count++
+				}
+			} else {
+				if violationEntity[testField] != testValue {
+					count++
+				}
 			}
+
 		}
 	}
 	return count
@@ -106,7 +118,7 @@ func mapViolations(t *testing.T, testField string, testValue string) int {
 
 func cliTestLoop(t *testing.T, cliTests []cliTestCase) {
 	for _, cliTest := range cliTests {
-		count := mapViolations(t, cliTest.field, cliTest.value)
+		count := mapViolations(t, cliTest)
 		if !strings.Contains(*executionArgs, cliTest.legitifyCommand) {
 			continue
 		}

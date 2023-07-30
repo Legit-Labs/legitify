@@ -11,4 +11,5 @@ type cliTestCase struct {
 	legitifyCommand string
 	field           string
 	value           string
+	op              string
 }
