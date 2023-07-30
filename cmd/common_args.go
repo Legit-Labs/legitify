@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/Legit-Labs/legitify/internal/errlog"
@@ -35,16 +37,18 @@ type args struct {
 	InputFile                  string
 	FailedOnly                 bool
 	SimulateSecondaryRateLimit bool
+	IgnoreInvalidCertificate   bool
 	PermissionsOutputFile      string
 }
 
 const (
-	ArgErrorFile             = "error-file"
-	ArgOutputFile            = "output-file"
-	ArgPermissionsOutputFile = "permissions-file"
-	ArgToken                 = "token"
-	ArgServerUrl             = "server-url"
-	ScmType                  = "scm"
+	ArgErrorFile                = "error-file"
+	ArgOutputFile               = "output-file"
+	ArgPermissionsOutputFile    = "permissions-file"
+	ArgToken                    = "token"
+	ArgServerUrl                = "server-url"
+	ArgIgnoreInvalidCertificate = "ignore-invalide-certificate"
+	ScmType                     = "scm"
 )
 
 const (
@@ -105,6 +109,7 @@ func (a *args) addCommonCollectionOptions(flags *pflag.FlagSet) {
 	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github/gitlab (required unless environment variable LEGITIFY_AUTH_TOKEN is set)")
 	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github/gitlab endpoint to use instead of the Cloud API (can be set via the environment variable SERVER_URL)")
 	flags.StringVarP(&a.ScmType, ScmType, "", scm_type.GitHub, "server type (GitHub, GitLab), defaults to GitHub")
+	flags.BoolVarP(&a.IgnoreInvalidCertificate, ArgIgnoreInvalidCertificate, "", false, "Ignore invalid server certificate")
 }
 
 func (a *args) applyCommonCollectionOptions() error {
@@ -123,6 +128,10 @@ func (a *args) applyCommonCollectionOptions() error {
 
 	if a.Endpoint == "" {
 		a.Endpoint = viper.GetString(EnvServerUrl)
+	}
+
+	if a.IgnoreInvalidCertificate {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
 	return nil

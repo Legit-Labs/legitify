@@ -3,6 +3,7 @@ package gitlab
 import (
 	"context"
 	"fmt"
+
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"

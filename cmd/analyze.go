@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/Legit-Labs/legitify/internal/screen"
 	"os"
 	"strings"
+
+	"github.com/Legit-Labs/legitify/internal/screen"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
