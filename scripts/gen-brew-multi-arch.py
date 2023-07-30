@@ -13,24 +13,22 @@ FORMULA_FILE_PATH="legitify.rb"
 def create_local_changes(version, arm_sha256, intel_sha256, formula_file_path=FORMULA_FILE_PATH):
     BREW_FORMULA = f"""
 class Legitify < Formula
-desc "Legitify - open source scm scanning tool by Legit Security"
-homepage "https://github.com/Legit-Labs/legitify"
+    desc "Legitify - open source scm scanning tool by Legit Security"
+    homepage "https://github.com/Legit-Labs/legitify"
 
-on_macos do
     if Hardware::CPU.intel?
-    url "https://legitify.legitsecurity.com/{version}/darwin/amd64.tar.gz"
-    sha256 "{intel_sha256}"
-    version "{version}"
+        url "https://legitify.legitsecurity.com/{version}/darwin/amd64.tar.gz"
+        sha256 "{intel_sha256}"
+        version "{version}"
     end 
-    if Hardware::CPU.arm? && !Hardware::CPU.is_64_bit?
-    url "https://legitify.legitsecurity.com/{version}/darwin/arm64.tar.gz"
-    sha256 "{arm_sha256}"
-    version "{version}" 
+    if Hardware::CPU.arm?
+        url "https://legitify.legitsecurity.com/{version}/darwin/arm64.tar.gz"
+        sha256 "{arm_sha256}"
+        version "{version}" 
     end
-end
 
     def install
-    bin.install "legitify"
+        bin.install "legitify"
     end
 end
 """

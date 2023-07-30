@@ -4,9 +4,9 @@ go 1.19
 
 require (
 	github.com/fatih/color v1.15.0
-	github.com/gofri/go-github-ratelimit v1.0.3
+	github.com/gofri/go-github-ratelimit v1.0.4
 	github.com/golang/mock v1.6.0
-	github.com/google/go-github/v49 v49.1.0
+	github.com/google/go-github/v53 v53.2.0
 	github.com/google/wire v0.5.0
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/iancoleman/orderedmap v0.2.0
@@ -25,8 +25,8 @@ require (
 	github.com/thedevsaddam/gojsonq/v2 v2.5.2
 	github.com/vbauerster/mpb/v8 v8.4.0
 	github.com/xanzy/go-gitlab v0.83.0
-	golang.org/x/net v0.9.0
-	golang.org/x/oauth2 v0.7.0
+	golang.org/x/net v0.10.0
+	golang.org/x/oauth2 v0.8.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -41,7 +41,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20221026131551-cf6655e29de4 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
@@ -125,12 +125,12 @@ require (
 	github.com/yashtewari/glob-intersection v0.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	gocloud.dev v0.29.0 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
+	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/term v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect

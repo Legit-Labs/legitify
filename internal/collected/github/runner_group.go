@@ -2,7 +2,7 @@ package githubcollected
 
 import (
 	"fmt"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 )
 
 type RunnerGroup struct {

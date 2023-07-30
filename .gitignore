@@ -21,6 +21,7 @@ legitify
 /dist/
 .idea/
 error.log
+permissions_log.json
 .vscode
 
 # docs

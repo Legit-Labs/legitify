@@ -6,7 +6,7 @@ import (
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v53/github"
 )
 
 type runnerGroupMockConfiguration struct {

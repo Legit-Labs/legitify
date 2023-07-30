@@ -58,7 +58,7 @@ func (sm *skipper) ShouldSkip(data collectors.CollectedData, violation opa_engin
 
 	sufficient, missingPrerequisite := sm.arePrerequisitesSatisfied(prerequisites, data)
 	if !sufficient {
-		errlog.PrereqIssueF("Skipping policy: %s, missing prerequisite: %s\n", violation.PolicyName, missingPrerequisite)
+		errlog.AddSkipIssue(violation.PolicyName, data.Entity.Name(), errlog.NewPrerequisiteSkipReason(missingPrerequisite))
 		return true
 	}
 
@@ -67,7 +67,7 @@ func (sm *skipper) ShouldSkip(data collectors.CollectedData, violation opa_engin
 
 	sufficient, missingScope := sufficientScopes(data.Context.Roles(), currentScopes, scopes)
 	if !sufficient {
-		errlog.PrereqIssueF("Skipping policy: %s, missing scope: %s\n", violation.PolicyName, missingScope)
+		errlog.AddSkipIssue(violation.PolicyName, data.Entity.Name(), errlog.NewPermissionSkipReason(missingScope))
 		return true
 	}
 
@@ -84,7 +84,7 @@ func (sm *skipper) ignoredPolicy(policy opa_engine.QueryResult) bool {
 	return false
 }
 
-func (sm *skipper) arePrerequisitesSatisfied(pre []string, data collectors.CollectedData) (satisfied bool, predicate string) {
+func (sm *skipper) arePrerequisitesSatisfied(pre []string, data collectors.CollectedData) (satisfied bool, prerequisite string) {
 	for _, p := range pre {
 		predicate, ok := sm.prerequisitesCheckers[p]
 		if !ok || !predicate(data) {

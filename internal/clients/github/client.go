@@ -22,7 +22,7 @@ import (
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
 
-	gh "github.com/google/go-github/v49/github"
+	gh "github.com/google/go-github/v53/github"
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
 )
@@ -583,4 +583,19 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 	}
 
 	return res, nil
+}
+
+func (c *Client) GetRulesForBranch(organization, repository, branch string) ([]*types.RepositoryRule, error) {
+	url := fmt.Sprintf("repos/%v/%v/rules/branches/%v", organization, repository, branch)
+	req, err := c.client.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var p []*types.RepositoryRule
+	_, err = c.client.Do(c.context, req, &p)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
 }
