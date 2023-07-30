@@ -146,7 +146,7 @@ default_project_visibility_is_public = false {
 
 # METADATA
 # scope: rule
-# title: Sign-up Confirmation Email Should Be Mandatory
+# title: Sign-Up Confirmation Email Should Be Mandatory
 # description: >
 #     This security option enforces any new user to confirm their email address, and ensures the user is verified. This increases the security and integrity of the identities created within the system, and prevents situations
 #     where a user is spoofed by a malicious actor while using a legitimate corporate email address.
