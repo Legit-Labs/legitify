@@ -136,3 +136,48 @@ default memberes_allowed_repository_move_or_deletion = true
 memberes_allowed_repository_move_or_deletion = false {
 	input.member_can_delete_repository == "DISABLED"
 }
+
+# METADATA
+# scope: rule
+# custom:
+#   severity: MEDIUM
+# title: Enterprise Should Automatically Enable Advanced Security Across All Organizations/Repositories
+# description: Advanced Security includes code scanning, secret scanning and dependency review. These features protect your repositories from containing vulnerable data. Prevents the risk of unauthorized access or exploitation of vulnerabilities.
+# custom:
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the Enterprise Settings page, Under the ‘Settings’ tab choose ‘Code security and analysis’, Check 'Automatically enable for new repositories']
+#   requiredScopes: [admin:enterprise]
+default enable_ghas_for_new_orgs = true
+
+enable_ghas_for_new_orgs = false {
+	input.code_analysis_and_security_policies.advanced_security_enabled_for_new_repositories == true
+}
+
+# METADATA
+# scope: rule
+# custom:
+#   severity: MEDIUM
+# title: Enterprise Should Automatically Enable Secret Scanning Across All Organizations/Repositories
+# description: Enable GitHub Advanced Security secret scanning to alert on sensitive data that exists in your enterprise. Secrets shouldn’t be hard-coded in to your repositories as they will be retrievable by anyone with access to the repository.
+# custom:
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the Enterprise Settings page, Under the ‘Settings’ tab choose ‘Code security and analysis’, Check 'Automatically enable for new repositories with Advanced Security enabled']
+#   requiredScopes: [admin:enterprise]
+default enable_secret_scanning_for_new_orgs = true
+
+enable_secret_scanning_for_new_orgs = false {
+	input.code_analysis_and_security_policies.secret_scanning_enabled_for_new_repositories == true
+}
+
+# METADATA
+# scope: rule
+# custom:
+#   severity: MEDIUM
+# title: Enterprise Should Automatically Enable Secret Scanning Across All Organizations/Repositories
+# description: The enterprise should prevent sensitive data from being pushed to all repositories, to prevent it from being exposed to anyone with access to the repository.
+# custom:
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the Enterprise Settings page, Under the ‘Settings’ tab choose ‘Code security and analysis’, Check 'Automatically enable for repositories added to secret scanning']
+#   requiredScopes: [admin:enterprise]
+default enable_push_protection_secret_scanning = true
+
+enable_push_protection_secret_scanning = false {
+	input.code_analysis_and_security_policies.secret_scanning_push_protection_enabled_for_new_repositories == true
+}

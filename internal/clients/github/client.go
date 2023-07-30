@@ -569,6 +569,11 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 			continue
 		}
 		samlEnabled := enterpriseQuery.Enterprise.OwnerInfo.SamlIdentityProvider.ExternalIdentities.TotalCount > 0
+		codeAndSecurityPolicySettings, err := c.GetSecurityAndAnalysisForEnterprise(enterprise)
+		if err != nil {
+			log.Printf("failed to get code security settings for enterprise %v: %v", enterprise, err)
+			continue
+		}
 		newEnter := githubcollected.NewEnterprise(
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting,
 			enterpriseQuery.Enterprise.Name,
@@ -581,7 +586,8 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 			enterpriseQuery.Enterprise.OwnerInfo.TwoFactorRequiredSetting,
 			enterpriseQuery.Enterprise.OwnerInfo.DefaultRepositoryPermissionSetting,
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanDeleteRepositoriesSetting,
-			samlEnabled)
+			samlEnabled,
+			codeAndSecurityPolicySettings)
 		res = append(res, newEnter)
 
 	}
@@ -597,6 +603,21 @@ func (c *Client) GetRulesForBranch(organization, repository, branch string) ([]*
 	}
 
 	var p []*types.RepositoryRule
+	_, err = c.client.Do(c.context, req, &p)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+func (c *Client) GetSecurityAndAnalysisForEnterprise(enterprise string) (*types.AnalysisAndSecurityPolicies, error) {
+	url := fmt.Sprintf("/api/v3/enterprises/%v/code_security_and_analysis", enterprise)
+	req, err := c.client.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var p *types.AnalysisAndSecurityPolicies
 	_, err = c.client.Do(c.context, req, &p)
 	if err != nil {
 		return nil, err
