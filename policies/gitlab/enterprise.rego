@@ -25,9 +25,8 @@ require_two_factor_authentication_not_globally_enforced = false {
 # scope: rule
 # title: Password Authentication For Git Over HTTP(S) Should Not Be Enabled
 # description: >
-#     It is recommended to turn on MFA at the server or account level, and proactively prevent any new user created without MFA.
-#     Even if identities are managed externally using an SSO, it is highly recommended to keep this option on,
-#     for the 'admin' user or to be protected in the future for a deliberate or incidental creation of a user without MFA.
+#     Password authentication for Git protocol operations (pull / push) is discouraged in favor of using personal access tokens and keys.
+#     From a security standpoint, it is recommended to disable password authentication completely.
 # custom:
 #   severity: LOW
 #   remediationSteps:
