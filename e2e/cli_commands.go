@@ -16,8 +16,8 @@ var analyzeFlagTests = []cliTestCase{
 	{
 		legitifyCommand: "--org Legitify-E2E",
 		field:           "canonicalLink",
-		value:           "https://github.com/Legitify-E2E/",
-		op:              "startsWith",
+		value:           "Legitify-E2E",
+		op:              "contains",
 	},
 	{
 		legitifyCommand: "--repo Legitify-E2E/bad_branch_protection",

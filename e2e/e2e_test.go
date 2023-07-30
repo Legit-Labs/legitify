@@ -90,7 +90,6 @@ func mapViolations(t *testing.T, testCase cliTestCase) int {
 	testField := testCase.field
 	testValue := testCase.value
 	op := testCase.op
-
 	jq := gojsonq.New().File(*reportPath)
 	content := jq.From("content")
 	mappedContent := content.Get()
@@ -100,9 +99,8 @@ func mapViolations(t *testing.T, testCase cliTestCase) int {
 		violations := (mappedPolicyValue["violations"]).([]interface{})
 		for _, violationEntity := range violations {
 			violationEntity := violationEntity.(map[string]interface{})
-
-			if op == "startsWith" {
-				if !strings.Contains(violationEntity[testField].(string), testValue) {
+			if op == "contains" {
+				if strings.Contains(violationEntity[testField].(string), testValue) {
 					count++
 				}
 			} else {
@@ -118,10 +116,11 @@ func mapViolations(t *testing.T, testCase cliTestCase) int {
 
 func cliTestLoop(t *testing.T, cliTests []cliTestCase) {
 	for _, cliTest := range cliTests {
-		count := mapViolations(t, cliTest)
 		if !strings.Contains(*executionArgs, cliTest.legitifyCommand) {
 			continue
 		}
+		t.Logf("test case %s %s %s %s\n", cliTest.field, cliTest.op, cliTest.value, cliTest.legitifyCommand)
+		count := mapViolations(t, cliTest)
 		if count != 0 {
 			t.Logf("Failed on test %s", cliTest.legitifyCommand)
 			t.Fail()
