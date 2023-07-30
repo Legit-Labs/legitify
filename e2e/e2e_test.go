@@ -102,7 +102,7 @@ func mapViolations(t *testing.T, testCase cliTestCase) int {
 			violationEntity := violationEntity.(map[string]interface{})
 
 			if op == "startsWith" {
-				if strings.Contains(violationEntity[testField].(string), testValue) {
+				if !strings.Contains(violationEntity[testField].(string), testValue) {
 					count++
 				}
 			} else {
