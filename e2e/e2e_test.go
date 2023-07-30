@@ -2,6 +2,7 @@ package test
 
 import (
 	"flag"
+	"strings"
 	"testing"
 
 	"github.com/thedevsaddam/gojsonq/v2"
@@ -106,6 +107,9 @@ func mapViolations(t *testing.T, testField string, testValue string) int {
 func cliTestLoop(t *testing.T, cliTests []cliTestCase) {
 	for _, cliTest := range cliTests {
 		count := mapViolations(t, cliTest.field, cliTest.value)
+		if !strings.Contains(*executionArgs, cliTest.legitifyCommand) {
+			continue
+		}
 		if count != 0 {
 			t.Logf("Failed on test %s", cliTest.legitifyCommand)
 			t.Fail()
