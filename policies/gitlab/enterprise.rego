@@ -63,7 +63,7 @@ throttle_authenticated_api_not_enabled = false {
 
 # METADATA
 # scope: rule
-# title: Branch Protection Is Not Globally Enabled By Default
+# title: Branch Protection Should Be Globally Enabled By Default
 # description: >
 #     Branch protection is not enabled for the entire server or account by default. Any newly created repository will not be protected unless explicitly specified.
 #     Protecting branches ensures new code changes must go through a controlled merge process and it allows enforcement of code review and other security tests. It is recommended to turn it on by default.
