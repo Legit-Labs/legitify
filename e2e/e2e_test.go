@@ -101,7 +101,6 @@ func mapViolations(t *testing.T, testCase cliTestCase) int {
 			violationEntity := violationEntity.(map[string]interface{})
 			if op == "contains" {
 				if strings.Contains(violationEntity[testField].(string), testValue) {
-					t.Logf("failed on %s : %s", violationEntity, violationEntity[testField])
 					count++
 				}
 			} else {
