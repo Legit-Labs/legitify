@@ -83,7 +83,7 @@ default_branch_protection_not_globally_enforced = false {
 
 # METADATA
 # scope: rule
-# title: Should Restrict Which Collaborators Are Allowed To Create Public Repositories
+# title: Creating Public Repositories Should Be Restricted To Admins
 # description: >
 #     Your server allows non-admin members to create public repositories.
 #     Creating a public repository can be done by mistake, and may expose sensitive organization code, that once exposed may be copied, cached or stored by external parties.
