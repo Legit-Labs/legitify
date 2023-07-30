@@ -209,7 +209,7 @@ webhooks_are_allowed_to_be_sent_to_local_network = false {
 # METADATA
 # scope: rule
 # title: Server Should Not Allow Access To Unauthenticated Users With Sign-Up
-# description: The server allows any person with network access to sign up, create a user and access sensitive data
+# description: The server allows any person with network access to sign up, create a user and access sensitive data. Turning this off will reduce the risk of attackers trying to infiltrate the server.
 # custom:
 #   severity: HIGH
 #   remediationSteps:
