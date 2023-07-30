@@ -168,8 +168,8 @@ send_user_confirmation_email_not_enabled = false {
 # scope: rule
 # title: Unauthenticated Requests Rate Limit Should Be Enabled
 # description: >
-#     The servers allows restricting the limit of unauthenticated requests. It is recommended to turn it on as a security and reliability measure,
-#     and reduce request volume. If an attacker will try accessing the system, this will reduce the risk of brute-force and Denial-of-service to the end users caused by high request rate.
+#     The server allows restricting the limit of unauthenticated requests. It is recommended to turn it on as a security and reliability measure,
+#     and to reduce request volume. If an attacker tries accessing the system, this will reduce the risk of brute-force and Denial-of-service to the end users caused by high request rate.
 # custom:
 #   severity: MEDIUM
 #   remediationSteps:
