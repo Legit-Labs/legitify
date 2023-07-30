@@ -16,10 +16,11 @@ const (
 )
 
 type Client struct {
-	context context.Context
-	client  *gitlab.Client
-	orgs    []string
-	isAdmin bool
+	context  context.Context
+	client   *gitlab.Client
+	orgs     []string
+	isAdmin  bool
+	endpoint string
 }
 
 func (c *Client) Client() *gitlab.Client {
@@ -45,13 +46,22 @@ func NewClient(ctx context.Context, token string, endpoint string, orgs []string
 	}
 
 	result := &Client{
-		context: ctx,
-		client:  git,
-		orgs:    orgs,
-		isAdmin: IsAdmin(git),
+		context:  ctx,
+		client:   git,
+		orgs:     orgs,
+		isAdmin:  IsAdmin(git),
+		endpoint: endpoint,
 	}
 
 	return result, nil
+}
+
+func (c *Client) ServerUrl() string {
+	return c.endpoint
+}
+
+func (c *Client) IsServer() bool {
+	return c.endpoint != ""
 }
 
 func (c *Client) IsAnalyzable(repo types.RepositoryWithOwner) (bool, error) {

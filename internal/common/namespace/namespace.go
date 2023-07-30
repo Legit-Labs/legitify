@@ -11,6 +11,7 @@ const (
 	Member       Namespace = "member"
 	Actions      Namespace = "actions"
 	RunnerGroup  Namespace = "runner_group"
+	Server       Namespace = "server"
 )
 
 var All = []Namespace{
@@ -20,6 +21,7 @@ var All = []Namespace{
 	Member,
 	Actions,
 	RunnerGroup,
+	Server,
 }
 
 func ValidateNamespaces(namespace []Namespace) error {

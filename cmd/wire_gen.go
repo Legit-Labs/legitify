@@ -126,7 +126,7 @@ func provideGitHubClient(analyzeArgs2 *args) (*github.Client, error) {
 // inject_gitlab.go:
 
 func provideGitLabCollectors(ctx context.Context, client *gitlab.Client, analyzeArgs2 *args) []collectors.Collector {
-	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *gitlab.Client) collectors.Collector{namespace.Organization: gitlab2.NewGroupCollector, namespace.Repository: gitlab2.NewRepositoryCollector, namespace.Member: gitlab2.NewUserCollector}
+	var collectorsMapping = map[namespace.Namespace]func(ctx context.Context, client *gitlab.Client) collectors.Collector{namespace.Organization: gitlab2.NewGroupCollector, namespace.Repository: gitlab2.NewRepositoryCollector, namespace.Member: gitlab2.NewUserCollector, namespace.Server: gitlab2.NewServerCollector}
 
 	var result []collectors.Collector
 	for _, ns := range analyzeArgs2.Namespaces {
