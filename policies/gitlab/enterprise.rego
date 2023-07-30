@@ -6,7 +6,7 @@ package enterprise
 # description: >
 #    It is recommended to turn on MFA at the server or account level, and proactively prevent any new user created without MFA.
 #    Even if identities are managed externally using an SSO,
-#    it is highly recommended to keep this option on to prevent any deliberate or accidental creation of a user without MFA.
+#    it is highly recommended to keep this option on, for the 'admin' user or to be protected in the future for a deliberate or incidental creation of a user without MFA.
 # custom:
 #   severity: HIGH
 #   remediationSteps:
