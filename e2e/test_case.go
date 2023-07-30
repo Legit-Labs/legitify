@@ -10,6 +10,5 @@ type testCase struct {
 type cliTestCase struct {
 	legitifyCommand string
 	field           string
-	op              string
 	value           string
 }

@@ -2,7 +2,6 @@ package test
 
 import (
 	"flag"
-	"strings"
 	"testing"
 
 	"github.com/thedevsaddam/gojsonq/v2"
@@ -86,16 +85,27 @@ func TestCLI(t *testing.T) {
 	}
 }
 
-func cliTestLoop(t *testing.T, cliTests []cliTestCase) {
-	jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
-	for _, cliTest := range cliTests {
-		if !strings.Contains(*executionArgs, cliTest.legitifyCommand) {
-			continue
+func mapViolations(t *testing.T, testField string, testValue string) int {
+	jq := gojsonq.New().File(*reportPath)
+	content := jq.From("content")
+	mappedContent := content.Get()
+	count := 0
+	for _, policyValue := range mappedContent.(map[string]interface{}) {
+		mappedPolicyValue := (policyValue.(map[string]interface{}))
+		violations := (mappedPolicyValue["violations"]).([]interface{})
+		for _, violationEntity := range violations {
+			violationEntity := violationEntity.(map[string]interface{})
+			if violationEntity[testField] != testValue {
+				count++
+			}
 		}
-		t.Logf("Testing: %s", cliTest.legitifyCommand)
-		jq.Reset()
-		content := jq.From("Content->content")
-		count := content.Where(cliTest.field, cliTest.op, cliTest.value).Count()
+	}
+	return count
+}
+
+func cliTestLoop(t *testing.T, cliTests []cliTestCase) {
+	for _, cliTest := range cliTests {
+		count := mapViolations(t, cliTest.field, cliTest.value)
 		if count != 0 {
 			t.Logf("Failed on test %s", cliTest.legitifyCommand)
 			t.Fail()
