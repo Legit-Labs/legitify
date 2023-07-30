@@ -191,7 +191,7 @@ throttle_unauthenticated_request_not_enabled = false {
 # description: >
 #     Webhooks sent by GitLab servers are authenticated, and can cause potential damage if sent uncontrollably. For example, a malicious user can plant a webhook address
 #     that triggers an API call in GitLab itself which can delete resources. Therefore, as a security best practice, webhooks should be limited to external URLs only.
-#     You can read more [here](https://docs.gitlab.com/ee/security/webhooks.html)",
+#     You can read more [here](https://docs.gitlab.com/ee/security/webhooks.html)
 # custom:
 #   severity: LOW
 #   remediationSteps:
