@@ -562,17 +562,14 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 		err := c.GraphQLClient().Query(c.context, &enterpriseQuery, variables)
 		if err != nil {
 			log.Printf("failed to get enterprise %v: %v", enterprise, err)
-			continue
 		}
 		if enterpriseQuery.Enterprise.DatabaseId == 0 {
 			log.Printf("Failed to get enterprise %v . User is not a member of this enterprise", enterprise)
-			continue
 		}
 		samlEnabled := enterpriseQuery.Enterprise.OwnerInfo.SamlIdentityProvider.ExternalIdentities.TotalCount > 0
 		codeAndSecurityPolicySettings, err := c.GetSecurityAndAnalysisForEnterprise(enterprise)
 		if err != nil {
 			log.Printf("failed to get code security settings for enterprise %v: %v", enterprise, err)
-			continue
 		}
 		newEnter := githubcollected.NewEnterprise(
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanChangeRepositoryVisibilitySetting,
@@ -617,10 +614,10 @@ func (c *Client) GetSecurityAndAnalysisForEnterprise(enterprise string) (*types.
 		return nil, err
 	}
 
-	var p *types.AnalysisAndSecurityPolicies
+	var p types.AnalysisAndSecurityPolicies
 	_, err = c.client.Do(c.context, req, &p)
 	if err != nil {
 		return nil, err
 	}
-	return p, nil
+	return &p, nil
 }
