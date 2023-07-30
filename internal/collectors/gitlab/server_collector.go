@@ -19,7 +19,7 @@ type serverCollector struct {
 
 func NewServerCollector(ctx context.Context, client *gitlab.Client) collectors.Collector {
 	c := &serverCollector{
-		BaseCollector: collectors.NewBaseCollector(namespace.Server),
+		BaseCollector: collectors.NewBaseCollector(namespace.Enterprise),
 		Client:        client,
 		Context:       ctx,
 		isServer:      client.IsServer(),

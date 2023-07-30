@@ -1,4 +1,4 @@
-package server
+package enterprise
 
 # METADATA
 # scope: rule

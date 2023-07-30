@@ -18,7 +18,7 @@ func NewServer(url string, settings *gitlab.Settings) *Server {
 }
 
 func (o Server) ViolationEntityType() string {
-	return namespace.Server
+	return namespace.Enterprise
 }
 
 func (o Server) CanonicalLink() string {
