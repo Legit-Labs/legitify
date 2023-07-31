@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Enterprise Should Not Allow Members To Invite Outside Collaborators
+title: Enterprise Should Prevent Members From Inviting Outside Collaborators
 parent: Enterprise Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Enterprise Should Not Allow Members To Invite Outside Collaborators
+## Enterprise Should Prevent Members From Inviting Outside Collaborators
 policy name: enterprise_allows_inviting_externals_collaborators
 
 severity: MEDIUM

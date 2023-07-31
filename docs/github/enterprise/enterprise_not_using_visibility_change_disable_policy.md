@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Enterprise Should Not Allow Members To Change Repository Visibility
+title: Enterprise Should Prevent Repository Admins From Changing Repository Visibility
 parent: Enterprise Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Enterprise Should Not Allow Members To Change Repository Visibility
+## Enterprise Should Prevent Repository Admins From Changing Repository Visibility
 policy name: enterprise_not_using_visibility_change_disable_policy
 
 severity: MEDIUM

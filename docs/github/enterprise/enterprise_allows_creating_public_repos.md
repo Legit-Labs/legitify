@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Enterprise Should Not Allow Members To Create public Repositories
+title: Enterprise Should Prevent Members From Creating public Repositories
 parent: Enterprise Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Enterprise Should Not Allow Members To Create public Repositories
+## Enterprise Should Prevent Members From Creating public Repositories
 policy name: enterprise_allows_creating_public_repos
 
 severity: MEDIUM

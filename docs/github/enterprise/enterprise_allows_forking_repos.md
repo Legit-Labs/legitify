@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Enterprise Should Not Allow Members To Fork Internal And Private Repositories
+title: Enterprise Should Prevent Members From Forking Internal And Private Repositories
 parent: Enterprise Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Enterprise Should Not Allow Members To Fork Internal And Private Repositories
+## Enterprise Should Prevent Members From Forking Internal And Private Repositories
 policy name: enterprise_allows_forking_repos
 
 severity: LOW

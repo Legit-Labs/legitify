@@ -25,8 +25,7 @@ Rewriting project history can make it difficult to trace back when bugs or secur
 3. Enter "Branches" tab
 4. Under "Branch protection rules"
 5. Click "Edit" on the default branch rule
-6. Uncheck "Allow deletions"
-7. Click "Save changes"
+6. Uncheck "Allow deletions", Click "Save changes"
 
 
 

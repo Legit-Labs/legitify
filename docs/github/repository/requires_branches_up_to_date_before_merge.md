@@ -20,14 +20,15 @@ Required status checks may be failing on the latest version after passing on an 
 
 
 ### Remediation
-1. Make sure you have admin permissions
-2. Go to the repo's settings page
-3. Enter "Branches" tab
-4. Under "Branch protection rules"
-5. Click "Edit" on the default branch rule
-6. Check "Require status checks to pass before merging"
-7. Check "Require branches to be up to date before merging"
-8. Click "Save changes"
+1. Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page
+2. Make sure you have admin permissions
+3. Go to the repo's settings page
+4. Enter "Branches" tab
+5. Under "Branch protection rules"
+6. Click "Edit" on the default branch rule
+7. Check "Require status checks to pass before merging"
+8. Check "Require branches to be up to date before merging"
+9. Click "Save changes"
 
 
 
