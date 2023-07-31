@@ -3,6 +3,7 @@ package gitlab
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
@@ -192,9 +193,9 @@ func (c *Client) GroupHooks(gid int) ([]*gitlab.GroupHook, error) {
 }
 
 func (c *Client) GroupPlan(group *gitlab.Group) (string, error) {
-	nss, _, err := c.Client().Namespaces.SearchNamespace(group.FullName)
+	nss, resp, err := c.Client().Namespaces.SearchNamespace(group.FullName)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to search namespace %s: %v (response: %+v)", group.FullName, err, resp)
 	}
 
 	for _, n := range nss {
@@ -209,6 +210,7 @@ func (c *Client) GroupPlan(group *gitlab.Group) (string, error) {
 func (c *Client) IsGroupPremium(group *gitlab.Group) bool {
 	plan, err := c.GroupPlan(group)
 	if err != nil {
+		log.Printf("failed to get namespace for group %s %v", group.FullName, err)
 		return false
 	}
 
