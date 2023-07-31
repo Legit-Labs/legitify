@@ -195,7 +195,7 @@ func (c *Client) GroupHooks(gid int) ([]*gitlab.GroupHook, error) {
 func (c *Client) GroupPlan(group *gitlab.Group) (string, error) {
 	nss, resp, err := c.Client().Namespaces.SearchNamespace(group.FullName)
 	if err != nil {
-		return "", fmt.Errorf("%s %d %s", resp.Status, resp.StatusCode, err)
+		return "", fmt.Errorf("failed to search namespace %s: %v (response: %+v)", group.FullName, err, resp)
 	}
 
 	for _, n := range nss {
@@ -210,7 +210,7 @@ func (c *Client) GroupPlan(group *gitlab.Group) (string, error) {
 func (c *Client) IsGroupPremium(group *gitlab.Group) bool {
 	plan, err := c.GroupPlan(group)
 	if err != nil {
-		log.Printf("Failed to get namespace for group %s %s", group.FullName, err)
+		log.Printf("failed to get namespace for group %s %s", group.FullName, err)
 		return false
 	}
 
