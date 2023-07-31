@@ -22,3 +22,6 @@ And More to come...
 
 ---
 > ℹ️ **NOTE:** This webpage describes only the policies which Legitify supports. To learn more about how to use the cli tool, or contribute the source code, visit [Legitify's GitHub page](https://github.com/Legit-Labs/legitify).
+>
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=6f4cbb25-54f4-4c47-b611-9b741732bb86" />
