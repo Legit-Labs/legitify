@@ -16,7 +16,7 @@ var analyzeFlagTests = []cliTestCase{
 	{
 		legitifyCommand: "--org Legitify-E2E",
 		field:           "canonicalLink",
-		op:              "contains",
+		op:              "not-contains",
 		value:           "Legitify-E2E-2",
 	},
 	{

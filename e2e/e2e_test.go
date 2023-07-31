@@ -87,9 +87,6 @@ func TestCLI(t *testing.T) {
 }
 
 func mapViolations(t *testing.T, testCase cliTestCase) int {
-	testField := testCase.field
-	testValue := testCase.value
-	op := testCase.op
 	jq := gojsonq.New().File(*reportPath)
 	content := jq.From("content")
 	mappedContent := content.Get()
@@ -99,12 +96,12 @@ func mapViolations(t *testing.T, testCase cliTestCase) int {
 		violations := (mappedPolicyValue["violations"]).([]interface{})
 		for _, violationEntity := range violations {
 			violationEntity := violationEntity.(map[string]interface{})
-			if op == "contains" {
-				if strings.Contains(violationEntity[testField].(string), testValue) {
+			if testCase.op == "not-contains" {
+				if strings.Contains(violationEntity[testCase.field].(string), testCase.value) {
 					count++
 				}
 			} else {
-				if violationEntity[testField] != testValue {
+				if violationEntity[testCase.field] != testCase.value {
 					count++
 				}
 			}
