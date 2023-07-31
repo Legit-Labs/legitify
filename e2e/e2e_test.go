@@ -2,12 +2,14 @@ package test
 
 import (
 	"flag"
+	"strings"
 	"testing"
 
 	"github.com/thedevsaddam/gojsonq/v2"
 )
 
 var reportPath = flag.String("report_path", "/tmp/out.json", "legitify report output path")
+var executionArgs = flag.String("execution_args", "", "arguments used to run legitify")
 
 const pathToEntityName = "aux->entityName"
 
@@ -36,95 +38,89 @@ func assertTestStatus(t *testing.T, jq *gojsonq.JSONQ, testPath, entityName, exp
 	}
 }
 
+type testPair struct {
+	Got, Want string
+}
+
 func assertionLoop(t *testing.T, tests []testCase) {
 	jq := gojsonq.New(gojsonq.SetSeparator("->")).File(*reportPath)
 	for _, test := range tests {
 		t.Logf("Testing: %s", test.path)
 
-		if test.passedEntity != "" {
-			assertTestStatus(t, jq, test.path, test.passedEntity, "PASSED")
+		pairs := []testPair{
+			{
+				Got:  test.passedEntity,
+				Want: "PASSED",
+			},
+			{
+				Got:  test.failedEntity,
+				Want: "FAILED",
+			},
+			{
+				Got:  test.skippedEntity,
+				Want: "SKIPPED",
+			},
 		}
 
-		if test.failedEntity != "" {
-			assertTestStatus(t, jq, test.path, test.failedEntity, "FAILED")
-		}
-
-		if test.skippedEntity != "" {
-			assertTestStatus(t, jq, test.path, test.skippedEntity, "SKIPPED")
+		for _, pair := range pairs {
+			if pair.Got == "" {
+				continue
+			}
+			assertTestStatus(t, jq, test.path, pair.Got, pair.Want)
 		}
 	}
 }
 
 func TestGitLab(t *testing.T) {
-	tests := []testCase{
-		{
-			path:         "data.organization.two_factor_authentication_not_required_for_group",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.organization.collaborators_can_fork_repositories_to_external_namespaces",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.organization.organization_webhook_doesnt_require_ssl",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.organization.group_does_not_enforce_branch_protection_by_default",
-			failedEntity: "Legitify-E2E-2",
-			passedEntity: "Legitify-E2E",
-		},
-		{
-			path:         "data.repository.missing_default_branch_protection",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-		{
-			path:          "data.member.two_factor_authentication_is_disabled_for_a_collaborator",
-			skippedEntity: "legitify-test",
-		},
-		{
-			path:          "data.member.two_factor_authentication_is_disabled_for_an_external_collaborator",
-			skippedEntity: "legitify-test",
-		},
-		{
-			path:         "data.repository.code_review_by_two_members_not_required",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-		{
-			path:         "data.repository.code_review_not_required",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-		{
-			path:         "data.repository.repository_allows_review_requester_to_approve_their_own_request",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-		{
-			path:         "data.repository.repository_allows_overriding_approvers",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-		{
-			path:         "data.repository.repository_require_code_owner_reviews_policy",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-		{
-			path:         "data.repository.repository_allows_committer_approvals_policy",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-		{
-			path:         "data.repository.repository_dismiss_stale_reviews",
-			failedEntity: "failed_repo",
-			passedEntity: "passed_repo",
-		},
-	}
+	tests := testCasesGitLab
 	assertionLoop(t, tests)
+}
+
+func TestCLI(t *testing.T) {
+	tests := [][]cliTestCase{
+		analyzeFlagTests,
+	}
+
+	for _, cliTestCases := range tests {
+		cliTestLoop(t, cliTestCases)
+	}
+}
+
+func mapViolations(t *testing.T, testCase cliTestCase) int {
+	jq := gojsonq.New().File(*reportPath)
+	content := jq.From("content")
+	mappedContent := content.Get()
+	count := 0
+	for _, policyValue := range mappedContent.(map[string]interface{}) {
+		mappedPolicyValue := (policyValue.(map[string]interface{}))
+		violations := (mappedPolicyValue["violations"]).([]interface{})
+		for _, violationEntity := range violations {
+			violationEntity := violationEntity.(map[string]interface{})
+			if testCase.op == "not-contains" {
+				if strings.Contains(violationEntity[testCase.field].(string), testCase.value) {
+					count++
+				}
+			} else {
+				if violationEntity[testCase.field] != testCase.value {
+					count++
+				}
+			}
+
+		}
+	}
+	return count
+}
+
+func cliTestLoop(t *testing.T, cliTests []cliTestCase) {
+	for _, cliTest := range cliTests {
+		if !strings.Contains(*executionArgs, cliTest.legitifyCommand) {
+			continue
+		}
+		t.Logf("test case %s %s %s %s\n", cliTest.field, cliTest.op, cliTest.value, cliTest.legitifyCommand)
+		count := mapViolations(t, cliTest)
+		if count != 0 {
+			t.Logf("Failed on test %s", cliTest.legitifyCommand)
+			t.Fail()
+		}
+	}
 }

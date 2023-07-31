@@ -6,3 +6,10 @@ type testCase struct {
 	passedEntity  string
 	skippedEntity string
 }
+
+type cliTestCase struct {
+	legitifyCommand string
+	field           string
+	op              string
+	value           string
+}
