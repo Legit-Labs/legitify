@@ -47,7 +47,7 @@ const (
 	ArgPermissionsOutputFile    = "permissions-file"
 	ArgToken                    = "token"
 	ArgServerUrl                = "server-url"
-	ArgIgnoreInvalidCertificate = "ignore-invalide-certificate"
+	ArgIgnoreInvalidCertificate = "ignore-invalid-certificate"
 	ScmType                     = "scm"
 )
 
