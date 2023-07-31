@@ -210,7 +210,7 @@ func (c *Client) GroupPlan(group *gitlab.Group) (string, error) {
 func (c *Client) IsGroupPremium(group *gitlab.Group) bool {
 	plan, err := c.GroupPlan(group)
 	if err != nil {
-		log.Printf("failed to get namespace for group %s %s", group.FullName, err)
+		log.Printf("failed to get namespace for group %s %v", group.FullName, err)
 		return false
 	}
 
