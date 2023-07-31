@@ -37,6 +37,7 @@ func provideGitLabCollectors(ctx context.Context, client *glclient.Client, analy
 		namespace.Organization: gitlab.NewGroupCollector,
 		namespace.Repository:   gitlab.NewRepositoryCollector,
 		namespace.Member:       gitlab.NewUserCollector,
+		namespace.Enterprise:   gitlab.NewServerCollector,
 	}
 
 	var result []collectors.Collector
