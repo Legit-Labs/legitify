@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+*.bin
 
 # Build output
 main
