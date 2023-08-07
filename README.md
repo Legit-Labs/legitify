@@ -7,13 +7,14 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Legit-Labs/legitify)](https://goreportcard.com/report/github.com/Legit-Labs/legitify)
 [![Maintained By Legit Security](https://img.shields.io/badge/Maintained%20by-Legit%20Security-blueviolet)](https://www.legitsecurity.com/)
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=6f4cbb25-54f4-4c47-b611-9b741732bb86" />
+<br/>
  <img width="250" alt="Legitify Logo" src="https://user-images.githubusercontent.com/74864790/174815311-746a0c98-9a1f-44a9-808c-035788edfd4d.png">
  
 Strengthen the security posture of your source-code management! <br/>
 Detect and remediate misconfigurations, security and compliance issues across all your GitHub and GitLab assets with ease 🔥 <br/>
  by [Legit Security](https://www.legitsecurity.com/).
 </div>
-<br/>
+
 https://user-images.githubusercontent.com/107790206/210602039-2d022692-87ea-4005-b9c6-f091158de3ce.mov
 
 ## Installation
