@@ -13,7 +13,7 @@ Strengthen the security posture of your source-code management! <br/>
 Detect and remediate misconfigurations, security and compliance issues across all your GitHub and GitLab assets with ease 🔥 <br/>
  by [Legit Security](https://www.legitsecurity.com/).
 </div>
-
+<br/>
 https://user-images.githubusercontent.com/107790206/210602039-2d022692-87ea-4005-b9c6-f091158de3ce.mov
 
 ## Installation
