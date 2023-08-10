@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
@@ -11,10 +13,13 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/xanzy/go-gitlab"
+	"golang.org/x/time/rate"
 )
 
 const (
-	allGroupsFilter = ""
+	allGroupsFilter  = ""
+	customRateLimit  = "GITLAB_RATE_LIMIT"
+	customBurstLimit = "GITLAB_BURST_LIMIT"
 )
 
 type Client struct {
@@ -37,6 +42,7 @@ func NewClient(ctx context.Context, token string, endpoint string, orgs []string
 			gitlab.WithHTTPClient(transport.NewHttpClient()),
 		}
 	}
+	config = append(config, getCustomRateLimit()...)
 
 	git, err := gitlab.NewClient(token, config...)
 	if err != nil {
@@ -56,6 +62,26 @@ func NewClient(ctx context.Context, token string, endpoint string, orgs []string
 	}
 
 	return result, nil
+}
+
+func getCustomRateLimit() []gitlab.ClientOptionFunc {
+	limit := os.Getenv(customRateLimit)
+	burst := os.Getenv(customBurstLimit)
+	if limit == "" || burst == "" {
+		return nil
+	}
+
+	floatLimit, err := strconv.ParseFloat(limit, 64)
+	if err != nil {
+		log.Printf("invalid rate limit %s: %v", limit, err)
+	}
+
+	burstLimit, err := strconv.ParseInt(burst, 10, 64)
+	if err != nil {
+		log.Printf("invalid burst limit %s: %v", burst, err)
+	}
+	limiter := rate.NewLimiter(rate.Limit(floatLimit), int(burstLimit))
+	return []gitlab.ClientOptionFunc{gitlab.WithCustomLimiter(limiter)}
 }
 
 func (c *Client) ServerUrl() string {
