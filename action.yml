@@ -30,6 +30,10 @@ inputs:
     description: "Compile legitify from source (use legitify_base_version as ref)"
     required: false
     default: "false"
+  artifact_name:
+    description: "If the repository where this action runs is private, the analysis report will be saved as an artifact with this name"
+    required: false
+    default: "legitify-report"
 runs:
   using: "composite"
   steps:
@@ -85,5 +89,5 @@ runs:
       if: ${{ steps.analyze.outputs.is_private == 'true' }}
       uses: actions/upload-artifact@v3
       with:
-        name: legitify-report
+        name: ${{ inputs.artifact_name }}
         path: legitify-output.*
