@@ -52,8 +52,8 @@ const (
 )
 
 const (
-	EnvToken     = "github_token"
-	NewEnvToken  = "legitify_token"
+	EnvToken     = "legitify_token"
+	NewEnvToken  = "scm_token"
 	EnvServerUrl = "server_url"
 )
 
@@ -106,7 +106,7 @@ func (a *args) applyOutputOptions() (preExitHook func(), err error) {
 }
 
 func (a *args) addCommonCollectionOptions(flags *pflag.FlagSet) {
-	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github/gitlab (required unless environment variable LEGITIFY_AUTH_TOKEN is set)")
+	flags.StringVarP(&a.Token, ArgToken, "t", "", "token to authenticate with github/gitlab (required unless environment variable SCM_TOKEN is set)")
 	flags.StringVarP(&a.Endpoint, ArgServerUrl, "", "", "github/gitlab endpoint to use instead of the Cloud API (can be set via the environment variable SERVER_URL)")
 	flags.StringVarP(&a.ScmType, ScmType, "", scm_type.GitHub, "server type (GitHub, GitLab), defaults to GitHub")
 	flags.BoolVarP(&a.IgnoreInvalidCertificate, ArgIgnoreInvalidCertificate, "", false, "Ignore invalid server certificate")
@@ -118,8 +118,7 @@ func (a *args) applyCommonCollectionOptions() error {
 	}
 
 	if a.Token == "" {
-		// backwards compatibility: support both LEGITIFY_TOKEN and GITHUB_TOKEN environment variables.
-		// In the future we'll remove the GITHUB_TOKEN option
+		// backwards compatibility: support both SCM_TOKEN and LEGITIFY_TOKEN environment variables.
 		a.Token = viper.GetString(NewEnvToken)
 		if a.Token == "" {
 			a.Token = viper.GetString(EnvToken)
