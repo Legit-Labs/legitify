@@ -34,7 +34,7 @@ inputs:
     description: "If the repository where this action runs is private, the analysis report will be saved as an artifact with this name"
     required: false
     default: "legitify-report"
-  ignored-policies:
+  ignore-policies:
     description: "List of policies to ignore (SKIP). Policies should be seperated by a new line"
     required: false
     default: ""
@@ -67,7 +67,7 @@ runs:
 
     - id: create_ignore_policies_file
       shell: bash
-      run: echo ${{ inputs.ignored-policies }} > ./ignored-policies
+      run: echo ${{ inputs.ignore-policies }} > ./ignored-policies
 
     - uses: actions/setup-node@v3
       with:
