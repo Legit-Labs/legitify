@@ -156,6 +156,14 @@ function generateAnalyzeArgs(repo, owner) {
   args.push("--org");
   args.push(owner);
 
+  if (process.env["ignore-policies-file"] !== "") {
+    args.push("--ignore-policies-file");
+    args.push(process.env["ignore-policies-file"]);
+    return args;
+  }
+
+  args.push(process.env["extra"])
+
   return args;
 }
 
@@ -199,7 +207,7 @@ async function run() {
     const repo = process.env["GITHUB_REPOSITORY"];
     const uploadCodeScanning = (process.env["upload_code_scanning"] === "true");
 
-    if (process.env["compile_legitify"] == "true") {
+    if (process.env["compile_legitify"] === "true") {
       console.log("using the compiled legitify version.");
     } else {
       const legitifyBaseVersion = process.env["legitify_base_version"];

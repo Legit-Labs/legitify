@@ -34,6 +34,14 @@ inputs:
     description: "If the repository where this action runs is private, the analysis report will be saved as an artifact with this name"
     required: false
     default: "legitify-report"
+  ignored-policies:
+    description: "List of policies to ignore (SKIP). Policies should be seperated by a new line"
+    required: false
+    default: ""
+  extra:
+    description: "Additional arguments"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -57,6 +65,10 @@ runs:
         cd legitify-build
         go build -o "${GITHUB_ACTION_PATH}/legitify"
 
+    - id: create_ignore_policies_file
+      shell: bash
+      run: echo ${{ inputs.ignored-policies }} > ./ignored-policies
+
     - uses: actions/setup-node@v3
       with:
           node-version: '16'
@@ -71,6 +83,8 @@ runs:
         scorecard: ${{ inputs.scorecard }}
         upload_code_scanning: ${{ inputs.upload_code_scanning }}
         compile_legitify: ${{ inputs.compile_legitify }}
+        ignore-policies-file: ./ignored-policies
+        extra: ${{ input.extra }}
       run: |
         cd "$GITHUB_ACTION_PATH"
         node index.js
