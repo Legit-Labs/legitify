@@ -67,7 +67,9 @@ runs:
 
     - id: create_ignore_policies_file
       shell: bash
-      run: echo "${{ inputs.ignore-policies }}" > ./ignored-policies
+      run: |
+        echo "${{ inputs.ignore-policies }}" > ./ignored-policies
+        cat ./ignored-policies
 
     - uses: actions/setup-node@v3
       with:
