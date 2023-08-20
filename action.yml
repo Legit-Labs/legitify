@@ -84,7 +84,7 @@ runs:
         upload_code_scanning: ${{ inputs.upload_code_scanning }}
         compile_legitify: ${{ inputs.compile_legitify }}
         ignore-policies-file: ./ignored-policies
-        extra: ${{ input.extra }}
+        extra: ${{ inputs.extra }}
       run: |
         cd "$GITHUB_ACTION_PATH"
         node index.js
