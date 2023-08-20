@@ -118,8 +118,7 @@ func (a *args) applyCommonCollectionOptions() error {
 	}
 
 	if a.Token == "" {
-		// backwards compatibility: support both SCM_TOKEN, LEGITIFY_TOKEN and GITHUB_TOKEN environment variables.
-		// In the future we'll remove the GITHUB_TOKEN option
+		// backwards compatibility: support both SCM_TOKEN and LEGITIFY_TOKEN environment variables.
 		a.Token = viper.GetString(NewEnvToken)
 		if a.Token == "" {
 			a.Token = viper.GetString(EnvToken)
