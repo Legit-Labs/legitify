@@ -69,8 +69,7 @@ runs:
       shell: bash
       run: |
         echo "${{ inputs.ignore-policies }}" > "${GITHUB_ACTION_PATH}/ignored-policies"
-        cat ./ignored-policies
-
+        cat "${GITHUB_ACTION_PATH}/ignored-policies"
     - uses: actions/setup-node@v3
       with:
           node-version: '16'
