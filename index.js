@@ -157,8 +157,6 @@ function generateAnalyzeArgs(repo, owner) {
   args.push(owner);
 
   if (process.env["ignore-policies-file"] !== "") {
-    console.log("ignore policies file")
-    console.log(process.env["ignore-policies-file"])
     args.push("--ignore-policies-file");
     args.push(process.env["ignore-policies-file"]);
     return args;
