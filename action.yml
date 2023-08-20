@@ -17,7 +17,7 @@ inputs:
   legitify_base_version:
     description: "The base version of legitify to use. Non breaking changes will be auto updated."
     required: false
-    default: "0.2"
+    default: "1.0"
   scorecard:
     description: 'Whether to run scorecard as part of the analysis (no/yes/verbose default to "no")'
     required: false
