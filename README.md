@@ -45,6 +45,32 @@ gh extension install legit-labs/gh-legitify
 gh legitify
 ```
 
+## CI - Legitify Custom GitHub Action
+
+You can run legitify as part of a CI process with the legitify Custom GitHub Actions:
+
+```
+name: Legitify Analyze
+on:
+    workflow_dispatch:
+    schedule:
+      - cron: '0 11 * * 1-5'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Legitify Action
+        uses: Legit-Labs/legitify@main
+        with:
+          github_token: ${{ secrets.PAT_FOR_LEGITIFY }}
+          ignore-policies: |
+             non_admins_can_create_public_repositories
+             requires_status_checks
+```
+
+Checkout the [action file](https://github.com/Legit-Labs/legitify/blob/main/action.yml) for additional parameters
+and configuration.
 
 ## Provenance
 
