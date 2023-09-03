@@ -144,22 +144,17 @@ function generateAnalyzeArgs(repo, owner) {
   if (process.env["analyze_self_only"] === "true") {
     args.push("--repo");
     args.push(repo);
-    return args;
-  }
-
-  if (process.env["repositories"] !== "") {
+  } else if (process.env["repositories"] !== "") {
     args.push("--repo");
     args.push(process.env["repositories"]);
-    return args;
+  } else {
+    args.push("--org");
+    args.push(owner);
   }
-
-  args.push("--org");
-  args.push(owner);
 
   if (process.env["ignore-policies-file"] !== "") {
     args.push("--ignore-policies-file");
     args.push(process.env["ignore-policies-file"]);
-    return args;
   }
 
   args.push(process.env["extra"])
