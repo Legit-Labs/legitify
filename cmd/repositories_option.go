@@ -11,13 +11,16 @@ func validateRepositories(repositories []string) ([]types.RepositoryWithOwner, e
 
 	for _, repo := range repositories {
 		splitted := strings.Split(repo, "/")
-		if len(splitted) != 2 {
-			return nil, fmt.Errorf("invalid repository format %s expected \"owner/name\"", repo)
+		if len(splitted) < 2 {
+			return nil, fmt.Errorf("invalid repository format %s expected \"owner/name\" for GitHub and group(/subgroups)/project from GitLab", repo)
 		}
 
+		repoName := splitted[len(splitted)-1]
+		owner := strings.Join(splitted[:len(splitted)-1], "/")
+
 		result = append(result, types.RepositoryWithOwner{
-			Owner: splitted[0],
-			Name:  splitted[1],
+			Owner: owner,
+			Name:  repoName,
 		})
 	}
 
