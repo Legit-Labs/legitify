@@ -54,7 +54,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
       myError += data.toString();
     },
   };
-  options.env = { GITHUB_TOKEN: token };
+  options.env = { SCM_TOKEN: token };
   options.silent = true
   const isPrivate = await isPrivateRepo(token)
   core.setOutput("is_private", isPrivate)
@@ -132,6 +132,11 @@ async function fetchLegitifyReleaseUrl(baseVersion) {
   }
 }
 
+function breakStringToParams(str) {
+  const pattern = /(-{1,2}\S+)(?:\s+((?!\s*-).+?)(?=\s+-{1,2}|\s*$))?/g;
+  return str.match(pattern)
+}
+
 function generateAnalyzeArgs(repo, owner) {
   let args = [];
 
@@ -144,25 +149,24 @@ function generateAnalyzeArgs(repo, owner) {
   if (process.env["analyze_self_only"] === "true") {
     args.push("--repo");
     args.push(repo);
-    return args;
-  }
-
-  if (process.env["repositories"] !== "") {
+  } else if (process.env["repositories"] !== "") {
     args.push("--repo");
     args.push(process.env["repositories"]);
-    return args;
+  } else {
+    args.push("--org");
+    args.push(owner);
   }
-
-  args.push("--org");
-  args.push(owner);
 
   if (process.env["ignore-policies-file"] !== "") {
     args.push("--ignore-policies-file");
     args.push(process.env["ignore-policies-file"]);
-    return args;
   }
 
-  args.push(process.env["extra"])
+  const extra = process.env["extra"]
+  if (extra !== "") {
+    const splitArgs = breakStringToParams(extra)
+    args.push(...splitArgs)
+  }
 
   return args;
 }
