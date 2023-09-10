@@ -132,6 +132,11 @@ async function fetchLegitifyReleaseUrl(baseVersion) {
   }
 }
 
+function breakStringToParams(str) {
+  const pattern = /(-{1,2}\w+\s+\w+)|(-{1,2}\w+)/g;
+  return str.match(pattern);
+}
+
 function generateAnalyzeArgs(repo, owner) {
   let args = [];
 
@@ -157,7 +162,11 @@ function generateAnalyzeArgs(repo, owner) {
     args.push(process.env["ignore-policies-file"]);
   }
 
-  args.push(process.env["extra"])
+  const extra = process.env["extra"]
+  if (extra !== "") {
+    const splitArgs = breakStringToParams(extra)
+    args.push(...splitArgs)
+  }
 
   return args;
 }
