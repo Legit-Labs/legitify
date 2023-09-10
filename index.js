@@ -133,8 +133,8 @@ async function fetchLegitifyReleaseUrl(baseVersion) {
 }
 
 function breakStringToParams(str) {
-  const pattern = /(-{1,2}\w+\s+\w+)|(-{1,2}\w+)/g;
-  return str.match(pattern);
+  const pattern = /(-{1,2}\S+)(?:\s+((?!\s*-).+?)(?=\s+-{1,2}|\s*$))?/g;
+  return str.match(pattern)
 }
 
 function generateAnalyzeArgs(repo, owner) {
