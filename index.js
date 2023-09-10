@@ -54,7 +54,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
       myError += data.toString();
     },
   };
-  options.env = { GITHUB_TOKEN: token };
+  options.env = { SCM_TOKEN: token };
   options.silent = true
   const isPrivate = await isPrivateRepo(token)
   core.setOutput("is_private", isPrivate)
