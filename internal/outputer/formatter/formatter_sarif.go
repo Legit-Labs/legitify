@@ -3,6 +3,7 @@ package formatter
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Legit-Labs/legitify/internal/analyzers"
 	"strings"
 
 	"github.com/owenrumney/go-sarif/v2/sarif"
@@ -72,6 +73,10 @@ func (f *sarifFormatter) Format(s scheme.Scheme, failedOnly bool) ([]byte, error
 		// https://github.com/ossf/scorecard/blob/273dccda33590b7b46e98e19a9154f9da5400521/pkg/testdata/check6.sarif
 
 		for _, violation := range data.Violations {
+			if violation.Status != analyzers.PolicyFailed {
+				continue
+			}
+
 			base, uri := f.URIFromLink(violation.CanonicalLink)
 			run.AddDistinctArtifact(violation.ViolationEntityType)
 			run.CreateResultForRule(policyInfo.FullyQualifiedPolicyName).
