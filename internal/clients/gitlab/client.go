@@ -156,7 +156,7 @@ func (c *Client) Group(name string) (*gitlab.Group, error) {
 	}
 
 	for _, g := range res.Collected {
-		if g.Path == name {
+		if g.FullPath == name {
 			return g, nil
 		}
 	}
