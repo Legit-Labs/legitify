@@ -12,9 +12,9 @@ package member
 #     - "1. An organization has a permissive attitude and provides an owner role to all developers."
 #     - "2. One of the developers has decided to collaborate with an evil ransomware gang, and uses his high privileges to add a malicious external collaborator"
 #     - "3. The malicious collaborator, being an owner, has a wide range of destructive operations he can do (e.g. remove security settings)"
-default organization_has_too_many_admins = true
+default organization_has_too_many_admins := true
 
-organization_has_too_many_admins = false {
+organization_has_too_many_admins := false {
 	admins := count({member | member := input.members[_]; member.is_admin == true})
 	admins <= 3
 }
@@ -31,7 +31,7 @@ organization_has_too_many_admins = false {
 #   prerequisites: [premium]
 #   threat:
 #     - "Stale members are most likely not managed and monitored, increasing the possibility of being compromised."
-stale_member_found[mem] = true {
+stale_member_found[mem] := true {
 	some member
 	mem := input.members[member]
 	mem.is_admin == false
@@ -51,7 +51,7 @@ stale_member_found[mem] = true {
 #   prerequisites: [premium]
 #   threat:
 #     - "Stale admins are most likely not managed and monitored, increasing the possibility of being compromised."
-stale_admin_found[mem] = true {
+stale_admin_found[mem] := true {
 	some member
 	mem := input.members[member]
 	mem.is_admin == true

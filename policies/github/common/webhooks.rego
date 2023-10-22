@@ -1,14 +1,12 @@
 package common.webhooks
 
-has_key(x, k) {
-  _ = x[k]
-}
+import future.keywords.in
 
 ssl_enabled(hook) {
-    has_key(hook.config, "insecure_ssl")
+    "insecure_ssl" in object.keys(hook.config)
     hook.config.insecure_ssl == "0"
 }
 
 has_secret(hook) {
-    has_key(hook.config, "secret")
+    "secret" in object.keys(hook.config)
 }
