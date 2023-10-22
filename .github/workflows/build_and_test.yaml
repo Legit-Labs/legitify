@@ -27,3 +27,16 @@ jobs:
         run: go test -count=1 -shuffle=on -timeout=10m -race $(go list ./... | grep -vE '^github.com/Legit-Labs/legitify/e2e')
       - name: Vet
         run: go vet -v ./...
+  check_rego:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: open-policy-agent/setup-opa@v2
+        with:
+          version: v0.55.0
+      - uses: styrainc/setup-regal@v0.2.0
+        with:
+          version: v0.11.0
+      - run: opa check --strict policies/github
+      - run: opa check --strict policies/gitlab
+      - run: regal lint --format=github policies

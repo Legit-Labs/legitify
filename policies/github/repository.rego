@@ -11,9 +11,9 @@ import data.common.webhooks as webhookUtils
 #   severity: HIGH
 #   requiredScopes: [repo]
 #   threat: As new vulnerabilities are found over time, unmaintained repositories are more likely to point to dependencies that have known vulnerabilities, exposing these repositories to 1-day attacks.
-default repository_not_maintained = true
+default repository_not_maintained := true
 
-repository_not_maintained = false {
+repository_not_maintained := false {
 	not input.repository.is_archived
 	not is_null(input.repository.pushed_at)
 	ns := time.parse_rfc3339_ns(input.repository.pushed_at)
@@ -33,12 +33,12 @@ repository_not_maintained = false {
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the repository settings page, Press "Collaborators and teams", Select the unwanted admin users, Select "Change Role"]
 #   requiredScopes: [read:org,repo]
-#   threat: 
+#   threat:
 #     - "A compromised user with admin permissions can initiate a supply chain attack in a plethora of ways."
 #     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past."
-default repository_has_too_many_admins = true
+default repository_has_too_many_admins := true
 
-repository_has_too_many_admins = false {
+repository_has_too_many_admins := false {
 	admins := [admin | admin := input.collaborators[_]; admin.permissions.admin]
 	count(admins) <= 3
 }
@@ -52,10 +52,10 @@ repository_has_too_many_admins = false {
 #   severity: LOW
 #   remediationSteps: [Make sure you can manage webhooks for the repository, Go to the repository settings page, Select "Webhooks", Press on the insecure webhook, Confiure a secret, Click "Update webhook"]
 #   requiredScopes: [read:repo_hook, repo]
-#   threat: 
+#   threat:
 #     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
 #     - "This allows attackers to masquerade as your repository, potentially creating an unstable or insecure state in other systems."
-repository_webhook_no_secret[violated] = true {
+repository_webhook_no_secret[violated] := true {
 	some index
 	hook := input.hooks[index]
 	not webhookUtils.has_secret(hook)
@@ -77,7 +77,7 @@ repository_webhook_no_secret[violated] = true {
 #   threat:
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
 #     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
-repository_webhook_doesnt_require_ssl[violated] = true {
+repository_webhook_doesnt_require_ssl[violated] := true {
 	some index
 	hook := input.hooks[index]
 	not webhookUtils.ssl_enabled(hook)
@@ -96,15 +96,11 @@ repository_webhook_doesnt_require_ssl[violated] = true {
 #   severity: LOW
 #   requiredScopes: [read:org]
 #   threat: Forked repositories cause more code and secret sprawl in the organization as forks are independent copies of the repository and need to be tracked separately, making it more difficult to keep track of sensitive assets and contain potential incidents.
-default forking_allowed_for_repository = true
+default forking_allowed_for_repository := true
 
-forking_allowed_for_repository = false {
+forking_allowed_for_repository := false {
 	input.repository.is_private == true
 	input.repository.allow_forking == false
-}
-
-is_null(x) {
-	x == null
 }
 
 # METADATA
@@ -117,13 +113,13 @@ is_null(x) {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Any contributor with write access may push potentially dangerous code to this repository, making it easier to compromise and difficult to audit.
-default missing_default_branch_protection = true
+default missing_default_branch_protection := true
 
-missing_default_branch_protection = false {
+missing_default_branch_protection := false {
 	not is_null(input.repository.default_branch.branch_protection_rule)
 }
 
-missing_default_branch_protection = false {
+missing_default_branch_protection := false {
     some index
     rule := input.rules_set[index]
     rule.type == "pull_request"
@@ -146,12 +142,13 @@ missing_default_branch_protection = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
-default missing_default_branch_protection_deletion = true
-missing_default_branch_protection_deletion = false {
+default missing_default_branch_protection_deletion := true
+
+missing_default_branch_protection_deletion := false {
 	not input.repository.default_branch.branch_protection_rule.allows_deletions
 }
 
-missing_default_branch_protection_deletion = false {
+missing_default_branch_protection_deletion := false {
     some index
     rule := input.rules_set[index]
     rule.type == "deletions"
@@ -167,13 +164,13 @@ missing_default_branch_protection_deletion = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
-default missing_default_branch_protection_force_push = true
+default missing_default_branch_protection_force_push := true
 
-missing_default_branch_protection_force_push = false {
+missing_default_branch_protection_force_push := false {
 	not input.repository.default_branch.branch_protection_rule.allows_force_pushes
 }
 
-missing_default_branch_protection_force_push = false {
+missing_default_branch_protection_force_push := false {
     some index
     rule := input.rules_set[index]
     rule.type == "non_fast_forward"
@@ -189,13 +186,13 @@ missing_default_branch_protection_force_push = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
-default requires_status_checks = true
+default requires_status_checks := true
 
-requires_status_checks = false {
+requires_status_checks := false {
 	input.repository.default_branch.branch_protection_rule.requires_status_checks
 }
 
-requires_status_checks = false {
+requires_status_checks := false {
     some index
     rule := input.rules_set[index]
     rule.type == "required_status_checks"
@@ -212,14 +209,14 @@ requires_status_checks = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Required status checks may be failing on the latest version after passing on an earlier version of the code, making it easy to commit buggy or otherwise insecure code.
-default requires_branches_up_to_date_before_merge = true
+default requires_branches_up_to_date_before_merge := true
 
-requires_branches_up_to_date_before_merge = false {
+requires_branches_up_to_date_before_merge := false {
 	input.repository.default_branch.branch_protection_rule.requires_status_checks
 	input.repository.default_branch.branch_protection_rule.requires_strict_status_checks
 }
 
-requires_branches_up_to_date_before_merge = false {
+requires_branches_up_to_date_before_merge := false {
     some index
     rule := input.rules_set[index]
     rule.type == "required_status_checks"
@@ -237,13 +234,13 @@ requires_branches_up_to_date_before_merge = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Buggy or insecure code may be committed after approval and will reach the main branch without review. Alternatively, an attacker can attempt a just-in-time attack to introduce dangerous code just before merge.
-default dismisses_stale_reviews = true
+default dismisses_stale_reviews := true
 
-dismisses_stale_reviews = false {
+dismisses_stale_reviews := false {
 	input.repository.default_branch.branch_protection_rule.dismisses_stale_reviews
 }
 
-dismisses_stale_reviews = false {
+dismisses_stale_reviews := false {
     some index
 	rule := input.rules_set[index]
 	rule.type == "pull_request"
@@ -260,13 +257,13 @@ dismisses_stale_reviews = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: Users can merge code without being reviewed, which can lead to insecure code reaching the main branch and production.
-default code_review_not_required = true
+default code_review_not_required := true
 
-code_review_not_required = false {
+code_review_not_required := false {
 	input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 1
 }
 
-code_review_not_required = false {
+code_review_not_required := false {
     some index
 	rule := input.rules_set[index]
 	rule.type == "pull_request"
@@ -286,13 +283,13 @@ code_review_not_required = false {
 #   threat:
 #     - "Users can merge code without being reviewed, which can lead to insecure code reaching the main branch and production."
 #     - "Requiring code review by at least two reviewers further decreases the risk of an insider threat (as merging code requires compromising at least 2 identities with write permissions), and decreases the likelihood of human error in the review process."
-default code_review_by_two_members_not_required = true
+default code_review_by_two_members_not_required := true
 
-code_review_by_two_members_not_required = false {
+code_review_by_two_members_not_required := false {
 	 input.repository.default_branch.branch_protection_rule.required_approving_review_count >= 2
 }
 
-code_review_by_two_members_not_required = false {
+code_review_by_two_members_not_required := false {
     some index
 	rule := input.rules_set[index]
 	rule.type == "pull_request"
@@ -309,13 +306,13 @@ code_review_by_two_members_not_required = false {
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
 #   threat: A pull request may be approved by any contributor with write access. Specifying specific code owners can ensure review is only done by individuals with the correct expertise required for the review of the changed files, potentially preventing bugs and security risks.
-default code_review_not_limited_to_code_owners = true
+default code_review_not_limited_to_code_owners := true
 
-code_review_not_limited_to_code_owners = false {
+code_review_not_limited_to_code_owners := false {
 	input.repository.default_branch.branch_protection_rule.requires_code_owner_reviews
 }
 
-code_review_not_limited_to_code_owners = false {
+code_review_not_limited_to_code_owners := false {
     some index
 	rule := input.rules_set[index]
 	rule.type == "pull_request"
@@ -332,13 +329,13 @@ code_review_not_limited_to_code_owners = false {
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
 #    threat: Having a non-linear history makes it harder to reverse changes, making recovery from bugs and security risks slower and more difficult.
-default non_linear_history = true
+default non_linear_history := true
 
-non_linear_history = false {
+non_linear_history := false {
 	input.repository.default_branch.branch_protection_rule.requires_linear_history
 }
 
-non_linear_history = false {
+non_linear_history := false {
     some index
 	rule := input.rules_set[index]
 	rule.type == "required_linear_history"
@@ -354,13 +351,13 @@ non_linear_history = false {
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
 #    threat: Allowing the merging of code without resolving all conversations can promote poor and vulnerable code, as important comments may be forgotten or deliberately ignored when the code is merged.
-default no_conversation_resolution = true
+default no_conversation_resolution := true
 
-no_conversation_resolution = false {
+no_conversation_resolution := false {
 	input.repository.default_branch.branch_protection_rule.requires_conversation_resolution
 }
 
-no_conversation_resolution = false {
+no_conversation_resolution := false {
     some index
 	rule := input.rules_set[index]
 	rule.type == "pull_request"
@@ -377,13 +374,13 @@ no_conversation_resolution = false {
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
 #    threat: A commit containing malicious code may be crafted by a malicious actor that has acquired write access to the repository to initiate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
-default no_signed_commits = true
+default no_signed_commits := true
 
-no_signed_commits = false {
+no_signed_commits := false {
 	input.repository.default_branch.branch_protection_rule.requires_commit_signatures
 }
 
-no_signed_commits = false {
+no_signed_commits := false {
     some index
 	rule := input.rules_set[index]
 	rule.type == "required_signatures"
@@ -399,10 +396,10 @@ no_signed_commits = false {
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
 #    threat: Allowing the dismissal of reviews can promote poor and vulnerable code, as important comments may be forgotten and ignored during the review process.
-default review_dismissal_allowed = true
+default review_dismissal_allowed := true
 
-review_dismissal_allowed = false {
-	input.repository.default_branch.branch_protection_rule.restricts_review_dismissals 
+review_dismissal_allowed := false {
+	input.repository.default_branch.branch_protection_rule.restricts_review_dismissals
 }
 
 # METADATA
@@ -415,14 +412,14 @@ review_dismissal_allowed = false {
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
 #    threat: An attacker with write credentials may introduce vulnerabilities to your code without your knowledge. Alternatively, contributors may commit unsafe code that is buggy or easy to exploit that could have been caught using a review process.
-default pushes_are_not_restricted = true
+default pushes_are_not_restricted := true
 
-pushes_are_not_restricted = false {
+pushes_are_not_restricted := false {
 	not code_review_not_required
 }
 
-pushes_are_not_restricted = false {
-	input.repository.default_branch.branch_protection_rule.restricts_pushes 
+pushes_are_not_restricted := false {
+	input.repository.default_branch.branch_protection_rule.restricts_pushes
 }
 
 # METADATA
@@ -434,11 +431,11 @@ pushes_are_not_restricted = false {
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   threat: An open source vulnerability may be affecting your code without your knowledge, making it vulnerable to exploitation.
-default vulnerability_alerts_not_enabled = true
+default vulnerability_alerts_not_enabled := true
 
-vulnerability_alerts_not_enabled = false {
+vulnerability_alerts_not_enabled := false {
 	# deliberately ignoring nil value (in case this data is unavailable)
-	input.vulnerability_alerts_enabled 
+	input.vulnerability_alerts_enabled
 }
 
 # METADATA
@@ -450,9 +447,9 @@ vulnerability_alerts_not_enabled = false {
 #    severity: MEDIUM
 #    requiredScopes: [repo]
 #    threat: A contributor may add vulnerable third-party dependencies to the repository, introducing vulnerabilities to your application that will only be detected after merge.
-default ghas_dependency_review_not_enabled = true
+default ghas_dependency_review_not_enabled := true
 
-ghas_dependency_review_not_enabled = false {
+ghas_dependency_review_not_enabled := false {
 	input.dependency_graph_manifests.total_count > 0
 }
 
@@ -467,9 +464,9 @@ ghas_dependency_review_not_enabled = false {
 #    requiredScopes: [repo, read:repo_hook]
 #    prerequisites: [scorecard_enabled]
 #    threat: A low Scorecard score can indicate that the repository is more vulnerable to attack than others, making it a prime attack target.
-default scorecard_score_too_low = true
+default scorecard_score_too_low := true
 
-scorecard_score_too_low = false {
+scorecard_score_too_low := false {
 	input.scorecard.score > 7.0
 }
 
@@ -489,9 +486,9 @@ scorecard_score_too_low = false {
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
 #   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
-default token_default_permissions_is_read_write = true
+default token_default_permissions_is_read_write := true
 
-token_default_permissions_is_read_write = false {
+token_default_permissions_is_read_write := false {
 	input.actions_token_permissions.default_workflow_permissions == "read"
 }
 
@@ -511,8 +508,8 @@ token_default_permissions_is_read_write = false {
 #   severity: HIGH
 #   requiredScopes: [admin:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
-default actions_can_approve_pull_requests = true
+default actions_can_approve_pull_requests := true
 
-actions_can_approve_pull_requests = false{
+actions_can_approve_pull_requests := false{
 	not input.actions_token_permissions.can_approve_pull_request_reviews
 }
