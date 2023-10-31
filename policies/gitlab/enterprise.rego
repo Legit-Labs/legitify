@@ -15,9 +15,9 @@ package enterprise
 #     - Expand "Sign-in restrictions" section
 #     - Toggle "Two-factor authentication"
 #     - Press "Save Changes"
-default require_two_factor_authentication_not_globally_enforced = true
+default require_two_factor_authentication_not_globally_enforced := true
 
-require_two_factor_authentication_not_globally_enforced = false {
+require_two_factor_authentication_not_globally_enforced := false {
 	input.require_two_factor_authentication
 }
 
@@ -35,9 +35,9 @@ require_two_factor_authentication_not_globally_enforced = false {
 #     - Expand "Sign-in restrictions" section
 #     - Un toggle "Allow password authentication for Git over HTTP(S)"
 #     - Press "Save Changes"
-default password_authentication_enabled_for_git_is_enabled = true
+default password_authentication_enabled_for_git_is_enabled := true
 
-password_authentication_enabled_for_git_is_enabled = false {
+password_authentication_enabled_for_git_is_enabled := false {
 	not input.password_authentication_enabled_for_git
 }
 
@@ -55,9 +55,9 @@ password_authentication_enabled_for_git_is_enabled = false {
 #     - Expand "User and IP rate limit" section
 #     - Toggle "Enable authenticated API request rate limit
 #     - Press "Save Changes"
-default throttle_authenticated_api_not_enabled = true
+default throttle_authenticated_api_not_enabled := true
 
-throttle_authenticated_api_not_enabled = false {
+throttle_authenticated_api_not_enabled := false {
 	input.throttle_authenticated_api_enabled
 }
 
@@ -75,9 +75,9 @@ throttle_authenticated_api_not_enabled = false {
 #     - Expand "Default Branch" section
 #     - Toggle "Fully protected"
 #     - Press "Save Changes"
-default default_branch_protection_not_globally_enforced = true
+default default_branch_protection_not_globally_enforced := true
 
-default_branch_protection_not_globally_enforced = false {
+default_branch_protection_not_globally_enforced := false {
 	input.default_branch_protection > 0
 }
 
@@ -96,9 +96,9 @@ default_branch_protection_not_globally_enforced = false {
 #     - Expand "Visibility and access controls" section
 #     - Under "Restricted visibility levels" toggle "Public"
 #     - Press "Save Changes"
-default all_users_are_allowed_to_create_public_projects = true
+default all_users_are_allowed_to_create_public_projects := true
 
-all_users_are_allowed_to_create_public_projects = false {
+all_users_are_allowed_to_create_public_projects := false {
 	public := [rule | rule := input.restricted_visibility_levels[_]; rule == "public"]
 	count(public) > 0
 }
@@ -117,9 +117,9 @@ all_users_are_allowed_to_create_public_projects = false {
 #     - Expand "Visibility and access controls" section
 #     - Under "Default group visibility" toggle "Private"
 #     - Press "Save Changes"
-default default_group_visibility_is_public = true
+default default_group_visibility_is_public := true
 
-default_group_visibility_is_public = false {
+default_group_visibility_is_public := false {
 	not input.default_group_visibility == "public"
 }
 
@@ -137,9 +137,9 @@ default_group_visibility_is_public = false {
 #     - Expand "Visibility and access controls" section
 #     - Under "Default project visibility" toggle "Private"
 #     - Press "Save Changes"
-default default_project_visibility_is_public = true
+default default_project_visibility_is_public := true
 
-default_project_visibility_is_public = false {
+default_project_visibility_is_public := false {
 	not input.default_project_visibility == "public"
 }
 
@@ -157,9 +157,9 @@ default_project_visibility_is_public = false {
 #     - Expand "Sign-up restrictions" section
 #     - Toggle "Send confirmation email on sign-up"
 #     - Press "Save Changes"
-default send_user_confirmation_email_not_enabled = true
+default send_user_confirmation_email_not_enabled := true
 
-send_user_confirmation_email_not_enabled = false {
+send_user_confirmation_email_not_enabled := false {
 	input.send_user_confirmation_email
 }
 
@@ -177,9 +177,9 @@ send_user_confirmation_email_not_enabled = false {
 #     - Expand "User and IP rate limit" section
 #     - Toggle "Enable unauthenticated API request rate limit" and "Enable unauthenticated web request rate limit"
 #     - Press "Save Changes"
-default throttle_unauthenticated_request_not_enabled = true
+default throttle_unauthenticated_request_not_enabled := true
 
-throttle_unauthenticated_request_not_enabled = false {
+throttle_unauthenticated_request_not_enabled := false {
     input.throttle_unauthenticated_api_enabled
     input.throttle_unauthenticated_web_enabled
 }
@@ -199,9 +199,9 @@ throttle_unauthenticated_request_not_enabled = false {
 #     - Expand "Outbound requests" section
 #     - Un toggle "Allow requests to the local network from web hooks and services"
 #     - Press "Save Changes"
-default webhooks_are_allowed_to_be_sent_to_local_network = true
+default webhooks_are_allowed_to_be_sent_to_local_network := true
 
-webhooks_are_allowed_to_be_sent_to_local_network = false {
+webhooks_are_allowed_to_be_sent_to_local_network := false {
     not input.allow_local_requests_from_web_hooks_and_services
 }
 
@@ -217,8 +217,8 @@ webhooks_are_allowed_to_be_sent_to_local_network = false {
 #     - Expand "Sign-up restrictions" section
 #     - Un toggle "Sign-up enabled"
 #     - Press "Save Changes"
-default unauthenticated_signup_enabled = true
+default unauthenticated_signup_enabled := true
 
-unauthenticated_signup_enabled = false {
+unauthenticated_signup_enabled := false {
     not input.signup_enabled
 }

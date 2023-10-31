@@ -14,16 +14,16 @@ package organization
 #     - Press "Save Changes"
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
-default two_factor_authentication_not_required_for_group = true
+default two_factor_authentication_not_required_for_group := true
 
-two_factor_authentication_not_required_for_group = false {
+two_factor_authentication_not_required_for_group := false {
 	input.require_two_factor_authentication
 }
 
 # METADATA
 # scope: rule
 # title: Forking of Repositories to External Namespaces Should Be Disabled.
-# description: The ability to fork project to external namespaces is turned on. Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork. 
+# description: The ability to fork project to external namespaces is turned on. Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
 # custom:
 #   severity: MEDIUM
 #   remediationSteps:
@@ -33,9 +33,9 @@ two_factor_authentication_not_required_for_group = false {
 #     - "Select Save changes"
 #   threat:
 #     - Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
-default collaborators_can_fork_repositories_to_external_namespaces = true
+default collaborators_can_fork_repositories_to_external_namespaces := true
 
-collaborators_can_fork_repositories_to_external_namespaces = false {
+collaborators_can_fork_repositories_to_external_namespaces := false {
 	input.prevent_forking_outside_group
 }
 
@@ -54,7 +54,7 @@ collaborators_can_fork_repositories_to_external_namespaces = false {
 #   threat:
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
 #     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
-organization_webhook_doesnt_require_ssl[violation] = true {
+organization_webhook_doesnt_require_ssl[violation] := true {
 	some index
 	hook := input.hooks[index]
 	hook.enable_ssl_verification == false
@@ -76,8 +76,8 @@ organization_webhook_doesnt_require_ssl[violation] = true {
 #   threat:
 #     - A developer creates a repository without any branch protection rules
 #     - Attacker that get access to the repository can modify its main branch without any restrictions
-default group_does_not_enforce_branch_protection_by_default = true
+default group_does_not_enforce_branch_protection_by_default := true
 
-group_does_not_enforce_branch_protection_by_default = false {
+group_does_not_enforce_branch_protection_by_default := false {
 	input.default_branch_protection > 0
 }
