@@ -11,10 +11,10 @@ import data.common.webhooks as webhookUtils
 #   severity: LOW
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Select "Webhooks", Press on the insecure webhook, Configure a secret , Click "Update webhook"]
 #   requiredScopes: [admin:org_hook]
-#   threat: 
+#   threat:
 #     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
 #     - "This allows attackers to masquerade as your organization, potentially creating an unstable or insecure state in other systems."
-organization_webhook_no_secret[violated] = true {
+organization_webhook_no_secret[violated] := true {
 	some index
 	hook := input.hooks[index]
 	not webhookUtils.has_secret(hook)
@@ -36,7 +36,7 @@ organization_webhook_no_secret[violated] = true {
 #   threat:
 #     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
 #     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
-organization_webhook_doesnt_require_ssl[violated] = true {
+organization_webhook_doesnt_require_ssl[violated] := true {
 	some index
 	hook := input.hooks[index]
 	not webhookUtils.ssl_enabled(hook)
@@ -56,9 +56,9 @@ organization_webhook_doesnt_require_ssl[violated] = true {
 #   requiredScopes: [admin:org]
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
-default two_factor_authentication_not_required_for_org = true
+default two_factor_authentication_not_required_for_org := true
 
-two_factor_authentication_not_required_for_org = false {
+two_factor_authentication_not_required_for_org := false {
 	input.organization.two_factor_requirement_enabled
 }
 
@@ -73,9 +73,9 @@ two_factor_authentication_not_required_for_org = false {
 #   requiredScopes: [read:org]
 #   threat:
 #     - "A member of the organization could inadvertently or maliciously make public an internal repository exposing confidential data."
-default non_admins_can_create_public_repositories = true
+default non_admins_can_create_public_repositories := true
 
-non_admins_can_create_public_repositories = false {
+non_admins_can_create_public_repositories := false {
 	not input.organization.members_can_create_public_repositories
 }
 
@@ -89,9 +89,9 @@ non_admins_can_create_public_repositories = false {
 #   requiredScopes: [read:enterprise]
 #   threat:
 #     - "Organization members can see the content of freshly created repositories, even if they should be restricted."
-default default_repository_permission_is_not_none = true
+default default_repository_permission_is_not_none := true
 
-default_repository_permission_is_not_none = false {
+default_repository_permission_is_not_none := false {
 	input.organization.default_repository_permission == "none"
 }
 
@@ -105,8 +105,8 @@ default_repository_permission_is_not_none = false {
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Enter "Authentication security" tab, Toggle on "Enable SAML authentication", Fill in the remaining SSO configuration as instructed on the screen, Click "Save"]
 #   requiredScopes: [admin:org]
 #   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions accross different systems, prevents the organization from defining a common password policy, and makes it challenging to audit different aspects of the user's behavior.
-default organization_not_using_single_sign_on = true
+default organization_not_using_single_sign_on := true
 
-organization_not_using_single_sign_on = false {
+organization_not_using_single_sign_on := false {
 	input.saml_enabled
 }
