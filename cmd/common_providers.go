@@ -92,5 +92,5 @@ func provideContext(client Client, args *args) (context.Context, error) {
 }
 
 func provideGPTAnalyzer(context context.Context, args *args) *gpt.Analyzer {
-	return gpt.NewAnalyzer(context, args.OpenAIToken)
+	return gpt.NewAnalyzer(context, args.OpenAIToken, args.OpenAIGptModel)
 }

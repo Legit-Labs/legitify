@@ -20,6 +20,7 @@ import (
 type Analyzer struct {
 	context   context.Context
 	gptClient *gogpt.Client
+	gptModel  string
 }
 
 type Result struct {
@@ -28,10 +29,11 @@ type Result struct {
 	GPTResult  string
 }
 
-func NewAnalyzer(ctx context.Context, gptToken string) *Analyzer {
+func NewAnalyzer(ctx context.Context, gptToken string, gptModel string) *Analyzer {
 	return &Analyzer{
 		context:   ctx,
 		gptClient: gogpt.NewClient(gptToken),
+		gptModel:  gptModel,
 	}
 }
 
@@ -109,7 +111,7 @@ func (a *Analyzer) Analyze(dataChannel <-chan collectors.CollectedData) chan Res
 				prompt := generatePrompt(raw, entityType)
 
 				requestOptions := gogpt.CompletionRequest{
-					Model:  gogpt.GPT3TextDavinci003,
+					Model:  a.gptModel,
 					Prompt: prompt,
 					// Temperature sets how much freedom GPT-3 API has to introduce randomness in the response
 					// 1.0 means maximum freedom

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	gogpt "github.com/sashabaranov/go-openai"
 
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
@@ -16,6 +17,7 @@ func init() {
 var analyzeGptArgs args
 
 const argOpenAiToken = "openai_token"
+const argOpenAiGptModel = "model"
 
 func newAnalyzeGptCommand() *cobra.Command {
 	analyzeCmd := &cobra.Command{
@@ -32,6 +34,7 @@ func newAnalyzeGptCommand() *cobra.Command {
 	flags.StringSliceVarP(&analyzeGptArgs.Organizations, argOrg, "", nil, "specific organizations to collect")
 	flags.StringSliceVarP(&analyzeGptArgs.Repositories, argRepository, "", nil, "specific repositories to collect (--repo owner/repo_name (e.g. ossf/scorecard)")
 	flags.StringVarP(&analyzeGptArgs.OpenAIToken, argOpenAiToken, "", "", "token to authenticate with openai API")
+	flags.StringVarP(&analyzeGptArgs.OpenAIGptModel, argOpenAiGptModel, "", gogpt.GPT3TextDavinci003, "gpt-model to use")
 	viper.AutomaticEnv()
 
 	return analyzeCmd
