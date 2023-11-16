@@ -7,9 +7,11 @@ import (
 
 	"github.com/Legit-Labs/legitify/internal/analyzers"
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	"github.com/Legit-Labs/legitify/internal/common/utils"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	sc "github.com/Legit-Labs/legitify/internal/scorecard"
+	"github.com/iancoleman/orderedmap"
 	"github.com/ossf/scorecard/v4/checker"
 	docs "github.com/ossf/scorecard/v4/docs/checks"
 )
@@ -44,10 +46,28 @@ func (e *scorecardEnricher) Enrich(ctx context.Context, data analyzers.AnalyzedD
 }
 
 func (e *scorecardEnricher) Parse(data interface{}) (Enrichment, error) {
-	if val, ok := data.([]ScorecardCheck); !ok {
-		return nil, fmt.Errorf("expecting []ScorecardCheck")
+	if val, ok := data.([]interface{}); !ok {
+		return nil, fmt.Errorf("scorecard enricher: expecting []map[string]string, found %T", data)
 	} else {
-		return ScorecardEnrichment(val), nil
+		result := []ScorecardCheck{}
+		casted := slice_utils.CastInterfaces[orderedmap.OrderedMap](val)
+		for _, m := range casted {
+			reason, _ := m.Get("Reason")
+			url, _ := m.Get("DocsUrl")
+			details, _ := m.Get("Details")
+			detailsCasted, _ := details.([]string)
+			reasonCasted, _ := reason.(string)
+			urlCasted, _ := url.(string)
+
+			check := ScorecardCheck{
+				Reason:  reasonCasted,
+				DocsUrl: urlCasted,
+				Details: detailsCasted,
+			}
+			result = append(result, check)
+		}
+
+		return ScorecardEnrichment(result), nil
 	}
 }
 
