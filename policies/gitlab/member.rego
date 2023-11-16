@@ -13,9 +13,9 @@ package member
 #     - Select "Account" on the left navigation bar
 #     - Press "Enable two-factor authentication"
 #   threat: Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password.
-default two_factor_authentication_is_disabled_for_a_collaborator = true
+default two_factor_authentication_is_disabled_for_a_collaborator := true
 
-two_factor_authentication_is_disabled_for_a_collaborator = false {
+two_factor_authentication_is_disabled_for_a_collaborator := false {
 	input.two_factor_enabled
 }
 
@@ -31,13 +31,13 @@ two_factor_authentication_is_disabled_for_a_collaborator = false {
 #     - Go to the user settings page
 #     - Select "Account" on the left navigation bar
 #     - Press "Enable two-factor authentication"
-#   threat: 
+#   threat:
 #     - "Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password."
 #     - "This is doubly important for external collaborators, as these are identities that aren't likely managed by you or your organization and may be easier to compromise."
-default two_factor_authentication_is_disabled_for_an_external_collaborator = true
+default two_factor_authentication_is_disabled_for_an_external_collaborator := true
 
-two_factor_authentication_is_disabled_for_an_external_collaborator = false {
-	input.external 
+two_factor_authentication_is_disabled_for_an_external_collaborator := false {
+	input.external
 	input.two_factor_enabled
 }
 
@@ -53,9 +53,9 @@ two_factor_authentication_is_disabled_for_an_external_collaborator = false {
 #     - Find the stale admin and either delete of block it
 #   threat:
 #     - "Stale admins are most likely not managed and monitored, increasing the possibility of being compromised."
-default stale_admin_found = true
+default stale_admin_found := true
 
-stale_admin_found = false {
+stale_admin_found := false {
 	input.is_admin == true
 	not is_null(input.last_sign_in_at)
 	ns := time.parse_rfc3339_ns(input.last_sign_in_at)
@@ -68,8 +68,4 @@ isStale(target_last_active, count_months) {
 
 	# diff[1] the months index
 	diff[1] >= count_months
-}
-
-is_null(x) {
-	x == null
 }

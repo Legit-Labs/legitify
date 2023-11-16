@@ -1,0 +1,23 @@
+rules:
+  idiomatic:
+    no-defined-entrypoint:
+      # OK to ignore for libraries
+      level: ignore
+  style:
+    file-length:
+      # Override default of 500 as one file has 515 lines
+      max-file-length: 550
+    line-length:
+      # Violations here mostly from metadata annotation values.
+      # These could be fixed by using |> and newlines, but we'll
+      # ignore this for now.
+      level: ignore
+    opa-fmt:
+      # Would mostly changes spaces -> tabs. Safe to ignore.
+      level: ignore
+    prefer-snake-case:
+      # Only a few violations here, so this would be easy to fix.
+      level: ignore
+    prefer-some-in-iteration:
+      # This is mostly a style preference, so safe to ignore.
+      level: ignore
