@@ -142,8 +142,6 @@ jobs:
   release:
     needs: macos_sign
     runs-on: ubuntu-latest
-    outputs:
-      brew_release_file: ${{ steps.artifact_name.outputs.brew_release_file }}
     permissions:
       actions: read # To read the workflow path.
       id-token: write # To sign the provenance.
@@ -170,25 +168,6 @@ jobs:
         # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}/*
-      - name: brew-inputs
-        id: artifact_name
-        run: |
-          set -euo pipefail
-          echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
-          cd "${{ env.ARTIFACTS_DOWNLOAD_PATH }}"
-          darwin_intel_file_name=$(find . -maxdepth 1 -type f -name "*darwin_amd64*" -exec basename {} \;)
-          darwin_intel_sha="$(shasum -a 256 $darwin_intel_file_name | awk '{printf $1}')"
-          echo "brew_intel_files_sha=$darwin_intel_sha" >> $GITHUB_OUTPUT
-          darwin_arm_file_name=$(find . -maxdepth 1 -type f -name "*darwin_arm64*" -exec basename {} \;)
-          darwin_arm_sha="$(shasum -a 256 $darwin_arm_file_name | awk '{printf $1}')"
-          echo "brew_arm_files_sha=$darwin_arm_sha" >> $GITHUB_OUTPUT
-      - name: update brew formula
-        env: 
-          # Required token to create a pull request in the tap repository 
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
-          GITHUB_USER: ${{ secrets.HOMEBREW_TAP_GITHUB_USER }}
-        run: |
-          python3 scripts/gen-brew-multi-arch.py ${{ steps.artifact_name.outputs.version }} ${{ steps.artifact_name.outputs.brew_arm_files_sha }} ${{ steps.artifact_name.outputs.brew_intel_files_sha }}
   provenance:
     needs: macos_sign
     permissions:
