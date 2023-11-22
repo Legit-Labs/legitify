@@ -23,7 +23,6 @@ Installation is possible in several ways:
 
 - For macOS (or linux) using homebrew:
 ```
-brew tap legit-labs/legit-labs
 brew install legitify
 ```
 
