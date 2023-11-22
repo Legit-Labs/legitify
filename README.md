@@ -13,6 +13,13 @@
 Strengthen the security posture of your source-code management! <br/>
 Detect and remediate misconfigurations, security and compliance issues across all your GitHub and GitLab assets with ease 🔥 <br/>
  by [Legit Security](https://www.legitsecurity.com/).
+
+<b>
+Wonder what Legit Security do?
+</b> 
+
+We do ASPM and software supply chain security, for more information checkout the [comparison table](#legit-platform-vs-legitify) 
+
 </div>
 
 https://user-images.githubusercontent.com/107790206/210602039-2d022692-87ea-4005-b9c6-f091158de3ce.mov
@@ -270,8 +277,6 @@ legitify comes with a set of policies for each SCM in the `policies/` directory.
 
 These policies are documented [here](https://legitify.dev).
 
-In addition, you can use the `--policies-path (-p)` flag to specify a custom directory for OPA policies.
-
 ## Contribution
 
 Thank you for considering contributing to Legitify! We encourage and appreciate any kind of contribution.
@@ -281,3 +286,14 @@ Here are some resources to help you get started:
 - [Code of Conduct](https://github.com/Legit-Labs/legitify/blob/main/CODE_OF_CONDUCT.md)
 - [Open an Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
 - [Open a Pull Request](https://github.com/Legit-Labs/legitify/compare)
+
+## Legit Platform vs Legitify
+
+| | **Legit**| **Legitify**|
+|------------|----------|-------------|
+| Supported Platforms| ALL SCM's<br> CI <br> CD <br> Package Registries| GitHub cloud & server <br> Gitlab cloud & server|
+|Issue Types| Misconfigurations <br> Pipelines <br> Secrets <br> IAC | Misconfigurations|
+| Issue & Policy Management| Yes| No|
+| Alerts on policy drifts| Yes| No|
+| AppSec Orchestration | Yes| No |
+| Workspaces and enterprise needs| Yes | No |
