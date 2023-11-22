@@ -15,10 +15,10 @@ Detect and remediate misconfigurations, security and compliance issues across al
  by [Legit Security](https://www.legitsecurity.com/).
 
 <b>
-Wonder what Legit Security do?
+Wonder what Legit Security does?
 </b> 
 
-We do ASPM and software supply chain security, for more information checkout the [comparison table](#legit-platform-vs-legitify) 
+We do ASPM and software supply chain security, for more information check out the [comparison table](#legit-platform-vs-legitify) 
 
 </div>
 
