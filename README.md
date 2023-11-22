@@ -287,13 +287,19 @@ Here are some resources to help you get started:
 - [Open an Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
 - [Open a Pull Request](https://github.com/Legit-Labs/legitify/compare)
 
-## Legit Platform vs Legitify
+## Legit vs Legitify
 
 | | **Legit**| **Legitify**|
 |------------|----------|-------------|
 | Supported Platforms| ALL SCM's<br> CI <br> CD <br> Package Registries| GitHub cloud & server <br> Gitlab cloud & server|
-|Issue Types| Misconfigurations <br> Pipelines <br> Secrets <br> IAC | Misconfigurations|
+| Issue Types| Misconfigurations <br> Pipelines <br> Secrets <br> IAC | Misconfigurations|
 | Issue & Policy Management| Yes| No|
-| Alerts on policy drifts| Yes| No|
+| Policy drifts| Yes| No |
 | AppSec Orchestration | Yes| No |
-| Workspaces and enterprise needs| Yes | No |
+| Workspaces & Enterprise needs| Yes | No |
+| Ticketing & Alerting| Yes | No |
+
+<div align="center">
+<img width="250" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
+</div>
+
