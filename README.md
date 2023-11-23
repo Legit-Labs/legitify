@@ -18,7 +18,7 @@ Detect and remediate misconfigurations, security and compliance issues across al
 Wonder what Legit Security does?
 </b> 
 
-We do ASPM and software supply chain security, for more information check out the [comparison table](#legit-platform-vs-legitify) 
+We do ASPM and software supply chain security, for more information check out the [comparison table](#legitify-vs-the-legit-security-platform) 
 
 </div>
 
@@ -287,7 +287,9 @@ Here are some resources to help you get started:
 - [Open an Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
 - [Open a Pull Request](https://github.com/Legit-Labs/legitify/compare)
 
-## Legit vs Legitify
+## Legitify vs the Legit Security platform
+
+Legit security protects your software supply chain from attacks and provides an Application Security Posture Management (ASPM) platform which helps organizations manage and prove secure application delivery from code to the cloud (runtime). It is a SaaS solution for enterprises that simplifies and boosts an organization's AppSec program.
 
 | | **Legit**| **Legitify**|
 |------------|----------|-------------|
@@ -300,6 +302,8 @@ Here are some resources to help you get started:
 | Ticketing & Alerting| Yes | No |
 
 <div align="center">
-<img width="250" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
+ <a href="https://www.legitsecurity.com">
+  <img width="250" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
+ </a>
 </div>
 
