@@ -1,7 +1,8 @@
 <div align="center">
  <a href="https://www.legitsecurity.com">
   <img width="100" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
-
+ </a>
+</div>
 <div align="center">
  
 [![Build & Test](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_test.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_test.yaml)
