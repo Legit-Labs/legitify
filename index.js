@@ -10,6 +10,12 @@ const { context, getOctokit } = require("@actions/github");
 const artifact = require("@actions/artifact");
 const { exit } = require("process");
 
+const logoMarkdown = ```<div align="center">
+<a href="https://www.legitsecurity.com">
+ <img width="100" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
+ </a>
+</div>```
+
 async function uploadErrorLog() {
   const fileName = "error.log";
   try {
@@ -88,6 +94,7 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     console.log("execute legitify convert markdown:", convertMarkdownArgs)
     await exec.exec('"./legitify"', convertMarkdownArgs, options)
     if (isPrivate) {
+      fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, logoMarkdown)
       fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
     } else {
       fs.unlinkSync(jsonFile);
