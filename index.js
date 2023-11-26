@@ -12,7 +12,7 @@ const { exit } = require("process");
 
 const logoMarkdown = `<div align="left">
 <a href="https://www.legitsecurity.com">
- <img width="120" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
+ <img width="200" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
  </a>
 </div>`
 
