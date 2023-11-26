@@ -94,8 +94,8 @@ async function executeLegitify(token, args, uploadCodeScanning) {
     console.log("execute legitify convert markdown:", convertMarkdownArgs)
     await exec.exec('"./legitify"', convertMarkdownArgs, options)
     if (isPrivate) {
-      fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, logoMarkdown)
-      fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, myOutput)
+      console.log(logoMarkdown)
+      fs.writeFileSync(process.env.GITHUB_STEP_SUMMARY, logoMarkdown + '\n' + myOutput)
     } else {
       fs.unlinkSync(jsonFile);
       fs.unlinkSync("error.log");
