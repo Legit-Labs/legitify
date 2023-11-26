@@ -295,8 +295,9 @@ Legit security protects your software supply chain from attacks and provides an 
 |------------|----------|-------------|
 | Supported Platforms| ALL SCM's<br> CI <br> CD <br> Package Registries| GitHub cloud & server <br> Gitlab cloud & server|
 | Issue Types| Misconfigurations <br> Pipelines <br> Secrets <br> IAC | Misconfigurations|
+| Compliance Report | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP||
 | Issue & Policy Management| Yes| No|
-| Policy drifts| Yes| No |
+| Policy drifts detection| Yes| No |
 | AppSec Orchestration | Yes| No |
 | Workspaces & Enterprise needs| Yes | No |
 | Ticketing & Alerting| Yes | No |
