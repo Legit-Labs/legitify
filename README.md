@@ -302,7 +302,8 @@ Legit security protects your software supply chain from attacks and provides an 
 | Issue Types| SCM Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipelines <br> Secrets <br> IaC <br> Security Incidents| SCM Misconfigurations <br> (checkout the full list [here](legitify.dev))|
 | Compliance Report | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP| [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/)|
 | Issue & Policy Management| Yes| No|
-| Policy drifts detection| Yes| No |
+| Contextualized Information | Prioritize issues with contextualized information through Legit's Code To Cloud technology | No context |
+| Policy drifts detection| Get real-time alerts when a misconfiguration is introduced | Can be detected periodically though Legitify's GitHub Action |
 | AppSec Orchestration | Yes| No |
 | Workspaces & Enterprise needs| Yes | No |
 | Ticketing & Alerting| Yes | No |
