@@ -292,6 +292,12 @@ Here are some resources to help you get started:
 - [Open an Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
 - [Open a Pull Request](https://github.com/Legit-Labs/legitify/compare)
 
+## Assistance 
+If you need any assistance or have questions about legitify, please don't hesitate to reach out. Our team is committed to providing support and ensuring a smooth experience. 
+
+You can contact us through GitHub Issues, GitHub Discussion or by mail at legitify@legitsecurity.com
+and we'll respond as promptly as possible. 
+
 ## Legitify vs the Legit Security platform
 
 Legit security protects your software supply chain from attacks and provides an Application Security Posture Management (ASPM) platform which helps organizations manage and prove secure application delivery from code to the cloud (runtime). It is a SaaS solution for enterprises that simplifies and boosts an organization's AppSec program.
