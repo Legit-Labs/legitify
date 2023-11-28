@@ -299,12 +299,9 @@ Here are some resources to help you get started:
 - [Open an Issue](https://github.com/Legit-Labs/legitify/issues/new/choose)
 - [Open a Pull Request](https://github.com/Legit-Labs/legitify/compare)
 
-## Assistance
+## Support
 
-If you need any assistance or have questions about legitify, please don't hesitate to reach out. Our team is committed to providing support and ensuring a smooth experience.
-
-You can contact us through GitHub Issues, GitHub Discussion or by mail at legitify@legitsecurity.com
-and we'll respond as promptly as possible.
+If you have questions about legitify or need any assistance with its operation, don't hesitate to [reach out](mailto:legitify@legitsecurity.com). Our team is committed to providing support and ensuring a smooth experience.
 
 ## Legitify vs. the Legit Security platform
 
