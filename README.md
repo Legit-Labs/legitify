@@ -296,17 +296,17 @@ Here are some resources to help you get started:
 
 Legit security protects your software supply chain from attacks and provides an Application Security Posture Management (ASPM) platform which helps organizations manage and prove secure application delivery from code to the cloud (runtime). It is a SaaS solution for enterprises that simplifies and boosts an organization's AppSec program.
 
-| | **Legit**| **Legitify**|
+| | **Legitify**| **Legit**|
 |------------|----------|-------------|
-| Supported Platforms| ALL SCM's<br> CI <br> CD <br> Package Registries| GitHub cloud & server <br> Gitlab cloud & server|
-| Issue Types| SCM Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipelines <br> Secrets <br> IaC <br> Security Incidents| SCM Misconfigurations <br> (checkout the full list [here](legitify.dev))|
-| Compliance Report | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP| [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/)|
-| Issue & Policy Management| Yes| No|
-| Contextualized Information | Prioritize issues with contextualized information through Legit's Code To Cloud technology | No context |
-| Policy drifts detection| Get real-time alerts when a misconfiguration is introduced | Can be detected periodically though Legitify's GitHub Action |
-| AppSec Orchestration | Yes| No |
-| Workspaces & Enterprise needs| Yes | No |
-| Ticketing & Alerting| Yes | No |
+| Supported Platforms| GitHub cloud & server <br> Gitlab cloud & server| ALL SCM's<br> CI <br> CD <br> Package Registries| 
+| Issue Types| SCM Misconfigurations <br> (checkout the full list [here](legitify.dev)) |SCM Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipelines <br> Secrets <br> IaC <br> Security Incidents| 
+| Compliance Report | [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/)| SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP| 
+| Issue & Policy Management| No| Yes|
+| Contextualized Information | No context| Prioritize issues with contextualized information through Legit's Code To Cloud technology| 
+| Policy drifts detection| Can be detected periodically though Legitify's GitHub Action| Get real-time alerts when a misconfiguration is introduced | 
+| AppSec Orchestration | No| Yes|
+| Workspaces & Enterprise needs| No| Yes|
+| Ticketing & Alerting| No| Yes|
 
 <div align="center">
  <a href="https://www.legitsecurity.com">
