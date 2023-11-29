@@ -310,16 +310,16 @@ Below is a comfeature parison between Legitify and Legit:
 
 | **Capability**              | **Legitify**                                                                | **Legit Security Platform**                                     |
 | --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| Supported Platforms         | GitHub cloud & server <br> Gitlab cloud & server | ALL Major SCMs (incl. Azure DevOps, Bitbucket and more)<br> CI/CD systems (e.g. Jenkins) <br> Package Registries (e.g. JFrog Artifactory) | 
+| Supported platforms         | GitHub cloud & server <br> Gitlab cloud & server | ALL Major SCMs (incl. Azure DevOps, Bitbucket and more)<br> CI/CD systems (e.g. Jenkins) <br> Package Registries (e.g. JFrog Artifactory) | 
 | Risk detection              | SCM's Misconfigurations only        | SCM's Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipeline risks <br> Secrets <br> IaC <br> Security Incidents <br> And more...| 
-| SDLC asset management       | - | Yes |
-| Compliance Report           | [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/) | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP <br> and more...|
-| Issue & Policy Management   | - | Yes |
-| Contextualized Information  | No Context | Prioritize issues with contextualized information through Legit's Code To Cloud technology | 
+| SDLC assets management       | - | Yes |
+| Compliance report           | [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/) | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP <br> And more...|
+| Issue & policy management   | - | Yes |
+| Contextualized information  | No Context | Prioritize issues with contextualized information through Legit's Code To Cloud technology | 
 | Custom policies             | - | Yes |  
 | Policy drifts detection     | - | Yes |
 | Workspaces & product groups | - | Yes |
-| Ticketing & Alerting        | - | Jira, Slack, etc. |
+| Ticketing & alerting        | - | Jira, Slack, and more |
 | Ingest risk                 | - | Import APIs and integrations with SAST, SCA and other testing solutions | 
 | Rest APIs                   | -| Yes |
 
