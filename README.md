@@ -1,3 +1,5 @@
+<div align="center">
+ 
 [![Build & Test](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_test.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_test.yaml)
 [![Code Analysis](https://github.com/Legit-Labs/legitify/actions/workflows/code_analysis.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/code_analysis.yaml)
 [![Version Releaser](https://github.com/Legit-Labs/legitify/actions/workflows/release.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/release.yaml)
