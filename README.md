@@ -313,20 +313,20 @@ If you liked Legitify, you are going to love the Legit Security Platform!
 
 Below is a comfeature parison between Legitify and Legit:
 
-| **Capability**              | **Legit Security Platform**                                                                | **Legitify**                                     |
+| **Capability**              | **Legitify**                                                                | **Legit Security Platform**                                     |
 | --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| Supported Platforms         | ALL Major SCM's<br> CI systems (e.g. Jenkins) <br> CD systems <br> Package Registries      | GitHub cloud & server <br> Gitlab cloud & server |
-| Risk detection              | Misconfigurations <br> Pipeline risks <br> Secrets <br> IaC <br> Security Incidents        | Misconfigurations only                           |
-| SDLC asset management       | Yes                                                                                        | -                                                |
-| Compliance Report           | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP <br> and more...                      | -                                                |
-| Issue & Policy Management   | Yes                                                                                        | -                                                |
-| Contextualized Information  | Prioritize issues with contextualized information through Legit's Code To Cloud technology | No Context                                       |
-| Custom policies             | Yes                                                                                        | -                                                |
-| Policy drifts detection     | Yes                                                                                        | -                                                |
-| Workspaces & product groups | Yes                                                                                        | -                                                |
-| Ticketing & Alerting        | Jira, Slack, etc.                                                                          | -                                                |
-| Ingest risk                 | Import APIs and integrations with SAST, SCA and other testing solutions                    | -                                                |
-| Rest APIs                   | Yes                                                                                        | -                                                |
+| Supported Platforms         | GitHub cloud & server <br> Gitlab cloud & server | ALL Major SCM's<br> CI systems (e.g. Jenkins) <br> CD systems <br> Package Registries      | 
+| Risk detection              | SCM's Misconfigurations only        | SCM's Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipeline risks <br> Secrets <br> IaC <br> Security Incidents | 
+| SDLC asset management       | - | Yes |
+| Compliance Report           | [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/) | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP <br> and more...|
+| Issue & Policy Management   | - | Yes |
+| Contextualized Information  | No Context | Prioritize issues with contextualized information through Legit's Code To Cloud technology | 
+| Custom policies             | - | Yes |  
+| Policy drifts detection     | - | Yes |
+| Workspaces & product groups | - | Yes |
+| Ticketing & Alerting        | - | Jira, Slack, etc. |
+| Ingest risk                 | - | Import APIs and integrations with SAST, SCA and other testing solutions | 
+| Rest APIs                   | -| Yes |
 
 To check out Legit, visit our [website](https://www.legitsecurity.com/) or directly [book a demo](https://info.legitsecurity.com/book-a-demo)
 
