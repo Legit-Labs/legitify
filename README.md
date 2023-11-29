@@ -316,7 +316,7 @@ Below is a comfeature parison between Legitify and Legit:
 | **Capability**              | **Legitify**                                                                | **Legit Security Platform**                                     |
 | --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
 | Supported Platforms         | GitHub cloud & server <br> Gitlab cloud & server | ALL Major SCMs (incl. Azure DevOps, Bitbucket and more)<br> CI/CD systems (e.g. Jenkins) <br> Package Registries (e.g. JFrog Artifactory | 
-| Risk detection              | SCM's Misconfigurations only        | SCM's Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipeline risks <br> Secrets <br> IaC <br> Security Incidents | 
+| Risk detection              | SCM's Misconfigurations only        | SCM's Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipeline risks <br> Secrets <br> IaC <br> Security Incidents <br> And more...| 
 | SDLC asset management       | - | Yes |
 | Compliance Report           | [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/) | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP <br> and more...|
 | Issue & Policy Management   | - | Yes |
