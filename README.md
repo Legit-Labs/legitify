@@ -1,10 +1,3 @@
-<div align="center">
- <a href="https://www.legitsecurity.com">
-  <img width="100" alt="Legitify Logo" src="https://github.com/Legit-Labs/legitify/assets/74864790/c76dc765-e8fd-498e-ab92-1228eb5a1f2d">
- </a>
-</div>
-<div align="center">
- 
 [![Build & Test](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_test.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/build_and_test.yaml)
 [![Code Analysis](https://github.com/Legit-Labs/legitify/actions/workflows/code_analysis.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/code_analysis.yaml)
 [![Version Releaser](https://github.com/Legit-Labs/legitify/actions/workflows/release.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/release.yaml)
@@ -23,7 +16,7 @@ Detect and remediate misconfigurations, security and compliance issues across al
 Wonder what Legit Security does?
 </b>
 
-We do ASPM and software supply chain security, for more information check out the [comparison table](#legitify-vs-the-legit-security-platform)
+We are an application security posture management (ASPM) solution and software supply chain security, for more information check out the [comparison table](#legitify-vs-the-legit-security-platform)
 
 </div>
 
