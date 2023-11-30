@@ -5,22 +5,23 @@
 [![Version Releaser](https://github.com/Legit-Labs/legitify/actions/workflows/release.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/release.yaml)
 [![Build Docs](https://github.com/Legit-Labs/legitify/actions/workflows/build_docs.yaml/badge.svg)](https://github.com/Legit-Labs/legitify/actions/workflows/build_docs.yaml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Legit-Labs/legitify)](https://goreportcard.com/report/github.com/Legit-Labs/legitify)
-[![Maintained By Legit Security](https://img.shields.io/badge/Maintained%20by-Legit%20Security-blueviolet)](https://www.legitsecurity.com/)
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=6f4cbb25-54f4-4c47-b611-9b741732bb86" />
 <br/>
  <img width="250" alt="Legitify Logo" src="https://user-images.githubusercontent.com/74864790/174815311-746a0c98-9a1f-44a9-808c-035788edfd4d.png">
- 
+
 Strengthen the security posture of your source-code management! <br/>
 Detect and remediate misconfigurations, security and compliance issues across all your GitHub and GitLab assets with ease 🔥 <br/>
- by [Legit Security](https://www.legitsecurity.com/).
+by [Legit Security](https://www.legitsecurity.com/).
 
 <b>
 Wonder what Legit Security does?
 </b>
 
-We are an application security posture management (ASPM) solution and software supply chain security, for more information check out the [comparison table](#legitify-vs-the-legit-security-platform)
+Legit Security is an application security posture management (ASPM) and software supply chain security solution.<br/>
+For more information check out the [comparison table](#legitify-vs-the-legit-security-platform)
 
 </div>
+
 
 https://user-images.githubusercontent.com/107790206/210602039-2d022692-87ea-4005-b9c6-f091158de3ce.mov
 
@@ -308,20 +309,19 @@ If you liked Legitify, you are going to love the Legit Security Platform!
 
 Below is a comfeature parison between Legitify and Legit:
 
-| **Capability**              | **Legitify**                                                                | **Legit Security Platform**                                     |
-| --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| Supported platforms         | GitHub cloud & server <br> Gitlab cloud & server | ALL Major SCMs (incl. Azure DevOps, Bitbucket and more)<br> CI/CD systems (e.g. Jenkins) <br> Package Registries (e.g. JFrog Artifactory) | 
-| Risk detection              | SCM's Misconfigurations only        | SCM's Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipeline risks <br> Secrets <br> IaC <br> Security Incidents <br> And more...| 
-| SDLC assets management       | - | Yes |
-| Compliance report           | [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/) | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP <br> And more...|
-| Issue & policy management   | - | Yes |
-| Contextualized information  | No Context | Prioritize issues with contextualized information through Legit's Code To Cloud technology | 
-| Custom policies             | - | Yes |  
-| Policy drifts detection     | - | Yes |
+| **Capability** | **Legitify** | **Legit Security Platform** |
+|---|---|---|
+| Supported platforms | GitHub <br> GitLab | ALL major SCMs (incl. Azure DevOps, Bitbucket and more)<br> CI/CD systems (e.g. Jenkins) <br> Package registries (e.g. JFrog Artifactory)<br>Cloud providers (e.g. AWS) |
+| Risk detection | SCM Misconfigurations only | SCMs Misconfigurations <br> CI Misconfigurations <br> CD Misconfigurations <br> Package Registries Misconfigurations <br> Pipeline risks <br> Secrets <br> IaC <br> Security Incidents <br> And more... |
+| Compliance report | [OSSF SCM Best Practices](https://best.openssf.org/SCM-BestPractices/) | SSDF <br> SLSA <br> SOC2 <br> ISO 27001 <br> FedRAMP <br> And more... |
+| Policy drifts detection | Can be detected periodically though Legitify's GitHub Action | Get real-time alerts when a misconfiguration is introduced |
+| SDLC assets management | - | Yes |
+| Issue & policy management | - | Yes |
+| Code To Cloud context | - | Yes (contextualized information enables smarter prioritization) |
 | Workspaces & product groups | - | Yes |
-| Ticketing & alerting        | - | Jira, Slack, and more |
-| Ingest risk                 | - | Import APIs and integrations with SAST, SCA and other testing solutions | 
-| Rest APIs                   | -| Yes |
+| Ticketing & alerting | - | Jira, Slack, and more |
+| Ingest risk | - | Import APIs and integrations with SAST, SCA and other testing solutions |
+| Rest APIs | - | Yes |
 
 To check out Legit, visit our [website](https://www.legitsecurity.com/) or directly [book a demo](https://info.legitsecurity.com/book-a-demo)
 
