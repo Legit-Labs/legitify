@@ -15,7 +15,7 @@ package member
 default organization_has_too_many_admins := true
 
 organization_has_too_many_admins := false {
-	admins := count({member | member := input.members[_]; member.is_admin == true})
+	admins := count([member | member := input.members[_]; member.is_admin == true])
 	admins <= 3
 }
 
