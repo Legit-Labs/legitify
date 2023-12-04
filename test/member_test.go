@@ -1,9 +1,10 @@
 package test
 
 import (
-	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"testing"
 	"time"
+
+	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
@@ -77,6 +78,36 @@ func TestMember(t *testing.T) {
 			args: memberMockConfiguration{
 				hasLastActive: true,
 				members: []githubcollected.OrganizationMember{
+					{
+						LastActive: int(time.Now().AddDate(0, -1, 0).UnixNano()),
+						IsAdmin:    true,
+					},
+				},
+			},
+		},
+		{
+			name:             "should find too many admins",
+			policyName:       "organization_has_too_many_admins",
+			shouldBeViolated: true,
+			args: memberMockConfiguration{
+				hasLastActive: true,
+				members: []githubcollected.OrganizationMember{
+					{
+						LastActive: int(time.Now().AddDate(0, -1, 0).UnixNano()),
+						IsAdmin:    true,
+					},
+					{
+						LastActive: int(time.Now().AddDate(0, -1, 0).UnixNano()),
+						IsAdmin:    true,
+					},
+					{
+						LastActive: int(time.Now().AddDate(0, -1, 0).UnixNano()),
+						IsAdmin:    true,
+					},
+					{
+						LastActive: int(time.Now().AddDate(0, -1, 0).UnixNano()),
+						IsAdmin:    true,
+					},
 					{
 						LastActive: int(time.Now().AddDate(0, -1, 0).UnixNano()),
 						IsAdmin:    true,
