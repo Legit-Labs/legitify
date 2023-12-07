@@ -30,7 +30,8 @@ func Execute() {
 	if screen.IsTty() {
 		logoColored := color.New(color.FgMagenta, color.Bold).Sprintf("%s", logo)
 		brandColored := color.New(color.Bold).Sprintf("%s", brand)
-		screen.Printf("%s\nBy %s\n\n", logoColored, brandColored)
+		legitifyWebsite := color.New(color.FgMagenta, color.Bold).Sprintf("https://legitsecurity.com/legitify")
+		screen.Printf("%s\nBy %s - %s\n\n", logoColored, brandColored, legitifyWebsite)
 	}
 	err := rootCmd.Execute()
 	if err != nil {
