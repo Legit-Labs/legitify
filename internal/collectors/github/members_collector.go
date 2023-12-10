@@ -132,14 +132,18 @@ func (c *memberCollector) enrichMembers(org *ghcollected.ExtendedOrg, members []
 		localMember := member
 		gw.Do(func() {
 			memberLastActive, err := c.collectMemberLastActiveTime(org.Name(), *localMember.Login)
+			lastActive := -1
+
+			if err == nil && !memberLastActive.IsZero() {
+				lastActive = int(memberLastActive.UnixNano())
+			}
+
 			if err != nil {
 				perm := c.memberMissingPermission(org, localMember)
 				c.IssueMissingPermissions(perm)
-				return
 			}
-			if !memberLastActive.IsZero() {
-				resChannel <- ghcollected.NewOrganizationMember(localMember, int(memberLastActive.UnixNano()), memberType)
-			}
+
+			resChannel <- ghcollected.NewOrganizationMember(localMember, lastActive, memberType)
 		})
 	}
 
