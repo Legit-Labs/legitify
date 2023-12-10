@@ -105,8 +105,8 @@ func (a *args) applyOutputOptions() (preExitHook func(), err error) {
 		legitify := color.New(color.FgMagenta, color.Bold).Sprintf("legitify")
 		legitifyMail := color.New(color.FgMagenta, color.Bold).Sprintf("legitify@legitsecurity.com")
 
-		legitText := fmt.Sprintf("\n\n%s If you have any questions or you need assistance using %s,"+
-			" PLEASE don't hesitate reaching out @ %s", lineStart, legitify, legitifyMail)
+		legitText := fmt.Sprintf("%s If you have any questions or you need assistance using %s,"+
+			" please don't hesitate REACHING OUT @ %s", lineStart, legitify, legitifyMail)
 
 		buf.WriteString(legitText)
 

@@ -10,3 +10,5 @@ var (
 )
 
 var ReadableVersion = fmt.Sprintf("%s version %s commit %s", Name, Version, Commit)
+
+var ReadableVersionLean = fmt.Sprintf("Version: %s Commit %s", Version, Commit)

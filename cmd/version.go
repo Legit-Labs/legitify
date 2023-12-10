@@ -28,3 +28,7 @@ var versionCmd = &cobra.Command{
 func GetVersion() string {
 	return version.ReadableVersion
 }
+
+func GetVersionLean() string {
+	return version.ReadableVersionLean
+}
