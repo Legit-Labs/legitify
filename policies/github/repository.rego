@@ -151,7 +151,7 @@ missing_default_branch_protection_deletion := false {
 missing_default_branch_protection_deletion := false {
     some index
     rule := input.rules_set[index]
-    rule.type == "deletions"
+    rule.type == "deletion"
 }
 
 # METADATA
