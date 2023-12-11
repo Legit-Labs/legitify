@@ -360,7 +360,7 @@ func (rc *repositoryCollector) withVulnerabilityAlerts(repo ghcollected.Reposito
 }
 
 func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository, org string) ghcollected.Repository {
-	users, _, err := rc.Client.Client().Repositories.ListCollaborators(rc.Context, org, repo.Repository.Name, &github.ListCollaboratorsOptions{})
+	users, err := pagination.New[*github.User](rc.Client.Client().Repositories.ListCollaborators, &github.ListCollaboratorsOptions{}).Sync(rc.Context, org, repo.Repository.Name)
 	if err != nil {
 		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(org, repo.Repository.Name),
 			"Cannot read repository collaborators", namespace.Repository)
@@ -368,7 +368,7 @@ func (rc *repositoryCollector) withRepoCollaborators(repo ghcollected.Repository
 		return repo
 	}
 
-	repo.Collaborators = users
+	repo.Collaborators = users.Collected
 	return repo
 }
 
