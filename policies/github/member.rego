@@ -35,6 +35,7 @@ stale_member_found[mem] := true {
 	some member
 	mem := input.members[member]
 	mem.is_admin == false
+	mem.last_active != -1
 	isStale(mem.last_active, 6)
 }
 
@@ -55,6 +56,7 @@ stale_admin_found[mem] := true {
 	some member
 	mem := input.members[member]
 	mem.is_admin == true
+	mem.last_active != -1
 	isStale(mem.last_active, 6)
 }
 
