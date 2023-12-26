@@ -532,8 +532,8 @@ actors_allowed_bypass_branch_rules := false{
     input.repository.default_branch.branch_protection_rule.is_admin_enforced
 }
 
-admins_allowed_bypass_branch_rules := false{
+admins_allowed_bypass_branch_rules := false {
     some index
-	rule := input.rules_set[index]
-	count(rule.ruleset.bypass_actor) == 0
+    rule := input.rules_set[index]
+    count(rule.ruleset.bypass_actors) == 0
 }
