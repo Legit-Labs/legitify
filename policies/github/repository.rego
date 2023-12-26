@@ -533,5 +533,7 @@ actors_allowed_bypass_branch_rules := false{
 }
 
 admins_allowed_bypass_branch_rules := false{
-    input.repository.rules_set.actor_type
+    some index
+	rule := input.rules_set[index]
+	count(rule.ruleset.bypass_actor) == 0
 }
