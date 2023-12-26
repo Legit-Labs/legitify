@@ -3,6 +3,7 @@ package github
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -592,6 +593,13 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 	return res, nil
 }
 
+// Define a struct to represent the parameters inside RepositoryRule
+type RuleParameters struct {
+	RulesetID string `json:"ruleset_id"`
+}
+
+// GetRulesForBranch function remains unchanged until the part where ruleset_ids are extracted
+
 func (c *Client) GetRulesForBranch(organization, repository, branch string) ([]*types.RepositoryRule, error) {
 	url := fmt.Sprintf("repos/%v/%v/rules/branches/%v", organization, repository, branch)
 	req, err := c.client.NewRequest("GET", url, nil)
@@ -599,12 +607,50 @@ func (c *Client) GetRulesForBranch(organization, repository, branch string) ([]*
 		return nil, err
 	}
 
-	var p []*types.RepositoryRule
-	_, err = c.client.Do(c.context, req, &p)
+	var rules []*types.RepositoryRule
+	_, err = c.client.Do(c.context, req, &rules)
 	if err != nil {
 		return nil, err
 	}
-	return p, nil
+
+	// Extract ruleset_ids from fetched rules
+	var rulesetIDs []string
+	for _, rule := range rules {
+		// Unmarshal the JSON raw message into a struct
+		var params RuleParameters
+		err := json.Unmarshal(*rule.Parameters, &params)
+		if err != nil {
+			return nil, err
+		}
+
+		// Access the ruleset_id field
+		rulesetIDs = append(rulesetIDs, params.RulesetID)
+	}
+
+	// Make requests for each ruleset_id to fetch actor_type
+	var actorTypes []*types.RepositoryRule
+	for _, rulesetID := range rulesetIDs {
+		actorTypeURL := fmt.Sprintf("https://api.github.com/repos/%s/%s/rulesets/%s", organization, repository, rulesetID)
+		actorTypeReq, err := c.client.NewRequest("GET", actorTypeURL, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		var actorType *types.RepositoryRule
+		_, err = c.client.Do(c.context, actorTypeReq, &actorType)
+		if err != nil {
+			return nil, err
+		}
+		actorTypes = append(actorTypes, actorType)
+	}
+
+	// Update the RepositoryRule struct with actor_type
+	for i, rule := range rules {
+		rule.ActorType = actorTypes[i].ActorType
+	}
+
+	return rules, nil
+
 }
 
 func (c *Client) GetSecurityAndAnalysisForEnterprise(enterprise string) (*types.AnalysisAndSecurityPolicies, error) {

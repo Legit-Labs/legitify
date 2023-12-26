@@ -10,6 +10,7 @@ type TokenPermissions struct {
 type RepositoryRule struct {
 	Type       string           `json:"type"`
 	Parameters *json.RawMessage `json:"parameters,omitempty"`
+	ActorType  string           `json:"actor_type,omitempty"`
 }
 
 type AnalysisAndSecurityPolicies struct {
@@ -18,4 +19,4 @@ type AnalysisAndSecurityPolicies struct {
 	SecretScanningEnabledForNewRepositories        bool   `json:"secret_scanning_enabled_for_new_repositories"`
 	SecretScanningPushProtectionEnabledForNewRepos bool   `json:"secret_scanning_push_protection_enabled_for_new_repositories"`
 	SecretScanningPushProtectionCustomLink         string `json:"secret_scanning_push_protection_custom_link"`
-} 
+}

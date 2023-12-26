@@ -513,3 +513,26 @@ default actions_can_approve_pull_requests := true
 actions_can_approve_pull_requests := false{
 	not input.actions_token_permissions.can_approve_pull_request_reviews
 }
+
+# METADATA
+# scope: rule
+# title: Actors are allowed to bypass branch protection rules
+# description: Branch protection rules are not applied to Actors. When using important branch protection rules it is recommended to make sure that Actors aren’t allowed to bypass these rules in order to avoid inadvertent or intentional alterations to critical code and compromising security which can lead to potential errors or vulnerabilities in the software.
+# custom:
+#   remediationSteps:
+#     - Go to the repository’s settings.
+      - Under "Code and automation", select "Branches".
+      - Under "Protect matching branches" enable "Do not allow bypassing the above settings". 
+#   severity: MEDIUM
+#   requiredScopes: [repo]
+#   threat: In case Actors can bypass important branch protection rules, inadvertent or intentional alterations to critical code and compromising security can happen and lead to potential errors or vulnerabilities in the software.
+default actors_allowed_bypass_branch_rules := true
+
+actors_allowed_bypass_branch_rules := false{
+    input.repository.default_branch.branch_protection_rule.is_admin_enforced
+
+admins_allowed_bypass_branch_rules := false{
+    input.repository.rules_set.actor_type
+
+
+}
