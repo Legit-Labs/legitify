@@ -526,13 +526,13 @@ actions_can_approve_pull_requests := false{
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   threat: In case Actors can bypass important branch protection rules, inadvertent or intentional alterations to critical code and compromising security can happen and lead to potential errors or vulnerabilities in the software.
-default actors_allowed_bypass_branch_rules := true
+default actors_allowed_to_bypass_branch_rules := true
 
-actors_allowed_bypass_branch_rules := false{
+actors_allowed_to_bypass_branch_rules := false {
     input.repository.default_branch.branch_protection_rule.is_admin_enforced
 }
 
-admins_allowed_bypass_branch_rules := false {
+actors_allowed_to_bypass_branch_rules := false {
     some index
     rule := input.rules_set[index]
     count(rule.ruleset.bypass_actors) == 0
