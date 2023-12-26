@@ -1,6 +1,9 @@
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/google/go-github/v53/github"
+)
 
 type TokenPermissions struct {
 	DefaultWorkflowPermissions   *string `json:"default_workflow_permissions,omitempty"`
@@ -10,7 +13,8 @@ type TokenPermissions struct {
 type RepositoryRule struct {
 	Type       string           `json:"type"`
 	Parameters *json.RawMessage `json:"parameters,omitempty"`
-	ActorType  string           `json:"actor_type,omitempty"`
+	Id         int64            `json:"ruleset_id"`
+	Ruleset    *github.Ruleset  `json:"ruleset"`
 }
 
 type AnalysisAndSecurityPolicies struct {

@@ -521,8 +521,8 @@ actions_can_approve_pull_requests := false{
 # custom:
 #   remediationSteps:
 #     - Go to the repository’s settings.
-      - Under "Code and automation", select "Branches".
-      - Under "Protect matching branches" enable "Do not allow bypassing the above settings". 
+#      - Under "Code and automation", select "Branches".
+#      - Under "Protect matching branches" enable "Do not allow bypassing the above settings".
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   threat: In case Actors can bypass important branch protection rules, inadvertent or intentional alterations to critical code and compromising security can happen and lead to potential errors or vulnerabilities in the software.
@@ -530,9 +530,8 @@ default actors_allowed_bypass_branch_rules := true
 
 actors_allowed_bypass_branch_rules := false{
     input.repository.default_branch.branch_protection_rule.is_admin_enforced
+}
 
 admins_allowed_bypass_branch_rules := false{
     input.repository.rules_set.actor_type
-
-
 }
