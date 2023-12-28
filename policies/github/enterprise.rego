@@ -160,7 +160,7 @@ enable_secret_scanning_for_new_orgs := false {
 
 # METADATA
 # scope: rule
-# title: Enterprise Should Automatically Enable Secret Scanning Across All Organizations/Repositories
+# title: Enterprise Should Automatically Enable Secret Scanning Push Protection Across All Organizations/Repositories
 # description: The enterprise should prevent sensitive data from being pushed to all repositories, to prevent it from being exposed to anyone with access to the repository.
 # custom:
 #   severity: MEDIUM
