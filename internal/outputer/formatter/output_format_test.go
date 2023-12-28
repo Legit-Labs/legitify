@@ -35,7 +35,7 @@ func TestOutputFormats(t *testing.T) {
 			// sarif has dedicated tests
 			continue
 		case formatter.Csv:
-			// sarif has dedicated tests
+			// csv has dedicated tests
 			continue
 
 		default:
