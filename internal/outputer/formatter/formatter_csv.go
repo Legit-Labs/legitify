@@ -24,7 +24,9 @@ func (f *CsvFormatter) csvFailedPolicies(output *scheme.Flattened, csvwriter *cs
 	failedPolicies := output.OnlyFailedViolations()
 	headers := []string{"#", "Policy Name", "Namespace", "Severity", "Threat", "Violations", "Remediation Steps"}
 	err := csvwriter.Write(headers)
-	
+	if err != nil {
+		panic(err)
+	}
 	
 	for i, policyName := range failedPolicies.AsOrderedMap().Keys() {
 		policyData := output.GetPolicyData(policyName)
@@ -53,7 +55,7 @@ func (f *CsvFormatter) csvFailedPolicies(output *scheme.Flattened, csvwriter *cs
 		}
 
 	}
-	csvwriter.Write([]string{"\n"})
+	err = csvwriter.Write([]string{"\n"})
 	if err != nil {
 		panic(err)
 	}
