@@ -516,23 +516,25 @@ actions_can_approve_pull_requests := false{
 
 # METADATA
 # scope: rule
-# title: Actors are allowed to bypass branch protection rules
-# description: Branch protection rules are not applied to Actors. When using important branch protection rules it is recommended to make sure that Actors aren’t allowed to bypass these rules in order to avoid inadvertent or intentional alterations to critical code and compromising security which can lead to potential errors or vulnerabilities in the software.
+# title: Users Are Allowed To Bypass Ruleset Rules
+# description: Rulesets rules are not enforced for some users. When defining rulesets it is recommended to make sure that no one is allowed to bypass these rules in order to avoid inadvertent or intentional alterations to critical code which can lead to potential errors or vulnerabilities in the software.
 # custom:
 #   remediationSteps:
-#     - Go to the repository’s settings.
-#      - Under "Code and automation", select "Branches".
-#      - Under "Protect matching branches" enable "Do not allow bypassing the above settings".
+#      - Go to the repository settings page
+#      - Under "Code and automation", select "Rules -> Rulesets"
+#      - Find the relevant ruleset
+#      - Empty the "Bypass list"
+#      - Press "Save Changes"
 #   severity: MEDIUM
 #   requiredScopes: [repo]
-#   threat: In case Actors can bypass important branch protection rules, inadvertent or intentional alterations to critical code and compromising security can happen and lead to potential errors or vulnerabilities in the software.
-default actors_allowed_to_bypass_branch_rules := true
+#   threat: Attackers that gain access to a user that can bypass the ruleset rules can compromise the codebase without anyone noticing, introducing malicious code that would go straight ahead to production.
+default users_allowed_to_bypass_ruleset := true
 
-actors_allowed_to_bypass_branch_rules := false {
-    input.repository.default_branch.branch_protection_rule.is_admin_enforced
+users_allowed_to_bypass_ruleset := false {
+    count(input.rules_set) == 0
 }
 
-actors_allowed_to_bypass_branch_rules := false {
+users_allowed_to_bypass_ruleset := false {
     some index
     rule := input.rules_set[index]
     count(rule.ruleset.bypass_actors) == 0

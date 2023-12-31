@@ -592,10 +592,6 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 	return res, nil
 }
 
-type RuleParameters struct {
-	RulesetID string `json:"ruleset_id"`
-}
-
 func (c *Client) GetRulesForBranch(organization, repository, branch string) ([]*types.RepositoryRule, error) {
 	url := fmt.Sprintf("repos/%v/%v/rules/branches/%v", organization, repository, branch)
 	req, err := c.client.NewRequest("GET", url, nil)
