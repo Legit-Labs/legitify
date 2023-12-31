@@ -70,7 +70,7 @@ type Repository struct {
 	Collaborators                []*github.User                    `json:"collaborators,omitempty"`
 	ActionsTokenPermissions      *types.TokenPermissions           `json:"actions_token_permissions"`
 	DependencyGraphManifests     *GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests"`
-	RulesSet                     []*types.RepositoryRule           `json:"rules_set"`
+	RulesSet                     []*types.RepositoryRule           `json:"rules_set,omitempty"`
 }
 
 func (r Repository) ViolationEntityType() string {
