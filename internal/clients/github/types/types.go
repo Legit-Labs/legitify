@@ -1,6 +1,9 @@
 package types
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/google/go-github/v53/github"
+)
 
 type TokenPermissions struct {
 	DefaultWorkflowPermissions   *string `json:"default_workflow_permissions,omitempty"`
@@ -10,6 +13,8 @@ type TokenPermissions struct {
 type RepositoryRule struct {
 	Type       string           `json:"type"`
 	Parameters *json.RawMessage `json:"parameters,omitempty"`
+	Id         int64            `json:"ruleset_id"`
+	Ruleset    *github.Ruleset  `json:"ruleset"`
 }
 
 type AnalysisAndSecurityPolicies struct {
@@ -18,4 +23,4 @@ type AnalysisAndSecurityPolicies struct {
 	SecretScanningEnabledForNewRepositories        bool   `json:"secret_scanning_enabled_for_new_repositories"`
 	SecretScanningPushProtectionEnabledForNewRepos bool   `json:"secret_scanning_push_protection_enabled_for_new_repositories"`
 	SecretScanningPushProtectionCustomLink         string `json:"secret_scanning_push_protection_custom_link"`
-} 
+}

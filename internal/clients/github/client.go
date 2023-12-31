@@ -599,12 +599,23 @@ func (c *Client) GetRulesForBranch(organization, repository, branch string) ([]*
 		return nil, err
 	}
 
-	var p []*types.RepositoryRule
-	_, err = c.client.Do(c.context, req, &p)
+	var rules []*types.RepositoryRule
+	_, err = c.client.Do(c.context, req, &rules)
 	if err != nil {
 		return nil, err
 	}
-	return p, nil
+
+	for _, rule := range rules {
+		specific, _, err := c.Client().Repositories.GetRuleset(c.context, organization, repository, rule.Id, true)
+		if err != nil {
+			continue
+		}
+
+		rule.Ruleset = specific
+	}
+
+	return rules, nil
+
 }
 
 func (c *Client) GetSecurityAndAnalysisForEnterprise(enterprise string) (*types.AnalysisAndSecurityPolicies, error) {

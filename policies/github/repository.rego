@@ -513,3 +513,29 @@ default actions_can_approve_pull_requests := true
 actions_can_approve_pull_requests := false{
 	not input.actions_token_permissions.can_approve_pull_request_reviews
 }
+
+# METADATA
+# scope: rule
+# title: Users Are Allowed To Bypass Ruleset Rules
+# description: Rulesets rules are not enforced for some users. When defining rulesets it is recommended to make sure that no one is allowed to bypass these rules in order to avoid inadvertent or intentional alterations to critical code which can lead to potential errors or vulnerabilities in the software.
+# custom:
+#   remediationSteps:
+#      - Go to the repository settings page
+#      - Under "Code and automation", select "Rules -> Rulesets"
+#      - Find the relevant ruleset
+#      - Empty the "Bypass list"
+#      - Press "Save Changes"
+#   severity: MEDIUM
+#   requiredScopes: [repo]
+#   threat: Attackers that gain access to a user that can bypass the ruleset rules can compromise the codebase without anyone noticing, introducing malicious code that would go straight ahead to production.
+default users_allowed_to_bypass_ruleset := true
+
+users_allowed_to_bypass_ruleset := false {
+    count(input.rules_set) == 0
+}
+
+users_allowed_to_bypass_ruleset := false {
+    some index
+    rule := input.rules_set[index]
+    count(rule.ruleset.bypass_actors) == 0
+}
