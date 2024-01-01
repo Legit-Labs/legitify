@@ -1,5 +1,6 @@
 name: Build Docs
 on:
+  pull_request:
   push:
     branches:
       - 'main'
@@ -30,6 +31,7 @@ jobs:
           rm -rf ./docs
           mv ../docs .
           git config --global user.name "build docs workflow"
+          git config --global user.email "docs@legitsecurity.com"
           git add -A
           if git commit -m "update docs"; then
             git push
