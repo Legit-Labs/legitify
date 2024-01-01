@@ -11,7 +11,7 @@ permissions:
   contents: 'write'
 jobs:
   update_docs:
-    environment: github-pages
+    #environment: github-pages
     runs-on: ubuntu-latest
     steps:
       - name: check out the main branch
