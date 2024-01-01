@@ -39,14 +39,14 @@ func (f *CsvFormatter) csvFailedPolicies(output *scheme.Flattened, csvwriter *cs
 
 		RemediationSteps := strings.Join([]string(policyInfo.RemediationSteps), "\n")
 		var entityType, Link, violationString string
-		var violationsSummery []string
+		var violationsSummary []string
 		for _, violation := range policyData.Violations {
 			entityType = (&violation).ViolationEntityType
 			Link = violation.CanonicalLink
 			violationString = entityType + " " + Link
-			violationsSummery = append(violationsSummery, violationString)
+			violationsSummary = append(violationsSummary, violationString)
 		}
-		violationsPolicy := strings.Join([]string(violationsSummery), "\n")
+		violationsPolicy := strings.Join([]string(violationsSummary), "\n")
 
 		row := []string{strconv.Itoa(rowNum), policyName, Namespace, Severity, Threat, violationsPolicy, RemediationSteps}
 		err := csvwriter.Write(row)
@@ -65,7 +65,7 @@ func (f *CsvFormatter) csvFailedPolicies(output *scheme.Flattened, csvwriter *cs
 }
 
 
-func (f *CsvFormatter) formatSummery(output *scheme.Flattened, csvwriter *csv.Writer) bool {
+func (f *CsvFormatter) formatSummary(output *scheme.Flattened, csvwriter *csv.Writer) bool {
 	headers := []string{"#", "Namespace", "Policy", "Severity", "Passed", "Failed", "Skipped"}
 	err := csvwriter.Write(headers)
 
@@ -113,10 +113,10 @@ func (f *CsvFormatter) Format(output scheme.Scheme, failedOnly bool) ([]byte, er
 		return nil, UnsupportedScheme{output}
 	}
 
-	f.csvFailedPolicies(typedOutput, csvWriter)
 	if !failedOnly {
-		f.formatSummery(typedOutput, csvWriter)
+		f.formatSummary(typedOutput, csvWriter)
 	}
+	f.csvFailedPolicies(typedOutput, csvWriter)
 	csvWriter.Flush()
 
 	// Check for errors during flushing
