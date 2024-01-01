@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Enterprise Should Automatically Enable Secret Scanning Across All Organizations/Repositories
+title: Enterprise Should Automatically Enable Secret Scanning Push Protection Across All Organizations/Repositories
 parent: Enterprise Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Enterprise Should Automatically Enable Secret Scanning Across All Organizations/Repositories
+## Enterprise Should Automatically Enable Secret Scanning Push Protection Across All Organizations/Repositories
 policy name: enable_push_protection_secret_scanning
 
 severity: MEDIUM
