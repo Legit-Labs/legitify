@@ -21,4 +21,4 @@ Supporting:
 And More to come...
 
 ---
-> ℹ️ **NOTE:** This webpage describes only the policies which Legitify supports. To learn more about how to use the cli tool, or contribute the source code, visit [Legitify's GitHub page](https://github.com/Legit-Labs/legitify).
+> ℹ️ **NOTE:** This webpage describes only the policies that Legitify supports. To learn more about how to use the cli tool, or contribute the source code, visit [Legitify's GitHub page](https://github.com/Legit-Labs/legitify).
