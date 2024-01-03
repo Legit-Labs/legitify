@@ -81,3 +81,23 @@ default group_does_not_enforce_branch_protection_by_default := true
 group_does_not_enforce_branch_protection_by_default := false {
 	input.default_branch_protection > 0
 }
+
+# METADATA
+# scope: rule
+# title: Two-Factor Authentication Grace Period Should Not Be Longer Than One Week
+# description: The group allows more than one week for new members to add two-factor authentication. This time leaves your organization vulnerable to credential theft attacks whenever adding new members, especially in large developer groups.
+# custom:
+#   severity: MEDIUM
+#   remediationSteps:
+#     - Go to the group page
+#     - Press Settings -> General
+#     - Expand "Permissions and group features"
+#     - 'In the box titled: "Delay 2FA enforcement (hours)", enter a number under 168 (preferably 0)'
+#     - Press "Save Changes"
+#   threat:
+#     - Any new group membmer effectivly acts as an attack surface until two-factor authentication is enabled. The risk is compounded as new members may be more culnrable to phising and identity theft attacks.
+default group_allows_excessive_mfa_grace_period := true
+
+group_allows_excessive_mfa_grace_period := false{
+	input.two_factor_grace_period <= 168
+}
