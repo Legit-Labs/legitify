@@ -13,6 +13,7 @@ const (
 	Json     FormatName = "json"
 	Sarif    FormatName = "sarif"
 	Markdown FormatName = "markdown"
+	Csv		 FormatName = "csv"
 )
 
 type OutputFormatter interface {
@@ -27,6 +28,7 @@ var outputFormatters = map[FormatName]NewFormatFunc{
 	Json:     NewJsonFormatter,
 	Markdown: newMarkdownFormatter,
 	Sarif:    newSarifFormatter,
+	Csv:	  newCSVFormatter,
 }
 
 func ValidateOutputFormat(outputFormat FormatName, schemeType scheme.SchemeType) error {
