@@ -34,6 +34,9 @@ func TestOutputFormats(t *testing.T) {
 		case formatter.Sarif:
 			// sarif has dedicated tests
 			continue
+		case formatter.Csv:
+			// csv has dedicated tests
+			continue
 
 		default:
 			t.Fatalf("unexpected format: %s", name)
