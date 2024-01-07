@@ -13,7 +13,6 @@ import (
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/Legit-Labs/legitify/internal/screen"
-	"github.com/fatih/color"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -100,15 +99,6 @@ func (a *args) applyOutputOptions() (preExitHook func(), err error) {
 		if errlog.HadPermIssues() {
 			buf.WriteString(fmt.Sprintf("Some policies skipped. Check %s for more details\n", permFile.Name()))
 		}
-
-		lineStart := color.New(color.FgMagenta, color.Bold).Sprintf("--->")
-		legitify := color.New(color.FgMagenta, color.Bold).Sprintf("legitify")
-		legitifyMail := color.New(color.FgMagenta, color.Bold).Sprintf("legitify@legitsecurity.com")
-
-		legitText := fmt.Sprintf("%s If you have any questions or you need assistance using %s,"+
-			" please don't hesitate REACHING OUT @ %s", lineStart, legitify, legitifyMail)
-
-		buf.WriteString(legitText)
 
 		if buf.Len() > 0 {
 			screen.Printf("\n\n%s\n", buf.String())

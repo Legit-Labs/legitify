@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"strings"
 
@@ -44,6 +45,14 @@ func newAnalyzeCommand() *cobra.Command {
 		Short:        `Analyze GitHub/GitLab organizations associated with a PAT to find security issues`,
 		RunE:         executeAnalyzeCommand,
 		SilenceUsage: true,
+		PostRun: func(cmd *cobra.Command, args []string) {
+			lineStart := color.New(color.FgMagenta, color.Bold).Sprintf("--->")
+			legitify := color.New(color.FgMagenta, color.Bold).Sprintf("legitify")
+			legitifyMail := color.New(color.FgMagenta, color.Bold).Sprintf("legitify@legitsecurity.com")
+			legitText := fmt.Sprintf("%s If you have any questions or you need assistance using %s,"+
+				" please don't hesitate REACHING OUT @ %s", lineStart, legitify, legitifyMail)
+			screen.Printf("%s", legitText)
+		},
 	}
 
 	scorecardWhens := toOptionsString(scorecardOptions())
