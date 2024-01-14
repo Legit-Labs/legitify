@@ -84,15 +84,7 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 					log.Println(err.Error())
 					return
 				}
-
-				isPremium := false
-				group, err := rc.Client.Group(r.Owner)
-				if err != nil {
-					log.Println(err.Error())
-				} else {
-					isPremium = rc.Client.IsGroupPremium(group)
-				}
-
+				isPremium := rc.Client.IsGroupPremium(r.Owner)
 				rc.extendedCollection(project, isPremium)
 			})
 
@@ -207,7 +199,7 @@ func (rc *repositoryCollector) collectAll() collectors.SubCollectorChannels {
 					for _, completedProject := range res.Collected {
 						completedProject := completedProject
 						gw.Do(func() {
-							rc.extendedCollection(completedProject, rc.Client.IsGroupPremium(g))
+							rc.extendedCollection(completedProject, rc.Client.IsGroupPremium(g.FullPath))
 						})
 					}
 				}

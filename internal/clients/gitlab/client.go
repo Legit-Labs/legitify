@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/gitlab/transport"
@@ -192,25 +193,26 @@ func (c *Client) GroupHooks(gid int) ([]*gitlab.GroupHook, error) {
 	return result.Collected, nil
 }
 
-func (c *Client) GroupPlan(group *gitlab.Group) (string, error) {
-	nss, resp, err := c.Client().Namespaces.SearchNamespace(group.Path)
+func (c *Client) GroupPlan(namespace string) (string, error) {
+	nss, resp, err := c.Client().Namespaces.SearchNamespace(namespace)
 	if err != nil {
-		return "", fmt.Errorf("failed to search namespace %s: %v (response: %+v)", group.Path, err, resp)
+		return "", fmt.Errorf("failed to search namespace %s: %v (response: %+v)", namespace, err, resp)
 	}
 
 	for _, n := range nss {
-		if n.FullPath == group.FullPath {
+		if n.FullPath == namespace {
 			return n.Plan, nil
 		}
 	}
 
-	return "", fmt.Errorf("didn't find namespace for %s", group.FullPath)
+	return "", fmt.Errorf("didn't find namespace for %s", namespace)
 }
 
-func (c *Client) IsGroupPremium(group *gitlab.Group) bool {
-	plan, err := c.GroupPlan(group)
+func (c *Client) IsGroupPremium(group string) bool {
+	groupRootNamespace := strings.Split(group, "/")[0]
+	plan, err := c.GroupPlan(groupRootNamespace)
 	if err != nil {
-		log.Printf("failed to get namespace for group %s %v", group.FullPath, err)
+		log.Printf("failed to get namespace for group %s %v", group, err)
 		return false
 	}
 
