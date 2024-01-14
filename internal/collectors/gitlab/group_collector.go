@@ -58,7 +58,7 @@ func (c *groupCollector) Collect() collectors.SubCollectorChannels {
 					return
 				}
 
-				isPremium := c.Client.IsGroupPremium(g)
+				isPremium := c.Client.IsGroupPremium(g.FullPath)
 
 				hooks, err := c.Client.GroupHooks(fullGroup.ID)
 
