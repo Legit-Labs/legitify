@@ -14,7 +14,7 @@ package runner_group
 # custom:
 #   severity: HIGH
 #   requiredEnrichers: [organizationId]
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   remediationSteps:
 #     - "Go to the organization settings page"
 #     - "Press Actions ➝ Runner groups"
@@ -41,7 +41,7 @@ runner_group_can_be_used_by_public_repositories := false {
 # custom:
 #   severity: MEDIUM
 #   requiredEnrichers: [organizationId]
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   remediationSteps:
 #     - "Go to the organization settings page"
 #     - "Go to Actions ➝ Runner groups"

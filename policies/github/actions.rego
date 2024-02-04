@@ -8,7 +8,7 @@ package actions
 #   requiredEnrichers: [organizationId]
 #   remediationSteps: [Make sure you have admin permissions, Go to the org's settings page, Enter the "Actions - General" tab, Under "Policies", Change "All repositories" to "Selected repositories" and select repositories that should be able to run actions, Click "Save"]
 #   severity: MEDIUM
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   threat:
 #     - "This misconfiguration could lead to the following attack:"
 #     - "1. Prerequisite: the attacker is part of your GitHub organization"
@@ -16,7 +16,6 @@ package actions
 #     - "3. Attacker creates a workflow file that reads all organization secrets and exfiltrate them"
 #     - "4. Attacker trigger the workflow"
 #     - "5. Attacker receives all organization secrets and uses them maliciously"
-#   requiredScopes: [admin:org]
 default all_repositories_can_run_github_actions := true
 
 all_repositories_can_run_github_actions := false {
@@ -31,7 +30,7 @@ all_repositories_can_run_github_actions := false {
 #   requiredEnrichers: [organizationId]
 #   remediationSteps: [Make sure you have admin permissions, Go to the org's settings page, Enter "Actions - General" tab, Under "Policies", 'Select "Allow enterprise, and select non-enterprise, actions and reusable workflows"', Check "Allow actions created by GitHub" and "Allow actions by Marketplace verified creators", Set any other used trusted actions under "Allow specified actions and reusable workflows", Click "Save"]
 #   severity: MEDIUM
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   threat:
 #     - "This misconfiguration could lead to the following attack:"
 #     - "1. Attacker creates a repository with a tempting but malicious custom GitHub Action"
@@ -49,6 +48,7 @@ all_github_actions_are_allowed := false {
 # description: The default GitHub Action workflow token permission is set to read-write. When creating workflow tokens, it is highly recommended to follow the Principle of Least Privilege and force workflow authors to specify explicitly which permissions they need.
 # custom:
 #   requiredEnrichers: [organizationId]
+#   requiredScopes: [read:org]
 #   remediationSteps:
 #     - Make sure you have admin permissions
 #     - Go to the org's settings page
@@ -57,7 +57,6 @@ all_github_actions_are_allowed := false {
 #     - Select 'Read repository contents permission'
 #     - Click 'Save'
 #   severity: MEDIUM
-#   requiredScopes: [admin:org]
 #   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
 default token_default_permissions_is_read_write := true
 
@@ -71,6 +70,7 @@ token_default_permissions_is_read_write := false {
 # description: Your organization allows workflows to open and approve pull requests. This could allow users to bypass code-review restrictions.
 # custom:
 #   requiredEnrichers: [organizationId]
+#   requiredScopes: [read:org]
 #   remediationSteps:
 #     - Make sure you have admin permissions
 #     - Go to the org's settings page
@@ -79,7 +79,6 @@ token_default_permissions_is_read_write := false {
 #     - Uncheck 'Allow GitHub actions to create and approve pull requests.
 #     - Click 'Save'
 #   severity: HIGH
-#   requiredScopes: [admin:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
 default actions_can_approve_pull_requests := true
 

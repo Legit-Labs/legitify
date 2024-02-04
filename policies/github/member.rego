@@ -7,7 +7,7 @@ package member
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization People page, Select the unwanted owners, Using the "X members selected" - change role to member]
 #   severity: MEDIUM
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   threat:
 #     - "1. An organization has a permissive attitude and provides an owner role to all developers."
 #     - "2. One of the developers has decided to collaborate with an evil ransomware gang, and uses his high privileges to add a malicious external collaborator"
@@ -27,7 +27,7 @@ organization_has_too_many_admins := false {
 #   requiredEnrichers: [entityId, violatedUsers]
 #   remediationSteps: [Make sure you have admin permissions, Go to the org's People page, Select all stale members, Using the "X members selected" - remove members from organization]
 #   severity: LOW
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   prerequisites: [premium]
 #   threat:
 #     - "Stale members are most likely not managed and monitored, increasing the possibility of being compromised."
@@ -48,7 +48,7 @@ stale_member_found[mem] := true {
 #   requiredEnrichers: [entityId, violatedUsers]
 #   remediationSteps: [Make sure you have admin permissions, Go to the org's People page, Select all stale admins, Using the "X members selected" - remove members from organization]
 #   severity: MEDIUM
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   prerequisites: [premium]
 #   threat:
 #     - "Stale admins are most likely not managed and monitored, increasing the possibility of being compromised."

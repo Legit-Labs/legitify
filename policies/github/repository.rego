@@ -484,7 +484,7 @@ scorecard_score_too_low := false {
 #     - Select 'Read repository contents permission'
 #     - Click 'Save'
 #   severity: MEDIUM
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   threat: In case of token compromise (due to a vulnerability or malicious third-party GitHub actions), an attacker can use this token to sabotage various assets in your CI/CD pipeline, such as packages, pull-requests, deployments, and more.
 default token_default_permissions_is_read_write := true
 
@@ -506,7 +506,7 @@ token_default_permissions_is_read_write := false {
 #     - Uncheck 'Allow GitHub actions to create and approve pull requests.
 #     - Click 'Save'
 #   severity: HIGH
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   threat: Attackers can exploit this misconfiguration to bypass code-review restrictions by creating a workflow that approves their own pull request and then merging the pull request without anyone noticing, introducing malicious code that would go straight ahead to production.
 default actions_can_approve_pull_requests := true
 

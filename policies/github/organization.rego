@@ -53,7 +53,7 @@ organization_webhook_doesnt_require_ssl[violated] := true {
 # custom:
 #   severity: HIGH
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Enter "Authentication security" tab, Under "Two-factor authentication", Toggle on "Require two-factor authentication for everyone in the <ORG> organization", Click "Save"]
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
 default two_factor_authentication_not_required_for_org := true
@@ -103,7 +103,7 @@ default_repository_permission_is_not_none := false {
 # description: It is recommended to enable access to an organization via SAML single sign-on (SSO) by authenticating through an identity provider (IdP). This allows for central account control and for timely access revocations.
 # custom:
 #   remediationSteps: [Make sure you have admin permissions, Go to the organization settings page, Enter "Authentication security" tab, Toggle on "Enable SAML authentication", Fill in the remaining SSO configuration as instructed on the screen, Click "Save"]
-#   requiredScopes: [admin:org]
+#   requiredScopes: [read:org]
 #   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions accross different systems, prevents the organization from defining a common password policy, and makes it challenging to audit different aspects of the user's behavior.
 default organization_not_using_single_sign_on := true
 
