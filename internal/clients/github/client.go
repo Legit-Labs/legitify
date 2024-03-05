@@ -517,14 +517,15 @@ func newHttpClients(ctx context.Context, token string) (client *http.Client, gra
 var enterpriseQuery struct {
 	Enterprise struct {
 		OwnerInfo struct {
-			MembersCanChangeRepositoryVisibilitySetting string
-			AllowPrivateRepositoryForkingSetting        string
-			MembersCanInviteCollaboratorsSetting        string
-			TwoFactorRequiredSetting                    string
-			MembersCanCreatePublicRepositoriesSetting   bool
-			DefaultRepositoryPermissionSetting          string
-			MembersCanDeleteRepositoriesSetting         string
-			SamlIdentityProvider                        struct {
+			MembersCanChangeRepositoryVisibilitySetting   string
+			AllowPrivateRepositoryForkingSetting          string
+			MembersCanInviteCollaboratorsSetting          string
+			TwoFactorRequiredSetting                      string
+			MembersCanCreatePublicRepositoriesSetting     bool
+			DefaultRepositoryPermissionSetting            string
+			MembersCanDeleteRepositoriesSetting           string
+			NotificationDeliveryRestrictionEnabledSetting string
+			SamlIdentityProvider                          struct {
 				ExternalIdentities struct {
 					TotalCount int
 				} `graphql:"externalIdentities(first: 1)"`
@@ -562,9 +563,11 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 		err := c.GraphQLClient().Query(c.context, &enterpriseQuery, variables)
 		if err != nil {
 			log.Printf("failed to get enterprise %v: %v", enterprise, err)
+			return nil, err
 		}
 		if enterpriseQuery.Enterprise.DatabaseId == 0 {
 			log.Printf("Failed to get enterprise %v . User is not a member of this enterprise", enterprise)
+			return nil, err
 		}
 		samlEnabled := enterpriseQuery.Enterprise.OwnerInfo.SamlIdentityProvider.ExternalIdentities.TotalCount > 0
 		codeAndSecurityPolicySettings, err := c.GetSecurityAndAnalysisForEnterprise(enterprise)
@@ -583,6 +586,7 @@ func (c *Client) collectSpecificEnterprises() ([]githubcollected.Enterprise, err
 			enterpriseQuery.Enterprise.OwnerInfo.TwoFactorRequiredSetting,
 			enterpriseQuery.Enterprise.OwnerInfo.DefaultRepositoryPermissionSetting,
 			enterpriseQuery.Enterprise.OwnerInfo.MembersCanDeleteRepositoriesSetting,
+			enterpriseQuery.Enterprise.OwnerInfo.NotificationDeliveryRestrictionEnabledSetting,
 			samlEnabled,
 			codeAndSecurityPolicySettings)
 		res = append(res, newEnter)
