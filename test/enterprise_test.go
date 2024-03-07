@@ -9,7 +9,8 @@ import (
 
 func makeEnterpriseForPolicy(policy string) githubcollected.Enterprise {
 	return githubcollected.Enterprise{
-		MembersCanChangeRepositoryVisibilitySetting: policy,
+		MembersCanChangeRepositoryVisibilitySetting:   policy,
+		NotificationDeliveryRestrictionEnabledSetting: policy,
 		EnterpriseName: "name",
 		Url:            "url",
 	}
@@ -23,6 +24,21 @@ func TestEnterpriseVisibilityChangePolicy(t *testing.T) {
 		"ENABLED":   true,
 		"NO_POLICY": true,
 		"DISABLED":  false,
+	}
+
+	for i := range policies {
+		enterpriseTestTemplate(t, name, makeEnterpriseForPolicy(i), testedPolicyName, policies[i], scm_type.GitHub)
+	}
+}
+
+func TestEnterpriseNotificationRestrictionPolicy(t *testing.T) {
+	name := "Enterprise Should Send Email Notifications Only To Verified Domains"
+	testedPolicyName := "enable_email_notification_to_verified_domains"
+
+	policies := map[string]bool{
+		"ENABLED":   false,
+		"NO_POLICY": true,
+		"DISABLED":  true,
 	}
 
 	for i := range policies {

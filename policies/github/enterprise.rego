@@ -171,3 +171,17 @@ default enable_push_protection_secret_scanning := true
 enable_push_protection_secret_scanning := false {
 	input.code_analysis_and_security_policies.secret_scanning_push_protection_enabled_for_new_repositories == true
 }
+
+# METADATA
+# scope: rule
+# title: Enterprise Should Send Email Notifications Only To Verified Domains
+# description: The enterprise should mitigate the leakage of sensitive data by allowing email notifications to be sent only to verified or approved domains.
+# custom:
+#   severity: MEDIUM
+#   remediationSteps: [Make sure you are an enterprise owner, Go to the Enterprise Landing page, Under the ‘Settings’ tab on the left click ‘Verified & approved domains’, Press the 'Add a domain' button and follow the instructions in the menu, Check the 'Restrict email notifications to only approved or verified domains' box, Press 'Save']
+#   requiredScopes: [admin:enterprise]
+default enable_email_notification_to_verified_domains := true
+
+enable_email_notification_to_verified_domains := false {
+	input.notification_delivery_restriction_enabled == "ENABLED"
+}
