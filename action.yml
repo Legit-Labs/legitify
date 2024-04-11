@@ -12,7 +12,7 @@ inputs:
     required: false
     default: "false"
   repositories:
-    description: "Strings of owner/repo. If this is set, only selected repositories will be analyzed"
+    description: "Strings of owner/repo seperated by a comma. If this is set, only selected repositories will be analyzed"
     required: false
   legitify_base_version:
     description: "The base version of legitify to use. Non breaking changes will be auto updated."
