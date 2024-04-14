@@ -1,6 +1,9 @@
 package namespace
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Namespace = string
 
@@ -25,15 +28,16 @@ var All = []Namespace{
 func ValidateNamespaces(namespace []Namespace) error {
 	for _, ns := range namespace {
 		found := false
+		trimmed := strings.Trim(ns, " ")
 		for _, e := range All {
-			if e == ns {
+			if e == trimmed {
 				found = true
 				break
 			}
 		}
 
 		if !found {
-			return fmt.Errorf("invalid namespace %s", ns)
+			return fmt.Errorf("invalid namespace %s", trimmed)
 		}
 	}
 

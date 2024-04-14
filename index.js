@@ -140,7 +140,14 @@ async function fetchLegitifyReleaseUrl(baseVersion) {
 
 function breakStringToParams(str) {
   const pattern = /(-{1,2}\S+)(?:\s+((?!\s*-).+?)(?=\s+-{1,2}|\s*$))?/g;
-  return str.match(pattern)
+  const matches = str.matchAll(pattern)
+  let args = []
+
+  for (const m of matches) {
+    args.push(m[1], m[2])
+  }
+
+  return args
 }
 
 function generateAnalyzeArgs(repo, owner) {
