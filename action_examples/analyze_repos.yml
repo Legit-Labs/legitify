@@ -16,4 +16,4 @@ jobs:
         uses: Legit-Labs/legitify@main # it is recommended to use a specific commit hash
         with:
           github_token: ${{ secrets.PAT_FOR_LEGITIFY }}
-          repositories: owner1/repo1 owner1/repo2
+          repositories: owner1/repo1, owner1/repo2
