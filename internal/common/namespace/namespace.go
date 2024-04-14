@@ -28,7 +28,7 @@ var All = []Namespace{
 func ValidateNamespaces(namespace []Namespace) error {
 	for _, ns := range namespace {
 		found := false
-		trimmed := strings.TrimSpace(ns)
+		trimmed := strings.Trim(ns, " ")
 		for _, e := range All {
 			if e == trimmed {
 				found = true
