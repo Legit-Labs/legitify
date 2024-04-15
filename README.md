@@ -197,7 +197,7 @@ Currently, the following namespaces are supported:
 1. `organization` - GitHub organization (or GitLab group) level policies (e.g., "Two-Factor Authentication Is Not Enforced for the Organization")
 2. `actions` - organization GitHub Actions policies (e.g., "GitHub Actions Runs Are Not Limited To Verified Actions")
 3. `member` - contributor level policies (e.g., "Stale Admin Found")
-4. `repository` - GitHub repository (or GitLab Project) level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
+4. `repository` - GitHub repository (or GitLab Project) level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced"). Note: Archived repositories are ignored unless specified directly via the `--repo` argument.
 5. `runner_group` - runner group policies (e.g, "runner can be used by public repositories")
 
 By default, legitify will analyze all namespaces. You can limit only to selected ones with the `--namespace` flag, and then a comma separated list of the selected namespaces.
