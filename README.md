@@ -102,12 +102,12 @@ ARCH=darwin_arm64
 SCM_TOKEN=<your_token> legitify analyze
 ```
 
-By default, legitify will check the policies against all your resources (organizations, repositories, members, actions).
+By default, legitify will check the policies against all your resources (organizations, repositories, members, actions). Archived repositories are skipped.
 
 You can control which resources will be analyzed with command-line flags namespace and org:
 
 - `--namespace (-n)`: will analyze policies that relate to the specified resources
-- `--org`: will limit the analysis to the specified GitHub organizations or GitLab group
+- `--org`: will limit the analysis to the specified GitHub organizations or GitLab group, excluding archived repositories
 - `--repo`: will limit the analysis to the specified GitHub repositories or GitLab projects
 - `--scm`: specify the source code management platform. Possible values are: `github` or `gitlab`. Defaults to `github`. Please note: when running on GitLab, `--scm gitlab` is required.
 - `--enterprise`: will specify which enterprises should be analyzed. Please note: in order to analyze an enterprise, an enterprise slug must be provided.
@@ -197,7 +197,7 @@ Currently, the following namespaces are supported:
 1. `organization` - GitHub organization (or GitLab group) level policies (e.g., "Two-Factor Authentication Is Not Enforced for the Organization")
 2. `actions` - organization GitHub Actions policies (e.g., "GitHub Actions Runs Are Not Limited To Verified Actions")
 3. `member` - contributor level policies (e.g., "Stale Admin Found")
-4. `repository` - GitHub repository (or GitLab Project) level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced")
+4. `repository` - GitHub repository (or GitLab Project) level policies (e.g., "Code Review By At Least Two Reviewers Is Not Enforced"). Note: Archived repositories are ignored unless specified directly via the `--repo` argument.
 5. `runner_group` - runner group policies (e.g, "runner can be used by public repositories")
 
 By default, legitify will analyze all namespaces. You can limit only to selected ones with the `--namespace` flag, and then a comma separated list of the selected namespaces.

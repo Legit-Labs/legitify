@@ -44,7 +44,7 @@ type totalCountRepoQuery struct {
 	Organization struct {
 		Repositories struct {
 			TotalCount githubv4.Int
-		} `graphql:"repositories(first: 1)"`
+		} `graphql:"repositories(first: 1, isArchived: false)"`
 	} `graphql:"organization(login: $login)"`
 }
 
@@ -180,7 +180,7 @@ type repoQuery struct {
 		Repositories struct {
 			PageInfo ghcollected.GitHubQLPageInfo
 			Nodes    []ghcollected.GitHubQLRepository
-		} `graphql:"repositories(first: 50, after: $repositoryCursor)"`
+		} `graphql:"repositories(first: 50, after: $repositoryCursor, isArchived: false)"`
 	} `graphql:"organization(login: $login)"`
 }
 
