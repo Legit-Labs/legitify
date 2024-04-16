@@ -102,12 +102,12 @@ ARCH=darwin_arm64
 SCM_TOKEN=<your_token> legitify analyze
 ```
 
-By default, legitify will check the policies against all your resources (organizations, repositories, members, actions).
+By default, legitify will check the policies against all your resources (organizations, repositories, members, actions). Archived repositories are skipped.
 
 You can control which resources will be analyzed with command-line flags namespace and org:
 
 - `--namespace (-n)`: will analyze policies that relate to the specified resources
-- `--org`: will limit the analysis to the specified GitHub organizations or GitLab group
+- `--org`: will limit the analysis to the specified GitHub organizations or GitLab group, excluding archived repositories
 - `--repo`: will limit the analysis to the specified GitHub repositories or GitLab projects
 - `--scm`: specify the source code management platform. Possible values are: `github` or `gitlab`. Defaults to `github`. Please note: when running on GitLab, `--scm gitlab` is required.
 - `--enterprise`: will specify which enterprises should be analyzed. Please note: in order to analyze an enterprise, an enterprise slug must be provided.
