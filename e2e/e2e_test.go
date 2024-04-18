@@ -8,7 +8,7 @@ import (
 )
 
 var reportPath = flag.String("report_path", "/tmp/out.json", "legitify report output path")
-
+var test = 5
 const pathToEntityName = "aux->entityName"
 
 func TestGitHub(t *testing.T) {
