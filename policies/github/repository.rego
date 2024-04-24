@@ -548,18 +548,16 @@ users_allowed_to_bypass_ruleset := false {
 #   remediationSteps:
 #      -Enter your repository's landing page
 #      -Go to the settings tab
-#      -Enter your repository's landing page
-#      -Go to the settings tab
-#      -Enter your repository's landing page
-#      -Go to the settings tab
-#      -Enter your repository's landing page
-#      -Go to the settings tab
-#   severity: HIGH
+#      -Under the 'Security' title on the left, choose 'Secrets and variables'
+#      -Click 'Actions'
+#      -Sort secrets by 'Last Updated'
+#      -Regenerate every secret older than one year and add the new value to GitHub's secret manager
+#   severity: MEDIUM
 #   requiredScopes: [repo]
 #   threat: There may be unused unnecessary tokens that have not been inspected and embody a possible attack surface. In addition, sensitive data may have been inadvertently been made public in the past, and an attacker that hold this data may gain access to your currents CI and services.
 repository_secret_is_stale[stale] := true{
     some index
-    secret := input.RepoSecrets.Secrets[index]
+    secret := input.repository_secrets.Secrets[index]
     is_stale(secret.UpdatedAt)
     stale :={
     "name" : secret.Name,
