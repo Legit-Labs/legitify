@@ -539,3 +539,38 @@ users_allowed_to_bypass_ruleset := false {
     rule := input.rules_set[index]
     count(rule.ruleset.bypass_actors) == 0
 }
+
+# METADATA
+# scope: rule
+# title: Repository Has Stale Secrets
+# description: Some of the repository secrets have not been updated for over a year. It is recommended to refresh secret values regularly in order to minimize the risk of breach in case of an information leak.
+# custom:
+#   remediationSteps:
+#      -Enter your repository's landing page
+#      -Go to the settings tab
+#      -Enter your repository's landing page
+#      -Go to the settings tab
+#      -Enter your repository's landing page
+#      -Go to the settings tab
+#      -Enter your repository's landing page
+#      -Go to the settings tab
+#   severity: HIGH
+#   requiredScopes: [repo]
+#   threat: There may be unused unnecessary tokens that have not been inspected and embody a possible attack surface. In addition, sensitive data may have been inadvertently been made public in the past, and an attacker that hold this data may gain access to your currents CI and services.
+repository_secret_is_stale[stale] := true{
+    some index
+    secret := input.RepoSecrets.Secrets[index]
+    is_stale(secret.UpdatedAt)
+    stale :={
+    "name" : secret.Name,
+    "update date" : secret.UpdatedAt,
+    }
+
+}
+
+is_stale(date) {
+    ns_per_year := 365 * 24 * 60 * 60 * 1000000000
+    event_time_ns := time.parse_rfc3339_ns(date)
+    diff_ns := time.now_ns() - event_time_ns
+    diff_ns > ns_per_year
+}

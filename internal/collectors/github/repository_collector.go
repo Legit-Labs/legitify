@@ -3,13 +3,12 @@ package github
 import (
 	"context"
 	"fmt"
-	"log"
-	"net/http"
-
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
+	"log"
+	"net/http"
 
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -246,6 +245,8 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	repo = rc.withRepositoryHooks(repo, login)
 	repo = rc.withRepoCollaborators(repo, login)
 	repo = rc.withActionsSettings(repo, login)
+	repo = rc.withSecrets(repo, login)
+	fmt.Println(repo)
 
 	repo, err = rc.withDependencyGraphManifestsCount(repo, login)
 	if err != nil {
@@ -386,6 +387,16 @@ func (rc *repositoryCollector) withRulesSet(repository ghcollected.Repository, o
 
 	repository.RulesSet = rules
 	return repository, nil
+}
+
+func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, login string) ghcollected.Repository {
+	secrets, err := rc.Client.GetRepositorySecrets(repository.Name(), login)
+	if err != nil {
+		//add prerequisite / scope / error
+		return repository
+	}
+	repository.RepoSecrets = secrets
+	return repository
 }
 
 // fixBranchProtectionInfo fixes the branch protection info for the repository,
