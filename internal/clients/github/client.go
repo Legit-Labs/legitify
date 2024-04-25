@@ -636,7 +636,7 @@ func (c *Client) GetSecurityAndAnalysisForEnterprise(enterprise string) (*types.
 }
 
 func (c *Client) GetRepositorySecrets(repo, owner string) (*gh.Secrets, error) {
-	secrets, res, err := c.client.Actions.ListRepoSecrets(c.context, repo, owner, nil)
+	secrets, res, err := c.client.Actions.ListRepoSecrets(c.context, owner, repo, nil)
 	if err != nil {
 		return nil, err
 	}

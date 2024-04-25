@@ -246,7 +246,6 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	repo = rc.withRepoCollaborators(repo, login)
 	repo = rc.withActionsSettings(repo, login)
 	repo = rc.withSecrets(repo, login)
-	fmt.Println(repo)
 
 	repo, err = rc.withDependencyGraphManifestsCount(repo, login)
 	if err != nil {
@@ -395,7 +394,11 @@ func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, lo
 		//add prerequisite / scope / error
 		return repository
 	}
-	repository.RepoSecrets = secrets
+	var repoSecrets []*ghcollected.RepositorySecret
+	for i := 0; i < len(secrets.Secrets); i++ {
+		repoSecrets = append(repoSecrets, &ghcollected.RepositorySecret{secrets.Secrets[i].Name, int(secrets.Secrets[i].UpdatedAt.Time.UnixNano())})
+	}
+	repository.RepoSecrets = repoSecrets
 	return repository
 }
 

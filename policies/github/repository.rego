@@ -557,18 +557,17 @@ users_allowed_to_bypass_ruleset := false {
 #   threat: There may be unused unnecessary tokens that have not been inspected and embody a possible attack surface. In addition, sensitive data may have been inadvertently been made public in the past, and an attacker that hold this data may gain access to your currents CI and services.
 repository_secret_is_stale[stale] := true{
     some index
-    secret := input.repository_secrets.Secrets[index]
-    is_stale(secret.UpdatedAt)
+    secret := input.repository_secrets[index]
+    is_stale(secret.updated_at)
     stale :={
-    "name" : secret.Name,
-    "update date" : secret.UpdatedAt,
+    "name" : secret.name,
+    "update date" : secret.updated_at,
     }
 
 }
 
 is_stale(date) {
     ns_per_year := 365 * 24 * 60 * 60 * 1000000000
-    event_time_ns := time.parse_rfc3339_ns(date)
-    diff_ns := time.now_ns() - event_time_ns
+    diff_ns := time.now_ns() - date
     diff_ns > ns_per_year
 }
