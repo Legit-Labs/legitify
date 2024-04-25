@@ -546,20 +546,20 @@ users_allowed_to_bypass_ruleset := false {
 # description: Some of the repository secrets have not been updated for over a year. It is recommended to refresh secret values regularly in order to minimize the risk of breach in case of an information leak.
 # custom:
 #   remediationSteps:
-#      -Enter your repository's landing page
-#      -Go to the settings tab
-#      -Under the 'Security' title on the left, choose 'Secrets and variables'
-#      -Click 'Actions'
-#      -Sort secrets by 'Last Updated'
-#      -Regenerate every secret older than one year and add the new value to GitHub's secret manager
+#      - Enter your repository's landing page
+#      - Go to the settings tab
+#      - Under the 'Security' title on the left, choose 'Secrets and variables'
+#      - Click 'Actions'
+#      - Sort secrets by 'Last Updated'
+#      - Regenerate every secret older than one year and add the new value to GitHub's secret manager
 #   severity: MEDIUM
 #   requiredScopes: [repo]
-#   threat: There may be unused unnecessary tokens that have not been inspected and embody a possible attack surface. In addition, sensitive data may have been inadvertently been made public in the past, and an attacker that hold this data may gain access to your currents CI and services.
+#   threat: Sensitive data may have been inadvertently been made public in the past, and an attacker that hold this data may gain access to your currents CI and services. In addition, there may be unused unnecessary tokens that have not been inspected and embody a possible attack surface.
 repository_secret_is_stale[stale] := true{
     some index
     secret := input.repository_secrets[index]
     is_stale(secret.updated_at)
-    stale :={
+    stale := {
     "name" : secret.name,
     "update date" : secret.updated_at,
     }
