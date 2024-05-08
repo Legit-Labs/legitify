@@ -50,12 +50,5 @@ func createSecretListEnrichment(extraData interface{}) (GenericListEnrichment, e
 		result = append(result, *map_utils.ToKeySortedMap(secretsEnrichment))
 	}
 
-	// order by url to maintain a determenistic order
-	//sort.Slice(result, func(i, j int) bool {
-	//	urlI := map_utils.UnsafeGet[string](&result[i], "url")
-	//	urlJ := map_utils.UnsafeGet[string](&result[j], "url")
-	//	return strings.Compare(urlI, urlJ) < 0
-	//})
-
 	return result, nil
 }
