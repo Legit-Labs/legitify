@@ -645,3 +645,14 @@ func (c *Client) GetRepositorySecrets(repo, owner string) (*gh.Secrets, error) {
 	}
 	return secrets, nil
 }
+
+func (c *Client) GetOrganizationSecrets(org string) (*gh.Secrets, error) {
+	secrets, res, err := c.client.Actions.ListOrgSecrets(c.context, org, nil)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("unexpected HTTP status: %d", res.StatusCode)
+	}
+	return secrets, nil
+}

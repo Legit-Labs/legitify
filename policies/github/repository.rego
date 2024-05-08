@@ -545,6 +545,7 @@ users_allowed_to_bypass_ruleset := false {
 # title: Repository Has Stale Secrets
 # description: Some of the repository secrets have not been updated for over a year. It is recommended to refresh secret values regularly in order to minimize the risk of breach in case of an information leak.
 # custom:
+#   requiredEnrichers: [secretsList]
 #   remediationSteps:
 #      - Enter your repository's landing page
 #      - Go to the settings tab
@@ -554,14 +555,14 @@ users_allowed_to_bypass_ruleset := false {
 #      - Regenerate every secret older than one year and add the new value to GitHub's secret manager
 #   severity: MEDIUM
 #   requiredScopes: [repo]
-#   threat: Sensitive data may have been inadvertently been made public in the past, and an attacker that hold this data may gain access to your currents CI and services. In addition, there may be unused unnecessary tokens that have not been inspected and embody a possible attack surface.
+#   threat: Sensitive data may have been inadvertently made public in the past, and an attacker who holds this data may gain access to your current CI and services. In addition, there may be old or unnecessary tokens that have not been inspected and can be used to access sensitive information.
 repository_secret_is_stale[stale] := true{
     some index
     secret := input.repository_secrets[index]
     is_stale(secret.updated_at)
     stale := {
-    "name" : secret.name,
-    "update date" : secret.updated_at,
+        "name" : secret.name,
+        "update date" : time.format(secret.updated_at),
     }
 
 }
