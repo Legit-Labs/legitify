@@ -396,7 +396,10 @@ func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, lo
 	}
 	var repoSecrets []*ghcollected.RepositorySecret
 	for i := 0; i < len(secrets.Secrets); i++ {
-		repoSecrets = append(repoSecrets, &ghcollected.RepositorySecret{secrets.Secrets[i].Name, int(secrets.Secrets[i].UpdatedAt.Time.UnixNano())})
+		repoSecrets = append(repoSecrets, &ghcollected.RepositorySecret{
+			Name:      secrets.Secrets[i].Name,
+			UpdatedAt: int(secrets.Secrets[i].UpdatedAt.Time.UnixNano()),
+		})
 	}
 	repository.RepoSecrets = repoSecrets
 	return repository

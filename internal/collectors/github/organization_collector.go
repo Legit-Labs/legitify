@@ -139,7 +139,9 @@ func (c *organizationCollector) collectOrgSecrets(org string) []*ghcollected.Org
 	}
 	var orgSecrets []*ghcollected.OrganizationSecret
 	for i := 0; i < len(secrets.Secrets); i++ {
-		orgSecrets = append(orgSecrets, &ghcollected.OrganizationSecret{secrets.Secrets[i].Name, int(secrets.Secrets[i].UpdatedAt.Time.UnixNano())})
+		orgSecrets = append(orgSecrets, &ghcollected.OrganizationSecret{
+			Name:      secrets.Secrets[i].Name,
+			UpdatedAt: int(secrets.Secrets[i].UpdatedAt.Time.UnixNano())})
 	}
 
 	return orgSecrets
