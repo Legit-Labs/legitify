@@ -1,7 +1,5 @@
 package repository
 
-import data.common.webhooks as webhookUtils
-
 # METADATA
 # scope: rule
 # title: Repository Has Stale Secrets
