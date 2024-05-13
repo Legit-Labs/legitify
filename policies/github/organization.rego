@@ -1,6 +1,7 @@
 package organization
 
 import data.common.webhooks as webhookUtils
+import data.common.secrets as secretUtils
 
 # METADATA
 # scope: rule
@@ -125,21 +126,14 @@ organization_not_using_single_sign_on := false {
 #      - Sort secrets by 'Last Updated'
 #      - Regenerate every secret older than one year and add the new value to GitHub's secret manager
 #   severity: MEDIUM
-#   requiredScopes: [repo]
+#   requiredScopes: [admin:org, repo]
 #   threat: Sensitive data may have been inadvertently made public in the past, and an attacker who holds this data may gain access to your current CI and services. In addition, there may be old or unnecessary tokens that have not been inspected and can be used to access sensitive information.
 organization_secret_is_stale[stale] := true{
     some index
     secret := input.organization_secrets[index]
-    is_stale(secret.updated_at)
+    secretUtils.is_stale(secret.updated_at)
     stale := {
     "name" : secret.name,
     "update date" : time.format(secret.updated_at),
     }
-
-}
-
-is_stale(date) {
-    ns_per_year := 365 * 24 * 60 * 60 * 1000000000
-    diff_ns := time.now_ns() - date
-    diff_ns > ns_per_year
 }

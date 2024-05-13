@@ -1,5 +1,7 @@
 package repository
 
+import data.common.secrets as secretUtils
+
 # METADATA
 # scope: rule
 # title: Repository Has Stale Secrets
@@ -19,16 +21,10 @@ package repository
 repository_secret_is_stale[stale] := true{
     some index
     secret := input.repository_secrets[index]
-    is_stale(secret.updated_at)
+    secretUtils.is_stale(secret.updated_at)
     stale := {
         "name" : secret.name,
         "update date" : time.format(secret.updated_at),
     }
 
-}
-
-is_stale(date) {
-    ns_per_year := 365 * 24 * 60 * 60 * 1000000000
-    diff_ns := time.now_ns() - date
-    diff_ns > ns_per_year
 }

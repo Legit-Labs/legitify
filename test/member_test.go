@@ -51,7 +51,7 @@ func TestMember(t *testing.T) {
 				hasLastActive: true,
 				members: []githubcollected.OrganizationMember{
 					{
-						LastActive: int(time.Now().AddDate(0, -9, 0).UnixNano()),
+						LastActive: int(time.Now().AddDate(-1, -2, 0).UnixNano()),
 						IsAdmin:    true,
 					},
 				},

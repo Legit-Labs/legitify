@@ -1,5 +1,6 @@
 package member
 
+import data.common.members as memberUtils
 # METADATA
 # scope: rule
 # title: Organization Should Have Fewer Than Three Owners
@@ -36,7 +37,7 @@ stale_member_found[mem] := true {
 	mem := input.members[member]
 	mem.is_admin == false
 	mem.last_active != -1
-	isStale(mem.last_active, 6)
+	memberUtils.isStale(mem.last_active, 6)
 }
 
 # METADATA
@@ -57,13 +58,5 @@ stale_admin_found[mem] := true {
 	mem := input.members[member]
 	mem.is_admin == true
 	mem.last_active != -1
-	isStale(mem.last_active, 6)
-}
-
-isStale(target_last_active, count_months) {
-	now := time.now_ns()
-	diff := time.diff(now, target_last_active)
-
-	# diff[1] the months index
-	diff[1] >= count_months
+	memberUtils.isStale(mem.last_active, 6)
 }

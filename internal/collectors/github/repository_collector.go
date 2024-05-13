@@ -245,7 +245,10 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	repo = rc.withRepositoryHooks(repo, login)
 	repo = rc.withRepoCollaborators(repo, login)
 	repo = rc.withActionsSettings(repo, login)
-	repo = rc.withSecrets(repo, login)
+	repo, err = rc.withSecrets(repo, login)
+	if err != nil {
+		log.Printf("failed to collect repository secrets for %s: %s", repo.Repository.Name, err)
+	}
 
 	repo, err = rc.withDependencyGraphManifestsCount(repo, login)
 	if err != nil {
@@ -388,11 +391,10 @@ func (rc *repositoryCollector) withRulesSet(repository ghcollected.Repository, o
 	return repository, nil
 }
 
-func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, login string) ghcollected.Repository {
+func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, login string) (ghcollected.Repository, error) {
 	secrets, err := rc.Client.GetRepositorySecrets(repository.Name(), login)
 	if err != nil {
-		//add prerequisite / scope / error
-		return repository
+		return repository, err
 	}
 	var repoSecrets []*ghcollected.RepositorySecret
 	for i := 0; i < len(secrets.Secrets); i++ {
@@ -402,7 +404,7 @@ func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, lo
 		})
 	}
 	repository.RepoSecrets = repoSecrets
-	return repository
+	return repository, nil
 }
 
 // fixBranchProtectionInfo fixes the branch protection info for the repository,
