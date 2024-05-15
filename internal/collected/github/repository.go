@@ -71,6 +71,12 @@ type Repository struct {
 	ActionsTokenPermissions      *types.TokenPermissions           `json:"actions_token_permissions"`
 	DependencyGraphManifests     *GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests"`
 	RulesSet                     []*types.RepositoryRule           `json:"rules_set,omitempty"`
+	RepoSecrets                  []*RepositorySecret               `json:"repository_secrets,omitempty"`
+}
+
+type RepositorySecret struct {
+	Name      string `json:"name"`
+	UpdatedAt int    `json:"updated_at"`
 }
 
 func (r Repository) ViolationEntityType() string {
