@@ -10,8 +10,8 @@ package member
 #   remediationSteps:
 #     - 1. Login with the user credentials
 #     - 2. Go to the user settings page
-#     - 3. Select "Account" on the left navigation bar
-#     - 4. Press "Enable two-factor authentication"
+#     - 3. Select 'Account' on the left navigation bar
+#     - 4. Press 'Enable two-factor authentication'
 #   threat:
 #     - Collaborators without two-factor authentication are prime targets for phishing and social engineering attacks, as compromise only requires acquiring the collaborator's password.
 default two_factor_authentication_is_disabled_for_a_collaborator := true
@@ -30,8 +30,8 @@ two_factor_authentication_is_disabled_for_a_collaborator := false {
 #   remediationSteps:
 #     - 1. Login with the user credentials
 #     - 2. Go to the user settings page
-#     - 3. Select "Account" on the left navigation bar
-#     - 4. Press "Enable two-factor authentication"
+#     - 3. Select 'Account' on the left navigation bar
+#     - 4. Press 'Enable two-factor authentication'
 #   threat:
 #     - Collaborators without two-factor authentication are prime targets for phishing and social engineering attacks, as compromise only requires acquiring the collaborator's password.
 #     - This is doubly important for external collaborators, as these are identities that aren't likely managed by you or your organization and may be easier to compromise.

@@ -9,10 +9,10 @@ package enterprise
 #   remediationSteps:
 #     - 1. Make sure you are an enterprise owner
 #     - 2. Go to the policies page
-#     - 3. Under the "Repository visibility change" section, choose the "Disabled" option
+#     - 3. Under the 'Repository visibility change' section, choose the 'Disabled' option
 #   requiredScopes: [admin:enterprise]
 #   threat:
-#     - 'A member of the organization could inadvertently or maliciously make public an internal repository exposing confidential data.'
+#     - A member of the organization could inadvertently or maliciously make public an internal repository exposing confidential data.
 default enterprise_not_using_visibility_change_disable_policy := true
 
 enterprise_not_using_visibility_change_disable_policy := false {
@@ -29,7 +29,7 @@ enterprise_not_using_visibility_change_disable_policy := false {
 #   remediationSteps:
 #     - 1. Make sure you are an enterprise owner
 #     - 2. Go to the policies page
-#     - 3. Under the "Repository Forking" section, Choose the "Disabled" option
+#     - 3. Under the 'Repository Forking' section, Choose the 'Disabled' option
 #   requiredScopes: [admin:enterprise]
 #   threat:
 #     - Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
@@ -49,7 +49,7 @@ enterprise_allows_forking_repos := false {
 #   remediationSteps:
 #     - 1. Make sure you are an enterprise owner
 #     - 2. Go to the policies page
-#     - 3. Under the "Repository creation" section, Choose the "Members can create repositories" option and uncheck 'Public'
+#     - 3. Under the 'Repository creation' section, Choose the 'Members can create repositories' option and uncheck 'Public'
 #   requiredScopes: [admin:enterprise]
 #   threat:
 #     - Users can accidentally create public repositories and expose source code.
@@ -69,7 +69,7 @@ enterprise_allows_creating_public_repos := false {
 #   remediationSteps:
 #     - 1. Make sure you are an enterprise owner
 #     - 2. Go to the policies page
-#     - 3. Under the "Repository outside collaborators" section, choose the "Enterprise Owners Only" or the "Organization Owners Only" option
+#     - 3. Under the 'Repository outside collaborators' section, choose the 'Enterprise Owners Only' or the 'Organization Owners Only' option
 #   requiredScopes: [admin:enterprise]
 #   threat:
 #     - Inviting external collaborators could result in a loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
@@ -89,7 +89,7 @@ enterprise_allows_inviting_externals_collaborators := false {
 #     - 1. Make sure you are an enterprise owner
 #     - 2. Go to the Settings page
 #     - 3. Go to the Authentication security tab
-#     - 4. Check the "Require two-factor authentication for all organizations in the enterprise" checkbox
+#     - 4. Check the 'Require two-factor authentication for all organizations in the enterprise' checkbox
 #   requiredScopes: [admin:enterprise]
 #   threat:
 #     - If an attacker gets valid credentials for one of the enterprise’s users they can authenticate to your GitHub enterprise.
@@ -110,9 +110,9 @@ enterprise_enforce_two_factor_authentication := false {
 #     - 1. Make sure you are an enterprise owner
 #     - 2. Go to the Settings page
 #     - 3. Go to the Authentication security tab
-#     - 4. Toggle on "Enable SAML authentication"
+#     - 4. Toggle on 'Enable SAML authentication'
 #     - 5. Fill in the remaining SSO configuration as instructed on the screen
-#     - 6. Click "Save"
+#     - 6. Click 'Save'
 #   requiredScopes: [admin:enterprise]
 #   threat: Not using an SSO solution makes it more difficult to track a potentially compromised user's actions across different systems, prevents common password policy throughout the enterprise, and makes it challenging to audit different aspects of the user's behavior.
 default enterprise_not_using_single_sign_on := true
@@ -123,7 +123,7 @@ enterprise_not_using_single_sign_on := false {
 
 # METADATA
 # scope: rule
-# title: Enterprise Should Define Base Permissions As "No Permission" For All Members
+# title: Enterprise Should Define Base Permissions As 'No Permission' For All Members
 # description: Collaborators in your organizations should receive access to specific organizations and repositories as necessary, and not have read and write access to all repositories across the enterprise.
 # custom:
 #   severity: MEDIUM

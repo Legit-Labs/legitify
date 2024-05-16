@@ -36,13 +36,13 @@ repository_not_maintained := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repository settings page
-#     - 3. Press "Collaborators and teams"
+#     - 3. Press 'Collaborators and teams'
 #     - 4. Select the unwanted admin users
-#     - 5. Select "Change Role"
+#     - 5. Select 'Change Role'
 #   requiredScopes: [read:org,repo]
 #   threat:
-#     - "A compromised user with admin permissions can initiate a supply chain attack in a plethora of ways."
-#     - "Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past."
+#     - A compromised user with admin permissions can initiate a supply chain attack in a plethora of ways.
+#     - Having many admin users increases the overall risk of user compromise, and makes it more likely to lose track of unused admin permissions given to users in the past.
 default repository_has_too_many_admins := true
 
 repository_has_too_many_admins := false {
@@ -60,21 +60,21 @@ repository_has_too_many_admins := false {
 #   remediationSteps:
 #     - 1. Make sure you can manage webhooks for the repository
 #     - 2. Go to the repository settings page
-#     - 3. Select "Webhooks"
+#     - 3. Select 'Webhooks'
 #     - 4. Press on the insecure webhook
 #     - 5. Configure a secret
-#     - 6. Click "Update webhook"
+#     - 6. Click 'Update webhook'
 #   requiredScopes: [read:repo_hook, repo]
 #   threat:
-#     - "Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request."
-#     - "This allows attackers to masquerade as your repository, potentially creating an unstable or insecure state in other systems."
+#     - 'Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request.'
+#     - 'This allows attackers to masquerade as your repository, potentially creating an unstable or insecure state in other systems.'
 repository_webhook_no_secret[violated] := true {
 	some index
 	hook := input.hooks[index]
 	not webhookUtils.has_secret(hook)
 	violated := {
-		"name": hook.name,
-		"url": hook.url,
+		'name': hook.name,
+		'url': hook.url,
 	}
 }
 
@@ -88,22 +88,22 @@ repository_webhook_no_secret[violated] := true {
 #   remediationSteps:
 #     - 1. Make sure you can manage webhooks for the repository
 #     - 2. Go to the repository settings page
-#     - 3. Select "Webhooks"
+#     - 3. Select 'Webhooks'
 #     - 4. Verify URL starts with https
 #     - 5. Press on the insecure webhook
-#     - 6. Enable "SSL verification"
-#     - 7. Click "Update webhook"
+#     - 6. Enable 'SSL verification'
+#     - 7. Click 'Update webhook'
 #   requiredScopes: [read:repo_hook, repo]
 #   threat:
-#     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it to freely read and affect the response of any webhook request."
-#     - "In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain."
+#     - 'If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it to freely read and affect the response of any webhook request.'
+#     - 'In the case of GitHub Enterprise Server instances, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain.'
 repository_webhook_doesnt_require_ssl[violated] := true {
 	some index
 	hook := input.hooks[index]
 	not webhookUtils.ssl_enabled(hook)
 	violated := {
-		"name": hook.name,
-		"url": hook.url,
+		'name': hook.name,
+		'url': hook.url,
 	}
 }
 
@@ -115,8 +115,8 @@ repository_webhook_doesnt_require_ssl[violated] := true {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "General" tab
-#     - 4. Under "Features", Toggle off "Allow forking"
+#     - 3. Enter 'General' tab
+#     - 4. Under 'Features', Toggle off 'Allow forking'
 #   severity: LOW
 #   requiredScopes: [read:org]
 #   threat: Forked repositories cause more code and secret sprawl in the organization as forks are independent copies of the repository and need to be tracked separately, making it more difficult to keep track of sensitive assets and contain potential incidents.
@@ -135,12 +135,12 @@ forking_allowed_for_repository := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Add rule"
-#     - 6. Set "Branch name pattern" as the default branch name (usually "main" or "master")
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Add rule'
+#     - 6. Set 'Branch name pattern' as the default branch name (usually 'main' or 'master')
 #     - 7. Set desired protections
-#     - 8. Click "Create" and save the rule
+#     - 8. Click 'Create' and save the rule
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -154,7 +154,7 @@ missing_default_branch_protection := false {
 missing_default_branch_protection := false {
     some index
     rule := input.rules_set[index]
-    rule.type == "pull_request"
+    rule.type == 'pull_request'
 }
 
 # METADATA
@@ -166,10 +166,10 @@ missing_default_branch_protection := false {
 #     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Edit" on the default branch rule
-#     - 6. Uncheck "Allow deletions", Click "Save changes"
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Uncheck 'Allow deletions', Click 'Save changes'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -183,7 +183,7 @@ missing_default_branch_protection_deletion := false {
 missing_default_branch_protection_deletion := false {
     some index
     rule := input.rules_set[index]
-    rule.type == "deletion"
+    rule.type == 'deletion'
 }
 
 # METADATA
@@ -195,11 +195,11 @@ missing_default_branch_protection_deletion := false {
 #     - 1. Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page
 #     - 2. Make sure you have admin permissions
 #     - 3. Go to the repo's settings page
-#     - 4. Enter "Branches" tab
-#     - 5. Under "Branch protection rules"
-#     - 6. Click "Edit" on the default branch rule
-#     - 7. Uncheck "Allow force pushes"
-#     - 8. Click "Save changes"
+#     - 4. Enter 'Branches' tab
+#     - 5. Under 'Branch protection rules'
+#     - 6. Click 'Edit' on the default branch rule
+#     - 7. Uncheck 'Allow force pushes'
+#     - 8. Click 'Save changes'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -213,7 +213,7 @@ missing_default_branch_protection_force_push := false {
 missing_default_branch_protection_force_push := false {
     some index
     rule := input.rules_set[index]
-    rule.type == "non_fast_forward"
+    rule.type == 'non_fast_forward'
 }
 
 # METADATA
@@ -225,12 +225,12 @@ missing_default_branch_protection_force_push := false {
 #     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Edit" on the default branch rule
-#     - 6. Check "Require status checks to pass before merging"
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Check 'Require status checks to pass before merging'
 #     - 7. Add the required checks that must pass before merging (tests, lint, etc...)
-#     - 8. Click "Save changes"
+#     - 8. Click 'Save changes'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -244,7 +244,7 @@ requires_status_checks := false {
 requires_status_checks := false {
     some index
     rule := input.rules_set[index]
-    rule.type == "required_status_checks"
+    rule.type == 'required_status_checks'
     count(rule.parameters.required_status_checks) > 0
 }
 
@@ -257,12 +257,12 @@ requires_status_checks := false {
 #     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Edit" on the default branch rule
-#     - 6. Check "Require status checks to pass before merging"
-#     - 7. Check "Require branches to be up to date before merging"
-#     - 8. Click "Save changes"
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Check 'Require status checks to pass before merging'
+#     - 7. Check 'Require branches to be up to date before merging'
+#     - 8. Click 'Save changes'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -277,7 +277,7 @@ requires_branches_up_to_date_before_merge := false {
 requires_branches_up_to_date_before_merge := false {
     some index
     rule := input.rules_set[index]
-    rule.type == "required_status_checks"
+    rule.type == 'required_status_checks'
     count(rule.parameters.required_status_checks) > 0
     rule.parameters.strict_required_status_checks_policy
 }
@@ -291,12 +291,12 @@ requires_branches_up_to_date_before_merge := false {
 #     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Edit" on the default branch rule
-#     - 6. Check "Require a pull request before merging"
-#     - 7. Check "Dismiss stale pull request approvals when new commits are pushed"
-#     - 8. Click "Save changes"
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Check 'Require a pull request before merging'
+#     - 7. Check 'Dismiss stale pull request approvals when new commits are pushed'
+#     - 8. Click 'Save changes'
 #   severity: LOW
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -310,7 +310,7 @@ dismisses_stale_reviews := false {
 dismisses_stale_reviews := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == "pull_request"
+	rule.type == 'pull_request'
 	rule.parameters.dismiss_stale_reviews_on_push
 }
 
@@ -323,13 +323,13 @@ dismisses_stale_reviews := false {
 #     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Edit" on the default branch rule
-#     - 6. Check "Require a pull request before merging"
-#     - 7. Check "Require approvals"
-#     - 8. Set "Required number of approvals before merging" to 1 or more
-#     - 9. Click "Save changes"
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Check 'Require a pull request before merging'
+#     - 7. Check 'Require approvals'
+#     - 8. Set 'Required number of approvals before merging' to 1 or more
+#     - 9. Click 'Save changes'
 #   severity: HIGH
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -343,7 +343,7 @@ code_review_not_required := false {
 code_review_not_required := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == "pull_request"
+	rule.type == 'pull_request'
 	rule.parameters.required_approving_review_count >= 1
 }
 
@@ -357,13 +357,13 @@ code_review_not_required := false {
 #     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Edit" on the default branch rule
-#     - 6. Check "Require a pull request before merging"
-#     - 7. Check "Require approvals"
-#     - 8. Set "Required number of approvals before merging" to 2 or more
-#     - 9. Click "Save changes"
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Check 'Require a pull request before merging'
+#     - 7. Check 'Require approvals'
+#     - 8. Set 'Required number of approvals before merging' to 2 or more
+#     - 9. Click 'Save changes'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -379,7 +379,7 @@ code_review_by_two_members_not_required := false {
 code_review_by_two_members_not_required := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == "pull_request"
+	rule.type == 'pull_request'
 	rule.parameters.required_approving_review_count >= 2
 }
 
@@ -392,12 +392,12 @@ code_review_by_two_members_not_required := false {
 #     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Branches" tab
-#     - 4. Under "Branch protection rules"
-#     - 5. Click "Edit" on the default branch rule
-#     - 6. Check "Require a pull request before merging"
-#     - 7. Check "Require review from Code Owners"
-#     - 8. Click "Save changes"
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Check 'Require a pull request before merging'
+#     - 7. Check 'Require review from Code Owners'
+#     - 8. Click 'Save changes'
 #   severity: LOW
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -411,7 +411,7 @@ code_review_not_limited_to_code_owners := false {
 code_review_not_limited_to_code_owners := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == "pull_request"
+	rule.type == 'pull_request'
 	rule.parameters.require_code_owner_review
 }
 
@@ -424,11 +424,11 @@ code_review_not_limited_to_code_owners := false {
 #      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
-#      - 3. Enter "Branches" tab
-#      - 4. Under "Branch protection rules"
-#      - 5. Click "Edit" on the default branch rule
-#      - 6. Check "Require linear history"
-#      - 7. Click "Save changes"
+#      - 3. Enter 'Branches' tab
+#      - 4. Under 'Branch protection rules'
+#      - 5. Click 'Edit' on the default branch rule
+#      - 6. Check 'Require linear history'
+#      - 7. Click 'Save changes'
 #    severity: MEDIUM
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -442,7 +442,7 @@ non_linear_history := false {
 non_linear_history := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == "required_linear_history"
+	rule.type == 'required_linear_history'
 }
 
 # METADATA
@@ -454,11 +454,11 @@ non_linear_history := false {
 #      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
-#      - 3. Enter "Branches" tab
-#      - 4. Under "Branch protection rules"
-#      - 5. Click "Edit" on the default branch rule
-#      - 6. Check "Require conversation resolution before merging"
-#      - 7. Click "Save changes"
+#      - 3. Enter 'Branches' tab
+#      - 4. Under 'Branch protection rules'
+#      - 5. Click 'Edit' on the default branch rule
+#      - 6. Check 'Require conversation resolution before merging'
+#      - 7. Click 'Save changes'
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -472,7 +472,7 @@ no_conversation_resolution := false {
 no_conversation_resolution := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == "pull_request"
+	rule.type == 'pull_request'
 	rule.parameters.required_review_thread_resolution
 }
 
@@ -485,11 +485,11 @@ no_conversation_resolution := false {
 #      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
-#      - 3. Enter "Branches" tab
-#      - 4. Under "Branch protection rules"
-#      - 5. Click "Edit" on the default branch rule
-#      - 6. Check "Require signed commits"
-#      - 7. Click "Save changes"
+#      - 3. Enter 'Branches' tab
+#      - 4. Under 'Branch protection rules'
+#      - 5. Click 'Edit' on the default branch rule
+#      - 6. Check 'Require signed commits'
+#      - 7. Click 'Save changes'
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -503,7 +503,7 @@ no_signed_commits := false {
 no_signed_commits := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == "required_signatures"
+	rule.type == 'required_signatures'
 }
 
 # METADATA
@@ -515,11 +515,11 @@ no_signed_commits := false {
 #      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
-#      - 3. Enter "Branches" tab
-#      - 4. Under "Branch protection rules"
-#      - 5. Click "Edit" on the default branch rule
-#      - 6. Check "Restrict who can dismiss pull request reviews"
-#      - 7. Click "Save changes"
+#      - 3. Enter 'Branches' tab
+#      - 4. Under 'Branch protection rules'
+#      - 5. Click 'Edit' on the default branch rule
+#      - 6. Check 'Restrict who can dismiss pull request reviews'
+#      - 7. Click 'Save changes'
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -539,12 +539,12 @@ review_dismissal_allowed := false {
 #      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
-#      - 3. Enter "Branches" tab
-#      - 4. Under "Branch protection rules"
-#      - 5. Click "Edit" on the default branch rule
-#      - 6. Check "Restrict who can push to matching branches"
+#      - 3. Enter 'Branches' tab
+#      - 4. Under 'Branch protection rules'
+#      - 5. Click 'Edit' on the default branch rule
+#      - 6. Check 'Restrict who can push to matching branches'
 #      - 7. Choose who should be allowed to push
-#      - 8. Click "Save changes"
+#      - 8. Click 'Save changes'
 #    severity: LOW
 #    requiredScopes: [repo]
 #    prerequisites: [has_branch_protection_permission]
@@ -567,8 +567,8 @@ pushes_are_not_restricted := false {
 #   remediationSteps: 
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Code security and analysis" tab
-#     - 4. Set "Dependabot alerts" as Enabled
+#     - 3. Enter 'Code security and analysis' tab
+#     - 4. Set 'Dependabot alerts' as Enabled
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   threat: An open source vulnerability may be affecting your code without your knowledge, making it vulnerable to exploitation.
@@ -587,8 +587,8 @@ vulnerability_alerts_not_enabled := false {
 #    remediationSteps: 
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
-#      - 3. Enter "Code security and analysis" tab
-#      - 4. Set "Dependency graph" as Enabled
+#      - 3. Enter 'Code security and analysis' tab
+#      - 4. Set 'Dependency graph' as Enabled
 #    severity: MEDIUM
 #    requiredScopes: [repo]
 #    threat: A contributor may add vulnerable third-party dependencies to the repository, introducing vulnerabilities to your application that will only be detected after merge.
@@ -628,7 +628,7 @@ scorecard_score_too_low := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the org's settings page
-#     - 3. Enter "Actions - General" tab
+#     - 3. Enter 'Actions - General' tab
 #     - 4. Under 'Workflow permissions'
 #     - 5. Select 'Read repository contents permission'
 #     - 6. Click 'Save'
@@ -638,7 +638,7 @@ scorecard_score_too_low := false {
 default token_default_permissions_is_read_write := true
 
 token_default_permissions_is_read_write := false {
-	input.actions_token_permissions.default_workflow_permissions == "read"
+	input.actions_token_permissions.default_workflow_permissions == 'read'
 }
 
 # METADATA
@@ -650,7 +650,7 @@ token_default_permissions_is_read_write := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the org's settings page
-#     - 3. Enter "Actions - General" tab
+#     - 3. Enter 'Actions - General' tab
 #     - 4. Under 'Workflow permissions'
 #     - 5. Uncheck 'Allow GitHub actions to create and approve pull requests.'
 #     - 6. Click 'Save'
@@ -670,10 +670,10 @@ actions_can_approve_pull_requests := false{
 # custom:
 #   remediationSteps:
 #     - 1. Go to the repository settings page
-#     - 2. Under "Code and automation", select "Rules -> Rulesets"
+#     - 2. Under 'Code and automation', select 'Rules -> Rulesets'
 #     - 3. Find the relevant ruleset
-#     - 4. Empty the "Bypass list"
-#     - 5. Press "Save Changes"
+#     - 4. Empty the 'Bypass list'
+#     - 5. Press 'Save Changes'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   threat: Attackers that gain access to a user that can bypass the ruleset rules can compromise the codebase without anyone noticing, introducing malicious code that would go straight ahead to production.

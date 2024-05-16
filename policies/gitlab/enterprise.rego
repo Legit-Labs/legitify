@@ -12,9 +12,9 @@ package enterprise
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> General
-#     - 3. Expand "Sign-in restrictions" section
-#     - 4. Toggle "Two-factor authentication"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Sign-in restrictions' section
+#     - 4. Toggle 'Two-factor authentication'
+#     - 5. Press 'Save Changes'
 default require_two_factor_authentication_not_globally_enforced := true
 
 require_two_factor_authentication_not_globally_enforced := false {
@@ -32,9 +32,9 @@ require_two_factor_authentication_not_globally_enforced := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> General
-#     - 3. Expand "Sign-in restrictions" section
-#     - 4. Un toggle "Allow password authentication for Git over HTTP(S)"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Sign-in restrictions' section
+#     - 4. Un toggle 'Allow password authentication for Git over HTTP(S)'
+#     - 5. Press 'Save Changes'
 default password_authentication_enabled_for_git_is_enabled := true
 
 password_authentication_enabled_for_git_is_enabled := false {
@@ -52,9 +52,9 @@ password_authentication_enabled_for_git_is_enabled := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> Network
-#     - 3. Expand "User and IP rate limit" section
-#     - 4. Toggle "Enable authenticated API request rate limit"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'User and IP rate limit' section
+#     - 4. Toggle 'Enable authenticated API request rate limit'
+#     - 5. Press 'Save Changes'
 default throttle_authenticated_api_not_enabled := true
 
 throttle_authenticated_api_not_enabled := false {
@@ -72,9 +72,9 @@ throttle_authenticated_api_not_enabled := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> Repository
-#     - 3. Expand "Default Branch" section
-#     - 4. Toggle "Fully protected"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Default Branch' section
+#     - 4. Toggle 'Fully protected'
+#     - 5. Press 'Save Changes'
 default default_branch_protection_not_globally_enforced := true
 
 default_branch_protection_not_globally_enforced := false {
@@ -93,9 +93,9 @@ default_branch_protection_not_globally_enforced := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> General
-#     - 3. Expand "Visibility and access controls" section
-#     - 4. Under "Restricted visibility levels" toggle "Public"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Visibility and access controls' section
+#     - 4. Under 'Restricted visibility levels' toggle 'Public'
+#     - 5. Press 'Save Changes'
 default all_users_are_allowed_to_create_public_projects := true
 
 all_users_are_allowed_to_create_public_projects := false {
@@ -114,13 +114,13 @@ all_users_are_allowed_to_create_public_projects := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> General
-#     - 3. Expand "Visibility and access controls" section
-#     - 4. Under "Default group visibility" toggle "Private"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Visibility and access controls' section
+#     - 4. Under 'Default group visibility' toggle 'Private'
+#     - 5. Press 'Save Changes'
 default default_group_visibility_is_public := true
 
 default_group_visibility_is_public := false {
-	not input.default_group_visibility == "public"
+	not input.default_group_visibility == 'public'
 }
 
 # METADATA
@@ -134,9 +134,9 @@ default_group_visibility_is_public := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> General
-#     - 3. Expand "Visibility and access controls" section
-#     - 4. Under "Default project visibility" toggle "Private"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Visibility and access controls' section
+#     - 4. Under 'Default project visibility' toggle 'Private'
+#     - 5. Press 'Save Changes'
 default default_project_visibility_is_public := true
 
 default_project_visibility_is_public := false {
@@ -154,9 +154,9 @@ default_project_visibility_is_public := false {
 #   remediationSteps:
 #     - Go to the admin page: Menu -> Admin
 #     - Press Settings -> General
-#     - Expand "Sign-up restrictions" section
-#     - Toggle "Send confirmation email on sign-up"
-#     - Press "Save Changes"
+#     - Expand 'Sign-up restrictions' section
+#     - Toggle 'Send confirmation email on sign-up'
+#     - Press 'Save Changes'
 default send_user_confirmation_email_not_enabled := true
 
 send_user_confirmation_email_not_enabled := false {
@@ -174,9 +174,9 @@ send_user_confirmation_email_not_enabled := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> Network
-#     - 3. Expand "User and IP rate limit" section
-#     - 4. Toggle "Enable unauthenticated API request rate limit" and "Enable unauthenticated web request rate limit"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'User and IP rate limit' section
+#     - 4. Toggle 'Enable unauthenticated API request rate limit' and 'Enable unauthenticated web request rate limit'
+#     - 5. Press 'Save Changes'
 default throttle_unauthenticated_request_not_enabled := true
 
 throttle_unauthenticated_request_not_enabled := false {
@@ -196,9 +196,9 @@ throttle_unauthenticated_request_not_enabled := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> Network
-#     - 3. Expand "Outbound requests" section
-#     - 4. Un toggle "Allow requests to the local network from web hooks and services"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Outbound requests' section
+#     - 4. Un toggle 'Allow requests to the local network from web hooks and services'
+#     - 5. Press 'Save Changes'
 default webhooks_are_allowed_to_be_sent_to_local_network := true
 
 webhooks_are_allowed_to_be_sent_to_local_network := false {
@@ -214,9 +214,9 @@ webhooks_are_allowed_to_be_sent_to_local_network := false {
 #   remediationSteps:
 #     - 1. Go to the admin page: Menu -> Admin
 #     - 2. Press Settings -> General
-#     - 3. Expand "Sign-up restrictions" section
-#     - 4. Un toggle "Sign-up enabled"
-#     - 5. Press "Save Changes"
+#     - 3. Expand 'Sign-up restrictions' section
+#     - 4. Un toggle 'Sign-up enabled'
+#     - 5. Press 'Save Changes'
 default unauthenticated_signup_enabled := true
 
 unauthenticated_signup_enabled := false {

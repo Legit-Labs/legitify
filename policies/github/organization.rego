@@ -13,10 +13,10 @@ import data.common.secrets as secretUtils
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the organization settings page
-#     - 3. Select "Webhooks"
+#     - 3. Select 'Webhooks'
 #     - 4. Press on the insecure webhook
 #     - 5. Configure a secret
-#     - 6. Click "Update webhook"
+#     - 6. Click 'Update webhook'
 #   requiredScopes: [admin:org_hook]
 #   threat:
 #     - Not using a webhook secret makes the service receiving the webhook unable to determine the authenticity of the request.
@@ -41,11 +41,11 @@ organization_webhook_no_secret[violated] := true {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the organization settings page
-#     - 3. Select "Webhooks"
+#     - 3. Select 'Webhooks'
 #     - 4. Press on the insecure webhook
 #     - 5. Verify URL starts with https
-#     - 6. Enable "SSL verification"
-#     - 7. Click "Update webhook"
+#     - 6. Enable 'SSL verification'
+#     - 7. Click 'Update webhook'
 #   requiredScopes: [admin:org_hook]
 #   threat:
 #     - If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request.
@@ -69,10 +69,10 @@ organization_webhook_doesnt_require_ssl[violated] := true {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the organization settings page
-#     - 3. Enter "Authentication security" tab
-#     - 4. Under "Two-factor authentication"
-#     - 5. Toggle on "Require two-factor authentication for everyone in the <ORG> organization"
-#     - 6. Click "Save"
+#     - 3. Enter 'Authentication security' tab
+#     - 4. Under 'Two-factor authentication'
+#     - 5. Toggle on 'Require two-factor authentication for everyone in the <ORG> organization'
+#     - 6. Click 'Save'
 #   requiredScopes: [admin:org]
 #   threat:
 #     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
@@ -92,10 +92,10 @@ two_factor_authentication_not_required_for_org := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the organization settings page
-#     - 3. Enter "Member privileges" tab
-#     - 4. Under "Repository creation"
-#     - 5. Toggle off "Public"
-#     - 6. Click "Save"
+#     - 3. Enter 'Member privileges' tab
+#     - 4. Under 'Repository creation'
+#     - 5. Toggle off 'Public'
+#     - 6. Click 'Save'
 #   requiredScopes: [read:org]
 #   threat:
 #     - A member of the organization could inadvertently or maliciously make public an internal repository exposing confidential data.
@@ -114,10 +114,10 @@ non_admins_can_create_public_repositories := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the organization settings page
-#     - 3. Enter "Member privileges" tab
-#     - 4. Under "Base permissions"
-#     - 5. Set permissions to "No permissions"
-#     - 6. Click "Save"
+#     - 3. Enter 'Member privileges' tab
+#     - 4. Under 'Base permissions'
+#     - 5. Set permissions to 'No permissions'
+#     - 6. Click 'Save'
 #   requiredScopes: [read:enterprise]
 #   threat:
 #     - Organization members can see the content of freshly created repositories, even if they should be restricted.
@@ -136,10 +136,10 @@ default_repository_permission_is_not_none := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the organization settings page
-#     - 3. Enter "Authentication security" tab
-#     - 4. Toggle on "Enable SAML authentication"
+#     - 3. Enter 'Authentication security' tab
+#     - 4. Toggle on 'Enable SAML authentication'
 #     - 5. Fill in the remaining SSO configuration as instructed on the screen
-#     - 6. Click "Save"
+#     - 6. Click 'Save'
 #   requiredScopes: [admin:org]
 #   threat:
 #     - Not using an SSO solution makes it more difficult to track a potentially compromised user's actions across different systems, prevents the organization from defining a common password policy, and makes it challenging to audit different aspects of the user's behavior.

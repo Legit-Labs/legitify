@@ -37,11 +37,11 @@ all_repositories_can_run_github_actions := false {
 #   remediationSteps: 
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the org's settings page
-#     - 3. Enter "Actions - General" tab
-#     - 4. Under "Policies", Select "Allow enterprise, and select non-enterprise, actions and reusable workflows"
-#     - 5. Check "Allow actions created by GitHub" and "Allow actions by Marketplace verified creators"
-#     - 6. Set any other used trusted actions under "Allow specified actions and reusable workflows"
-#     - 7. Click "Save"
+#     - 3. Enter 'Actions - General' tab
+#     - 4. Under 'Policies', Select 'Allow enterprise, and select non-enterprise, actions and reusable workflows'
+#     - 5. Check 'Allow actions created by GitHub' and 'Allow actions by Marketplace verified creators'
+#     - 6. Set any other used trusted actions under 'Allow specified actions and reusable workflows'
+#     - 7. Click 'Save'
 #   severity: MEDIUM
 #   requiredScopes: [admin:org]
 #   threat:
@@ -64,7 +64,7 @@ all_github_actions_are_allowed := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the org's settings page
-#     - 3. Enter "Actions - General" tab
+#     - 3. Enter 'Actions - General' tab
 #     - 4. Under 'Workflow permissions'
 #     - 5. Select 'Read repository contents permission'
 #     - 6. Click 'Save'
@@ -86,9 +86,9 @@ token_default_permissions_is_read_write := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the org's settings page
-#     - 3. Enter "Actions - General" tab
+#     - 3. Enter 'Actions - General' tab
 #     - 4. Under 'Workflow permissions'
-#     - 5. Uncheck 'Allow GitHub actions to create and approve pull requests.'
+#     - 5. Uncheck 'Allow GitHub actions to create and approve pull requests'
 #     - 6. Click 'Save'
 #   severity: HIGH
 #   requiredScopes: [admin:org]

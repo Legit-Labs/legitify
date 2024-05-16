@@ -52,8 +52,8 @@ project_has_too_many_admins := false {
 #   remediationSteps:
 #     - 1. Make sure you have owner permissions
 #     - 2. Go to the project's settings page
-#     - 3. Enter "General" tab
-#     - 4. Under "Visibility, project features, permissions", Toggle off "Forks"
+#     - 3. Enter 'General' tab
+#     - 4. Under 'Visibility, project features, permissions', Toggle off 'Forks'
 #   severity: LOW
 #   threat: Forked repositories may leak important code assets or sensitive secrets embedded in the code to anyone outside your organization, as the code becomes publicly accessible.
 default forking_allowed_for_repository := true
@@ -75,9 +75,9 @@ forking_allowed_for_repository := false {
 #   remediationSteps:
 #     - 1. Make sure you have owner permissions
 #     - 2. Go to the project's settings -> Repository page
-#     - 3. Enter "Protected branches" tab
+#     - 3. Enter 'Protected branches' tab
 #     - 4. Select the default branch
-#     - 5. Set the allowed to merge to "maintainers" and the allowed to push to "No one"
+#     - 5. Set the allowed to merge to 'maintainers' and the allowed to push to 'No one'
 #   severity: MEDIUM
 #   prerequisites: [premium]
 #   threat: Any contributor with write access may push potentially dangerous code to this repository, making it easier to compromise and difficult to audit.
@@ -96,9 +96,9 @@ missing_default_branch_protection := false {
 #   remediationSteps:
 #     - 1. Make sure you have owner permissions
 #     - 2. Go to the project's settings -> Repository page
-#     - 3. Enter "Protected branches" tab
+#     - 3. Enter 'Protected branches' tab
 #     - 4. Select the default branch
-#     - 5. Set the allowed to merge to "maintainers" and the allowed to push to "No one"
+#     - 5. Set the allowed to merge to 'maintainers' and the allowed to push to 'No one'
 #   severity: MEDIUM
 #   prerequisites: [premium]
 #   threat: Rewriting project history can make it difficult to trace back when bugs or security issues were introduced, making them more difficult to remediate.
@@ -120,9 +120,9 @@ missing_default_branch_protection_force_push := false {
 #   remediationSteps:
 #     - 1. Make sure you have owner permissions
 #     - 2. Go to the project's settings -> Repository page
-#     - 3. Enter "Protected branches" tab
+#     - 3. Enter 'Protected branches' tab
 #     - 4. Select the default branch
-#     - 5. Check the "Code owner approval"
+#     - 5. Check the 'Code owner approval'
 #   severity: LOW
 #   prerequisites: [premium]
 #   threat: A pull request may be approved by any contributor with write access. Specifying specific code owners can ensure review is only done by individuals with the correct expertise required for the review of the changed files, potentially preventing bugs and security risks.
@@ -143,9 +143,9 @@ repository_require_code_owner_reviews_policy := false {
 #   remediationSteps:
 #     - 1. Make sure you can manage webhooks for the project
 #     - 2. Go to the project's settings page
-#     - 3. Select "Webhooks"
-#     - 4. Press on the "Enable SSL verification"
-#     - 5. Click "Save changes"
+#     - 3. Select 'Webhooks'
+#     - 4. Press on the 'Enable SSL verification'
+#     - 5. Click 'Save changes'
 #   threat:
 #     - If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it to freely read and affect the response of any webhook request.
 #     - In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed, as an attacker can redirect traffic to the target domain in your internal network directly to them, and this is often much easier than compromising an internet-facing domain.
@@ -165,9 +165,9 @@ project_webhook_doesnt_require_ssl := false{
 #   remediationSteps:
 #     - 1. Make sure you can manage project merge requests permissions
 #     - 2. Go to the project's settings page
-#     - 3. Select "Merge Requests"
-#     - 4. Press on the "Pipelines must succeed"
-#     - 5. Click "Save changes"
+#     - 3. Select 'Merge Requests'
+#     - 4. Press on the 'Pipelines must succeed'
+#     - 5. Click 'Save changes'
 #   threat: Not defining a set of required status checks can make it easy for contributors to introduce buggy or insecure code as manual review, whether mandated or optional, is the only line of defense.
 default requires_status_checks := true
 
@@ -184,9 +184,9 @@ requires_status_checks := false {
 #   remediationSteps:
 #     - 1. Make sure you can manage project merge requests permissions
 #     - 2. Go to the project's settings page
-#     - 3. Select "Merge Requests"
-#     - 4. Press on the "All threads must be resolved"
-#     - 5. Click "Save changes"
+#     - 3. Select 'Merge Requests'
+#     - 4. Press on the 'All threads must be resolved'
+#     - 5. Click 'Save changes'
 #   threat: Allowing the merging of code without resolving all conversations can promote poor and vulnerable code, as important comments may be forgotten or deliberately ignored when the code is merged.
 default no_conversation_resolution := true
 
@@ -202,8 +202,8 @@ no_conversation_resolution := false {
 #   remediationSteps:
 #     - 1. Make sure you have owner permissions
 #     - 2. Go to the project's settings -> Repository page
-#     - 3. Enter "Push Rules" tab
-#     - 4. Set the "Reject unsigned commits" checkbox
+#     - 3. Enter 'Push Rules' tab
+#     - 4. Set the 'Reject unsigned commits' checkbox
 #   severity: LOW
 #   prerequisites: [premium]
 #   threat: A commit containing malicious code may be crafted by a malicious actor that has acquired write access to the repository to initiate a supply chain attack. Commit signing provides another layer of defense that can prevent this type of compromise.
@@ -222,11 +222,11 @@ no_signed_commits := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Merge Requests" tab
-#     - 4. Under "Merge request approvals", Click "Add approval rule" on the default branch rule
-#     - 5. Select "Approvals required" and enter at least 1 approvers
-#     - 6. Select "Add approvers" and select the desired members
-#     - 7. Click "Add approval rule"
+#     - 3. Enter 'Merge Requests' tab
+#     - 4. Under 'Merge request approvals', Click 'Add approval rule' on the default branch rule
+#     - 5. Select 'Approvals required' and enter at least 1 approvers
+#     - 6. Select 'Add approvers' and select the desired members
+#     - 7. Click 'Add approval rule'
 #   severity: HIGH
 #   prerequisites: [premium]
 #   threat:
@@ -245,11 +245,11 @@ code_review_not_required := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Merge Requests" tab
-#     - 4. Under "Merge request approvals", Click "Add approval rule" on the default branch rule
-#     - 5. Select "Approvals required" and enter at least 2 approvers
-#     - 6. Select "Add approvers" and select the desired members
-#     - 7. Click "Add approval rule"
+#     - 3. Enter 'Merge Requests' tab
+#     - 4. Under 'Merge request approvals', Click 'Add approval rule' on the default branch rule
+#     - 5. Select 'Approvals required' and enter at least 2 approvers
+#     - 6. Select 'Add approvers' and select the desired members
+#     - 7. Click 'Add approval rule'
 #   severity: MEDIUM
 #   prerequisites: [premium]
 #   threat:
@@ -268,9 +268,9 @@ code_review_by_two_members_not_required := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Merge Requests" tab
-#     - 4. Under "Approval settings", Check "Prevent approval by author"
-#     - 5. Click "Save Changes"
+#     - 3. Enter 'Merge Requests' tab
+#     - 4. Under 'Approval settings', Check 'Prevent approval by author'
+#     - 5. Click 'Save Changes'
 #   severity: MEDIUM
 #   threat:
 #     - Users can merge code without being reviewed which can lead to insecure code reaching the main branch and production.
@@ -288,9 +288,9 @@ repository_allows_review_requester_to_approve_their_own_request := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Merge Requests" tab
-#     - 4. Under "Approval settings", Check "Prevent editing approval rules in merge requests"
-#     - 5. Click "Save Changes"
+#     - 3. Enter 'Merge Requests' tab
+#     - 4. Under 'Approval settings', Check 'Prevent editing approval rules in merge requests'
+#     - 5. Click 'Save Changes'
 #   severity: MEDIUM
 #   prerequisites: [premium]
 #   threat:
@@ -309,9 +309,9 @@ repository_allows_overriding_approvers := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Merge Requests" tab
-#     - 4. Under "Approval settings", Check "Prevent approvals by users who add commits"
-#     - 5. Click "Save Changes"
+#     - 3. Enter 'Merge Requests' tab
+#     - 4. Under 'Approval settings', Check 'Prevent approvals by users who add commits'
+#     - 5. Click 'Save Changes'
 #   severity: LOW
 #   prerequisites: [premium]
 #   threat:
@@ -330,9 +330,9 @@ repository_allows_committer_approvals_policy := false {
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
-#     - 3. Enter "Merge Requests" tab
-#     - 4. Under "Approval settings", Check "Remove all approvals"
-#     - 5. Click "Save Changes"
+#     - 3. Enter 'Merge Requests' tab
+#     - 4. Under 'Approval settings', Check 'Remove all approvals'
+#     - 5. Click 'Save Changes'
 #   severity: LOW
 #   prerequisites: [premium]
 #   threat: Buggy or insecure code may be committed after approval and will reach the main branch without review. Alternatively, an attacker can attempt a just-in-time attack to introduce dangerous code just before merge.
