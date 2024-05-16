@@ -3,13 +3,12 @@ package github
 import (
 	"context"
 	"fmt"
-	"log"
-	"net/http"
-
 	"github.com/Legit-Labs/legitify/internal/collectors"
 	"github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/context_utils"
 	"github.com/Legit-Labs/legitify/internal/scorecard"
+	"log"
+	"net/http"
 
 	"github.com/Legit-Labs/legitify/internal/common/group_waiter"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -246,6 +245,10 @@ func (rc *repositoryCollector) collectExtraData(login string,
 	repo = rc.withRepositoryHooks(repo, login)
 	repo = rc.withRepoCollaborators(repo, login)
 	repo = rc.withActionsSettings(repo, login)
+	repo, err = rc.withSecrets(repo, login)
+	if err != nil {
+		log.Printf("failed to collect repository secrets for %s: %s", repo.Repository.Name, err)
+	}
 
 	repo, err = rc.withDependencyGraphManifestsCount(repo, login)
 	if err != nil {
@@ -385,6 +388,22 @@ func (rc *repositoryCollector) withRulesSet(repository ghcollected.Repository, o
 	}
 
 	repository.RulesSet = rules
+	return repository, nil
+}
+
+func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, login string) (ghcollected.Repository, error) {
+	secrets, err := rc.Client.GetRepositorySecrets(repository.Name(), login)
+	if err != nil {
+		return repository, err
+	}
+	var repoSecrets []*ghcollected.RepositorySecret
+	for i := 0; i < len(secrets.Secrets); i++ {
+		repoSecrets = append(repoSecrets, &ghcollected.RepositorySecret{
+			Name:      secrets.Secrets[i].Name,
+			UpdatedAt: int(secrets.Secrets[i].UpdatedAt.Time.UnixNano()),
+		})
+	}
+	repository.RepoSecrets = repoSecrets
 	return repository, nil
 }
 

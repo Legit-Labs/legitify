@@ -309,6 +309,68 @@ func TestRepositoryActionsSettingsActionsCanApprovePullRequests(t *testing.T) {
 	}
 }
 
+func TestRepositoryWithNoStaleSecrets(t *testing.T) {
+	name := "repository has no secrets"
+	testedPolicyName := "repository_secret_is_stale"
+	makeMockData := func() githubcollected.Repository {
+		return githubcollected.Repository{
+			RepoSecrets: []*githubcollected.RepositorySecret{
+				{
+					Name:      "test1",
+					UpdatedAt: int(time.Now().UnixNano()) - 2628000000000000, // one month
+				},
+				{
+					Name:      "test2",
+					UpdatedAt: int(time.Now().UnixNano()) - (3 * 2628000000000000), // three months
+				},
+				{
+					Name:      "test3",
+					UpdatedAt: int(time.Now().UnixNano()) - (6 * 2628000000000000), // six month
+				},
+			},
+		}
+	}
+	expectFailure := false
+	repositoryTestTemplate(t, name, makeMockData(), testedPolicyName, expectFailure, scm_type.GitHub)
+}
+
+func TestRepositoryWithStaleSecrets(t *testing.T) {
+	name := "repository has no secrets"
+	testedPolicyName := "repository_secret_is_stale"
+	makeMockData := func() githubcollected.Repository {
+		return githubcollected.Repository{
+			RepoSecrets: []*githubcollected.RepositorySecret{
+				{
+					Name:      "test1",
+					UpdatedAt: 1652020546000000000, //08.05.2022
+				},
+				{
+					Name:      "test2",
+					UpdatedAt: 957796546000000000, //08.05.2000
+				},
+				{
+					Name:      "test3",
+					UpdatedAt: int(time.Now().UnixNano()),
+				},
+			},
+		}
+	}
+	expectFailure := true
+	repositoryTestTemplate(t, name, makeMockData(), testedPolicyName, expectFailure, scm_type.GitHub)
+}
+
+func TestRepositoryWithNoSecrets(t *testing.T) {
+	name := "repository has no secrets"
+	testedPolicyName := "repository_secret_is_stale"
+	makeMockData := func() githubcollected.Repository {
+		return githubcollected.Repository{
+			RepoSecrets: nil,
+		}
+	}
+	expectFailure := false
+	repositoryTestTemplate(t, name, makeMockData(), testedPolicyName, expectFailure, scm_type.GitHub)
+}
+
 func TestGitlabRepositoryTooManyAdmins(t *testing.T) {
 	name := "Project Has Too Many Owners"
 	testedPolicyName := "project_has_too_many_admins"
