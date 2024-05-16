@@ -163,7 +163,7 @@ missing_default_branch_protection := false {
 # description: The history of the default branch is not protected against deletion for this repository.
 # custom:
 #   remediationSteps:
-#     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
 #     - 3. Enter 'Branches' tab
@@ -192,7 +192,7 @@ missing_default_branch_protection_deletion := false {
 # description: The history of the default branch is not protected against changes for this repository. Protecting branch history ensures every change that was made to code can be retained and later examined. This issue is raised if the default branch history can be modified using force push.
 # custom:
 #   remediationSteps:
-#     - 1. Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set based protection should be updated from the rules set page"
 #     - 2. Make sure you have admin permissions
 #     - 3. Go to the repo's settings page
 #     - 4. Enter 'Branches' tab
@@ -222,7 +222,7 @@ missing_default_branch_protection_force_push := false {
 # description: Branch protection is enabled. However, the checks that validate the quality and security of the code are not required to pass before submitting new changes. The default check ensures the code is up-to-date to prevent faulty merges and unexpected behaviors, as well as other custom checks that test security and quality. It is advised to turn this control on to ensure any existing or future check will be required to pass.
 # custom:
 #   remediationSteps: 
-#     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
 #     - 3. Enter 'Branches' tab
@@ -254,7 +254,7 @@ requires_status_checks := false {
 # description: Status checks are required, but branches that are not up to date can be merged. This can result in previously remediated issues being merged in over fixes.
 # custom:
 #   remediationSteps: 
-#     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
 #     - 3. Enter 'Branches' tab
@@ -288,7 +288,7 @@ requires_branches_up_to_date_before_merge := false {
 # description: This security control prevents merging code that was approved but later on changed. Turning it on ensures any new changes must be reviewed again. This setting is part of the branch protection and code-review settings, and hardens the review process. If turned off - a developer can change the code after approval, and push code that is different from the one that was previously allowed. This option is found in the branch protection setting for the repository.
 # custom:
 #   remediationSteps: 
-#     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
 #     - 3. Enter 'Branches' tab
@@ -320,7 +320,7 @@ dismisses_stale_reviews := false {
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management system's built-in enforcement. This option is found in the branch protection setting of the repository.
 # custom:
 #   remediationSteps: 
-#     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
 #     - 3. Enter 'Branches' tab
@@ -354,7 +354,7 @@ code_review_not_required := false {
 # description: In order to comply with separation of duties principle and enforce secure code practices, a code review should be mandatory using the source-code-management built-in enforcement. This option is found in the branch protection setting of the repository.
 # custom:
 #   remediationSteps: 
-#     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
 #     - 3. Enter 'Branches' tab
@@ -389,7 +389,7 @@ code_review_by_two_members_not_required := false {
 # description: It is recommended to require code review only from designated individuals specified in CODEOWNERS file. Turning this option on enforces that only the allowed owners can approve a code change. This option is found in the branch protection setting of the repository.
 # custom:
 #   remediationSteps: 
-#     - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#     - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #     - 1. Make sure you have admin permissions
 #     - 2. Go to the repo's settings page
 #     - 3. Enter 'Branches' tab
@@ -421,7 +421,7 @@ code_review_not_limited_to_code_owners := false {
 # description: Prevent merge commits from being pushed to protected branches.
 # custom:
 #    remediationSteps: 
-#      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#      - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
 #      - 3. Enter 'Branches' tab
@@ -451,7 +451,7 @@ non_linear_history := false {
 # description: Require all Pull Request conversations to be resolved before merging. Check this to avoid bypassing/missing a Pull Request comment.
 # custom:
 #    remediationSteps: 
-#      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#      - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
 #      - 3. Enter 'Branches' tab
@@ -482,7 +482,7 @@ no_conversation_resolution := false {
 # description: Require all commits to be signed and verified
 # custom:
 #    remediationSteps: 
-#      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#      - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
 #      - 3. Enter 'Branches' tab
@@ -512,7 +512,7 @@ no_signed_commits := false {
 # description: Any user with write access to the repository can dismiss pull-request reviews. Pull-request review contains essential information on the work that needs to be done and helps keep track of the changes. Dismissing it might cause a loss of this information and should be restricted to a limited number of users.
 # custom:
 #    remediationSteps: 
-#      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#      - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
 #      - 3. Enter 'Branches' tab
@@ -536,7 +536,7 @@ review_dismissal_allowed := false {
 # description: By default, commits can be pushed directly to protected branches without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
 # custom:
 #    remediationSteps: 
-#      - Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+#      - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
 #      - 3. Enter 'Branches' tab

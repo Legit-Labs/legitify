@@ -4,7 +4,7 @@ import data.common.secrets as secretUtils
 
 # METADATA
 # scope: rule
-# title: Repository Has Stale Secrets
+# title: Repository Secrets Should Be Updated At Least Yearly
 # description: Some of the repository secrets have not been updated for over a year. It is recommended to refresh secret values regularly in order to minimize the risk of breach in case of an information leak.
 # custom:
 #   requiredEnrichers: [secretsList]
