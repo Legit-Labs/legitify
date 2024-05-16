@@ -5,8 +5,8 @@ rules:
       level: ignore
   style:
     file-length:
-      # Override default of 500 as one file has 515 lines
-      max-file-length: 550
+      # Override default of 500 as one file has 690 lines
+      max-file-length: 750
     line-length:
       # Violations here mostly from metadata annotation values.
       # These could be fixed by using |> and newlines, but we'll
