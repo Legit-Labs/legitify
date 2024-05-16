@@ -99,7 +99,6 @@ two_factor_authentication_not_required_for_org := false {
 #   requiredScopes: [read:org]
 #   threat:
 #     - A member of the organization could inadvertently or maliciously make public an internal repository exposing confidential data.
-
 default non_admins_can_create_public_repositories := true
 
 non_admins_can_create_public_repositories := false {
