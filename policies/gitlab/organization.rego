@@ -92,7 +92,7 @@ group_does_not_enforce_branch_protection_by_default := false {
 #     - 1. Go to the group page
 #     - 2. Press Settings -> General
 #     - 3. Expand 'Permissions and group features'
-#     - '4. In the box titled: 'Delay 2FA enforcement (hours)', enter a number under 168 (preferably 0)'
+#     - "4. In the box titled: 'Delay 2FA enforcement (hours)', enter a number under 168 (preferably 0)"
 #     - 5. Press 'Save Changes'
 #   threat:
 #     - Any new group member effectively acts as an attack surface until two-factor authentication is enabled. The risk is compounded as new members may be more vulnerable to phishing and identity theft attacks.

@@ -73,8 +73,8 @@ repository_webhook_no_secret[violated] := true {
 	hook := input.hooks[index]
 	not webhookUtils.has_secret(hook)
 	violated := {
-		'name': hook.name,
-		'url': hook.url,
+		"name": hook.name,
+		"url": hook.url,
 	}
 }
 
@@ -102,8 +102,8 @@ repository_webhook_doesnt_require_ssl[violated] := true {
 	hook := input.hooks[index]
 	not webhookUtils.ssl_enabled(hook)
 	violated := {
-		'name': hook.name,
-		'url': hook.url,
+		"name": hook.name,
+		"url": hook.url,
 	}
 }
 
@@ -154,7 +154,7 @@ missing_default_branch_protection := false {
 missing_default_branch_protection := false {
     some index
     rule := input.rules_set[index]
-    rule.type == 'pull_request'
+    rule.type == "pull_request"
 }
 
 # METADATA
@@ -183,7 +183,7 @@ missing_default_branch_protection_deletion := false {
 missing_default_branch_protection_deletion := false {
     some index
     rule := input.rules_set[index]
-    rule.type == 'deletion'
+    rule.type == "deletion"
 }
 
 # METADATA
@@ -213,7 +213,7 @@ missing_default_branch_protection_force_push := false {
 missing_default_branch_protection_force_push := false {
     some index
     rule := input.rules_set[index]
-    rule.type == 'non_fast_forward'
+    rule.type == "non_fast_forward"
 }
 
 # METADATA
@@ -244,7 +244,7 @@ requires_status_checks := false {
 requires_status_checks := false {
     some index
     rule := input.rules_set[index]
-    rule.type == 'required_status_checks'
+    rule.type == "required_status_checks"
     count(rule.parameters.required_status_checks) > 0
 }
 
@@ -277,7 +277,7 @@ requires_branches_up_to_date_before_merge := false {
 requires_branches_up_to_date_before_merge := false {
     some index
     rule := input.rules_set[index]
-    rule.type == 'required_status_checks'
+    rule.type == "required_status_checks"
     count(rule.parameters.required_status_checks) > 0
     rule.parameters.strict_required_status_checks_policy
 }
@@ -310,7 +310,7 @@ dismisses_stale_reviews := false {
 dismisses_stale_reviews := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == 'pull_request'
+	rule.type == "pull_request"
 	rule.parameters.dismiss_stale_reviews_on_push
 }
 
@@ -343,7 +343,7 @@ code_review_not_required := false {
 code_review_not_required := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == 'pull_request'
+	rule.type == "pull_request"
 	rule.parameters.required_approving_review_count >= 1
 }
 
@@ -379,7 +379,7 @@ code_review_by_two_members_not_required := false {
 code_review_by_two_members_not_required := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == 'pull_request'
+	rule.type == "pull_request"
 	rule.parameters.required_approving_review_count >= 2
 }
 
@@ -411,7 +411,7 @@ code_review_not_limited_to_code_owners := false {
 code_review_not_limited_to_code_owners := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == 'pull_request'
+	rule.type == "pull_request"
 	rule.parameters.require_code_owner_review
 }
 
@@ -442,7 +442,7 @@ non_linear_history := false {
 non_linear_history := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == 'required_linear_history'
+	rule.type == "required_linear_history"
 }
 
 # METADATA
@@ -472,7 +472,7 @@ no_conversation_resolution := false {
 no_conversation_resolution := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == 'pull_request'
+	rule.type == "pull_request"
 	rule.parameters.required_review_thread_resolution
 }
 
@@ -503,7 +503,7 @@ no_signed_commits := false {
 no_signed_commits := false {
     some index
 	rule := input.rules_set[index]
-	rule.type == 'required_signatures'
+	rule.type == "required_signatures"
 }
 
 # METADATA
@@ -638,7 +638,7 @@ scorecard_score_too_low := false {
 default token_default_permissions_is_read_write := true
 
 token_default_permissions_is_read_write := false {
-	input.actions_token_permissions.default_workflow_permissions == 'read'
+	input.actions_token_permissions.default_workflow_permissions == "read"
 }
 
 # METADATA

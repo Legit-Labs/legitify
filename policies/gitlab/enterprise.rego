@@ -120,7 +120,7 @@ all_users_are_allowed_to_create_public_projects := false {
 default default_group_visibility_is_public := true
 
 default_group_visibility_is_public := false {
-	not input.default_group_visibility == 'public'
+	not input.default_group_visibility == "public"
 }
 
 # METADATA
