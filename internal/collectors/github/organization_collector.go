@@ -91,10 +91,17 @@ func (c *organizationCollector) collectExtraData(org *ghcollected.ExtendedOrg) g
 		c.IssueMissingPermissions(perm)
 	}
 
+	secrets, err := c.collectOrgSecrets(org.Name())
+	if err != nil {
+		secrets = nil
+		log.Printf("failed to collect secrets for %s, %s", org.Name(), err)
+	}
+
 	return ghcollected.Organization{
 		Organization: org,
 		SamlEnabled:  samlEnabled,
 		Hooks:        hooks,
+		OrgSecrets:   secrets,
 	}
 }
 
@@ -127,4 +134,19 @@ func (c *organizationCollector) collectOrgSamlData(org string) (*bool, error) {
 
 	return &samlEnabled, nil
 
+}
+
+func (c *organizationCollector) collectOrgSecrets(org string) ([]*ghcollected.OrganizationSecret, error) {
+	secrets, err := c.Client.GetOrganizationSecrets(org)
+	if err != nil {
+		return nil, err
+	}
+	var orgSecrets []*ghcollected.OrganizationSecret
+	for i := 0; i < len(secrets.Secrets); i++ {
+		orgSecrets = append(orgSecrets, &ghcollected.OrganizationSecret{
+			Name:      secrets.Secrets[i].Name,
+			UpdatedAt: int(secrets.Secrets[i].UpdatedAt.Time.UnixNano())})
+	}
+
+	return orgSecrets, nil
 }

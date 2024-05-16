@@ -4,12 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
-	"net/http"
-	"regexp"
-	"strings"
-	"sync"
-
 	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/github/transport"
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
@@ -18,6 +12,11 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/screen"
+	"log"
+	"net/http"
+	"regexp"
+	"strings"
+	"sync"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -83,7 +82,6 @@ func (c *Client) initClients(ctx context.Context, token string) error {
 
 	var ghClient *gh.Client
 	var graphQLClient *githubv4.Client
-
 	rawClient, graphQLRawClient, err := newHttpClients(ctx, token)
 	if err != nil {
 		return err
@@ -635,4 +633,26 @@ func (c *Client) GetSecurityAndAnalysisForEnterprise(enterprise string) (*types.
 		return nil, err
 	}
 	return &p, nil
+}
+
+func (c *Client) GetRepositorySecrets(repo, owner string) (*gh.Secrets, error) {
+	secrets, res, err := c.client.Actions.ListRepoSecrets(c.context, owner, repo, nil)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("unexpected HTTP status: %d", res.StatusCode)
+	}
+	return secrets, nil
+}
+
+func (c *Client) GetOrganizationSecrets(org string) (*gh.Secrets, error) {
+	secrets, res, err := c.client.Actions.ListOrgSecrets(c.context, org, nil)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("unexpected HTTP status: %d", res.StatusCode)
+	}
+	return secrets, nil
 }

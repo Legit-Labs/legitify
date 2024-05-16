@@ -45,6 +45,12 @@ type Organization struct {
 	SamlEnabled  *bool          `json:"saml_enabled,omitempty"`
 	Hooks        []*github.Hook `json:"hooks"`
 	UserRole     permissions.OrganizationRole
+	OrgSecrets   []*OrganizationSecret `json:"organization_secrets,omitempty"`
+}
+
+type OrganizationSecret struct {
+	Name      string `json:"name"`
+	UpdatedAt int    `json:"updated_at"`
 }
 
 func (o Organization) ViolationEntityType() string {

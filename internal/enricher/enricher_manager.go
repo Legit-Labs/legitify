@@ -50,6 +50,7 @@ var mapping = map[string]enrichers.Enricher{
 	enrichers.Scorecard:      enrichers.NewScorecardEnricher(),
 	enrichers.MembersList:    enrichers.NewMembersListEnricher(),
 	enrichers.HooksList:      enrichers.NewHooksListEnricher(),
+	enrichers.SecretsList:    enrichers.NewSecretsListEnricher(),
 }
 
 func NewEnricherManager() EnricherManager {
