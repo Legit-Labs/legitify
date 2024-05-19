@@ -22,7 +22,7 @@ In case of token compromise (due to a vulnerability or malicious third-party Git
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the org's settings page
-3. Enter "Actions - General" tab
+3. Enter 'Actions - General' tab
 4. Under 'Workflow permissions'
 5. Select 'Read repository contents permission'
 6. Click 'Save'

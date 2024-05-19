@@ -17,10 +17,10 @@ This security option enforces any new user to confirm their email address, and e
 
 
 ### Remediation
-1. Press Settings -> General
-2. Expand "Sign-up restrictions" section
-3. Toggle "Send confirmation email on sign-up"
-4. Press "Save Changes"
+2. Press Settings -> General
+3. Expand 'Sign-up restrictions' section
+4. Toggle 'Send confirmation email on sign-up'
+5. Press 'Save Changes'
 
 
 

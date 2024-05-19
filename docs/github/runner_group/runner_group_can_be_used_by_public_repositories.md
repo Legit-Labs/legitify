@@ -23,7 +23,6 @@ that create a workflow that exploits these vulnerabilities and move laterally in
 
 ### Threat Example(s)
 Hosted runners are usually part of the organization's private network and can be easily misconfigured.
-If the hosted runner is insecurely configured, any GitHub user could:
 1. Create a workflow that runs on the public hosted runner
 2. Exploit the misconfigurations to execute code inside the private network
 

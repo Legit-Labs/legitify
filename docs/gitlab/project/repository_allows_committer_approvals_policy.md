@@ -22,10 +22,9 @@ Users can merge code without being reviewed which can lead to insecure code reac
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the repo's settings page
-3. Enter "Merge Requests" tab
-4. Under "Approval settings"
-5. Check "Prevent approvals by users who add commits"
-6. Click "Save Changes"
+3. Enter 'Merge Requests' tab
+4. Under 'Approval settings', Check 'Prevent approvals by users who add commits'
+5. Click 'Save Changes'
 
 
 

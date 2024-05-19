@@ -17,10 +17,10 @@ The server allows restricting the limit of unauthenticated requests. It is recom
 
 
 ### Remediation
-1. Press Settings -> Network
-2. Expand "User and IP rate limit" section
-3. Toggle "Enable unauthenticated API request rate limit" and "Enable unauthenticated web request rate limit"
-4. Press "Save Changes"
+2. Press Settings -> Network
+3. Expand 'User and IP rate limit' section
+4. Toggle 'Enable unauthenticated API request rate limit' and 'Enable unauthenticated web request rate limit'
+5. Press 'Save Changes'
 
 
 

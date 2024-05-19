@@ -19,7 +19,6 @@ malicious insider could create a repository with a workflow that exploits the ru
 
 ### Threat Example(s)
 Hosted runners are usually part of the organization's private network and can be easily misconfigured.
-If the hosted runner is insecurely configured, any user in the organization could:
 1. Create a workflow that runs on the hosted runner
 2. Exploit the runner misconfigurations/known CVE's to execute code inside the private network
 

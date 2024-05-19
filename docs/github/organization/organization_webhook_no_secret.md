@@ -23,10 +23,10 @@ This allows attackers to masquerade as your organization, potentially creating a
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the organization settings page
-3. Select "Webhooks"
+3. Select 'Webhooks'
 4. Press on the insecure webhook
 5. Configure a secret
-6. Click "Update webhook"
+6. Click 'Update webhook'
 
 
 

@@ -21,10 +21,10 @@ Attackers that gain access to a user that can bypass the ruleset rules can compr
 
 ### Remediation
 1. Go to the repository settings page
-2. Under "Code and automation", select "Rules -> Rulesets"
+2. Under 'Code and automation', select 'Rules -> Rulesets'
 3. Find the relevant ruleset
-4. Empty the "Bypass list"
-5. Press "Save Changes"
+4. Empty the 'Bypass list'
+5. Press 'Save Changes'
 
 
 

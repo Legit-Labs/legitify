@@ -17,10 +17,10 @@ Your server is configured by default that every new group is created public. Thi
 
 
 ### Remediation
-1. Press Settings -> General
-2. Expand "Visibility and access controls" section
-3. Under "Default group visibility" toggle "Private"
-4. Press "Save Changes"
+2. Press Settings -> General
+3. Expand 'Visibility and access controls' section
+4. Under 'Default group visibility' toggle 'Private'
+5. Press 'Save Changes'
 
 
 

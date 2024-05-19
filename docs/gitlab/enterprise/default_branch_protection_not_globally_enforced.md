@@ -17,10 +17,10 @@ Branch protection is not enabled for the entire server or account by default. An
 
 
 ### Remediation
-1. Press Settings -> Repository
-2. Expand "Default Branch" section
-3. Toggle "Fully protected"
-4. Press "Save Changes"
+2. Press Settings -> Repository
+3. Expand 'Default Branch' section
+4. Toggle 'Fully protected'
+5. Press 'Save Changes'
 
 
 

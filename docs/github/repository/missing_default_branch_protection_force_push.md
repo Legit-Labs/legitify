@@ -20,14 +20,14 @@ Rewriting project history can make it difficult to trace back when bugs or secur
 
 
 ### Remediation
-1. Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page
-2. Make sure you have admin permissions
-3. Go to the repo's settings page
-4. Enter "Branches" tab
-5. Under "Branch protection rules"
-6. Click "Edit" on the default branch rule
-7. Uncheck "Allow force pushes"
-8. Click "Save changes"
+Note: The remediation steps apply to legacy branch protections, rules set based protection should be updated from the rules set page
+1. Make sure you have admin permissions
+2. Go to the repo's settings page
+3. Enter 'Branches' tab
+4. Under 'Branch protection rules'
+5. Click 'Edit' on the default branch rule
+6. Uncheck 'Allow force pushes'
+7. Click 'Save changes'
 
 
 

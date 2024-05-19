@@ -17,10 +17,10 @@ Your server allows non-admin members to create public repositories. Creating a p
 
 
 ### Remediation
-1. Press Settings -> General
-2. Expand "Visibility and access controls" section
-3. Under "Restricted visibility levels" toggle "Public"
-4. Press "Save Changes"
+2. Press Settings -> General
+3. Expand 'Visibility and access controls' section
+4. Under 'Restricted visibility levels' toggle 'Public'
+5. Press 'Save Changes'
 
 
 

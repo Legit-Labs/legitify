@@ -22,9 +22,8 @@ Forked repositories cause more code and secret sprawl in the organization as for
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the repo's settings page
-3. Enter "General" tab
-4. Under "Features"
-5. Toggle off "Allow forking"
+3. Enter 'General' tab
+4. Under 'Features', Toggle off 'Allow forking'
 
 
 

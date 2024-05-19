@@ -22,8 +22,8 @@ A contributor may add vulnerable third-party dependencies to the repository, int
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the repo's settings page
-3. Enter "Code security and analysis" tab
-4. Set "Dependency graph" as Enabled
+3. Enter 'Code security and analysis' tab
+4. Set 'Dependency graph' as Enabled
 
 
 

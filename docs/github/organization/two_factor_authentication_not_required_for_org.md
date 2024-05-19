@@ -22,10 +22,10 @@ If an attacker gets the valid credentials for one of the organization’s users 
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the organization settings page
-3. Enter "Authentication security" tab
-4. Under "Two-factor authentication"
-5. Toggle on "Require two-factor authentication for everyone in the <ORG> organization"
-6. Click "Save"
+3. Enter 'Authentication security' tab
+4. Under 'Two-factor authentication'
+5. Toggle on 'Require two-factor authentication for everyone in the <ORG> organization'
+6. Click 'Save'
 
 
 

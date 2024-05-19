@@ -22,8 +22,7 @@ Forking to external namespaces could result in loss of control over proprietary 
 ### Remediation
 1. Make sure you are an enterprise owner
 2. Go to the policies page
-3. Under the "Repository Forking" section
-4. Choose the "Disabled" option
+3. Under the 'Repository Forking' section, Choose the 'Disabled' option
 
 
 

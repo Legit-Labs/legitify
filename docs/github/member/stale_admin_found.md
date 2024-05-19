@@ -23,7 +23,7 @@ Stale admins are most likely not managed and monitored, increasing the possibili
 1. Make sure you have admin permissions
 2. Go to the org's People page
 3. Select all stale admins
-4. Using the "X members selected" - remove members from organization
+4. Using the 'X members selected' - remove members from organization
 
 
 

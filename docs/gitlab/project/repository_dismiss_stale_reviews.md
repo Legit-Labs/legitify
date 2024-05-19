@@ -22,10 +22,9 @@ Buggy or insecure code may be committed after approval and will reach the main b
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the repo's settings page
-3. Enter "Merge Requests" tab
-4. Under "Approval settings"
-5. Check "Remove all approvals"
-6. Click "Save Changes"
+3. Enter 'Merge Requests' tab
+4. Under 'Approval settings', Check 'Remove all approvals'
+5. Click 'Save Changes'
 
 
 

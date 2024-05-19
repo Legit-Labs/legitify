@@ -22,9 +22,9 @@ Attackers can exploit this misconfiguration to bypass code-review restrictions b
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the org's settings page
-3. Enter "Actions - General" tab
+3. Enter 'Actions - General' tab
 4. Under 'Workflow permissions'
-5. Uncheck 'Allow GitHub actions to create and approve pull requests.
+5. Uncheck 'Allow GitHub actions to create and approve pull requests.'
 6. Click 'Save'
 
 

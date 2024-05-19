@@ -17,10 +17,10 @@ Webhooks sent by GitLab servers are authenticated, and can cause potential damag
 
 
 ### Remediation
-1. Press Settings -> Network
-2. Expand "Outbound requests" section
-3. Un toggle "Allow requests to the local network from web hooks and services"
-4. Press "Save Changes"
+2. Press Settings -> Network
+3. Expand 'Outbound requests' section
+4. Un toggle 'Allow requests to the local network from web hooks and services'
+5. Press 'Save Changes'
 
 
 

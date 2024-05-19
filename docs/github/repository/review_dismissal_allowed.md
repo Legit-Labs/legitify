@@ -20,13 +20,14 @@ Allowing the dismissal of reviews can promote poor and vulnerable code, as impor
 
 
 ### Remediation
+Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
 1. Make sure you have admin permissions
 2. Go to the repo's settings page
-3. Enter "Branches" tab
-4. Under "Branch protection rules"
-5. Click "Edit" on the default branch rule
-6. Check "Restrict who can dismiss pull request reviews"
-7. Click "Save changes"
+3. Enter 'Branches' tab
+4. Under 'Branch protection rules'
+5. Click 'Edit' on the default branch rule
+6. Check 'Restrict who can dismiss pull request reviews'
+7. Click 'Save changes'
 
 
 

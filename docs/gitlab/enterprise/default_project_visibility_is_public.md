@@ -18,10 +18,10 @@ Your server is configured by default that every new project is created public. T
 
 
 ### Remediation
-1. Press Settings -> General
-2. Expand "Visibility and access controls" section
-3. Under "Default project visibility" toggle "Private"
-4. Press "Save Changes"
+2. Press Settings -> General
+3. Expand 'Visibility and access controls' section
+4. Under 'Default project visibility' toggle 'Private'
+5. Press 'Save Changes'
 
 
 

@@ -23,11 +23,11 @@ In the case of GitHub Enterprise Server instances, it may be sufficient only to 
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the organization settings page
-3. Select "Webhooks"
+3. Select 'Webhooks'
 4. Press on the insecure webhook
-5. Verify url starts with https
-6. Enable "SSL verification"
-7. Click "Update webhook"
+5. Verify URL starts with https
+6. Enable 'SSL verification'
+7. Click 'Update webhook'
 
 
 

@@ -21,8 +21,9 @@ A commit containing malicious code may be crafted by a malicious actor that has 
 
 ### Remediation
 1. Make sure you have owner permissions
-2. Go to the projects's settings -> Repository page
-3. Enter "Push Rules" tab. Set the "Reject unsigned commits" checkbox
+2. Go to the project's settings -> Repository page
+3. Enter 'Push Rules' tab
+4. Set the 'Reject unsigned commits' checkbox
 
 
 

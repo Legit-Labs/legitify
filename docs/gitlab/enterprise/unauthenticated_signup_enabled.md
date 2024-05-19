@@ -16,10 +16,10 @@ The server allows any person with network access to sign up, create a user and a
 
 
 ### Remediation
-1. Press Settings -> General
-2. Expand "Sign-up restrictions" section
-3. Un toggle "Sign-up enabled"
-4. Press "Save Changes"
+2. Press Settings -> General
+3. Expand 'Sign-up restrictions' section
+4. Un toggle 'Sign-up enabled'
+5. Press 'Save Changes'
 
 
 

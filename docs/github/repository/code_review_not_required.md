@@ -20,16 +20,16 @@ Users can merge code without being reviewed, which can lead to insecure code rea
 
 
 ### Remediation
-1. Note: The remediation steps applys to legacy branch protections, rules set based protection should be updated from the rules set page
-2. Make sure you have admin permissions
-3. Go to the repo's settings page
-4. Enter "Branches" tab
-5. Under "Branch protection rules"
-6. Click "Edit" on the default branch rule
-7. Check "Require a pull request before merging"
-8. Check "Require approvals"
-9. Set "Required number of approvals before merging" to 1 or more
-10. Click "Save changes"
+Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page
+1. Make sure you have admin permissions
+2. Go to the repo's settings page
+3. Enter 'Branches' tab
+4. Under 'Branch protection rules'
+5. Click 'Edit' on the default branch rule
+6. Check 'Require a pull request before merging'
+7. Check 'Require approvals'
+8. Set 'Required number of approvals before merging' to 1 or more
+9. Click 'Save changes'
 
 
 

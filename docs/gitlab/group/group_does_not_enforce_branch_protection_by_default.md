@@ -16,16 +16,16 @@ The default branch should be protected in each group so that any new repository 
 
 ### Threat Example(s)
 A developer creates a repository without any branch protection rules
-Attacker that get access to the repository can modify its main branch without any restrictions
+An attacker that gains access to the repository can modify its main branch without any restrictions
 
 
 
 ### Remediation
 1. Go to the group page
 2. Press Settings -> Repository
-3. Expand "Default Branch" section
+3. Expand 'Default Branch' section
 4. Toggle the required protection rule
-5. Press "Save Changes"
+5. Press 'Save Changes'
 
 
 

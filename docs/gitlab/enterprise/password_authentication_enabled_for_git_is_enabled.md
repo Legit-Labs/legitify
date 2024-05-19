@@ -17,10 +17,10 @@ Password authentication for Git protocol operations (pull / push) is discouraged
 
 
 ### Remediation
-1. Press Settings -> General
-2. Expand "Sign-in restrictions" section
-3. Un toggle "Allow password authentication for Git over HTTP(S)"
-4. Press "Save Changes"
+2. Press Settings -> General
+3. Expand 'Sign-in restrictions' section
+4. Un toggle 'Allow password authentication for Git over HTTP(S)'
+5. Press 'Save Changes'
 
 
 

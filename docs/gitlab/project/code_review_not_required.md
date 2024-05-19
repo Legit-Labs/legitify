@@ -22,12 +22,11 @@ Users can merge code without being reviewed which can lead to insecure code reac
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the repo's settings page
-3. Enter "Merge Requests" tab
-4. Under "Merge request approvals"
-5. Click "Add approval rule" on the default branch rule
-6. Select "Approvals required" and enter at least 1 approvers"
-7. Select "Add approvers" and select the desired members
-8. Click "Add approval rule"
+3. Enter 'Merge Requests' tab
+4. Under 'Merge request approvals', Click 'Add approval rule' on the default branch rule
+5. Select 'Approvals required' and enter at least 1 approvers
+6. Select 'Add approvers' and select the desired members
+7. Click 'Add approval rule'
 
 
 

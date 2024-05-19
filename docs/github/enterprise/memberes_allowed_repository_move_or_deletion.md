@@ -23,8 +23,7 @@ A member of the organization could inadvertently or maliciously transfer a repos
 1. Make sure you are an enterprise owner
 2. Go to the Enterprise Settings page
 3. Under the ‘Policies’ tab choose ‘Repositories’
-4. Go to the ‘Admin repository permissions' section
-5. under ‘Repository deletion and transfer' and select 'Disabled'
+4. Go to the ‘Admin repository permissions' section, under ‘Repository deletion and transfer' and select 'Disabled'
 
 
 

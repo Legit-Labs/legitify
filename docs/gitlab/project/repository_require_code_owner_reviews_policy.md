@@ -21,9 +21,10 @@ A pull request may be approved by any contributor with write access. Specifying 
 
 ### Remediation
 1. Make sure you have owner permissions
-2. Go to the projects's settings -> Repository page
-3. Enter "Protected branches" tab
-4. select the default branch. Check the "Code owner approval"
+2. Go to the project's settings -> Repository page
+3. Enter 'Protected branches' tab
+4. Select the default branch
+5. Check the 'Code owner approval'
 
 
 

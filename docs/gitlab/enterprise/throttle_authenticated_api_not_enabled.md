@@ -17,10 +17,10 @@ Enabling authenticated request rate-limit on APIs reduces volume of requests, an
 
 
 ### Remediation
-1. Press Settings -> Network
-2. Expand "User and IP rate limit" section
-3. Toggle "Enable authenticated API request rate limit
-4. Press "Save Changes"
+2. Press Settings -> Network
+3. Expand 'User and IP rate limit' section
+4. Toggle 'Enable authenticated API request rate limit'
+5. Press 'Save Changes'
 
 
 

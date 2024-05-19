@@ -22,12 +22,12 @@ Any contributor with write access may push potentially dangerous code to this re
 ### Remediation
 1. Make sure you have admin permissions
 2. Go to the repo's settings page
-3. Enter "Branches" tab
-4. Under "Branch protection rules"
-5. Click "Add rule"
-6. Set "Branch name pattern" as the default branch name (usually "main" or "master")
+3. Enter 'Branches' tab
+4. Under 'Branch protection rules'
+5. Click 'Add rule'
+6. Set 'Branch name pattern' as the default branch name (usually 'main' or 'master')
 7. Set desired protections
-8. Click "Create" and save the rule
+8. Click 'Create' and save the rule
 
 
 

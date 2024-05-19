@@ -15,7 +15,7 @@ severity: HIGH
 An external collaborator's two factor authentication is disabled. Turn it on in the collaborator setting, or globally in the account, to prevent any access without MFA.
 
 ### Threat Example(s)
-Collaborators without two-factor authentication are prime targets for phising and social engineering attacks, as compromise only requires acquiring the collaborator's password.
+Collaborators without two-factor authentication are prime targets for phishing and social engineering attacks, as compromise only requires acquiring the collaborator's password.
 This is doubly important for external collaborators, as these are identities that aren't likely managed by you or your organization and may be easier to compromise.
 
 
@@ -23,8 +23,8 @@ This is doubly important for external collaborators, as these are identities tha
 ### Remediation
 1. Login with the user credentials
 2. Go to the user settings page
-3. Select "Account" on the left navigation bar
-4. Press "Enable two-factor authentication"
+3. Select 'Account' on the left navigation bar
+4. Press 'Enable two-factor authentication'
 
 
 

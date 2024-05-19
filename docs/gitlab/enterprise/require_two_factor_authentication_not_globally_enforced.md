@@ -17,10 +17,10 @@ It is recommended to turn on MFA at the server or account level, and proactively
 
 
 ### Remediation
-1. Press Settings -> General
-2. Expand "Sign-in restrictions" section
-3. Toggle "Two-factor authentication"
-4. Press "Save Changes"
+2. Press Settings -> General
+3. Expand 'Sign-in restrictions' section
+4. Toggle 'Two-factor authentication'
+5. Press 'Save Changes'
 
 
 
