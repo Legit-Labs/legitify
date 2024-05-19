@@ -151,7 +151,7 @@ organization_not_using_single_sign_on := false {
 
 # METADATA
 # scope: rule
-# title: Organization Has Stale Secrets
+# title: Organization Secrets Should Be Updated At Least Yearly
 # description: Some of the organizations secrets have not been updated for over a year. It is recommended to refresh secret values regularly in order to minimize the risk of breach in case of an information leak.
 # custom:
 #   requiredEnrichers: [secretsList]
