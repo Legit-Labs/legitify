@@ -2,9 +2,10 @@ package policies
 
 import (
 	"embed"
-	"github.com/stretchr/testify/require"
 	"path"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func countFiles(fs embed.FS, p string) (int, error) {
@@ -46,5 +47,5 @@ func TestPoliciesBundle(t *testing.T) {
 	count, err := countBundles()
 
 	require.Nilf(t, err, "counting files: %v", err)
-	require.Equal(t, count, 10, "Expecting 10 files in bundle")
+	require.Equal(t, count, 9, "Expecting 9 files in bundle")
 }

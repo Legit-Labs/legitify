@@ -7,13 +7,13 @@ package organization
 # custom:
 #   severity: HIGH
 #   remediationSteps:
-#     - Go to the group page
-#     - Press Settings -> General
-#     - Expand "Permissions and group features"
-#     - Toggle "Require all users in this group to set up two-factor authentication"
-#     - Press "Save Changes"
+#     - 1. Go to the group page
+#     - 2. Press Settings -> General
+#     - 3. Expand 'Permissions and group features'
+#     - 4. Toggle 'Require all users in this group to set up two-factor authentication'
+#     - 5. Press 'Save Changes'
 #   threat:
-#     - If an attacker gets the valid credentials for one of the organization’s users they can authenticate to your GitHub organization.
+#     - If an attacker gets valid credentials for one of the organization’s users, they can authenticate to your GitHub organization.
 default two_factor_authentication_not_required_for_group := true
 
 two_factor_authentication_not_required_for_group := false {
@@ -23,14 +23,14 @@ two_factor_authentication_not_required_for_group := false {
 # METADATA
 # scope: rule
 # title: Forking of Repositories to External Namespaces Should Be Disabled.
-# description: The ability to fork project to external namespaces is turned on. Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
+# description: The ability to fork a project to external namespaces is turned on. Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
 # custom:
 #   severity: MEDIUM
 #   remediationSteps:
-#     - "Go to the top-level groups Settings > General page"
-#     - "Expand the Permissions and group features section"
-#     - "Check Prevent project forking outside current group"
-#     - "Select Save changes"
+#     - 1. Go to the top-level groups Settings > General page
+#     - 2. Expand the Permissions and group features section
+#     - 3. Check 'Prevent project forking outside current group'
+#     - 4. Select 'Save changes'
 #   threat:
 #     - Forking to external namespaces could result in loss of control over proprietary information and potentially expose the organization to security risks, such as data leaks.
 default collaborators_can_fork_repositories_to_external_namespaces := true
@@ -42,18 +42,18 @@ collaborators_can_fork_repositories_to_external_namespaces := false {
 # METADATA
 # scope: rule
 # title: Webhooks Should Be Configured To Use SSL
-# description: Webhooks that are not configured with SSL enabled could expose your sofware to man in the middle attacks (MITM).
+# description: Webhooks that are not configured with SSL enabled could expose your software to man-in-the-middle attacks (MITM).
 # custom:
 #   severity: LOW
 #   requiredEnrichers: [hooksList]
 #   remediationSteps:
-#     - Go to the group Settings -> Webhooks page
-#     - Find the misconfigured webhook and press "Edit"
-#     - Toggle "Enable SSL verification"
-#     - Press "Save Changes"
+#     - 1. Go to the group Settings -> Webhooks page
+#     - 2. Find the misconfigured webhook and press 'Edit'
+#     - 3. Toggle 'Enable SSL verification'
+#     - 4. Press 'Save Changes'
 #   threat:
-#     - "If SSL verification is disabled, any party with access to the target DNS domain can masquerade as your designated payload URL, allowing it freely read and affect the response of any webhook request."
-#     - "In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed."
+#     - Webhooks with SSL verification disabled can be exploited by any party with access to the target DNS domain, allowing them to masquerade as your designated payload URL and freely read and affect the response of any webhook request.
+#     - In the case of GitLab Self-Managed, it may be sufficient only to control the DNS configuration of the network where the instance is deployed.
 organization_webhook_doesnt_require_ssl[violation] := true {
 	some index
 	hook := input.hooks[index]
@@ -68,14 +68,14 @@ organization_webhook_doesnt_require_ssl[violation] := true {
 # custom:
 #   severity: MEDIUM
 #   remediationSteps:
-#     - Go to the group page
-#     - Press Settings -> Repository
-#     - Expand "Default Branch" section
-#     - Toggle the required protection rule
-#     - Press "Save Changes"
+#     - 1. Go to the group page
+#     - 2. Press Settings -> Repository
+#     - 3. Expand 'Default Branch' section
+#     - 4. Toggle the required protection rule
+#     - 5. Press 'Save Changes'
 #   threat:
 #     - A developer creates a repository without any branch protection rules
-#     - Attacker that get access to the repository can modify its main branch without any restrictions
+#     - An attacker that gains access to the repository can modify its main branch without any restrictions
 default group_does_not_enforce_branch_protection_by_default := true
 
 group_does_not_enforce_branch_protection_by_default := false {
@@ -89,13 +89,13 @@ group_does_not_enforce_branch_protection_by_default := false {
 # custom:
 #   severity: MEDIUM
 #   remediationSteps:
-#     - Go to the group page
-#     - Press Settings -> General
-#     - Expand "Permissions and group features"
-#     - 'In the box titled: "Delay 2FA enforcement (hours)", enter a number under 168 (preferably 0)'
-#     - Press "Save Changes"
+#     - 1. Go to the group page
+#     - 2. Press Settings -> General
+#     - 3. Expand 'Permissions and group features'
+#     - "4. In the box titled: 'Delay 2FA enforcement (hours)', enter a number under 168 (preferably 0)"
+#     - 5. Press 'Save Changes'
 #   threat:
-#     - Any new group membmer effectivly acts as an attack surface until two-factor authentication is enabled. The risk is compounded as new members may be more vulnerable to phising and identity theft attacks.
+#     - Any new group member effectively acts as an attack surface until two-factor authentication is enabled. The risk is compounded as new members may be more vulnerable to phishing and identity theft attacks.
 default group_allows_excessive_mfa_grace_period := true
 
 group_allows_excessive_mfa_grace_period := false{
