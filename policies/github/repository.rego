@@ -1,6 +1,8 @@
 package repository
 
 import data.common.webhooks as webhookUtils
+import data.common.secrets as secretUtils
+
 
 # METADATA
 # scope: rule
@@ -193,13 +195,13 @@ missing_default_branch_protection_deletion := false {
 # custom:
 #   remediationSteps:
 #     - "Note: The remediation steps apply to legacy branch protections, rules set based protection should be updated from the rules set page"
-#     - 2. Make sure you have admin permissions
-#     - 3. Go to the repo's settings page
-#     - 4. Enter 'Branches' tab
-#     - 5. Under 'Branch protection rules'
-#     - 6. Click 'Edit' on the default branch rule
-#     - 7. Uncheck 'Allow force pushes'
-#     - 8. Click 'Save changes'
+#     - 1. Make sure you have admin permissions
+#     - 2. Go to the repo's settings page
+#     - 3. Enter 'Branches' tab
+#     - 4. Under 'Branch protection rules'
+#     - 5. Click 'Edit' on the default branch rule
+#     - 6. Uncheck 'Allow force pushes'
+#     - 7. Click 'Save changes'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
 #   prerequisites: [has_branch_protection_permission]
@@ -687,4 +689,31 @@ users_allowed_to_bypass_ruleset := false {
     some index
     rule := input.rules_set[index]
     count(rule.ruleset.bypass_actors) == 0
+}
+
+# METADATA
+# scope: rule
+# title: Repository Secrets Should Be Updated At Least Yearly
+# description: Some of the repository secrets have not been updated for over a year. It is recommended to refresh secret values regularly in order to minimize the risk of breach in case of an information leak.
+# custom:
+#   requiredEnrichers: [secretsList]
+#   remediationSteps:
+#      - 1. Enter your repository's landing page
+#      - 2. Go to the settings tab
+#      - 3. Under the 'Security' title on the left, choose 'Secrets and variables'
+#      - 4. Click 'Actions'
+#      - 5. Sort secrets by 'Last Updated'
+#      - 6. Regenerate every secret older than one year and add the new value to GitHub's secret manager
+#   severity: MEDIUM
+#   requiredScopes: [repo]
+#   threat: Sensitive data may have been inadvertently made public in the past, and an attacker who holds this data may gain access to your current CI and services. In addition, there may be old or unnecessary tokens that have not been inspected and can be used to access sensitive information.
+repository_secret_is_stale[stale] := true{
+    some index
+    secret := input.repository_secrets[index]
+    secretUtils.is_stale(secret.updated_at)
+    stale := {
+        "name" : secret.name,
+        "update date" : time.format(secret.updated_at),
+    }
+
 }

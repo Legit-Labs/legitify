@@ -152,11 +152,11 @@ default_project_visibility_is_public := false {
 # custom:
 #   severity: MEDIUM
 #   remediationSteps:
-#     - Go to the admin page: Menu -> Admin
-#     - Press Settings -> General
-#     - Expand 'Sign-up restrictions' section
-#     - Toggle 'Send confirmation email on sign-up'
-#     - Press 'Save Changes'
+#     - 1. Go to the admin page: Menu -> Admin
+#     - 2. Press Settings -> General
+#     - 3. Expand 'Sign-up restrictions' section
+#     - 4. Toggle 'Send confirmation email on sign-up'
+#     - 5. Press 'Save Changes'
 default send_user_confirmation_email_not_enabled := true
 
 send_user_confirmation_email_not_enabled := false {
