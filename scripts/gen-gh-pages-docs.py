@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import yaml
 import os
 import argparse
@@ -46,7 +45,7 @@ def gen_policy_markdown(policy):
     threat = policy["threat"]
 
     remediation_string = "".join(
-        [f"{index+1}. {line}\n" for index, line in enumerate(remediation)]
+        [f"{line}\n" for line in remediation]
     )
     remediation = f"""
 {format_header(HeaderSize.H3, "Remediation")}
@@ -96,7 +95,7 @@ def create_ns_policies(output_dir, ns, docs_yaml, parent):
     os.mkdir(ns_dir)
     title = f"{ns.title()} Policies"
 
-    file_path = os.path.join(ns_dir, f"index.md")
+    file_path = os.path.join(ns_dir, "index.md")
     file_header = f"""---
 layout: default
 title: {title}
@@ -117,7 +116,7 @@ has_children: true
 def create_scm_policy_docs(scm, docs_yaml, output_dir):
     scm_outdir = os.path.join(output_dir, scm)
     os.mkdir(scm_outdir)
-    file_path = os.path.join(scm_outdir, f"index.md")
+    file_path = os.path.join(scm_outdir, "index.md")
     title = f"{scm_to_pretty_name(scm)} Policies"
     file_header = f"""---
 layout: default

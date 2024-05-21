@@ -16,15 +16,15 @@ package runner_group
 #   requiredEnrichers: [organizationId]
 #   requiredScopes: [admin:org]
 #   remediationSteps:
-#     - "Go to the organization settings page"
-#     - "Press Actions ➝ Runner groups"
-#     - "Select the violating repository"
-#     - "Uncheck Allow public repositories"
+#     - 1. Go to the organization settings page
+#     - 2. Press Actions ➝ Runner groups
+#     - 3. Select the violating repository
+#     - 4. Uncheck Allow public repositories
 #   threat:
-#     - "Hosted runners are usually part of the organization's private network and can be easily misconfigured."
-#     - "If the hosted runner is insecurely configured, any GitHub user could:"
-#     - "1. Create a workflow that runs on the public hosted runner"
-#     - "2. Exploit the misconfigurations to execute code inside the private network"
+#     - Hosted runners are usually part of the organization's private network and can be easily misconfigured.
+#     - If the hosted runner is insecurely configured, any GitHub user could:
+#     - 1. Create a workflow that runs on the public hosted runner
+#     - 2. Exploit the misconfigurations to execute code inside the private network
 default runner_group_can_be_used_by_public_repositories := true
 
 runner_group_can_be_used_by_public_repositories := false {
@@ -43,15 +43,15 @@ runner_group_can_be_used_by_public_repositories := false {
 #   requiredEnrichers: [organizationId]
 #   requiredScopes: [admin:org]
 #   remediationSteps:
-#     - "Go to the organization settings page"
-#     - "Go to Actions ➝ Runner groups"
-#     - "Under the 'Repository Access' section, select 'Selected repositories'"
-#     - "Select the required repositories"
+#     - 1. Go to the organization settings page
+#     - 2. Go to Actions ➝ Runner groups
+#     - 3. Under the 'Repository Access' section, select 'Selected repositories'
+#     - 4. Select the required repositories
 #   threat:
-#     - "Hosted runners are usually part of the organization's private network and can be easily misconfigured."
-#     - "If the hosted runner is insecurely configured, any user in the organization could:"
-#     - "1. Create a workflow that runs on the hosted runner"
-#     - "2. Exploit the runner misconfigurations/known CVE's to execute code inside the private network"
+#     - Hosted runners are usually part of the organization's private network and can be easily misconfigured.
+#     - If the hosted runner is insecurely configured, any user in the organization could:
+#     - 1. Create a workflow that runs on the hosted runner
+#     - 2. Exploit the runner misconfigurations/known CVE's to execute code inside the private network
 default runner_group_not_limited_to_selected_repositories := true
 
 runner_group_not_limited_to_selected_repositories := false {
