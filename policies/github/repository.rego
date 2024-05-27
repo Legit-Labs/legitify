@@ -717,3 +717,22 @@ repository_secret_is_stale[stale] := true{
     }
 
 }
+
+# METADATA
+# scope: rule
+# title: Secret Scanning should be enabled for public repositories
+# description: Public repositories should not have secrets hard-coded in the files. It is recommended to enable some sort of secret scanning.
+# custom:
+#   remediationSteps:
+#     - 1. Go to the repository settings page
+#     - 2. Under the 'Security' title on the left, select 'Code security and analysis'
+#     - 3. Under 'Secret scanning', click 'Enable'
+#   severity: MEDIUM
+#   requiredScopes: [repo]
+#   prerequisites: [is_branch_protection_supported]
+#   threat: Exposed secrets increases the risk of sensitive information such as API keys, passwords, and tokens being disclosed, leading to unauthorized access to systems and services, and data breaches.
+default secret_scanning_not_enabled := true
+
+secret_scanning_not_enabled := false{
+    input.security_and_analysis.secret_scanning.status == "enabled"
+}

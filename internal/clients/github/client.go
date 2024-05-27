@@ -4,6 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"regexp"
+	"strings"
+	"sync"
+
 	"github.com/Legit-Labs/legitify/internal/clients/github/pagination"
 	"github.com/Legit-Labs/legitify/internal/clients/github/transport"
 	"github.com/Legit-Labs/legitify/internal/clients/github/types"
@@ -12,11 +18,6 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/slice_utils"
 	commontypes "github.com/Legit-Labs/legitify/internal/common/types"
 	"github.com/Legit-Labs/legitify/internal/screen"
-	"log"
-	"net/http"
-	"regexp"
-	"strings"
-	"sync"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/permissions"
@@ -655,4 +656,17 @@ func (c *Client) GetOrganizationSecrets(org string) (*gh.Secrets, error) {
 		return nil, fmt.Errorf("unexpected HTTP status: %d", res.StatusCode)
 	}
 	return secrets, nil
+}
+
+func (c *Client) GetSecurityAndAnalysisForRepository(repo, owner string) (*gh.SecurityAndAnalysis, error) {
+	r, res, err := c.Client().Repositories.Get(c.context, owner, repo)
+
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("unexpected HTTP status: %d", res.StatusCode)
+	}
+
+	return r.SecurityAndAnalysis, nil
 }

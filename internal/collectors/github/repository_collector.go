@@ -255,6 +255,11 @@ func (rc *repositoryCollector) collectExtraData(login string,
 		log.Printf("error getting repository dependency manifests for %s: %s", collectors.FullRepoName(login, repo.Repository.Name), err)
 	}
 
+	repo, err = rc.withSecurityAndAnalysis(repo, login)
+	if err != nil {
+		log.Printf("failed to collect repository Security and Analysis settings for %s: %s", repo.Repository.Name, err)
+	}
+
 	if isBranchProtectionSupported {
 		repo, err = rc.fixBranchProtectionInfo(repo, login)
 		if err != nil {
@@ -405,6 +410,23 @@ func (rc *repositoryCollector) withSecrets(repository ghcollected.Repository, lo
 	}
 	repository.RepoSecrets = repoSecrets
 	return repository, nil
+}
+
+func (rc *repositoryCollector) withSecurityAndAnalysis(repo ghcollected.Repository, login string) (ghcollected.Repository, error) {
+	
+	securityAndAnalysis, err := rc.Client.GetSecurityAndAnalysisForRepository(repo.Name(), login)
+	if err != nil {
+		return repo, err
+	}
+	if securityAndAnalysis == nil {
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(login, repo.Repository.Name),
+			"Cannot read Security and Analysis settings", namespace.Repository)
+		rc.IssueMissingPermissions(perm)
+		return repo, nil
+	}
+
+	repo.SecurityAndAnalysis = securityAndAnalysis
+	return repo, nil
 }
 
 // fixBranchProtectionInfo fixes the branch protection info for the repository,
