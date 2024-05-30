@@ -720,8 +720,8 @@ repository_secret_is_stale[stale] := true{
 
 # METADATA
 # scope: rule
-# title: Secret Scanning should be enabled for public repositories
-# description: Public repositories should not have secrets hard-coded in the files. It is recommended to enable some sort of secret scanning.
+# title: Secret Scanning should be enabled
+# description: Repositories should not have secrets hard-coded in the files. It is recommended to enable some sort of secret scanning.
 # custom:
 #   remediationSteps:
 #     - 1. Go to the repository settings page
