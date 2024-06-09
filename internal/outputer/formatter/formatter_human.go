@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Legit-Labs/legitify/internal/common/severity"
+	"github.com/fatih/color"
 	tw "github.com/olekukonko/tablewriter"
 
+	"github.com/Legit-Labs/legitify/internal/common/severity"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
-	"github.com/fatih/color"
 )
 
 type HumanFormatter struct {
@@ -152,13 +152,9 @@ func (hp humanPolicyFormatter) FormatList(depth int, title string, list []string
 	}
 
 	var sb strings.Builder
-	bullet := "-"
 	sb.WriteString(hp.FormatText(depth, "%s\n", title))
-	for i, step := range list {
-		if ordered {
-			bullet = fmt.Sprintf("%d.", i+1)
-		}
-		sb.WriteString(hp.FormatText(depth, "%s %s\n", bullet, step))
+	for _, step := range list {
+		sb.WriteString(hp.FormatText(depth, "%s\n", step))
 	}
 
 	return sb.String()
