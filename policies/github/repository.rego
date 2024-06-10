@@ -729,7 +729,7 @@ repository_secret_is_stale[stale] := true{
 #     - 3. Under 'Secret scanning', click 'Enable'
 #   severity: MEDIUM
 #   requiredScopes: [repo]
-#   prerequisites: [is_branch_protection_supported]
+#   prerequisites: [advanced_security]
 #   threat: Exposed secrets increases the risk of sensitive information such as API keys, passwords, and tokens being disclosed, leading to unauthorized access to systems and services, and data breaches.
 default secret_scanning_not_enabled := true
 

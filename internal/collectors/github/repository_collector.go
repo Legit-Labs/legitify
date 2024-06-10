@@ -136,11 +136,11 @@ func (rc *repositoryCollector) collectSpecific(repositories []types.RepositoryWi
 
 					hasBp := hasBranchProtection(org, query.RepositoryOwner.Repository.IsPrivate)
 					collectionContext = newRepositoryContext([]permissions.Role{org.Role, query.RepositoryOwner.Repository.ViewerPermission},
-						hasBp, org.IsEnterprise(), false)
+						hasBp, org.IsEnterprise(), false, false)
 				} else {
 					hasBp := rc.hasBranchProtectionForUser(repo.Owner, query.RepositoryOwner.Repository.IsPrivate)
 					collectionContext = newRepositoryContext([]permissions.Role{query.RepositoryOwner.Repository.ViewerPermission},
-						hasBp, false, false)
+						hasBp, false, false, false)
 				}
 
 				rc.collectRepository(&query.RepositoryOwner.Repository, repo.Owner, collectionContext)
@@ -206,7 +206,7 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 				node := &(nodes[i])
 				extraGw.Do(func() {
 					collectionContext := newRepositoryContext([]permissions.Role{org.Role, node.ViewerPermission},
-						hasBranchProtection(org, node.IsPrivate), org.IsEnterprise(), false)
+						hasBranchProtection(org, node.IsPrivate), org.IsEnterprise(), false, false)
 					rc.collectRepository(node, org.Name(), collectionContext)
 				})
 			}
@@ -229,6 +229,7 @@ func (rc *repositoryCollector) collectRepository(repository *ghcollected.GitHubQ
 	missingPermissions := rc.checkMissingPermissions(repo, entityName)
 	rc.IssueMissingPermissions(missingPermissions...)
 	collectionContext.SetHasBranchProtectionPermission(!repo.NoBranchProtectionPermission)
+	collectionContext.SetHasGithubAdvancedSecurity(repo.SecurityAndAnalysis != nil)
 	rc.CollectDataWithContext(repo, repo.Repository.Url, collectionContext)
 	rc.CollectionChangeByOne()
 }

@@ -9,6 +9,7 @@ type repositoryContext struct {
 	isEnterprise                  bool
 	isBranchProtectionSupported   bool
 	hasBranchProtectionPermission bool
+	hasGithubAdvancedSecurity     bool
 }
 
 func (rc *repositoryContext) Premium() bool {
@@ -31,11 +32,20 @@ func (rc *repositoryContext) HasBranchProtectionPermission() bool {
 	return rc.hasBranchProtectionPermission
 }
 
-func newRepositoryContext(roles []permissions.RepositoryRole, isBranchProtectionSupported bool, isEnterprise bool, hasBranchProtectionPermission bool) *repositoryContext {
+func (rc *repositoryContext) SetHasGithubAdvancedSecurity(value bool) {
+	rc.hasGithubAdvancedSecurity = value
+}
+
+func (rc *repositoryContext) HasGithubAdvancedSecurity() bool {
+	return rc.hasGithubAdvancedSecurity
+}
+
+func newRepositoryContext(roles []permissions.RepositoryRole, isBranchProtectionSupported bool, isEnterprise bool, hasBranchProtectionPermission bool, hasGithubAdvancedSecurity bool) *repositoryContext {
 	return &repositoryContext{
 		roles:                         roles,
 		isEnterprise:                  isEnterprise,
 		isBranchProtectionSupported:   isBranchProtectionSupported,
 		hasBranchProtectionPermission: hasBranchProtectionPermission,
+		hasGithubAdvancedSecurity:     hasGithubAdvancedSecurity,
 	}
 }
