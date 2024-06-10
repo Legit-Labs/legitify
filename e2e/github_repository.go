@@ -76,4 +76,9 @@ var testCasesGitHubRepository = []testCase{
 		failedEntity: "bad_repo",
 		passedEntity: "good_repo",
 	},
+	{
+		path:         "data.repository.secret_scanning_not_enabled",
+		failedEntity: "bad_repo",
+		passedEntity: "good-public-repo",
+	},
 }
