@@ -226,7 +226,7 @@ func (rc *repositoryCollector) collectRepositories(org *ghcollected.ExtendedOrg)
 func (rc *repositoryCollector) collectRepository(repository *ghcollected.GitHubQLRepository, login string, collectionContext *repositoryContext) {
 	repo := rc.collectExtraData(login, repository, collectionContext.isBranchProtectionSupported)
 	entityName := collectors.FullRepoName(login, repo.Repository.Name)
-	missingPermissions := rc.checkMissingPermissions(repo, entityName)
+	missingPermissions := rc.checkMissingPermissions(repo, entityName, collectionContext)
 	rc.IssueMissingPermissions(missingPermissions...)
 	collectionContext.SetHasBranchProtectionPermission(!repo.NoBranchProtectionPermission)
 	collectionContext.SetHasGithubAdvancedSecurity(repo.SecurityAndAnalysis != nil)
@@ -419,12 +419,6 @@ func (rc *repositoryCollector) withSecurityAndAnalysis(repo ghcollected.Reposito
 	if err != nil {
 		return repo, err
 	}
-	if securityAndAnalysis == nil {
-		perm := collectors.NewMissingPermission(permissions.RepoAdmin, collectors.FullRepoName(login, repo.Repository.Name),
-			"Cannot read Security and Analysis settings", namespace.Repository)
-		rc.IssueMissingPermissions(perm)
-		return repo, nil
-	}
 
 	repo.SecurityAndAnalysis = securityAndAnalysis
 	return repo, nil
@@ -467,14 +461,36 @@ func (rc *repositoryCollector) fixBranchProtectionInfo(repository ghcollected.Re
 	return repository, nil
 }
 
-func (rc *repositoryCollector) checkMissingPermissions(repo ghcollected.Repository, entityName string) []collectors.MissingPermission {
+func (rc *repositoryCollector) checkMissingPermissions(repo ghcollected.Repository, entityName string, repoContext *repositoryContext) []collectors.MissingPermission {
 	var missingPermissions []collectors.MissingPermission
 	if repo.NoBranchProtectionPermission {
 		effect := "Cannot read repository branch protection information"
 		perm := collectors.NewMissingPermission(permissions.RepoAdmin, entityName, effect, namespace.Repository)
 		missingPermissions = append(missingPermissions, perm)
 	}
+	if repo.SecurityAndAnalysis == nil {
+		//if (not org.owner and not scope.repo_admin) {
+		var effect string
+		if !checkRepoAdminPermission(repoContext.roles) {
+			effect = "Cannot read repository Security and Analysis settings"
+		} else if repo.Repository.IsPrivate {
+			effect = "Your GitHub plan does not include a secret scanning feature."
+		}
+		perm := collectors.NewMissingPermission(permissions.RepoAdmin, entityName, effect, namespace.Repository)
+		missingPermissions = append(missingPermissions, perm)
+	}
+
 	return missingPermissions
+}
+
+func checkRepoAdminPermission(roles []permissions.RepositoryRole) bool{
+	for _, role := range roles {
+		if (permissions.IsRepositoryRole(role) && role == permissions.RepoRoleAdmin) ||
+			(permissions.IsOrgRole(role) && role == permissions.OrgRoleOwner) {
+			return true
+		}
+	}
+	return false
 }
 
 const (
