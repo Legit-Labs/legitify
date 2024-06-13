@@ -371,6 +371,28 @@ func TestRepositoryWithNoSecrets(t *testing.T) {
 	repositoryTestTemplate(t, name, makeMockData(), testedPolicyName, expectFailure, scm_type.GitHub)
 }
 
+func TestRepositorySecretScanning(t *testing.T) {
+	name := "repository secret scanning is disabled"
+	testedPolicyName := "secret_scanning_not_enabled"
+	makeMockData := func(flag string) githubcollected.Repository {
+		return githubcollected.Repository{
+			SecurityAndAnalysis: &github.SecurityAndAnalysis{
+				SecretScanning: &github.SecretScanning{Status: &flag},
+			},
+		}
+	}
+
+	options := map[bool]string{
+		false: "enabled",
+		true:  "disabled",
+	}
+
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitHub)
+	}
+}
+
 func TestGitlabRepositoryTooManyAdmins(t *testing.T) {
 	name := "Project Has Too Many Owners"
 	testedPolicyName := "project_has_too_many_admins"

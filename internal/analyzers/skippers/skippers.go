@@ -39,6 +39,14 @@ func NewSkipper(ctx context.Context) Skipper {
 			"enterprise": func(_ collectors.CollectedData) bool {
 				return !context_utils.GetIsCloud(ctx)
 			},
+			"advanced_security": func(data collectors.CollectedData) bool {
+				repositoryContext, ok := data.Context.(collectors.CollectedDataRepositoryContext)
+				if !ok {
+					log.Printf("invalid type %T", data.Context)
+					return false
+				}
+				return repositoryContext.HasGithubAdvancedSecurity()
+			},
 		},
 	}
 }

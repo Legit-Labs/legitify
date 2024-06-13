@@ -15,6 +15,7 @@ type CollectedDataContext interface {
 type CollectedDataRepositoryContext interface {
 	CollectedDataContext
 	HasBranchProtectionPermission() bool
+	HasGithubAdvancedSecurity()     bool
 }
 
 type CollectedData struct {

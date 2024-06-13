@@ -72,6 +72,7 @@ type Repository struct {
 	DependencyGraphManifests     *GitHubQLDependencyGraphManifests `json:"dependency_graph_manifests"`
 	RulesSet                     []*types.RepositoryRule           `json:"rules_set,omitempty"`
 	RepoSecrets                  []*RepositorySecret               `json:"repository_secrets,omitempty"`
+	SecurityAndAnalysis          *github.SecurityAndAnalysis       `json:"security_and_analysis,omitempty"`
 }
 
 type RepositorySecret struct {
