@@ -469,7 +469,6 @@ func (rc *repositoryCollector) checkMissingPermissions(repo ghcollected.Reposito
 		missingPermissions = append(missingPermissions, perm)
 	}
 	if repo.SecurityAndAnalysis == nil {
-		//if (not org.owner and not scope.repo_admin) {
 		var effect string
 		if !checkRepoAdminPermission(repoContext.roles) {
 			effect = "Cannot read repository Security and Analysis settings"
