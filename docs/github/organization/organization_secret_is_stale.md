@@ -20,12 +20,12 @@ Sensitive data may have been inadvertently made public in the past, and an attac
 
 
 ### Remediation
-Enter your organization's landing page
-Go to the settings tab
-Under the 'Security' title on the left, choose 'Secrets and variables'
-Click 'Actions'
-Sort secrets by 'Last Updated'
-Regenerate every secret older than one year and add the new value to GitHub's secret manager
+1. Enter your organization's landing page
+2. Go to the settings tab
+3. Under the 'Security' title on the left, choose 'Secrets and variables'
+4. Click 'Actions'
+5. Sort secrets by 'Last Updated'
+6. Regenerate every secret older than one year and add the new value to GitHub's secret manager
 
 
 
