@@ -156,12 +156,12 @@ organization_not_using_single_sign_on := false {
 # custom:
 #   requiredEnrichers: [secretsList]
 #   remediationSteps:
-#      - Enter your organization's landing page
-#      - Go to the settings tab
-#      - Under the 'Security' title on the left, choose 'Secrets and variables'
-#      - Click 'Actions'
-#      - Sort secrets by 'Last Updated'
-#      - Regenerate every secret older than one year and add the new value to GitHub's secret manager
+#      - 1. Enter your organization's landing page
+#      - 2. Go to the settings tab
+#      - 3. Under the 'Security' title on the left, choose 'Secrets and variables'
+#      - 4. Click 'Actions'
+#      - 5. Sort secrets by 'Last Updated'
+#      - 6. Regenerate every secret older than one year and add the new value to GitHub's secret manager
 #   severity: MEDIUM
 #   requiredScopes: [admin:org, repo]
 #   threat: Sensitive data may have been inadvertently made public in the past, and an attacker who holds this data may gain access to your current CI and services. In addition, there may be old or unnecessary tokens that have not been inspected and can be used to access sensitive information.

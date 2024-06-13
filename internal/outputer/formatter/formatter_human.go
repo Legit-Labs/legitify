@@ -146,7 +146,7 @@ func (hp humanPolicyFormatter) FormatText(depth int, format string, args ...inte
 	return indentMultiline(depth, fmt.Sprintf(format, args...))
 }
 
-func (hp humanPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool) string {
+func (hp humanPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool, addListPrefix bool) string {
 	if len(list) == 0 {
 		return ""
 	}

@@ -3,6 +3,7 @@ package formatter
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/Legit-Labs/legitify/internal/common/severity"
@@ -174,19 +175,43 @@ func (mp markdownPolicyFormatter) FormatText(depth int, format string, args ...i
 	return indentMultilineSpecial(depth, fmt.Sprintf(format, args...), mp.Indent(1), mp.Linebreak())
 }
 
-func (mp markdownPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool) string {
+func isMarkdownListItem(s string) bool {
+	unorderedPattern := `^[\-\*\+] `
+	orderedPattern := `^\d+\.\s`
+
+	unorderedRegex, err := regexp.Compile(unorderedPattern)
+	if err != nil {
+		return false
+	}
+
+	orderedRegex, err := regexp.Compile(orderedPattern)
+	if err != nil {
+		return false
+	}
+
+	return unorderedRegex.MatchString(s) || orderedRegex.MatchString(s)
+}
+
+func (mp markdownPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool, addListPrefix bool) string {
 	if len(list) == 0 {
 		return ""
 	}
 
 	var sb strings.Builder
 	bullet := "-"
-	sb.WriteString(mp.FormatText(depth, "%s\n", title))
+	sb.WriteString(mp.FormatText(depth, "%s\n\n", title))
 	for i, step := range list {
-		if ordered {
-			bullet = fmt.Sprintf("%d.", i+1)
+		if addListPrefix {
+			if ordered {
+				bullet = fmt.Sprintf("%d.", i+1)
+			}
+			sb.WriteString(mp.FormatText(depth, "%s %s\n", bullet, step))
+		} else {
+			sb.WriteString(mp.FormatText(depth, "%s\n", step))
+			if !isMarkdownListItem(step) {
+				sb.WriteString(mp.FormatText(depth, "\n"))
+			}
 		}
-		sb.WriteString(mp.FormatText(depth, "%s %s\n", bullet, step))
 	}
 
 	return sb.String()
