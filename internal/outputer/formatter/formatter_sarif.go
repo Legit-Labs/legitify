@@ -217,7 +217,7 @@ func (sp sarifPolicyFormatter) FormatText(depth int, format string, args ...inte
 	return indentMultilineSpecial(depth, fmt.Sprintf(format, args...), sp.Indent(1), sp.Linebreak())
 }
 
-func (sp sarifPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool) string {
+func (sp sarifPolicyFormatter) FormatList(depth int, title string, list []string, ordered bool, addListPrefix bool) string {
 	if len(list) == 0 {
 		return ""
 	}

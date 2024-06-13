@@ -14,7 +14,7 @@ type policiesFormatter interface {
 	FormatTitle(title string, severity string) string
 	FormatSubtitle(title string) string
 	FormatText(depth int, format string, args ...interface{}) string
-	FormatList(depth int, title string, list []string, ordered bool) string
+	FormatList(depth int, title string, list []string, ordered bool, addListPrefix bool) string
 	Linebreak() string
 	Separator() string
 	Indent(depth int) string
@@ -94,9 +94,9 @@ func (pc *policiesContent) writeLineBreak() {
 	pc.writeLine("")
 }
 
-func (pc *policiesContent) writeList(title string, list []string, ordered bool) {
+func (pc *policiesContent) writeList(title string, list []string, ordered bool, addListPrefix bool) {
 	title = fmt.Sprintf("%s:", pc.bold(title))
-	pc.sb.WriteString(pc.pf.FormatList(pc.depth, title, list, ordered))
+	pc.sb.WriteString(pc.pf.FormatList(pc.depth, title, list, ordered, addListPrefix))
 }
 
 func (pc *policiesContent) writeKeyval(key string, val string) {
@@ -114,10 +114,10 @@ func (pc *policiesContent) writePolicyInfo(policyName string, policyInfo scheme.
 	pc.writeKeyval("Severity", coloredSeverity)
 
 	pc.writeLineBreak()
-	pc.writeList("Threat", policyInfo.Threat, false)
+	pc.writeList("Threat", policyInfo.Threat, false, true)
 
 	pc.writeLineBreak()
-	pc.writeList("Remediation Steps", policyInfo.RemediationSteps, true)
+	pc.writeList("Remediation Steps", policyInfo.RemediationSteps, false, false)
 }
 
 func (pc *policiesContent) bold(text interface{}) string {
@@ -146,7 +146,7 @@ func (pc *policiesContent) writeAux(aux *orderedmap.OrderedMap) {
 		return
 	}
 
-	pc.writeList("Auxiliary Info", pc.auxAsList(aux), false)
+	pc.writeList("Auxiliary Info", pc.auxAsList(aux), false, true)
 }
 
 func (pc *policiesContent) auxAsList(m *orderedmap.OrderedMap) []string {
