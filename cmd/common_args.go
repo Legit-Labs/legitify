@@ -7,14 +7,15 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 	"github.com/Legit-Labs/legitify/internal/errlog"
 	"github.com/Legit-Labs/legitify/internal/outputer/formatter"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme"
 	"github.com/Legit-Labs/legitify/internal/outputer/scheme/converter"
 	"github.com/Legit-Labs/legitify/internal/screen"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 type args struct {
@@ -78,7 +79,7 @@ func (a *args) applyOutputOptions() (preExitHook func(), err error) {
 	if err != nil {
 		return nil, err
 	}
-	permFile, err := setPermissionsOutputFile(analyzeGptArgs.PermissionsOutputFile)
+	permFile, err := setPermissionsOutputFile(a.PermissionsOutputFile)
 	if err != nil {
 		return nil, err
 	}
