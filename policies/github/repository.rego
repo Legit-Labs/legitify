@@ -32,7 +32,7 @@ repository_not_maintained := false {
 # METADATA
 # scope: rule
 # title: Repository Should Have Fewer Than Three Admins
-# description: Repository admins are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of Repository Admins to the minimum required (recommended maximum 3 admins).
+# description: Repository admins are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of admins to the minimum required, and no more than 5% of the userbase (it is recommended to keep a maximum of 3 admins)..
 # custom:
 #   severity: LOW
 #   remediationSteps:
@@ -49,7 +49,10 @@ default repository_has_too_many_admins := true
 
 repository_has_too_many_admins := false {
 	admins := [admin | admin := input.collaborators[_]; admin.permissions.admin]
-	count(admins) <= 3
+	adminNum := count(admins)
+	userNum := count(input.collaborators)
+	maxAdmins := max([3, ceil(userNum * 0.05)])
+	adminNum <= maxAdmins
 }
 
 # METADATA
