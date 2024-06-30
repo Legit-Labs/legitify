@@ -32,7 +32,7 @@ repository_not_maintained := false {
 # METADATA
 # scope: rule
 # title: Repository Should Have Fewer Than Three Admins
-# description: Repository admins are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of admins to the minimum required, and no more than 5% of the userbase (it is recommended to keep a maximum of 3 admins)..
+# description: Repository admins are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of repository admins to the minimum required, and no more than 5% of the userbase (it is recommended to keep a maximum of 3 admins).
 # custom:
 #   severity: LOW
 #   remediationSteps:
