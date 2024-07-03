@@ -12,7 +12,7 @@ permissions:
   contents: read
 jobs:
   install_and_run_e2e_tests:
-    if: ${{ (github.event.pull_request.head.repo.fork == false || github.event.pull_request.head.repo.fork == true) && contains(github.event.pull_request.labels.*.name,'Approve E2E Test') }}
+    if: ${{ github.event.pull_request.head.repo.fork == false || (github.event.pull_request.head.repo.fork == true && contains(github.event.pull_request.labels.*.name,'Approve E2E Test') }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
