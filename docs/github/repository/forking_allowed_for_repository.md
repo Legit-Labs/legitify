@@ -1,18 +1,18 @@
 ---
 layout: default
-title: Forking Should Not Be Allowed for This Repository
+title: Forking Should Not Be Allowed for Private/Internal Repositories
 parent: Repository Policies
 grand_parent: GitHub Policies
 ---
 
 
-## Forking Should Not Be Allowed for This Repository
+## Forking Should Not Be Allowed for Private/Internal Repositories
 policy name: forking_allowed_for_repository
 
 severity: LOW
 
 ### Description
-Forking a repository can lead to loss of control and potential exposure of the source code. If you do not need forking, it is recommended to turn it off in the repository configuration. If needed, forking should be turned on by admins deliberately when opting to create a fork.
+Forking private or internal repositories can lead to unauthorized spread and potential exposure of sensitive source code. It is recommended to disable forking for private repositories in the repository or the organization configuration to maintain control over the source code. If forking is necessary, it should be enabled selectively by admins for specific collaboration needs on private repositories.
 
 ### Threat Example(s)
 Forked repositories cause more code and secret sprawl in the organization as forks are independent copies of the repository and need to be tracked separately, making it more difficult to keep track of sensitive assets and contain potential incidents.
