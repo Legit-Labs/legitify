@@ -10,6 +10,7 @@ on:
     types: [ labeled ]
 permissions:
   contents: read
+  pull-requests: write
 jobs:
   install_and_run_e2e_tests:
     if: ${{ github.event.pull_request.head.repo.fork == false || (github.event.pull_request.head.repo.fork == true && contains(github.event.pull_request.labels.*.name,'Approve E2E Test')) }}
