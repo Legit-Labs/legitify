@@ -98,7 +98,6 @@ jobs:
   remove_e2e_label:
     if: ${{ always() && (github.event.pull_request.head.repo.fork == true && contains(github.event.pull_request.labels.*.name,'Approve E2E Test')) }}
     needs: install_and_run_e2e_tests
-    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - name: Remove E2E Label
