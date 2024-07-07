@@ -99,10 +99,11 @@ jobs:
     if: ${{ always() && (github.event.pull_request.head.repo.fork == true && contains(github.event.pull_request.labels.*.name,'Approve E2E Test')) }}
     needs: install_and_run_e2e_tests
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Remove E2E Label
         run: |
-          gh api --method DELETE -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/${{ github.repository }}/issues/${{ github.event.number }}/labels/${{ 'Approve%20E2E%20Test' }} || true
+          gh api --method DELETE -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/${{ github.repository }}/issues/${{ github.event.number }}/labels/${{ 'Approve%20E2E%20Test' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
