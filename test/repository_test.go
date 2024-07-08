@@ -403,11 +403,21 @@ func TestGitlabRepositoryTooManyAdmins(t *testing.T) {
 		}
 	}
 
-	tmpMember := &gitlab2.ProjectMember{
+	tmpAdminMember := &gitlab2.ProjectMember{
 		AccessLevel: 50,
 	}
-	trueCase := []*gitlab2.ProjectMember{tmpMember, tmpMember, tmpMember, tmpMember}
-	falseCase := []*gitlab2.ProjectMember{tmpMember, tmpMember}
+	tmpRegMember := &gitlab2.ProjectMember{
+		AccessLevel: 20,
+	}
+	trueCase := []*gitlab2.ProjectMember{tmpAdminMember, tmpAdminMember, tmpAdminMember, tmpAdminMember}
+	for i := 0; i < 10; i++ {
+		trueCase = append(trueCase, tmpRegMember)
+	}
+	falseCase := []*gitlab2.ProjectMember{tmpAdminMember, tmpAdminMember, tmpAdminMember, tmpAdminMember}
+	for i := 0; i < 57; i++ {
+		falseCase = append(falseCase, tmpRegMember)
+	}
+
 	options := map[bool][]*gitlab2.ProjectMember{
 		false: falseCase,
 		true:  trueCase,

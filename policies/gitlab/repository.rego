@@ -26,8 +26,8 @@ project_not_maintained := false {
 
 # METADATA
 # scope: rule
-# title: Project Should Have Fewer Than Three Owners
-# description: Projects owners are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of Project Owners to the minimum required (recommended maximum 3 admins).
+# title: Project Should Have A Low Owner Count
+# description: Projects owners are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of Project Owners to the minimum required, and no more than 5% of the userbase (Up to 3 owners are always allowed).
 # custom:
 #   severity: LOW
 #   remediationSteps:
@@ -41,7 +41,10 @@ default project_has_too_many_admins := true
 
 project_has_too_many_admins := false {
 	admins := [admin | admin := input.members[_]; admin.access_level == 50]
-	count(admins) <= 3
+	adminNum := count(admins)
+	userNum := count(input.members)
+	maxAdmins := max([3, ceil(userNum * 0.05)])
+	adminNum <= maxAdmins
 }
 
 # METADATA
