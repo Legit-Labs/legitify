@@ -49,8 +49,8 @@ project_has_too_many_admins := false {
 
 # METADATA
 # scope: rule
-# title: Forking Should Not Be Allowed
-# description: Forking a repository can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project's configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
+# title: Forking Should Not Be Allowed for Private/Internal Projects
+# description: Forking a project (repository) can lead to loss of control and potential exposure of source code. If you do not need forking, it is recommended to turn it off in the project or group configuration. The option to fork should be enabled only by owners deliberately when opting to create a fork.
 # custom:
 #   remediationSteps:
 #     - 1. Make sure you have owner permissions
