@@ -27,7 +27,7 @@ project_not_maintained := false {
 # METADATA
 # scope: rule
 # title: Project Should Have A Low Owner Count
-# description: Projects owners are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of Project Owners to the minimum required, and no more than 5% of the userbase (it is recommended to keep a maximum of 3 owners).
+# description: Projects owners are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of Project Owners to the minimum required, and no more than 5% of the userbase (Up to 3 owners are always allowed).
 # custom:
 #   severity: LOW
 #   remediationSteps:
