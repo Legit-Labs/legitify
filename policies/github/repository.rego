@@ -31,8 +31,8 @@ repository_not_maintained := false {
 }
 # METADATA
 # scope: rule
-# title: Repository Should Have Fewer Than Three Admins
-# description: Repository admins are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of Repository Admins to the minimum required (recommended maximum 3 admins).
+# title: Repository Should Have A Low Admin Count
+# description: Repository admins are highly privileged and could create great damage if they are compromised. It is recommended to limit the number of repository admins to the minimum required, and no more than 5% of the userbase (Up to 3 admins are always allowed).
 # custom:
 #   severity: LOW
 #   remediationSteps:
@@ -49,7 +49,10 @@ default repository_has_too_many_admins := true
 
 repository_has_too_many_admins := false {
 	admins := [admin | admin := input.collaborators[_]; admin.permissions.admin]
-	count(admins) <= 3
+	adminNum := count(admins)
+	userNum := count(input.collaborators)
+	maxAdmins := max([3, ceil(userNum * 0.05)])
+	adminNum <= maxAdmins
 }
 
 # METADATA
@@ -111,8 +114,8 @@ repository_webhook_doesnt_require_ssl[violated] := true {
 
 # METADATA
 # scope: rule
-# title: Forking Should Not Be Allowed for This Repository
-# description: Forking a repository can lead to loss of control and potential exposure of the source code. If you do not need forking, it is recommended to turn it off in the repository configuration. If needed, forking should be turned on by admins deliberately when opting to create a fork.
+# title: Forking Should Not Be Allowed for Private/Internal Repositories
+# description: Forking private or internal repositories can lead to unauthorized spread and potential exposure of sensitive source code. It is recommended to disable forking for private repositories in the repository or the organization configuration to maintain control over the source code. If forking is necessary, it should be enabled selectively by admins for specific collaboration needs on private repositories.
 # custom:
 #   remediationSteps:
 #     - 1. Make sure you have admin permissions
@@ -123,6 +126,10 @@ repository_webhook_doesnt_require_ssl[violated] := true {
 #   requiredScopes: [read:org]
 #   threat: Forked repositories cause more code and secret sprawl in the organization as forks are independent copies of the repository and need to be tracked separately, making it more difficult to keep track of sensitive assets and contain potential incidents.
 default forking_allowed_for_repository := true
+
+forking_allowed_for_repository := false {
+	input.repository.is_private == false
+}
 
 forking_allowed_for_repository := false {
 	input.repository.is_private == true
