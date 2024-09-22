@@ -69,4 +69,9 @@ var testCasesGitLab = []testCase{
 		path:          "data.member.two_factor_authentication_is_disabled_for_an_external_collaborator",
 		skippedEntity: "legitify-test",
 	},
+	{
+		path:         "data.repository.overriding_defined_variables_isnt_restricted",
+		failedEntity: "failed_repo",
+		passedEntity: "passed_repo",
+	},
 }
