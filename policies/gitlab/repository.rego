@@ -347,7 +347,7 @@ repository_dismiss_stale_reviews := false {
 
 # METADATA
 # scope: rule
-# title: The ability to override predefined variables should be limited only to users with at least Maintainer role.
+# title: Overriding predefined variables should be allowed only to Maintainer role or higher.
 # description: It’s recommended to restrict users with low privileges from overriding predefined variables, as doing so could compromise the security and integrity of the CI/CD pipeline.
 # custom:
 #   remediationSteps:
