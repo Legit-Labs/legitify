@@ -1,12 +1,12 @@
 ---
 layout: default
-title: The ability to override predefined variables should be limited only to users with at least Maintainer role.
+title: Overriding predefined CI/CD variables should be restricted.
 parent: Project Policies
 grand_parent: GitLab Policies
 ---
 
 
-## The ability to override predefined variables should be limited only to users with at least Maintainer role.
+## Overriding predefined CI/CD variables should be restricted.
 policy name: overriding_defined_variables_isnt_restricted
 
 severity: LOW
