@@ -347,7 +347,7 @@ repository_dismiss_stale_reviews := false {
 
 # METADATA
 # scope: rule
-# title: Overriding predefined variables should be restricted.
+# title: Overriding predefined CI/CD variables should be restricted.
 # description: It’s recommended to restrict users with low privileges from overriding predefined variables, as doing so could compromise the security and integrity of the CI/CD pipeline.
 # custom:
 #   remediationSteps:
