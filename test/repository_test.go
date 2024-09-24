@@ -751,3 +751,20 @@ func TestGitlabRepositoryDismissStaleReviews(t *testing.T) {
 		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
 	}
 }
+
+func TestGitlabRepositoryRestrictsOverrideVariables(t *testing.T) {
+	name := "Restrict Override Of Defined Variables"
+	testedPolicyName := "overriding_defined_variables_isnt_restricted"
+
+	makeMockData := func(flag bool) gitlabcollected.Repository {
+		return gitlabcollected.Repository{Project: &gitlab2.Project{RestrictUserDefinedVariables: flag}}
+	}
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+	for _, expectFailure := range bools {
+		flag := options[expectFailure]
+		repositoryTestTemplate(t, name, makeMockData(flag), testedPolicyName, expectFailure, scm_type.GitLab)
+	}
+}

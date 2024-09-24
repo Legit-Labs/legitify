@@ -344,3 +344,22 @@ default repository_dismiss_stale_reviews := true
 repository_dismiss_stale_reviews := false {
 	input.approval_configuration.reset_approvals_on_push
 }
+
+# METADATA
+# scope: rule
+# title: Overriding predefined CI/CD variables should be restricted.
+# description: It’s recommended to restrict users with low privileges from overriding predefined variables, as doing so could compromise the security and integrity of the CI/CD pipeline.
+# custom:
+#   remediationSteps:
+#     - 1. Make sure you have owner or maintainer permissions
+#     - 2. The remediation is available through the project's API (e.g., 'https://gitlab.com/api/v4/projects/<your-project-ID>')
+#     - 3. Set the 'restrict_user_defined_variables' attribute to TRUE (this attribute is FALSE by default)
+#     - 4. When 'restrict_user_defined_variables' is enabled, you can specify which role can override variables. This is done by setting the 'ci_pipeline_variables_minimum_override_role' attribute to one of: owner, maintainer, developer or no_one_allowed.
+#     - 5. For more information, you can check out gitlab's API documentation: https://docs.gitlab.com/ee/api/projects.html
+#   severity: LOW
+#   threat: Allowing overrides of predefined variables can result in unintentional misconfigurations of the CI/CD pipeline or deliberate tampering.
+default overriding_defined_variables_isnt_restricted := true
+
+overriding_defined_variables_isnt_restricted := false {
+	input.restrict_user_defined_variables
+}
