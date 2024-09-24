@@ -69,9 +69,9 @@ runs:
       shell: bash
       run: |
         echo "${{ inputs.ignore-policies }}" > "${GITHUB_ACTION_PATH}/ignored-policies"
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
-          node-version: '16'
+          node-version: '20'
 
     - id: analyze
       shell: bash
@@ -95,13 +95,13 @@ runs:
     - name: "Upload SARIF as Code Scanning Results"
       if: ${{ inputs.upload_code_scanning == 'true' }}
       continue-on-error: true
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: legitify-output.sarif
         category: "legitify-report"
     - name: "Upload outputs as Workflow Artifacts"
       if: ${{ steps.analyze.outputs.is_private == 'true' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact_name }}
         path: legitify-output.*
