@@ -544,7 +544,7 @@ review_dismissal_allowed := false {
 # title: Default Branch Should Restrict Who Can Push To It
 # description: By default, commits can be pushed directly to protected branches without going through a Pull Request. Restrict who can push commits to protected branches so that commits can be added only via merges, which require Pull Request.
 # custom:
-#    remediationSteps: 
+#    remediationSteps:
 #      - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
 #      - 1. Make sure you have admin permissions
 #      - 2. Go to the repo's settings page
@@ -566,6 +566,33 @@ pushes_are_not_restricted := false {
 
 pushes_are_not_restricted := false {
 	input.repository.default_branch.branch_protection_rule.restricts_pushes
+}
+
+# METADATA
+# scope: rule
+# title: Default Branch Should Enforce All Rules For Administrators
+# description: Branch protection rules are not enforced for administrators. It is recommended to enforce these rules for everyone, including administrators, to ensure all code changes follow the same quality and security standards regardless of contributor privilege level.
+# custom:
+#    remediationSteps:
+#      - "Note: The remediation steps apply to legacy branch protections, rules set-based protection should be updated from the rules set page"
+#      - 1. Make sure you have admin permissions
+#      - 2. Go to the repo's settings page
+#      - 3. Enter 'Branches' tab
+#      - 4. Under 'Branch protection rules'
+#      - 5. Click 'Edit' on the default branch rule
+#      - 6. Check 'Do not allow bypassing the above settings'
+#      - 7. Click 'Save changes'
+#    severity: MEDIUM
+#    requiredScopes: [repo]
+#    prerequisites: [has_branch_protection_permission]
+#    compliance:
+#      - SOC2: [CC4.1, CC4.2, CC5.2, CC5.3, CC6.1, CC6.2, CC6.3, CC6.6, CC6.7, CC7.1, CC7.2, CC7.3, CC8.1, CC9.2]
+#      - ISO27002: [5.2, 5.3, 5.12, 5.15, 5.18, 5.21, 5.24, 5.25, 5.26, 5.28, 5.33, 5.36, 5.37, 8.2, 8.3, 8.4, 8.6, 8.8, 8.9, 8.10, 8.12, 8.15, 8.16, 8.25, 8.28, 8.29, 8.32]
+#    threat: Administrators with bypass privileges can make unauthorized changes without going through established security controls such as code review, status checks, or commit signing. This creates an insider threat vector and reduces audit trail effectiveness, potentially allowing malicious code or vulnerable changes to reach production without oversight.
+default admin_enforcement_not_enabled := true
+
+admin_enforcement_not_enabled := false {
+	input.repository.default_branch.branch_protection_rule.is_admin_enforced
 }
 
 # METADATA
@@ -742,4 +769,29 @@ default secret_scanning_not_enabled := true
 
 secret_scanning_not_enabled := false{
     input.security_and_analysis.secret_scanning.status == "enabled"
+}
+
+# METADATA
+# scope: rule
+# title: Default Branch Should Be Named "main"
+# description: Repository default branch should be named "main" instead of "master" or other names. Using "main" as the default branch name aligns with modern naming conventions and promotes inclusive terminology in software development practices.
+# custom:
+#   remediationSteps:
+#     - 1. Make sure you have admin permissions
+#     - 2. Go to the repository settings page
+#     - 3. Under 'Code and automation', select 'Branches'
+#     - 4. Click the pencil icon next to the default branch name
+#     - 5. Type 'main' as the new branch name
+#     - 6. Click 'Rename branch'
+#     - 7. Update local clones and any CI/CD pipelines that reference the old branch name
+#   severity: LOW
+#   requiredScopes: [repo]
+#   compliance:
+#     - SOC2: [CC4.1, CC4.2, CC5.2, CC5.3, CC6.1, CC6.2, CC6.3, CC6.6, CC6.7, CC7.1, CC7.2, CC7.3, CC8.1, CC9.2]
+#     - ISO27002: [5.2, 5.3, 5.12, 5.15, 5.18, 5.21, 5.24, 5.25, 5.26, 5.28, 5.33, 5.36, 5.37, 8.2, 8.3, 8.4, 8.6, 8.8, 8.9, 8.10, 8.12, 8.15, 8.16, 8.25, 8.28, 8.29, 8.32]
+#   threat: Using outdated branch naming conventions may not align with organizational standards and modern development practices. Standardizing on "main" helps ensure consistency across repositories and demonstrates commitment to inclusive terminology.
+default default_branch_not_named_main := true
+
+default_branch_not_named_main := false {
+	input.repository.default_branch.name == "main"
 }
