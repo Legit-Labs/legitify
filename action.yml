@@ -67,8 +67,10 @@ runs:
 
     - id: create_ignore_policies_file
       shell: bash
+      env:
+        IGNORE_POLICIES: ${{ inputs.ignore-policies }}
       run: |
-        echo "${{ inputs.ignore-policies }}" > "${GITHUB_ACTION_PATH}/ignored-policies"
+        printf '%s\n' "$IGNORE_POLICIES" > "${GITHUB_ACTION_PATH}/ignored-policies"
     - uses: actions/setup-node@v4
       with:
           node-version: '20'
