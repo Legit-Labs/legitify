@@ -8,6 +8,7 @@ import (
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
+	"github.com/Legit-Labs/legitify/internal/common/permissions"
 )
 
 type organizationMockConfiguration struct {
@@ -16,6 +17,7 @@ type organizationMockConfiguration struct {
 	name       string
 	url        string
 	secrets    []*githubcollected.OrganizationSecret
+	org        *github.Organization
 }
 
 func newOrganizationMock(config organizationMockConfiguration) githubcollected.Organization {
@@ -37,8 +39,14 @@ func newOrganizationMock(config organizationMockConfiguration) githubcollected.O
 		orgSecrets = append(orgSecrets, config.secrets...)
 	}
 
+	var org *githubcollected.ExtendedOrg
+	if config.org != nil {
+		extended := githubcollected.NewExtendedOrg(config.org, permissions.OrgRoleNone)
+		org = &extended
+	}
+
 	return githubcollected.Organization{
-		Organization: nil,
+		Organization: org,
 		SamlEnabled:  &samlEnabledMockResult,
 		Hooks:        hooks,
 		OrgSecrets:   orgSecrets,
@@ -168,6 +176,66 @@ func TestOrganization(t *testing.T) {
 			shouldBeViolated: false,
 			args: organizationMockConfiguration{
 				secrets: nil,
+			},
+		},
+		{
+			name:             "two factor authentication required for the organization",
+			policyName:       "two_factor_authentication_not_required_for_org",
+			shouldBeViolated: false,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					TwoFactorRequirementEnabled: github.Bool(true),
+				},
+			},
+		},
+		{
+			name:             "two factor authentication not required for the organization",
+			policyName:       "two_factor_authentication_not_required_for_org",
+			shouldBeViolated: true,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					TwoFactorRequirementEnabled: github.Bool(false),
+				},
+			},
+		},
+		{
+			name:             "default repository permission is none",
+			policyName:       "default_repository_permission_is_not_none",
+			shouldBeViolated: false,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					DefaultRepoPermission: github.String("none"),
+				},
+			},
+		},
+		{
+			name:             "default repository permission grants read to every member",
+			policyName:       "default_repository_permission_is_not_none",
+			shouldBeViolated: true,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					DefaultRepoPermission: github.String("read"),
+				},
+			},
+		},
+		{
+			name:             "only admins can create public repositories",
+			policyName:       "non_admins_can_create_public_repositories",
+			shouldBeViolated: false,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					MembersCanCreatePublicRepos: github.Bool(false),
+				},
+			},
+		},
+		{
+			name:             "non admins can create public repositories",
+			policyName:       "non_admins_can_create_public_repositories",
+			shouldBeViolated: true,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					MembersCanCreatePublicRepos: github.Bool(true),
+				},
 			},
 		},
 	}

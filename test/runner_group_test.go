@@ -11,6 +11,7 @@ import (
 
 type runnerGroupMockConfiguration struct {
 	allowedByPublic bool
+	visibility      string
 }
 
 func newRunnerGroupMock(config runnerGroupMockConfiguration) githubcollected.RunnerGroup {
@@ -18,6 +19,7 @@ func newRunnerGroupMock(config runnerGroupMockConfiguration) githubcollected.Run
 		Organization: defaultOrg,
 		RunnerGroup: &github.RunnerGroup{
 			AllowsPublicRepositories: &config.allowedByPublic,
+			Visibility:               &config.visibility,
 		},
 	}
 }
@@ -46,6 +48,24 @@ func TestRunnerGroup(t *testing.T) {
 			shouldBeViolated: false,
 			args: runnerGroupMockConfiguration{
 				allowedByPublic: false,
+			},
+		},
+		{
+			name:             "runner group is limited to selected repositories",
+			policyName:       "runner_group_not_limited_to_selected_repositories",
+			scmType:          scm_type.GitHub,
+			shouldBeViolated: false,
+			args: runnerGroupMockConfiguration{
+				visibility: "selected",
+			},
+		},
+		{
+			name:             "runner group is available to all repositories",
+			policyName:       "runner_group_not_limited_to_selected_repositories",
+			scmType:          scm_type.GitHub,
+			shouldBeViolated: true,
+			args: runnerGroupMockConfiguration{
+				visibility: "all",
 			},
 		},
 	}
