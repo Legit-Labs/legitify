@@ -22,7 +22,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.4
-	github.com/thedevsaddam/gojsonq/v2 v2.5.2
 	github.com/vbauerster/mpb/v8 v8.4.0
 	github.com/xanzy/go-gitlab v0.83.0
 	golang.org/x/net v0.23.0
