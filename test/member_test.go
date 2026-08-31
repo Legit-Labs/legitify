@@ -7,7 +7,9 @@ import (
 	"github.com/Legit-Labs/legitify/internal/common/scm_type"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	gitlabcollected "github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
+	gitlab2 "github.com/xanzy/go-gitlab"
 )
 
 type memberMockConfiguration struct {
@@ -120,5 +122,45 @@ func TestMember(t *testing.T) {
 	for _, test := range tests {
 		PolicyTestTemplate(t, test.name, newMemberMock(test.args),
 			namespace.Member, test.policyName, test.shouldBeViolated, scm_type.GitHub)
+	}
+}
+
+func gitlabMemberTestTemplate(t *testing.T, name string, mockData interface{}, testedPolicyName string, expectFailure bool) {
+	PolicyTestTemplate(t, name, mockData, namespace.Member, testedPolicyName, expectFailure, scm_type.GitLab)
+}
+
+func TestGitlabCollaboratorTwoFactor(t *testing.T) {
+	name := "Collaborator Should Have Two-Factor Authentication Enabled"
+	testedPolicyName := "two_factor_authentication_is_disabled_for_a_collaborator"
+
+	makeMockData := func(twoFactorEnabled bool) gitlabcollected.Member {
+		return gitlabcollected.Member{User: &gitlab2.User{TwoFactorEnabled: twoFactorEnabled}}
+	}
+
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+
+	for _, expectFailure := range bools {
+		gitlabMemberTestTemplate(t, name, makeMockData(options[expectFailure]), testedPolicyName, expectFailure)
+	}
+}
+
+func TestGitlabExternalCollaboratorTwoFactor(t *testing.T) {
+	name := "External Collaborator Should Have Two-Factor Authentication Enabled"
+	testedPolicyName := "two_factor_authentication_is_disabled_for_an_external_collaborator"
+
+	makeMockData := func(twoFactorEnabled bool) gitlabcollected.Member {
+		return gitlabcollected.Member{User: &gitlab2.User{External: true, TwoFactorEnabled: twoFactorEnabled}}
+	}
+
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+
+	for _, expectFailure := range bools {
+		gitlabMemberTestTemplate(t, name, makeMockData(options[expectFailure]), testedPolicyName, expectFailure)
 	}
 }
