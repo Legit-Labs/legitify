@@ -393,6 +393,46 @@ func TestRepositorySecretScanning(t *testing.T) {
 	}
 }
 
+func TestRepositoryCodeReviewNotRequired(t *testing.T) {
+	name := "repository should require at least one review"
+	testedPolicyName := "code_review_not_required"
+	makeMockData := func(count int) githubcollected.Repository {
+		return makeRepoForBranchProtection(githubcollected.GitHubQLBranchProtectionRule{
+			RequiredApprovingReviewCount: github.Int(count),
+		})
+	}
+
+	options := map[bool]int{
+		false: 1,
+		true:  0,
+	}
+
+	for _, expectFailure := range bools {
+		repositoryTestTemplate(t, name, makeMockData(options[expectFailure]), testedPolicyName, expectFailure, scm_type.GitHub)
+	}
+}
+
+func TestRepositoryForkingAllowed(t *testing.T) {
+	name := "private repository should not allow forking"
+	testedPolicyName := "forking_allowed_for_repository"
+	makeMockData := func(forkingAllowed bool) githubcollected.Repository {
+		return makeRepo(githubcollected.GitHubQLRepository{
+			Name:           "REPO",
+			IsPrivate:      true,
+			ForkingAllowed: forkingAllowed,
+		})
+	}
+
+	options := map[bool]bool{
+		false: false,
+		true:  true,
+	}
+
+	for _, expectFailure := range bools {
+		repositoryTestTemplate(t, name, makeMockData(options[expectFailure]), testedPolicyName, expectFailure, scm_type.GitHub)
+	}
+}
+
 func TestGitlabRepositoryTooManyAdmins(t *testing.T) {
 	name := "Project Has Too Many Owners"
 	testedPolicyName := "project_has_too_many_admins"

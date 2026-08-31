@@ -40,7 +40,7 @@ jobs:
           args: "release --clean"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # ratchet:actions/upload-artifact@v7
         with:
           name: ${{ env.GORELEASER_ARTIFACTS_NAME }}
           path: |
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # ratchet:actions/download-artifact@v8
         with:
           name: ${{ env.GORELEASER_ARTIFACTS_NAME }}
           path: ${{ env.GORELEASER_ARTIFACTS_DOWNLOAD_PATH }}
@@ -126,7 +126,7 @@ jobs:
             tar -czvf "$currnet_archive_name" -C "$cli_path" *
             cp "$currnet_archive_name" ${{ env.SIGNED_ARTIFACTS_PATH }}
           done
-      - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # ratchet:actions/upload-artifact@v3
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # ratchet:actions/upload-artifact@v7
         with:
           name: ${{ env.SIGNED_MACOS_ARTIFACTS_NAME }}
           path: ${{ env.SIGNED_ARTIFACTS_PATH }}
@@ -152,11 +152,11 @@ jobs:
       - uses: 'actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b'
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # ratchet:actions/download-artifact@v8
         with:
           name: ${{ env.SIGNED_MACOS_ARTIFACTS_NAME }}
           path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
-      - uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # ratchet:actions/download-artifact@v3
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # ratchet:actions/download-artifact@v8
         with:
           name: ${{ env.GORELEASER_ARTIFACTS_NAME }}
           path: ${{ env.GORELEASER_ARTIFACTS_DOWNLOAD_PATH }}

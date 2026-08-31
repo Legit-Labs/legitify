@@ -7,7 +7,10 @@ import (
 	"time"
 
 	githubcollected "github.com/Legit-Labs/legitify/internal/collected/github"
+	gitlabcollected "github.com/Legit-Labs/legitify/internal/collected/gitlab_collected"
 	"github.com/Legit-Labs/legitify/internal/common/namespace"
+	"github.com/Legit-Labs/legitify/internal/common/permissions"
+	gitlab2 "github.com/xanzy/go-gitlab"
 )
 
 type organizationMockConfiguration struct {
@@ -16,6 +19,7 @@ type organizationMockConfiguration struct {
 	name       string
 	url        string
 	secrets    []*githubcollected.OrganizationSecret
+	org        *github.Organization
 }
 
 func newOrganizationMock(config organizationMockConfiguration) githubcollected.Organization {
@@ -37,8 +41,14 @@ func newOrganizationMock(config organizationMockConfiguration) githubcollected.O
 		orgSecrets = append(orgSecrets, config.secrets...)
 	}
 
+	var org *githubcollected.ExtendedOrg
+	if config.org != nil {
+		extended := githubcollected.NewExtendedOrg(config.org, permissions.OrgRoleNone)
+		org = &extended
+	}
+
 	return githubcollected.Organization{
-		Organization: nil,
+		Organization: org,
 		SamlEnabled:  &samlEnabledMockResult,
 		Hooks:        hooks,
 		OrgSecrets:   orgSecrets,
@@ -170,10 +180,128 @@ func TestOrganization(t *testing.T) {
 				secrets: nil,
 			},
 		},
+		{
+			name:             "two factor authentication required for the organization",
+			policyName:       "two_factor_authentication_not_required_for_org",
+			shouldBeViolated: false,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					TwoFactorRequirementEnabled: github.Bool(true),
+				},
+			},
+		},
+		{
+			name:             "two factor authentication not required for the organization",
+			policyName:       "two_factor_authentication_not_required_for_org",
+			shouldBeViolated: true,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					TwoFactorRequirementEnabled: github.Bool(false),
+				},
+			},
+		},
+		{
+			name:             "default repository permission is none",
+			policyName:       "default_repository_permission_is_not_none",
+			shouldBeViolated: false,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					DefaultRepoPermission: github.String("none"),
+				},
+			},
+		},
+		{
+			name:             "default repository permission grants read to every member",
+			policyName:       "default_repository_permission_is_not_none",
+			shouldBeViolated: true,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					DefaultRepoPermission: github.String("read"),
+				},
+			},
+		},
+		{
+			name:             "only admins can create public repositories",
+			policyName:       "non_admins_can_create_public_repositories",
+			shouldBeViolated: false,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					MembersCanCreatePublicRepos: github.Bool(false),
+				},
+			},
+		},
+		{
+			name:             "non admins can create public repositories",
+			policyName:       "non_admins_can_create_public_repositories",
+			shouldBeViolated: true,
+			args: organizationMockConfiguration{
+				org: &github.Organization{
+					MembersCanCreatePublicRepos: github.Bool(true),
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
 		PolicyTestTemplate(t, test.name, newOrganizationMock(test.args),
 			namespace.Organization, test.policyName, test.shouldBeViolated, scm_type.GitHub)
+	}
+}
+
+func gitlabGroupTestTemplate(t *testing.T, name string, mockData interface{}, testedPolicyName string, expectFailure bool) {
+	PolicyTestTemplate(t, name, mockData, namespace.Organization, testedPolicyName, expectFailure, scm_type.GitLab)
+}
+
+func TestGitlabGroupTwoFactorRequired(t *testing.T) {
+	name := "Group Should Require Two-Factor Authentication"
+	testedPolicyName := "two_factor_authentication_not_required_for_group"
+
+	makeMockData := func(flag bool) gitlabcollected.Organization {
+		return gitlabcollected.Organization{Group: &gitlab2.Group{RequireTwoFactorAuth: flag}}
+	}
+
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+
+	for _, expectFailure := range bools {
+		gitlabGroupTestTemplate(t, name, makeMockData(options[expectFailure]), testedPolicyName, expectFailure)
+	}
+}
+
+func TestGitlabGroupForkingOutsideNamespace(t *testing.T) {
+	name := "Group Should Prevent Forking To External Namespaces"
+	testedPolicyName := "collaborators_can_fork_repositories_to_external_namespaces"
+
+	makeMockData := func(flag bool) gitlabcollected.Organization {
+		return gitlabcollected.Organization{Group: &gitlab2.Group{PreventForkingOutsideGroup: flag}}
+	}
+
+	options := map[bool]bool{
+		false: true,
+		true:  false,
+	}
+
+	for _, expectFailure := range bools {
+		gitlabGroupTestTemplate(t, name, makeMockData(options[expectFailure]), testedPolicyName, expectFailure)
+	}
+}
+
+func TestGitlabGroupBranchProtection(t *testing.T) {
+	name := "Group Should Enforce Branch Protection By Default"
+	testedPolicyName := "group_does_not_enforce_branch_protection_by_default"
+
+	makeMockData := func(protection int) gitlabcollected.Organization {
+		return gitlabcollected.Organization{Group: &gitlab2.Group{DefaultBranchProtection: protection}}
+	}
+
+	options := map[bool]int{
+		false: 2,
+		true:  0,
+	}
+
+	for _, expectFailure := range bools {
+		gitlabGroupTestTemplate(t, name, makeMockData(options[expectFailure]), testedPolicyName, expectFailure)
 	}
 }
